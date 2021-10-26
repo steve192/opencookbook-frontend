@@ -1,15 +1,24 @@
 import React from 'react';
 import * as eva from '@eva-design/eva';
-import { ApplicationProvider, Layout, Text } from '@ui-kitten/components';
+import { ApplicationProvider, IconRegistry, TopNavigation } from '@ui-kitten/components';
+import { NavigationContainer } from '@react-navigation/native';
+import MainNavigation from './src/navigation/Navigation';
+import { EvaIconsPack } from '@ui-kitten/eva-icons';
+import { enableScreens } from 'react-native-screens'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
-const HomeScreen = () => (
-  <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-    <Text category='h1'>HOME</Text>
-  </Layout>
-);
+
+enableScreens()
+
 
 export default () => (
-  <ApplicationProvider {...eva} theme={eva.light}>
-    <HomeScreen />
-  </ApplicationProvider>
+  <>
+    <IconRegistry icons={EvaIconsPack} />
+        <ApplicationProvider {...eva} theme={eva.light}>
+          <NavigationContainer>
+            <MainNavigation />
+          </NavigationContainer>
+        </ApplicationProvider>
+  </>
 );
+
