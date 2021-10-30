@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@eva-design/eva": "^2.0.0",
+    "@expo/ngrok": "^4.1.0",
     "@react-native-masked-view/masked-view": "^0.2.6",
     "@react-navigation/bottom-tabs": "^5.11.7",
     "@react-navigation/drawer": "^5.11.4",
