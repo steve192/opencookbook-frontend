@@ -39,5 +39,5 @@ publish-expo:
     EXPO_TOKEN: $EXPO_TOKEN
   script:
     - npm ci
-    - npx expo login -u $EXPO_USERNAME -p $EXPO_TOKEN
+    - npx expo login
     - npm run expo-publish
