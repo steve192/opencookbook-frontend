@@ -1,8 +1,15 @@
 import axios from "axios";
 import Configuration from "../Configuration";
 
-
+export interface Recipe {
+    title: string;
+    neededIngredients: {ingredient: {id: number, name:string}, amount: number, unit: string}[];
+    preparationSteps: string[];
+}
 class RestAPI {
+    static createNewRecipe(newRecipeData: Recipe) {
+        alert(newRecipeData);
+    }
 
     private static serverUrl = Configuration.getBackendURL();
     private static authToken: string;
