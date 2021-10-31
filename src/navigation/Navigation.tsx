@@ -8,6 +8,7 @@ import WeeklyRecipeListScreen from '../screens/WeeklyRecipeListScreen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from '../screens/LoginScreen';
 import RecipeWizardScreen from '../screens/RecipeWizardScreen';
+import { RecipeScreen } from '../screens/RecipeScreen';
 
 const MainNavigation = () => {
     return (
@@ -34,6 +35,10 @@ const StackNavigator = () => {
             <Stack.Screen
                 name="RecipeWizardScreen"
                 component={RecipeWizardScreen}
+            />
+            <Stack.Screen
+                name="RecipeScreen"
+                component={RecipeScreen}
             />
         </Stack.Navigator>
     );
