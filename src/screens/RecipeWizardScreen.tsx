@@ -1,24 +1,21 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Avatar, Button, Icon, Input, Layout, StyleService } from '@ui-kitten/components';
+import { Avatar, Button, Icon, Input, Text, StyleService } from '@ui-kitten/components';
 import React, { useState } from 'react';
 import { ImageProps, View } from 'react-native';
 import { ScrollView } from 'react-native';
 import { StyleSheet } from 'react-native';
-import StepWizard, { StepWizardChildProps } from 'react-step-wizard';
+import RestAPI, { Recipe } from '../dao/RestAPI';
 import { MainNavigationProps } from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
 
-interface INewRecipe {
-    title: string;
-    preparationSteps: string[];
-}
+
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeWizardScreen'>;
 const RecipeWizardScreen = (props: Props) => {
 
     let [currentStep, setCurrentStep] = useState(0);
-    let [newRecipeData, setNewRecipeData] = useState<INewRecipe>({ title: "test", preparationSteps: ["test"] });
+    let [newRecipeData, setNewRecipeData] = useState<Recipe>({ title: "", neededIngredients: [{ingredient: {id: 0, name: ""}, amount: 0, unit: ""}], preparationSteps: [""] });
 
     const AddIcon = (props: Partial<ImageProps> | undefined) => (
         <Icon {...props} name="plus-outline" />
@@ -63,15 +60,34 @@ const RecipeWizardScreen = (props: Props) => {
                 return (
                     <View style={styles.contentContainer}>
                         <ScrollView style={CentralStyles.scrollView}>
+                            <Text>Ingredients</Text>
+                            {newRecipeData.neededIngredients.map((neededIngredient, ingredientIndex) => {
+                                <>
+                                    <Input
+                                        key={ingredientIndex}
+                                        value={neededIngredient.ingredient.name}
+                                        placeholder="Ingredient name" />
+                                    <Input
+                                        key={ingredientIndex}
+                                        value={neededIngredient.amount.toString() + " " + neededIngredient.unit}
+                                        placeholder="Amount and Unit" />
+
+                                    {ingredientIndex === newRecipeData.neededIngredients.length - 1 ? <Button accessoryLeft={AddIcon} onPress={addPreparationStep} /> : ""}
+                                </>
+                            })}
+
+                            <Text>Preparation Steps</Text>
                             {newRecipeData.preparationSteps.map((preparationStep, preparationStepIndex) =>
-                                <Input
-                                    key={preparationStepIndex}
-                                    multiline={true}
-                                    value={newRecipeData.preparationSteps[preparationStepIndex]}
-                                    onChangeText={newText => changeRecipeStep(newText, preparationStepIndex)}
-                                    placeholder="Add description of preparation step..." />
+                                <>
+                                    <Input
+                                        key={preparationStepIndex}
+                                        multiline={true}
+                                        value={newRecipeData.preparationSteps[preparationStepIndex]}
+                                        onChangeText={newText => changeRecipeStep(newText, preparationStepIndex)}
+                                        placeholder="Add description of preparation step..." />
+                                    {preparationStepIndex === newRecipeData.preparationSteps.length - 1 ? <Button accessoryLeft={AddIcon} onPress={addPreparationStep} /> : ""}
+                                </>
                             )}
-                            <Button accessoryLeft={AddIcon} onPress={addPreparationStep} />
                         </ScrollView>
                         <Button
                             size="giant"
@@ -82,6 +98,7 @@ const RecipeWizardScreen = (props: Props) => {
     };
 
     const createNewRecipe = () => {
+        RestAPI.createNewRecipe(newRecipeData);
         alert(JSON.stringify(newRecipeData));
     };
 
