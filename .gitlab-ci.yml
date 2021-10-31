@@ -35,6 +35,8 @@ publish-expo:
   stage: publish
   resource_group: qa
   image: node:16.13
+  variables:
+    - EXPO_TOKEN: $EXPO_TOKEN
   script:
     - npm ci
     - npx expo login -u $EXPO_USERNAME -p $EXPO_TOKEN
