@@ -6,7 +6,7 @@ stages:
 
 build-web:
   stage: build
-  image: node
+  image: node:16.13
   script: 
     - npm ci
     - npm run build-web
@@ -34,7 +34,7 @@ package-docker-qa:
 publish-expo:
   stage: publish
   resource_group: qa
-  image: node:alpine
+  image: node:16.13
   script:
     - npm ci
     - npx expo login -u $EXPO_USERNAME -p $EXPO_TOKEN
