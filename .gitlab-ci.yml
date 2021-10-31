@@ -1,0 +1,41 @@
+stages:
+  - build
+  - package
+  - publish
+
+
+build-web:
+  stage: build
+  image: node
+  script: 
+    - npm ci
+    - npm run build-web
+  artifacts:
+    paths:
+      - web-build/
+
+package-docker-qa:
+  stage: package
+  resource_group: qa
+  needs:
+    - job: build-web
+      artifacts: true
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  variables:
+    REGISTRY_TAG: qa
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$REGISTRY_TAG --cache=true --cache-ttl=100h
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+
+publish-expo:
+  stage: publish
+  resource_group: qa
+  image: node:alpine
+  script:
+    - npm ci
+    - npx expo login -u $EXPO_USERNAME -p $EXPO_TOKEN
+    - npm run expo-publish
