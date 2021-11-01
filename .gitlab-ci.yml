@@ -39,4 +39,4 @@ publish-expo:
     EXPO_TOKEN: $EXPO_TOKEN
   script:
     - npm ci
-    - npm run expo-publish
+    - npm run publish-expo
