@@ -58,9 +58,7 @@ const RecipeListScreen = (props: Props) => {
       footer={renderItemFooter}>
       <Image
         style={styles.containerImage}
-        source={{
-          uri: require("../assets/placeholder.png"),
-        }}
+        source={require("../assets/placeholder.png")}
       />
 
 
