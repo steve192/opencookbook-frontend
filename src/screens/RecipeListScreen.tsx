@@ -8,13 +8,6 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { StatusBar } from '../components/StatusBar';
 
-const addActions: IActionProps[] = [
-  {
-    text: "Add recipe",
-    name: "addRecipe"
-  }
-
-];
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<OverviewNavigationProps, "RecipesListScreen">,
@@ -25,28 +18,22 @@ const RecipeListScreen = (props: Props) => {
 
   const theme = useTheme();
 
-  const styles = StyleSheet.create({
-    container: {
-      // maxHeight: 320,
-      width: "100%"
+  const addActions: IActionProps[] = [
+    {
+      text: "Add recipe",
+      name: "addRecipe",
+      color: theme["color-primary-default"]
     },
-    contentContainer: {
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-    },
-    item: {
-      marginVertical: 4,
-    },
-    cardcontainer: {
-      flex: 1,
-      flexDirection: 'row',
-    },
-    containerImage: {
-      flex: 1,
-      width: undefined,
-      height: 100,
+    {
+      text: "Import recipe",
+      name: "imoprtRecipe",
+      color: theme["color-primary-default"]
     }
-  });
+  
+  ];
+  
+
+  
 
   const data = new Array(8).fill({
     title: 'Item',
@@ -108,5 +95,28 @@ const RecipeListScreen = (props: Props) => {
   )
 
 }
+
+const styles = StyleSheet.create({
+  container: {
+    // maxHeight: 320,
+    width: "100%"
+  },
+  contentContainer: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  item: {
+    marginVertical: 4,
+  },
+  cardcontainer: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  containerImage: {
+    flex: 1,
+    width: undefined,
+    height: 100,
+  }
+});
 
 export default RecipeListScreen;
