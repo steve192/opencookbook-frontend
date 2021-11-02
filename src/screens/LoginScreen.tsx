@@ -6,6 +6,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainNavigationProps } from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
 import Configuration from '../Configuration';
+import { Spacer } from '../components/Spacer';
 
 
 
@@ -49,10 +50,11 @@ const LoginScreen = ({ route, navigation }: Props) => {
             style={styles.container}
             source={require("../assets/login-screen.jpg")}>
             <View style={styles.loginContainer}>
-                <Text style={styles.title}>OpenCookbook</Text>
                 <Card style={styles.card}>
                     <Button onPress={() => setSettingsModalVisible(true)} status='basic' accessoryLeft={<Icon name="settings-outline" />} style={styles.settingsButton} />
+                    <Text style={styles.title}>OpenCookbook</Text>
                     <Input value={email} onChangeText={text => setEmail(text)} placeholder="E-Mail"></Input>
+                    <Spacer/>
                     <Input value={password} onChangeText={text => setPassword(text)} placeholder="Password" secureTextEntry={true} ></Input>
                     <Button style={CentralStyles.elementSpacing} onPress={onClick}>Login</Button>
                 </Card>
@@ -78,10 +80,10 @@ const styles = StyleSheet.create({
         marginBottom: 10
     },
     title: {
-        color: "white",
-        padding: 20,
+        paddingBottom: 20,
         fontWeight: "bold",
-        fontSize: 30
+        fontSize: 30,
+        textAlign: "center"
 
     },
     container: {
