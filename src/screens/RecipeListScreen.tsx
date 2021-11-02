@@ -1,11 +1,12 @@
 import React from 'react';
 import { StyleSheet, View, Image } from 'react-native';
-import { ApplicationProvider, Avatar, Card, Layout, List, Text, ListProps, Button } from '@ui-kitten/components';
+import { ApplicationProvider, Avatar, Card, Layout, List, Text, ListProps, Button, useTheme } from '@ui-kitten/components';
 import { FloatingAction, IActionProps } from 'react-native-floating-action';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { MainNavigationProps, OverviewNavigationProps } from '../navigation/NavigationRoutes';
 import { StackScreenProps } from '@react-navigation/stack';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { StatusBar } from '../components/StatusBar';
 
 const addActions: IActionProps[] = [
   {
@@ -21,8 +22,8 @@ type Props = CompositeScreenProps<
 >;
 
 const RecipeListScreen = (props: Props) => {
-  
 
+  const theme = useTheme();
 
   const styles = StyleSheet.create({
     container: {
@@ -88,18 +89,22 @@ const RecipeListScreen = (props: Props) => {
   }
 
   return (
-
-    <Layout style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'baseline' }}>
-      <Text category="h2">My Recipes</Text>
-      <List
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
-        data={data}
-        // numColumns={2}
-        renderItem={renderItem}
-      />
-      <FloatingAction actions={addActions} onPressItem={name => { props.navigation.push("RecipeWizardScreen") }}></FloatingAction>
-    </Layout>
+    <>
+      <StatusBar />
+      <Layout style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'baseline' }}>
+        <List
+          style={styles.container}
+          contentContainerStyle={styles.contentContainer}
+          data={data}
+          // numColumns={2}
+          renderItem={renderItem}
+        />
+        <FloatingAction
+          actions={addActions}
+          onPressItem={name => { props.navigation.push("RecipeWizardScreen") }}
+          color={theme["color-primary-default"]} />
+      </Layout>
+    </>
   )
 
 }

@@ -6,6 +6,7 @@ import MainNavigation from './src/navigation/Navigation';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import { enableScreens } from 'react-native-screens'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { myTheme } from './src/styles/custom-theme-light';
 
 
 enableScreens()
@@ -14,7 +15,7 @@ enableScreens()
 export default () => (
   <>
     <IconRegistry icons={EvaIconsPack} />
-        <ApplicationProvider {...eva} theme={eva.light}>
+        <ApplicationProvider {...eva} theme={myTheme}>
           <NavigationContainer>
             <MainNavigation />
           </NavigationContainer>
