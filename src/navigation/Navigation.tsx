@@ -6,7 +6,7 @@ import { FaCalendarWeek, FaThList } from 'react-icons/fa';
 import LoginScreen from '../screens/LoginScreen';
 import RecipeListScreen from '../screens/RecipeListScreen';
 import { RecipeScreen } from '../screens/RecipeScreen';
-import RecipeWizardScreen from '../screens/RecipeWizardScreen';
+import RecipeWizardScreen from '../screens/wizard-screen/RecipeWizardScreen';
 import WeeklyRecipeListScreen from '../screens/WeeklyRecipeListScreen';
 
 
@@ -38,6 +38,9 @@ const MainNavigation = () => {
                 <Stack.Screen
                     name="RecipeWizardScreen"
                     component={RecipeWizardScreen}
+                    options={{
+                        title: "Create recipe"
+                    }}
                 />
                 <Stack.Screen
                     name="RecipeScreen"
