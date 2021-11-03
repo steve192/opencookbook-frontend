@@ -1,8 +1,10 @@
+import { Recipe } from "../dao/RestAPI";
+
 export type MainNavigationProps = {
     LoginScreen: undefined
     OverviewScreen: undefined
     RecipeWizardScreen: undefined
-    RecipeScreen: undefined
+    RecipeScreen: {recipe: Recipe}
 };
 
 export type OverviewNavigationProps = {

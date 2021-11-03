@@ -66,7 +66,7 @@ const RecipeListScreen = (props: Props) => {
   );
 
   const openRecipe = (recipe: Recipe) => {
-    props.navigation.push("RecipeScreen");
+    props.navigation.push("RecipeScreen", {recipe: recipe});
   }
 
   const queryRecipes = () => {

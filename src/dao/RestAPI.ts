@@ -24,22 +24,26 @@ class RestAPI {
             {
                 title: "Demo recipe",
                 preparationSteps: ["Do stuff", "Do more stuff", "Done"],
-                neededIngredients: [{ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: ""}]
+                neededIngredients: [
+                    { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" },
+                    { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" },
+                    { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }
+                ]
             },
             {
                 title: "Demo recipe 2",
                 preparationSteps: ["Do stuff", "Do more stuff", "Done"],
-                neededIngredients: [{ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: ""}]
+                neededIngredients: [{ ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }]
             },
             {
                 title: "Demo recipe 3",
                 preparationSteps: ["Do stuff", "Do more stuff", "Done"],
-                neededIngredients: [{ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: ""}]
+                neededIngredients: [{ ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }]
             },
             {
                 title: "Demo recipe 4",
                 preparationSteps: ["Do stuff", "Do more stuff", "Done"],
-                neededIngredients: [{ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: ""}]
+                neededIngredients: [{ ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }]
             }
         ];
     }
