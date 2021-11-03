@@ -3,13 +3,14 @@ import Configuration from "../Configuration";
 
 
 export interface Ingredient {
-    id: number
+    id: number | undefined
     name: string
 }
 
 export interface IngredientUse {
-
-    ingredient: Ingredient, amount: number, unit: string
+    ingredient: Ingredient
+    amount: number | undefined
+    unit: string
 }
 export interface Recipe {
     title: string;

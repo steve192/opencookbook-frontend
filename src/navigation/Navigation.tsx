@@ -1,6 +1,6 @@
 import { BottomTabBarProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { BottomNavigation, BottomNavigationTab, useTheme } from '@ui-kitten/components';
+import { BottomNavigation, BottomNavigationTab, useTheme, Text } from '@ui-kitten/components';
 import React from 'react';
 import { FaCalendarWeek, FaThList } from 'react-icons/fa';
 import LoginScreen from '../screens/LoginScreen';
@@ -8,6 +8,7 @@ import RecipeListScreen from '../screens/RecipeListScreen';
 import { RecipeScreen } from '../screens/RecipeScreen';
 import RecipeWizardScreen from '../screens/wizard-screen/RecipeWizardScreen';
 import WeeklyRecipeListScreen from '../screens/WeeklyRecipeListScreen';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 
 
 
@@ -19,37 +20,41 @@ const MainNavigation = () => {
     const StackNavigator = () => {
         return (
             <>
-            <Stack.Navigator
-                screenOptions={{
-                    headerStyle: { backgroundColor: theme["color-primary-default"] },
-                    headerTintColor: theme["text-alternate-color"]
-                }}>
-                <Stack.Screen
-                    name="LoginScreen"
-                    component={LoginScreen}
-                    options={{ headerShown: false }} />
-                <Stack.Screen
-                    name="OverviewScreen"
-                    component={BottomTabNavigation}
-                    options={
-                        { headerShown: false }
-                    }
-                />
-                <Stack.Screen
-                    name="RecipeWizardScreen"
-                    component={RecipeWizardScreen}
-                    options={{
-                        title: "Create recipe"
-                    }}
-                />
-                <Stack.Screen
-                    name="RecipeScreen"
-                    component={RecipeScreen}
-                    options={
-                        { headerTransparent: true, headerStyle: {} }
-                    }
-                />
-            </Stack.Navigator>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"} 
+                    style={{flex: 1}}>
+                    <Stack.Navigator
+                        screenOptions={{
+                            headerStyle: { backgroundColor: theme["color-primary-default"] },
+                            headerTintColor: theme["text-alternate-color"]
+                        }}>
+                        <Stack.Screen
+                            name="LoginScreen"
+                            component={LoginScreen}
+                            options={{ headerShown: false }} />
+                        <Stack.Screen
+                            name="OverviewScreen"
+                            component={BottomTabNavigation}
+                            options={
+                                { headerShown: false }
+                            }
+                        />
+                        <Stack.Screen
+                            name="RecipeWizardScreen"
+                            component={RecipeWizardScreen}
+                            options={{
+                                title: "Create recipe"
+                            }}
+                        />
+                        <Stack.Screen
+                            name="RecipeScreen"
+                            component={RecipeScreen}
+                            options={
+                                { headerTransparent: true, headerStyle: {} }
+                            }
+                        />
+                    </Stack.Navigator>
+                </KeyboardAvoidingView>
             </>
         );
     }
