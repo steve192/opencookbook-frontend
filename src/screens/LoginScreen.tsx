@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Button, Card, Icon, Input, Layout, Modal, Text } from '@ui-kitten/components';
-import { ScrollView, View, StyleSheet, ImageBackground } from 'react-native';
+import { ScrollView, View, StyleSheet, ImageBackground, KeyboardAvoidingView, Platform } from 'react-native';
 import RestAPI from '../dao/RestAPI';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainNavigationProps } from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
 import Configuration from '../Configuration';
-import { Spacer } from '../components/Spacer';
+import Spacer from 'react-spacer';
+import { color } from 'react-native-reanimated';
 
 
 
@@ -49,22 +50,27 @@ const LoginScreen = ({ route, navigation }: Props) => {
         <ImageBackground
             style={styles.container}
             source={require("../assets/login-screen.jpg")}>
-            <View style={styles.loginContainer}>
-                <Card style={styles.card}>
-                    <Button onPress={() => setSettingsModalVisible(true)} status='basic' accessoryLeft={<Icon name="settings-outline" />} style={styles.settingsButton} />
-                    <Text style={styles.title}>OpenCookbook</Text>
-                    <Input value={email} onChangeText={text => setEmail(text)} placeholder="E-Mail"></Input>
-                    <Spacer/>
-                    <Input value={password} onChangeText={text => setPassword(text)} placeholder="Password" secureTextEntry={true} ></Input>
-                    <Button style={CentralStyles.elementSpacing} onPress={onClick}>Login</Button>
-                </Card>
+            <View style={{backgroundColor: "rgba(0, 0, 0, 0.45)", position: 'absolute', top: 0, left: 0, right:0, bottom: 0}}>
+                <View
+                    style={styles.container}>
+                    <Button status="control" onPress={() => setSettingsModalVisible(true)} accessoryLeft={<Icon name="settings-outline" />} style={styles.settingsButton} />
+                    <View style={styles.loginContainer}>
+                        <View style={styles.card}>
+                            <Text style={styles.title}>OpenCookbook</Text>
+                            <Input value={email} onChangeText={text => setEmail(text)} placeholder="E-Mail"></Input>
+                            <Spacer height={10} />
+                            <Input value={password} onChangeText={text => setPassword(text)} placeholder="Password" secureTextEntry={true} ></Input>
+                            <Button style={CentralStyles.elementSpacing} onPress={onClick}>Login</Button>
+                        </View>
+                    </View>
+                    {settingsModal}
+                </View>
             </View>
-            {settingsModal}
         </ImageBackground>
     )
 
 }
-
+StyleSheet.absoluteFill
 
 const styles = StyleSheet.create({
     backdrop: {
@@ -83,8 +89,8 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
         fontWeight: "bold",
         fontSize: 30,
-        textAlign: "center"
-
+        textAlign: "center",
+        color: "white"
     },
     container: {
         flex: 1,
@@ -100,7 +106,7 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
 });
 
