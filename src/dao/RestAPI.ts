@@ -23,9 +23,13 @@ class RestAPI {
         return [
             {
                 title: "Demo recipe",
-                preparationSteps: ["Do stuff", "Do more stuff", "Done"],
+                preparationSteps: [
+                    "Do stuff and prepare shit. This is a very long description with a lot of words in it\nIt also\n has multiple\n lines",
+                    "Do more stuff",
+                    "Bake the shit out of that thing\n also make sure to check every 30 seconds\nok?",
+                    "Done"],
                 neededIngredients: [
-                    { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" },
+                    { ingredient: { id: 0, name: "Eatable stuff with long name" }, amount: 1, unit: "Parts" },
                     { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" },
                     { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }
                 ]
