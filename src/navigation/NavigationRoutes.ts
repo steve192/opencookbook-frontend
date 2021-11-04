@@ -4,7 +4,7 @@ export type MainNavigationProps = {
     LoginScreen: undefined
     OverviewScreen: undefined
     RecipeWizardScreen: undefined
-    RecipeScreen: {recipe: Recipe}
+    RecipeScreen: {recipeId: number}
 };
 
 export type OverviewNavigationProps = {
