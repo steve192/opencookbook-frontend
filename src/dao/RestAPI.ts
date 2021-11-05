@@ -91,7 +91,7 @@ class RestAPI {
     private static authToken: string;
 
     static async authenticate(emailAddress: string, password: string): Promise<void> {
-        let response = await axios.post(this.url("/login"), {
+        let response = await axios.post(this.url("/users/login"), {
             emailAddress: emailAddress,
             password: password
         });
