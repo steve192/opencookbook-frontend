@@ -94,6 +94,10 @@ class RestAPI {
             emailAddress: emailAddress,
             password: password
         });
+
+        if (response.status > 299) {
+            throw Error("Error server responded with http" + response.status);
+        }
     }
 
     private static url(path: string): string {

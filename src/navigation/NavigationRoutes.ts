@@ -2,6 +2,7 @@ import { Recipe } from "../dao/RestAPI";
 
 export type MainNavigationProps = {
     LoginScreen: undefined
+    SignupScreen: undefined
     OverviewScreen: undefined
     RecipeWizardScreen: undefined
     RecipeScreen: {recipeId: number}

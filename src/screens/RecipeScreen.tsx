@@ -13,11 +13,11 @@ import RestAPI, { Recipe } from "../dao/RestAPI";
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
 export const RecipeScreen = (props: Props) => {
-    
+
     const [portions, setPortions] = useState<number>(1);
-    const [recipe, setRecipe]= useState<Recipe>();
-    
-    props.navigation.setOptions({ title: recipe ? recipe.title : "Loading"});
+    const [recipe, setRecipe] = useState<Recipe>();
+
+    props.navigation.setOptions({ title: recipe ? recipe.title : "Loading" });
     useEffect(() => {
         RestAPI.getRecipeById(props.route.params.recipeId)
             .then(setRecipe);
@@ -65,7 +65,7 @@ export const RecipeScreen = (props: Props) => {
                         <Text>{preparationStep}</Text>
                     </View>
                 </>
-            )): null}
+            )) : null}
         </>
     );
 
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         flexDirection: 'row',
-        
+
     },
 });
 

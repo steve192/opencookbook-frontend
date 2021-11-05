@@ -72,6 +72,7 @@ const RecipeWizardScreen = (props: Props) => {
     const createNewRecipe = () => {
         RestAPI.createNewRecipe(newRecipeData);
         alert(JSON.stringify(newRecipeData));
+        props.navigation.goBack();
     };
 
     const renderIngredientsSection = () =>

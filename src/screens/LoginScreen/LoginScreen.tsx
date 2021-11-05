@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Button, Card, Icon, Input, Layout, Modal, Text } from '@ui-kitten/components';
 import { ScrollView, View, StyleSheet, ImageBackground, KeyboardAvoidingView, Platform } from 'react-native';
-import RestAPI from '../dao/RestAPI';
+import RestAPI from '../../dao/RestAPI';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { MainNavigationProps } from '../navigation/NavigationRoutes';
-import CentralStyles from '../styles/CentralStyles';
-import Configuration from '../Configuration';
+import { MainNavigationProps } from '../../navigation/NavigationRoutes';
+import CentralStyles from '../../styles/CentralStyles';
+import Configuration from '../../Configuration';
 import Spacer from 'react-spacer';
 import { color } from 'react-native-reanimated';
+import { LoginBackdrop } from './LoginBackdrop';
 
 
 
@@ -31,9 +32,9 @@ const LoginScreen = ({ route, navigation }: Props) => {
     const settingsModal = (
         <Modal
             visible={settingsModalVisible}
-            backdropStyle={styles.backdrop}
+            backdropStyle={styles.modalBackdrop}
             onBackdropPress={() => setSettingsModalVisible(false)}>
-            <Card disabled={true} style={styles.card}>
+            <Card disabled={true} style={styles.innerLoginContainer}>
                 <Text>Server URL</Text>
                 <Input value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
                 <Button onPress={() => {
@@ -47,34 +48,45 @@ const LoginScreen = ({ route, navigation }: Props) => {
     )
 
     return (
-        <ImageBackground
-            style={styles.container}
-            source={require("../assets/login-screen.jpg")}>
-            <View style={{backgroundColor: "rgba(0, 0, 0, 0.45)", position: 'absolute', top: 0, left: 0, right:0, bottom: 0}}>
-                <View
-                    style={styles.container}>
-                    <Button status="control" onPress={() => setSettingsModalVisible(true)} accessoryLeft={<Icon name="settings-outline" />} style={styles.settingsButton} />
-                    <View style={styles.loginContainer}>
-                        <View style={styles.card}>
-                            <Text style={styles.title}>OpenCookbook</Text>
-                            <Input value={email} onChangeText={text => setEmail(text)} placeholder="E-Mail"></Input>
-                            <Spacer height={10} />
-                            <Input value={password} onChangeText={text => setPassword(text)} placeholder="Password" secureTextEntry={true} ></Input>
-                            <Button style={CentralStyles.elementSpacing} onPress={onClick}>Login</Button>
-                        </View>
+        <LoginBackdrop>
+            <Button status="control" onPress={() => setSettingsModalVisible(true)} accessoryLeft={<Icon name="settings-outline" />} style={styles.settingsButton} />
+            <View style={styles.loginContainer}>
+                <View style={styles.innerLoginContainer}>
+                    <Text style={styles.title}>OpenCookbook</Text>
+                    <Input value={email} onChangeText={text => setEmail(text)} placeholder="E-Mail"></Input>
+                    <Spacer height={10} />
+                    <Input value={password} onChangeText={text => setPassword(text)} placeholder="Password" secureTextEntry={true} />
+                    <View style={styles.forgotPasswordContainer}>
+                        <Button
+                            appearance='ghost'
+                            status='basic'
+                            onPress={() => null}>
+                            Forgot your password?
+                        </Button>
                     </View>
-                    {settingsModal}
+                    <Button style={CentralStyles.elementSpacing} onPress={onClick}>Login</Button>
+                    <Button
+                        appearance='ghost'
+                        status='basic'
+                        onPress={() => navigation.navigate("SignupScreen")}
+                    >
+                        Don't have an account? Create
+                    </Button>
                 </View>
             </View>
-        </ImageBackground>
+            {settingsModal}
+        </LoginBackdrop>
     )
 
 }
-StyleSheet.absoluteFill
 
 const styles = StyleSheet.create({
-    backdrop: {
+    modalBackdrop: {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    forgotPasswordContainer: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
     },
     settingsButton: {
         width: 16,
@@ -92,12 +104,7 @@ const styles = StyleSheet.create({
         textAlign: "center",
         color: "white"
     },
-    container: {
-        flex: 1,
-        paddingVertical: 24,
-        paddingHorizontal: 16,
-    },
-    card: {
+    innerLoginContainer: {
         maxWidth: 500,
         width: "100%",
         // opacity: 0.8

@@ -3,12 +3,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { BottomNavigation, BottomNavigationTab, useTheme, Text } from '@ui-kitten/components';
 import React from 'react';
 import { FaCalendarWeek, FaThList } from 'react-icons/fa';
-import LoginScreen from '../screens/LoginScreen';
+import LoginScreen from '../screens/LoginScreen/LoginScreen';
 import RecipeListScreen from '../screens/RecipeListScreen';
 import { RecipeScreen } from '../screens/RecipeScreen';
 import RecipeWizardScreen from '../screens/wizard-screen/RecipeWizardScreen';
 import WeeklyRecipeListScreen from '../screens/WeeklyRecipeListScreen';
 import { KeyboardAvoidingView, Platform } from 'react-native';
+import { SignupScreen } from '../screens/LoginScreen/SignupScreen';
 
 
 
@@ -31,6 +32,10 @@ const MainNavigation = () => {
                         <Stack.Screen
                             name="LoginScreen"
                             component={LoginScreen}
+                            options={{ headerShown: false }} />
+                            <Stack.Screen
+                            name="SignupScreen"
+                            component={SignupScreen}
                             options={{ headerShown: false }} />
                         <Stack.Screen
                             name="OverviewScreen"
