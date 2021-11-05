@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import Configuration from "../Configuration";
 
 
@@ -66,15 +66,26 @@ class RestAPI {
             }
         ];
     }
+
+    static axiosConfig(): AxiosRequestConfig {
+        return {
+            headers: {"Authorization": "Bearer " + this.authToken}
+        }
+    }
     static async getIngredients(filter: string = ""): Promise<Ingredient[]> {
         //TODO: Implement API call
-        return [
-            { id: 1, name: "Zwiebel" },
-            { id: 2, name: "Knoblauch" }
-        ];
+        let response = await axios.get(this.url("/ingredients"), this.axiosConfig());
+        if (response.status > 299) {
+            throw Error("Server error");
+        }
+        return response.data;
     }
     static async createNewRecipe(newRecipeData: Recipe) {
-        alert(newRecipeData);
+        let response = await axios.post(this.url("/recipes"),newRecipeData, this.axiosConfig());
+
+        if (response.status > 299) {
+            throw Error("Server responded with http " + response.status);
+        }
     }
 
     private static serverUrl = Configuration.getBackendURL();
@@ -85,7 +96,12 @@ class RestAPI {
             emailAddress: emailAddress,
             password: password
         });
-        this.authToken = response.headers["Authentification"]
+
+        if (response.status > 299) {
+            throw Error("Server responded with http " + response.status);
+        }
+
+        this.authToken = response.data.token;
 
     }
 
