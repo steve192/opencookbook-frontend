@@ -88,7 +88,6 @@ class RestAPI {
         }
     }
 
-    private static serverUrl = Configuration.getBackendURL();
     private static authToken: string;
 
     static async authenticate(emailAddress: string, password: string): Promise<void> {
@@ -117,7 +116,7 @@ class RestAPI {
     }
 
     private static url(path: string): string {
-        return RestAPI.serverUrl + path;
+        return Configuration.getApiRoute() + path;
     }
 }
 

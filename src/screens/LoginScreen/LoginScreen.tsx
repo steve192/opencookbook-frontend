@@ -20,11 +20,14 @@ const LoginScreen = ({ route, navigation }: Props) => {
     const [password, setPassword] = useState<string>("");
     const [settingsModalVisible, setSettingsModalVisible] = useState<boolean>(false);
     const [serverUrl, setServerUrl] = useState<string>(Configuration.getBackendURL());
+    const [apiErrorMessage, setApiErrorMessage] = useState<string>();
 
-    const onClick = () => {
-        navigation.navigate('OverviewScreen');
+    const doLogin = () => {
+
         RestAPI.authenticate(email, password).then(() => {
-        }).catch(() => {
+            navigation.navigate('OverviewScreen');
+        }).catch((error: Error) => {
+            setApiErrorMessage(error.toString());
         });
 
     };
@@ -64,7 +67,8 @@ const LoginScreen = ({ route, navigation }: Props) => {
                             Forgot your password?
                         </Button>
                     </View>
-                    <Button style={CentralStyles.elementSpacing} onPress={onClick}>Login</Button>
+                    <Button style={CentralStyles.elementSpacing} onPress={doLogin}>Login</Button>
+                    {apiErrorMessage ? <Text status="danger">{apiErrorMessage}</Text> : null}
                     <Button
                         appearance='ghost'
                         status='basic'
