@@ -105,7 +105,7 @@ class RestAPI {
     }
 
     static async registerUser(emailAddress: string, password: string) {
-        let response = await axios.post(this.url(Configuration.getApiRoute() + "/users/signup"), {
+        let response = await axios.post(this.url("/users/signup"), {
             emailAddress: emailAddress,
             password: password
         });
