@@ -42,11 +42,13 @@ export const RecipeScreen = (props: Props) => {
                     <Button
                         style={CentralStyles.iconButton}
                         size='tiny'
+                        onPress={() => setPortions(portions - 1)}
                         accessoryLeft={<MinusIcon />} />
                     <Text style={{ paddingHorizontal: 20 }}> {portions} Portions</Text>
                     <Button
                         style={CentralStyles.iconButton}
                         size='tiny'
+                        onPress={() => setPortions(portions + 1)}
                         accessoryLeft={<PlusIcon />} />
                 </View>
             </View>
