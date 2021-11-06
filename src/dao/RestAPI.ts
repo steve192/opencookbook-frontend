@@ -116,7 +116,7 @@ class RestAPI {
     }
 
     private static url(path: string): string {
-        return Configuration.getApiRoute() + path;
+        return Configuration.getBackendURL() + Configuration.getApiRoute() + path;
     }
 }
 
