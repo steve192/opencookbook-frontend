@@ -13,58 +13,71 @@ export interface IngredientUse {
     unit: string
 }
 export interface Recipe {
+    id : number
     title: string;
     neededIngredients: IngredientUse[];
     preparationSteps: string[];
 }
 class RestAPI {
     static async getRecipeById(recipeId: number): Promise<Recipe> {
-        return {
-            title: "Demo recipe",
-            preparationSteps: [
-                "Do stuff and prepare shit. This is a very long description with a lot of words in it\nIt also\n has multiple\n lines",
-                "Do more stuff",
-                "Bake the shit out of that thing\n also make sure to check every 30 seconds\nok?",
-                "Done"],
-            neededIngredients: [
-                { ingredient: { id: 0, name: "Eatable stuff with long name" }, amount: 1, unit: "Parts" },
-                { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" },
-                { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }
-            ]
+        const response = await axios.get(this.url(`/recipes/${recipeId}`), this.axiosConfig());
+        if (response.status > 299) {
+            throw new Error();
         }
+
+        return response.data;
+        // return {
+        //     id : 1,
+        //     title: "Demo recipe",
+        //     preparationSteps: [
+        //         "Do stuff and prepare shit. This is a very long description with a lot of words in it\nIt also\n has multiple\n lines",
+        //         "Do more stuff",
+        //         "Bake the shit out of that thing\n also make sure to check every 30 seconds\nok?",
+        //         "Done"],
+        //     neededIngredients: [
+        //         { ingredient: { id: 0, name: "Eatable stuff with long name" }, amount: 1, unit: "Parts" },
+        //         { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" },
+        //         { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }
+        //     ]
+        // }
     }
     static async getRecipes(): Promise<Recipe[]> {
-        //TODO: Implement API call
-        return [
-            {
-                title: "Demo recipe",
-                preparationSteps: [
-                    "Do stuff and prepare shit. This is a very long description with a lot of words in it\nIt also\n has multiple\n lines",
-                    "Do more stuff",
-                    "Bake the shit out of that thing\n also make sure to check every 30 seconds\nok?",
-                    "Done"],
-                neededIngredients: [
-                    { ingredient: { id: 0, name: "Eatable stuff with long name" }, amount: 1, unit: "Parts" },
-                    { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" },
-                    { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }
-                ]
-            },
-            {
-                title: "Demo recipe 2",
-                preparationSteps: ["Do stuff", "Do more stuff", "Done"],
-                neededIngredients: [{ ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }]
-            },
-            {
-                title: "Demo recipe 3",
-                preparationSteps: ["Do stuff", "Do more stuff", "Done"],
-                neededIngredients: [{ ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }]
-            },
-            {
-                title: "Demo recipe 4",
-                preparationSteps: ["Do stuff", "Do more stuff", "Done"],
-                neededIngredients: [{ ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }]
-            }
-        ];
+        const response = await axios.get(this.url("/recipes"), this.axiosConfig());
+        if (response.status > 299) {
+            throw new Error();
+        }
+
+        return response.data;
+        // return [
+        //     {
+        //         title: "Demo recipe",
+        //         preparationSteps: [
+        //             "Do stuff and prepare shit. This is a very long description with a lot of words in it\nIt also\n has multiple\n lines",
+        //             "Do more stuff",
+        //             "Bake the shit out of that thing\n also make sure to check every 30 seconds\nok?",
+        //             "Done"],
+        //         neededIngredients: [
+        //             { ingredient: { id: 0, name: "Eatable stuff with long name" }, amount: 1, unit: "Parts" },
+        //             { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" },
+        //             { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }
+        //         ]
+        //     },
+        //     {
+        //         title: "Demo recipe 2",
+        //         preparationSteps: ["Do stuff", "Do more stuff", "Done"],
+        //         neededIngredients: [{ ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }]
+        //     },
+        //     {
+        //         title: "Demo recipe 3",
+        //         preparationSteps: ["Do stuff", "Do more stuff", "Done"],
+        //         neededIngredients: [{ ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }]
+        //     },
+        //     {
+        //         title: "Demo recipe 4",
+        //         preparationSteps: ["Do stuff", "Do more stuff", "Done"],
+        //         neededIngredients: [{ ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }]
+        //     }
+        // ];
     }
 
     static axiosConfig(): AxiosRequestConfig {

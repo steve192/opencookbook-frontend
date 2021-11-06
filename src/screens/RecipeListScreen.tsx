@@ -66,7 +66,7 @@ const RecipeListScreen = (props: Props) => {
   );
 
   const openRecipe = (recipe: Recipe) => {
-    props.navigation.push("RecipeScreen", {recipe: recipe});
+    props.navigation.push("RecipeScreen", {recipeId: recipe.id});
   }
 
   const queryRecipes = () => {
@@ -74,7 +74,7 @@ const RecipeListScreen = (props: Props) => {
       .then(setMyRecipes);
   }
 
-  useEffect(queryRecipes);
+  useEffect(queryRecipes, []);
 
   return (
     <>
