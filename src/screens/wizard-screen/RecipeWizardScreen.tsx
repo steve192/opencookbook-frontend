@@ -15,12 +15,11 @@ import { RecipeFormField } from './PreparationStepFormField';
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeWizardScreen'>;
 const RecipeWizardScreen = (props: Props) => {
 
-    let [newRecipeData, setNewRecipeData] = useState<Recipe>({ title: "", neededIngredients: [{ ingredient: { id: 0, name: "" }, amount: 0, unit: "" }], preparationSteps: [""] });
-
-
-
-
-
+    let [newRecipeData, setNewRecipeData] = useState<Recipe>({ 
+        title: "", 
+        neededIngredients: [{ ingredient: { name: "" }, amount: 0, unit: "" }], 
+        preparationSteps: [""] 
+    });
 
     const AddIcon = (props: Partial<ImageProps> | undefined) => (
         <Icon {...props} name="plus-outline" />
@@ -132,10 +131,10 @@ const RecipeWizardScreen = (props: Props) => {
                         <Text category="label">Preparation Steps</Text>
                         {renderPreparationStepsSection()}
                     </View>
-                </ScrollView>
                 <Button
                     size="giant"
                     onPress={() => createNewRecipe()}>Create</Button>
+                </ScrollView>
             </View>
         </>
     )

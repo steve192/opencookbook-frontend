@@ -21,12 +21,11 @@ export const IngredientFormField = (props: Props ) => {
 
     const setIngredient = (text: string) => {
         setIngredientQuery(text);
-        //TODO: Wait for API results
         const existingIngredient = availableIngredients.find(ingredient => ingredient.name.toLowerCase() === ingredientQuery.toLowerCase());
         if (existingIngredient) {
             props.onIngredientChange({ ingredient: existingIngredient, amount: amount, unit: unit });
         } else {
-            props.onIngredientChange({ ingredient: { id: 0, name: text }, amount: amount, unit: unit });
+            props.onIngredientChange({ ingredient: { name: text }, amount: amount, unit: unit });
         }
     };
 

@@ -3,17 +3,17 @@ import Configuration from "../Configuration";
 
 
 export interface Ingredient {
-    id: number | undefined
+    id?: number 
     name: string
 }
 
 export interface IngredientUse {
     ingredient: Ingredient
-    amount: number | undefined
+    amount: number
     unit: string
 }
 export interface Recipe {
-    id : number
+    id?: number
     title: string;
     neededIngredients: IngredientUse[];
     preparationSteps: string[];
@@ -48,41 +48,11 @@ class RestAPI {
         }
 
         return response.data;
-        // return [
-        //     {
-        //         title: "Demo recipe",
-        //         preparationSteps: [
-        //             "Do stuff and prepare shit. This is a very long description with a lot of words in it\nIt also\n has multiple\n lines",
-        //             "Do more stuff",
-        //             "Bake the shit out of that thing\n also make sure to check every 30 seconds\nok?",
-        //             "Done"],
-        //         neededIngredients: [
-        //             { ingredient: { id: 0, name: "Eatable stuff with long name" }, amount: 1, unit: "Parts" },
-        //             { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" },
-        //             { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }
-        //         ]
-        //     },
-        //     {
-        //         title: "Demo recipe 2",
-        //         preparationSteps: ["Do stuff", "Do more stuff", "Done"],
-        //         neededIngredients: [{ ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }]
-        //     },
-        //     {
-        //         title: "Demo recipe 3",
-        //         preparationSteps: ["Do stuff", "Do more stuff", "Done"],
-        //         neededIngredients: [{ ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }]
-        //     },
-        //     {
-        //         title: "Demo recipe 4",
-        //         preparationSteps: ["Do stuff", "Do more stuff", "Done"],
-        //         neededIngredients: [{ ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }]
-        //     }
-        // ];
     }
 
     static axiosConfig(): AxiosRequestConfig {
         return {
-            headers: {"Authorization": "Bearer " + this.authToken}
+            headers: { "Authorization": "Bearer " + this.authToken }
         }
     }
     static async getIngredients(filter: string = ""): Promise<Ingredient[]> {
@@ -94,7 +64,7 @@ class RestAPI {
         return response.data;
     }
     static async createNewRecipe(newRecipeData: Recipe) {
-        let response = await axios.post(this.url("/recipes"),newRecipeData, this.axiosConfig());
+        let response = await axios.post(this.url("/recipes"), newRecipeData, this.axiosConfig());
 
         if (response.status > 299) {
             throw Error("Server responded with http " + response.status);
@@ -114,7 +84,12 @@ class RestAPI {
         }
 
         this.authToken = response.data.token;
+        Configuration.setAuthToken(response.data.token);
 
+    }
+
+    static async isAuthTokenValid(token: string) {
+        return true;
     }
 
     static async registerUser(emailAddress: string, password: string) {
