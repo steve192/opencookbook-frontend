@@ -8,6 +8,7 @@ import { MainNavigationProps } from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
 import { IngredientFormField } from './IngridientFromField';
 import { RecipeFormField } from './PreparationStepFormField';
+import * as ImagePicker from 'expo-image-picker';
 
 
 
@@ -15,10 +16,11 @@ import { RecipeFormField } from './PreparationStepFormField';
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeWizardScreen'>;
 const RecipeWizardScreen = (props: Props) => {
 
-    let [newRecipeData, setNewRecipeData] = useState<Recipe>({ 
-        title: "", 
-        neededIngredients: [{ ingredient: { name: "" }, amount: 0, unit: "" }], 
-        preparationSteps: [""] 
+    let [newRecipeData, setNewRecipeData] = useState<Recipe>({
+        title: "",
+        neededIngredients: [{ ingredient: { name: "" }, amount: 0, unit: "" }],
+        preparationSteps: [""],
+        images: []
     });
 
     const AddIcon = (props: Partial<ImageProps> | undefined) => (
@@ -55,7 +57,7 @@ const RecipeWizardScreen = (props: Props) => {
         ingredientsCopy.push({
             ingredient: { id: undefined, name: "" },
             unit: "",
-            amount: undefined
+            amount: 1
         });
         setNewRecipeData({ ...newRecipeData, neededIngredients: ingredientsCopy })
     }
@@ -103,6 +105,26 @@ const RecipeWizardScreen = (props: Props) => {
             <Button size="small" key="addStep" accessoryLeft={AddIcon} onPress={addPreparationStep} />
         </>
 
+    const selectImage = async () => {
+        // Ask the user for the permission to access the media library 
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+        if (!permissionResult.granted) {
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync();
+
+        if (result.cancelled) {
+            return;
+        }
+
+
+        alert(JSON.stringify(result));
+        await RestAPI.uploadImage(result.uri);
+
+
+    };
 
     return (
         <>
@@ -112,12 +134,20 @@ const RecipeWizardScreen = (props: Props) => {
                         <ViewPager
                             selectedIndex={0}
                             style={styles.recipeImage}>
-                            <Avatar
-                                key={0 + "image"}
-                                source={require('../../assets/placeholder.png')}
-                                style={styles.recipeImage} />
+
+                            {newRecipeData.images.length === 0 ?
+                                <Avatar
+                                    source={require('../../assets/placeholder.png')}
+                                    style={styles.recipeImage} /> :
+
+                                newRecipeData.images.map((image, imageIndex) =>
+                                    <Avatar
+                                        key={imageIndex + "image"}
+                                        source={require('../../assets/placeholder.png')}
+                                        style={styles.recipeImage} />
+                                )}
                         </ViewPager>
-                        <Button style={styles.imageButton} status="basic" accessoryLeft={<Icon name="camera" />} />
+                        <Button onPress={selectImage} style={styles.imageButton} status="basic" accessoryLeft={<Icon name="camera" />} />
                     </View>
                     <View style={[styles.formContainer, CentralStyles.elementSpacing]}>
                         <Text category="label">Title</Text>
@@ -131,9 +161,9 @@ const RecipeWizardScreen = (props: Props) => {
                         <Text category="label">Preparation Steps</Text>
                         {renderPreparationStepsSection()}
                     </View>
-                <Button
-                    size="giant"
-                    onPress={() => createNewRecipe()}>Create</Button>
+                    <Button
+                        size="giant"
+                        onPress={() => createNewRecipe()}>Create</Button>
                 </ScrollView>
             </View>
         </>

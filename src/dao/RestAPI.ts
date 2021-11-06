@@ -3,7 +3,7 @@ import Configuration from "../Configuration";
 
 
 export interface Ingredient {
-    id?: number 
+    id?: number
     name: string
 }
 
@@ -17,8 +17,25 @@ export interface Recipe {
     title: string;
     neededIngredients: IngredientUse[];
     preparationSteps: string[];
+    images: { uuid: String }[];
 }
 class RestAPI {
+    static async uploadImage(uri: string) {
+        const formData = new FormData();
+        formData.append("image", new Blob([uri], {type : ""}));
+
+        let response = await axios.post(this.url("/recipes-images"), formData,
+            {
+                ...this.axiosConfig(),
+                headers: {
+                    ...this.axiosConfig().headers,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+        if (response.status > 299) {
+            throw new Error();
+        }
+    }
     static async getRecipeById(recipeId: number): Promise<Recipe> {
         const response = await axios.get(this.url(`/recipes/${recipeId}`), this.axiosConfig());
         if (response.status > 299) {
