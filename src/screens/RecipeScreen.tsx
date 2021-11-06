@@ -28,12 +28,12 @@ export const RecipeScreen = (props: Props) => {
     const renderIngredientsSection = () => (
         <>
             <Text category="label">Ingredients</Text>
-            <View style={{ flex: 1, flexDirection: "row" }}>
-                <View style={{ flex: 1 }}>
+            <View style={{ flexDirection: "row", flexWrap:"wrap" }}>
+                <View style={{  }}>
                     {recipe ? recipe.neededIngredients.map(ingredient =>
-                        <View style={{ flex: 1, flexDirection: "row" }}>
-                            <Text style={{ color: theme["color-primary-default"], fontWeight: "bold", marginRight: 20 }}>{ingredient.amount + ingredient.unit}</Text>
-                            <Text >{ingredient.ingredient.name}</Text>
+                        <View style={{ display: "flex", flexDirection:"row", alignItems: "stretch"}}>
+                            <Text style={{ flexGrow: 1, color: theme["color-primary-default"], fontWeight: "bold" }}>{`${ingredient.amount} ${ingredient.unit}`}</Text>
+                            <Text style={{flexGrow: 1}} >{ingredient.ingredient.name}</Text>
                         </View>
                     ) : null}
                 </View>
