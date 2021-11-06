@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
         width: 16,
         height: 16,
         alignSelf: "flex-end",
-        right: 0,
+        right: 16,
         top: 0,
         borderRadius: 24,
         marginBottom: 10
@@ -118,6 +118,9 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
+        marginLeft: 16,
+        marginRight: 16
+
     },
 });
 

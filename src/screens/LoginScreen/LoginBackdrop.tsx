@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { ImageBackground, StyleSheet, View } from 'react-native';
+import { SafeAreaInsetsContext } from 'react-native-safe-area-context';
 
 
 
@@ -10,7 +11,12 @@ export const LoginBackdrop: FunctionComponent = (props) => {
             style={styles.container}
             source={require("../../assets/login-screen.jpg")}>
             <View style={{ backgroundColor: "rgba(0, 0, 0, 0.45)", position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
-                {props.children}
+                <>
+                    <SafeAreaInsetsContext.Consumer>
+                        {insets => insets ? <View style={{ paddingTop: insets.top }} /> : null}
+                    </SafeAreaInsetsContext.Consumer>
+                    {props.children}
+                </>
             </View>
         </ImageBackground>
     )
@@ -18,7 +24,7 @@ export const LoginBackdrop: FunctionComponent = (props) => {
 }
 
 const styles = StyleSheet.create({
- 
+
     container: {
         flex: 1,
         paddingVertical: 24,
