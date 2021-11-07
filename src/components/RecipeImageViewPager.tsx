@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         width: "100%",
         height: "100%",
-        backgroundColor: "rgb(161 161 161)"
+        backgroundColor: "rgb(161, 161, 161)"
     },
     imageButton: {
         position: "absolute",
