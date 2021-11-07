@@ -93,6 +93,7 @@ const RecipeWizardScreen = (props: Props) => {
                     onIngredientChange={(ingredient) => changeIngredient(ingredientIndex, ingredient)}
                     onRemovePress={() => removeIngredient(ingredientIndex)} />
             )}
+            <Spacer height={10} />
             <Button size="small" key="addIngredient" accessoryLeft={AddIcon} onPress={addIngredient} />
         </>
 
@@ -109,6 +110,7 @@ const RecipeWizardScreen = (props: Props) => {
                     onChangeText={newText => changePreparationStep(newText, preparationStepIndex)}
                     placeholder="Add description of preparation step..." />
             )}
+            <Spacer height={10} />
             <Button size="small" key="addStep" accessoryLeft={AddIcon} onPress={addPreparationStep} />
         </>
 
@@ -123,15 +125,15 @@ const RecipeWizardScreen = (props: Props) => {
                         images={newRecipeData.images}
                         allowEdit={true}
                     />
-                    <View style={[styles.formContainer, CentralStyles.elementSpacing]}>
+                    <View style={[CentralStyles.contentContainer, CentralStyles.elementSpacing]}>
                         <Text category="label">Title</Text>
                         <Input
                             value={newRecipeData.title}
                             onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, title: newText })}
                             placeholder="Name" />
-                        <Spacer height={10} />
+                        <Spacer height={15} />
                         {renderIngredientsSection()}
-                        <Spacer height={10} />
+                        <Spacer height={15} />
                         <Text category="label">Preparation Steps</Text>
                         {renderPreparationStepsSection()}
                     </View>
@@ -152,10 +154,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'space-between',
     },
-    formContainer: {
-        paddingVertical: 24,
-        paddingHorizontal: 16,
-    }
 });
 
 

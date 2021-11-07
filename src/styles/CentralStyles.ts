@@ -12,5 +12,13 @@ export default StyleSheet.create({
         borderRadius: 16,
         width: 32,
         height: 32
+    },
+    contentContainer: {
+        width: "100%",
+        alignSelf: "center",
+        justifyContent: "center",
+        paddingVertical: 24,
+        paddingHorizontal: 16,
+        maxWidth: 600
     }
 });

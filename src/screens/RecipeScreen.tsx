@@ -80,7 +80,7 @@ export const RecipeScreen = (props: Props) => {
                 <RecipeImageViewPager
                     images={recipe ? recipe?.images : []}
                 />
-                <View style={styles.formContainer} >
+                <View style={CentralStyles.contentContainer} >
                     {renderIngredientsSection()}
 
                     <Spacer height={20} />
@@ -114,10 +114,6 @@ const styles = StyleSheet.create({
         width: "100%",
         height: 320,
         borderRadius: 0,
-    },
-    formContainer: {
-        paddingVertical: 24,
-        paddingHorizontal: 16,
     },
     portionsContainer: {
 

@@ -6,6 +6,7 @@ export type MainNavigationProps = {
     OverviewScreen: undefined
     RecipeWizardScreen: undefined
     RecipeScreen: {recipeId: number}
+    ImportScreen: {importUrl?: string}
 };
 
 export type OverviewNavigationProps = {

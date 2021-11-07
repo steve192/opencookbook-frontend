@@ -10,6 +10,7 @@ import RecipeWizardScreen from '../screens/wizard-screen/RecipeWizardScreen';
 import WeeklyRecipeListScreen from '../screens/WeeklyRecipeListScreen';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { SignupScreen } from '../screens/LoginScreen/SignupScreen';
+import { ImportScreen } from '../screens/ImportScreen';
 
 
 
@@ -22,8 +23,8 @@ const MainNavigation = () => {
         return (
             <>
                 <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"} 
-                    style={{flex: 1}}>
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    style={{ flex: 1 }}>
                     <Stack.Navigator
                         screenOptions={{
                             headerStyle: { backgroundColor: theme["color-primary-default"] },
@@ -33,7 +34,7 @@ const MainNavigation = () => {
                             name="LoginScreen"
                             component={LoginScreen}
                             options={{ headerShown: false }} />
-                            <Stack.Screen
+                        <Stack.Screen
                             name="SignupScreen"
                             component={SignupScreen}
                             options={{ headerShown: false }} />
@@ -49,6 +50,13 @@ const MainNavigation = () => {
                             component={RecipeWizardScreen}
                             options={{
                                 title: "Create recipe"
+                            }}
+                        />
+                        <Stack.Screen
+                            name="ImportScreen"
+                            component={ImportScreen}
+                            options={{
+                                title: "Import recipe"
                             }}
                         />
                         <Stack.Screen

@@ -27,11 +27,26 @@ const RecipeListScreen = (props: Props) => {
     },
     {
       text: "Import recipe",
-      name: "imoprtRecipe",
+      name: "importRecipe",
       color: theme["color-primary-default"]
     }
 
   ];
+
+  const onActionButtonPress = (pressedItem: string | undefined) => {
+    if (!pressedItem) {
+      return;
+    }
+
+    switch (pressedItem) {
+      case 'importRecipe':
+        props.navigation.navigate("ImportScreen", {});
+        break;
+      case 'addRecipe':
+        props.navigation.navigate("RecipeWizardScreen");
+        break;
+    }
+  }
 
 
   const renderItemHeader = (headerProps: ViewProps | undefined, info: Recipe) => (
@@ -66,7 +81,7 @@ const RecipeListScreen = (props: Props) => {
   );
 
   const openRecipe = (recipe: Recipe) => {
-    props.navigation.push("RecipeScreen", {recipeId: recipe.id});
+    props.navigation.push("RecipeScreen", { recipeId: recipe.id });
   }
 
   const queryRecipes = () => {
@@ -89,7 +104,7 @@ const RecipeListScreen = (props: Props) => {
         />
         <FloatingAction
           actions={addActions}
-          onPressItem={name => { props.navigation.push("RecipeWizardScreen") }}
+          onPressItem={onActionButtonPress}
           color={theme["color-primary-default"]} />
       </Layout>
     </>
