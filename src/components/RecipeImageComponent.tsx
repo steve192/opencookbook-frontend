@@ -1,6 +1,6 @@
-import { Avatar } from '@ui-kitten/components';
+import { Avatar, Spinner } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Image, Platform } from 'react-native';
+import { StyleSheet, Image, Platform, View } from 'react-native';
 import RestAPI from '../dao/RestAPI';
 
 interface Props {
@@ -31,17 +31,34 @@ export const RecipeImageComponent = (props: Props) => {
         // <Avatar
         //     source={imageData ? { uri: imageData } : require('../../assets/placeholder.png')}
         //     style={styles.recipeImage} />
-        <Image
-            source={imageData ? { uri: imageData } : require('../../assets/placeholder.png')}
-            style={styles.recipeImage} />
+        <>
+            <Image
+                source={imageData ? { uri: imageData } : require('../../assets/placeholder.png')}
+                style={styles.recipeImage} />
+            {!requestPending ? null :
+                <View style={styles.loadingSpinner}>
+                    <Spinner size="giant" />
+                </View>}
+        </>
     )
 }
 
 const styles = StyleSheet.create({
+    loadingSpinner: {
+        position: "absolute",
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        justifyContent: "center",
+        alignItems: "center",
+        flex: 1,
+        width: "100%",
+        height: "100%"
+    },
     recipeImage: {
         width: "100%",
         height: "100%",
-        borderRadius: 0,
         resizeMode: Platform.OS === "web" ? 'center' : 'cover'
     },
 });
