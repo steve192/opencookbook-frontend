@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import RestAPI, { RecipeImage } from '../dao/RestAPI';
+import { RecipeImageComponent } from './RecipeImageComponent';
 
 interface Props {
     onImageAdded?: (uuid: string) => void,
@@ -14,22 +15,6 @@ export const RecipeImageViewPager = (props: Props) => {
 
 
     const [shownImageIndex, setShownImageIndex] = useState<number>(0);
-    const [imageDataBuffer, setImageDataBuffer] = useState<{ [uuid: string]: string }>({});
-
-
-    // Hook for loading images used in the receipe and putting them in the buffer
-    useEffect(() => {
-        props.images.forEach((image) => {
-            if (!imageDataBuffer[image.uuid]) {
-                RestAPI.getImageAsDataURI(image.uuid).then((data) => {
-                    setImageDataBuffer({ ...imageDataBuffer, [image.uuid]: data });
-                }).catch((error) => {
-                    alert("Error fetching image" + error);
-                    //TODO: Error handling
-                });
-            }
-        });
-    });
 
     const selectImage = async () => {
         // Ask the user for the permission to access the media library 
@@ -65,10 +50,8 @@ export const RecipeImageViewPager = (props: Props) => {
                         style={styles.recipeImage} /> :
 
                     props.images.map((image, imageIndex) =>
-                        <Avatar
-                            key={imageIndex + "image"}
-                            source={imageDataBuffer[image.uuid] ? { uri: imageDataBuffer[image.uuid] } : require('../../assets/placeholder.png')}
-                            style={styles.recipeImage} />
+                        <RecipeImageComponent
+                            uuid={image.uuid}/>
                     )}
             </ViewPager>
             {!props.allowEdit ? null :
@@ -85,11 +68,6 @@ const styles = StyleSheet.create({
         height: 320,
         borderRadius: 16,
     },
-    recipeImage: {
-        width: "100%",
-        height: "100%",
-        borderRadius: 0,
-    },
     imageButton: {
         position: "absolute",
         alignSelf: "flex-end",
@@ -101,5 +79,10 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderStyle: 'solid',
         borderColor: 'grey'
-    }
+    },
+    recipeImage: {
+        width: "100%",
+        height: "100%",
+        borderRadius: 0,
+    },
 });
