@@ -9,6 +9,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import Spacer from "react-spacer";
 import { MinusIcon, PlusIcon } from "../assets/Icons";
 import RestAPI, { Recipe } from "../dao/RestAPI";
+import { RecipeImageViewPager } from "../components/RecipeImageViewPager";
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
@@ -76,14 +77,9 @@ export const RecipeScreen = (props: Props) => {
         <>
             <StatusBar />
             <ScrollView>
-                <ViewPager
-                    selectedIndex={0}
-                    style={styles.recipeImage}>
-                    <Avatar
-                        key={0 + "image"}
-                        // source={require('../assets/placeholder.png')}
-                        style={styles.recipeImage} />
-                </ViewPager>
+                <RecipeImageViewPager
+                    images={recipe ? recipe?.images : []}
+                />
                 <View style={styles.formContainer} >
                     {renderIngredientsSection()}
 

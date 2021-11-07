@@ -121,6 +121,7 @@ const RecipeWizardScreen = (props: Props) => {
                     <RecipeImageViewPager
                         onImageAdded={addRecipeImage}
                         images={newRecipeData.images}
+                        allowEdit={true}
                     />
                     <View style={[styles.formContainer, CentralStyles.elementSpacing]}>
                         <Text category="label">Title</Text>

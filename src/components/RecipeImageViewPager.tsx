@@ -5,13 +5,14 @@ import * as ImagePicker from 'expo-image-picker';
 import RestAPI, { RecipeImage } from '../dao/RestAPI';
 
 interface Props {
-    onImageAdded: (uuid: string) => void,
-    images: RecipeImage[]
+    onImageAdded?: (uuid: string) => void,
+    images: RecipeImage[],
+    allowEdit?: boolean
 }
 
 export const RecipeImageViewPager = (props: Props) => {
 
-    
+
     const [shownImageIndex, setShownImageIndex] = useState<number>(0);
     const [imageDataBuffer, setImageDataBuffer] = useState<{ [uuid: string]: string }>({});
 
@@ -44,7 +45,7 @@ export const RecipeImageViewPager = (props: Props) => {
         }
 
         await RestAPI.uploadImage(result.uri).then((uuid) => {
-            props.onImageAdded(uuid);
+            props.onImageAdded ? props.onImageAdded(uuid) : null;
         }).catch((error) => {
             //TODO: Error handling
             alert("Error uploading picture");
@@ -53,25 +54,27 @@ export const RecipeImageViewPager = (props: Props) => {
 
     return (
         <View style={[styles.recipeImageContainer]}>
-        <ViewPager
-            selectedIndex={shownImageIndex}
-            onSelect={setShownImageIndex}
-            style={styles.recipeImage}>
+            <ViewPager
+                selectedIndex={shownImageIndex}
+                onSelect={setShownImageIndex}
+                style={styles.recipeImage}>
 
-            {props.images.length === 0 ?
-                <Avatar
-                    source={require('../../assets/placeholder.png')}
-                    style={styles.recipeImage} /> :
-
-                props.images.map((image, imageIndex) =>
+                {props.images.length === 0 ?
                     <Avatar
-                        key={imageIndex + "image"}
-                        source={imageDataBuffer[image.uuid] ? { uri: imageDataBuffer[image.uuid] } : require('../../assets/placeholder.png')}
-                        style={styles.recipeImage} />
-                )}
-        </ViewPager>
-        <Button onPress={selectImage} style={styles.imageButton} status="basic" accessoryLeft={<Icon name="camera" />} />
-    </View>
+                        source={require('../../assets/placeholder.png')}
+                        style={styles.recipeImage} /> :
+
+                    props.images.map((image, imageIndex) =>
+                        <Avatar
+                            key={imageIndex + "image"}
+                            source={imageDataBuffer[image.uuid] ? { uri: imageDataBuffer[image.uuid] } : require('../../assets/placeholder.png')}
+                            style={styles.recipeImage} />
+                    )}
+            </ViewPager>
+            {!props.allowEdit ? null :
+                <Button onPress={selectImage} style={styles.imageButton} status="basic" accessoryLeft={<Icon name="camera" />} />
+            }
+        </View>
     );
 }
 
