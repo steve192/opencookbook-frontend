@@ -4,7 +4,7 @@ import { StyleSheet, Image, Platform } from 'react-native';
 import RestAPI from '../dao/RestAPI';
 
 interface Props {
-    uuid: string
+    uuid?: string | undefined
 }
 export const RecipeImageComponent = (props: Props) => {
 
@@ -15,7 +15,7 @@ export const RecipeImageComponent = (props: Props) => {
 
     // Hook for loading images used and putting them in the buffer
     useEffect(() => {
-        if (!imageData && !requestPending) {
+        if (!imageData && !requestPending && props.uuid) {
             setRequestPending(true);
             RestAPI.getImageAsDataURI(props.uuid).then((data) => {
                 setImageData(data);
