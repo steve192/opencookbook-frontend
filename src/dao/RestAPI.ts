@@ -26,6 +26,10 @@ export interface Recipe {
     images: RecipeImage[];
 }
 class RestAPI {
+    static async importRecipe(importURL: string): Promise<Recipe> {
+        let response = await axios.get(this.url("/recipes/import?importUrl=" + encodeURI(importURL)), await this.axiosConfig());
+        return response.data;
+    }
 
     private static dataURItoBlob(dataURI: string) {
         // convert base64/URLEncoded data component to raw binary data held in a string
