@@ -20,7 +20,7 @@
     "@ui-kitten/components": "^5.1.1",
     "@ui-kitten/eva-icons": "^5.1.1",
     "axios": "^0.24.0",
-    "Buffer": "^0.0.0",
+    "buffer": "^6.0.3",
     "expo": "~43.0.0",
     "expo-file-system": "^13.0.3",
     "expo-image-picker": "~11.0.3",
