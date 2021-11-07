@@ -1,7 +1,6 @@
-
 import { Avatar } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Image, Platform } from 'react-native';
 import RestAPI from '../dao/RestAPI';
 
 interface Props {
@@ -29,7 +28,10 @@ export const RecipeImageComponent = (props: Props) => {
     });
 
     return (
-        <Avatar
+        // <Avatar
+        //     source={imageData ? { uri: imageData } : require('../../assets/placeholder.png')}
+        //     style={styles.recipeImage} />
+        <Image
             source={imageData ? { uri: imageData } : require('../../assets/placeholder.png')}
             style={styles.recipeImage} />
     )
@@ -40,5 +42,6 @@ const styles = StyleSheet.create({
         width: "100%",
         height: "100%",
         borderRadius: 0,
+        resizeMode: Platform.OS === "web" ? 'center' : 'cover'
     },
 });

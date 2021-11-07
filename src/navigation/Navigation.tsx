@@ -62,9 +62,9 @@ const MainNavigation = () => {
                         <Stack.Screen
                             name="RecipeScreen"
                             component={RecipeScreen}
-                            options={
-                                { headerTransparent: true, headerStyle: {} }
-                            }
+                            // options={
+                            //     { headerTransparent: true, headerStyle: {} }
+                            // }
                         />
                     </Stack.Navigator>
                 </KeyboardAvoidingView>

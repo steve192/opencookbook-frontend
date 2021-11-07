@@ -30,28 +30,28 @@ export const RecipeScreen = (props: Props) => {
         <>
             <Text category="label">Ingredients</Text>
             {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                    {recipe ? recipe.neededIngredients.map(ingredient =>
-                        <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row'}}>
-                            <Text style={{ flex: 1, alignSelf: 'stretch', color: theme["color-primary-default"], fontWeight: "bold" }}>{`${ingredient.amount} ${ingredient.unit}`}</Text>
-                            <Text style={{flex: 1, alignSelf: 'stretch'}} >{ingredient.ingredient.name}</Text>
-                        </View>
-                    ) : null}
-                </View>
-                <Spacer height={20}/>
-                <View style={styles.portionsContainer}>
-                    <Button
-                        style={CentralStyles.iconButton}
-                        size='tiny'
-                        onPress={() => setPortions(portions - 1)}
-                        accessoryLeft={<MinusIcon />} />
-                    <Text style={{ paddingHorizontal: 20 }}> {portions} Portions</Text>
-                    <Button
-                        style={CentralStyles.iconButton}
-                        size='tiny'
-                        onPress={() => setPortions(portions + 1)}
-                        accessoryLeft={<PlusIcon />} />
-                </View>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                {recipe ? recipe.neededIngredients.map(ingredient =>
+                    <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row' }}>
+                        <Text style={{ flex: 1, alignSelf: 'stretch', color: theme["color-primary-default"], fontWeight: "bold" }}>{`${ingredient.amount} ${ingredient.unit}`}</Text>
+                        <Text style={{ flex: 3, alignSelf: 'stretch' }} >{ingredient.ingredient.name}</Text>
+                    </View>
+                ) : null}
+            </View>
+            <Spacer height={20} />
+            <View style={styles.portionsContainer}>
+                <Button
+                    style={CentralStyles.iconButton}
+                    size='tiny'
+                    onPress={() => setPortions(portions - 1)}
+                    accessoryLeft={<MinusIcon />} />
+                <Text style={{ paddingHorizontal: 20 }}> {portions} Portions</Text>
+                <Button
+                    style={CentralStyles.iconButton}
+                    size='tiny'
+                    onPress={() => setPortions(portions + 1)}
+                    accessoryLeft={<PlusIcon />} />
+            </View>
             {/* </View> */}
         </>
     )
@@ -59,13 +59,14 @@ export const RecipeScreen = (props: Props) => {
     const renderStepsSection = () => (
         <>
             <Text category="label">Preparation steps</Text>
+            <Spacer height={20} />
             {recipe ? recipe.preparationSteps.map((preparationStep, index) => (
                 <>
-                    <View style={{ flex: 1, flexDirection: "row", paddingVertical: 10, alignItems: "center" }}>
+                    <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
                         <View style={styles.textBulletContrainer}>
                             <Text style={styles.textBullet}>{index + 1}</Text>
                         </View>
-                        <Text>{preparationStep}</Text>
+                        <Text style={{ flex: 1 }}>{preparationStep}</Text>
                     </View>
                 </>
             )) : null}
@@ -75,12 +76,13 @@ export const RecipeScreen = (props: Props) => {
 
     return (
         <>
-            <StatusBar />
+            {/* <StatusBar /> */}
             <ScrollView>
                 <RecipeImageViewPager
+                    style={{ height: 320 }}
                     images={recipe ? recipe?.images : []}
                 />
-                <View style={CentralStyles.contentContainer} >
+                <View style={[CentralStyles.contentContainer, { flex: 1 }]} >
                     {renderIngredientsSection()}
 
                     <Spacer height={20} />
@@ -116,7 +118,7 @@ const styles = StyleSheet.create({
         borderRadius: 0,
     },
     portionsContainer: {
-        
+
         justifyContent: "center",
         alignItems: "center",
         flexDirection: 'row',

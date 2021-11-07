@@ -121,6 +121,7 @@ const RecipeWizardScreen = (props: Props) => {
             <View style={styles.contentContainer}>
                 <ScrollView>
                     <RecipeImageViewPager
+                        style={{height: 320}}
                         onImageAdded={addRecipeImage}
                         images={newRecipeData.images}
                         allowEdit={true}

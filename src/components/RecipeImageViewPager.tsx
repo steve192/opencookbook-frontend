@@ -1,14 +1,15 @@
-import { Avatar, Icon, ViewPager, Button } from '@ui-kitten/components';
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Avatar, Button, Icon, ViewPager } from '@ui-kitten/components';
 import * as ImagePicker from 'expo-image-picker';
+import React, { useState } from 'react';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import RestAPI, { RecipeImage } from '../dao/RestAPI';
 import { RecipeImageComponent } from './RecipeImageComponent';
 
 interface Props {
     onImageAdded?: (uuid: string) => void,
     images: RecipeImage[],
-    allowEdit?: boolean
+    allowEdit?: boolean,
+    style: StyleProp<ViewStyle>
 }
 
 export const RecipeImageViewPager = (props: Props) => {
@@ -38,7 +39,7 @@ export const RecipeImageViewPager = (props: Props) => {
     };
 
     return (
-        <View style={[styles.recipeImageContainer]}>
+        <View style={[styles.recipeImageContainer, props.style]}>
             <ViewPager
                 selectedIndex={shownImageIndex}
                 onSelect={setShownImageIndex}
@@ -65,8 +66,8 @@ const styles = StyleSheet.create({
     recipeImageContainer: {
         alignSelf: 'center',
         width: "100%",
-        height: 320,
-        borderRadius: 16,
+        height: "100%",
+        backgroundColor: "rgb(161 161 161)"
     },
     imageButton: {
         position: "absolute",
