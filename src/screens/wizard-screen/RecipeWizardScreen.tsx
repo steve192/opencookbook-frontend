@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Autocomplete, AutocompleteItem, Avatar, Button, Icon, Input, Text, ViewPager } from '@ui-kitten/components';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ImageProps, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
 import RestAPI, { Ingredient, IngredientUse, Recipe } from '../../dao/RestAPI';
@@ -21,6 +21,21 @@ const RecipeWizardScreen = (props: Props) => {
         neededIngredients: [{ ingredient: { name: "" }, amount: 0, unit: "" }],
         preparationSteps: [""],
         images: []
+    });
+
+    let [imageURIs, setImageURIs] = useState<{ [uuid: string]: string }>({});
+
+    useEffect(() => {
+        newRecipeData.images.forEach((image) => {
+            if (!imageURIs[image.uuid]) {
+                RestAPI.getImageAsDataURI(image.uuid).then((data) => {
+                    setImageURIs({ ...imageURIs, [image.uuid]: data });
+                }).catch((error) => {
+                    alert("Error fetching image" + error);
+                    //TODO: Error handling
+                });
+            }
+        });
     });
 
     const AddIcon = (props: Partial<ImageProps> | undefined) => (
@@ -52,6 +67,12 @@ const RecipeWizardScreen = (props: Props) => {
         setNewRecipeData({ ...newRecipeData, neededIngredients: ingredientsCopy })
     }
 
+    const addRecipeImage = (uuid: string) => {
+        let images = newRecipeData.images;
+        images.push({ uuid })
+        setNewRecipeData({ ...newRecipeData, images: images })
+    }
+
     const addIngredient = () => {
         let ingredientsCopy = newRecipeData.neededIngredients;
         ingredientsCopy.push({
@@ -71,9 +92,7 @@ const RecipeWizardScreen = (props: Props) => {
 
 
     const createNewRecipe = () => {
-        RestAPI.createNewRecipe(newRecipeData);
-        alert(JSON.stringify(newRecipeData));
-        props.navigation.goBack();
+        RestAPI.createNewRecipe(newRecipeData).then(() => props.navigation.goBack());
     };
 
     const renderIngredientsSection = () =>
@@ -113,17 +132,18 @@ const RecipeWizardScreen = (props: Props) => {
             return;
         }
 
-        const result = await ImagePicker.launchImageLibraryAsync();
+        const result = await ImagePicker.launchImageLibraryAsync({ base64: true });
 
         if (result.cancelled) {
             return;
         }
 
-
-        alert(JSON.stringify(result));
-        await RestAPI.uploadImage(result.uri);
-
-
+        await RestAPI.uploadImage(result.uri).then((uuid) => {
+            addRecipeImage(uuid);
+        }).catch((error) => {
+            //TODO: Error handling
+            alert("Error uploading picture");
+        });
     };
 
     return (
@@ -143,7 +163,7 @@ const RecipeWizardScreen = (props: Props) => {
                                 newRecipeData.images.map((image, imageIndex) =>
                                     <Avatar
                                         key={imageIndex + "image"}
-                                        source={require('../../assets/placeholder.png')}
+                                        source={imageURIs[image.uuid] ? { uri: imageURIs[image.uuid] } : require('../../assets/placeholder.png')}
                                         style={styles.recipeImage} />
                                 )}
                         </ViewPager>

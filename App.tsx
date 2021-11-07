@@ -9,9 +9,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { myTheme } from './src/styles/custom-theme-light';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 
-
 enableScreens()
-
 
 export default () => (
   <>
