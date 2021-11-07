@@ -1,4 +1,4 @@
-import { Avatar, Button, Icon, ViewPager } from '@ui-kitten/components';
+import { Avatar, Button, Icon, ViewPager, Text } from '@ui-kitten/components';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
@@ -58,11 +58,23 @@ export const RecipeImageViewPager = (props: Props) => {
             {!props.allowEdit ? null :
                 <Button onPress={selectImage} style={styles.imageButton} status="basic" accessoryLeft={<Icon name="camera" />} />
             }
+
+            <Text style={styles.indexIndicator}>{shownImageIndex + 1} / {props.images.length}</Text>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    indexIndicator: {
+        fontWeight: "bold",
+        position: "absolute",
+        bottom: 10,
+        left: 10,
+        color: "white",
+        backgroundColor: "rgba( 0,0,0,0.3)",
+        borderRadius: 5,
+        padding: 10
+    },
     recipeImageContainer: {
         alignSelf: 'center',
         width: "100%",
