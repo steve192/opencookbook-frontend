@@ -81,7 +81,7 @@ export const RecipeScreen = (props: Props) => {
                     style={styles.recipeImage}>
                     <Avatar
                         key={0 + "image"}
-                        source={require('../assets/placeholder.png')}
+                        // source={require('../assets/placeholder.png')}
                         style={styles.recipeImage} />
                 </ViewPager>
                 <View style={styles.formContainer} >

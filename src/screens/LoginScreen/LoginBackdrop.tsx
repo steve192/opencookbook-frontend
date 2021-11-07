@@ -9,7 +9,7 @@ export const LoginBackdrop: FunctionComponent = (props) => {
     return (
         <ImageBackground
             style={styles.container}
-            source={require("../../assets/login-screen.jpg")}>
+            source={require("../../../assets/login-screen.jpg")}>
             <View style={{ backgroundColor: "rgba(0, 0, 0, 0.45)", position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
                 <>
                     <SafeAreaInsetsContext.Consumer>

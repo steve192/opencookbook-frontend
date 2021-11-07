@@ -1,9 +1,9 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Avatar, Button, Icon, Input, Text, ViewPager } from '@ui-kitten/components';
-import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
 import { ImageProps, ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
+import { RecipeImageViewPager } from '../../components/RecipeImageViewPager';
 import RestAPI, { IngredientUse, Recipe } from '../../dao/RestAPI';
 import { MainNavigationProps } from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
@@ -23,22 +23,8 @@ const RecipeWizardScreen = (props: Props) => {
         images: []
     });
 
-    let [imageDataBuffer, setImageDataBuffer] = useState<{ [uuid: string]: string }>({});
 
-
-    // Hook for loading images used in the receipe and putting them in the buffer
-    useEffect(() => {
-        newRecipeData.images.forEach((image) => {
-            if (!imageDataBuffer[image.uuid]) {
-                RestAPI.getImageAsDataURI(image.uuid).then((data) => {
-                    setImageDataBuffer({ ...imageDataBuffer, [image.uuid]: data });
-                }).catch((error) => {
-                    alert("Error fetching image" + error);
-                    //TODO: Error handling
-                });
-            }
-        });
-    });
+   
 
     const AddIcon = (props: Partial<ImageProps> | undefined) => (
         <Icon {...props} name="plus-outline" />
@@ -126,50 +112,16 @@ const RecipeWizardScreen = (props: Props) => {
             <Button size="small" key="addStep" accessoryLeft={AddIcon} onPress={addPreparationStep} />
         </>
 
-    const selectImage = async () => {
-        // Ask the user for the permission to access the media library 
-        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-        if (!permissionResult.granted) {
-            return;
-        }
-
-        const result = await ImagePicker.launchImageLibraryAsync({ base64: true });
-        if (result.cancelled) {
-            return;
-        }
-
-        await RestAPI.uploadImage(result.uri).then((uuid) => {
-            addRecipeImage(uuid);
-        }).catch((error) => {
-            //TODO: Error handling
-            alert("Error uploading picture");
-        });
-    };
+   
 
     return (
         <>
             <View style={styles.contentContainer}>
                 <ScrollView>
-                    <View style={[styles.recipeImageContainer]}>
-                        <ViewPager
-                            selectedIndex={0}
-                            style={styles.recipeImage}>
-
-                            {newRecipeData.images.length === 0 ?
-                                <Avatar
-                                    source={require('../../assets/placeholder.png')}
-                                    style={styles.recipeImage} /> :
-
-                                newRecipeData.images.map((image, imageIndex) =>
-                                    <Avatar
-                                        key={imageIndex + "image"}
-                                        source={imageDataBuffer[image.uuid] ? { uri: imageDataBuffer[image.uuid] } : require('../../assets/placeholder.png')}
-                                        style={styles.recipeImage} />
-                                )}
-                        </ViewPager>
-                        <Button onPress={selectImage} style={styles.imageButton} status="basic" accessoryLeft={<Icon name="camera" />} />
-                    </View>
+                    <RecipeImageViewPager
+                        onImageAdded={addRecipeImage}
+                        images={newRecipeData.images}
+                    />
                     <View style={[styles.formContainer, CentralStyles.elementSpacing]}>
                         <Text category="label">Title</Text>
                         <Input
@@ -195,29 +147,6 @@ const RecipeWizardScreen = (props: Props) => {
 }
 
 const styles = StyleSheet.create({
-    recipeImageContainer: {
-        alignSelf: 'center',
-        width: "100%",
-        height: 320,
-        borderRadius: 16,
-    },
-    recipeImage: {
-        width: "100%",
-        height: "100%",
-        borderRadius: 0,
-    },
-    imageButton: {
-        position: "absolute",
-        alignSelf: "flex-end",
-        bottom: 16,
-        right: 16,
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        borderWidth: 1,
-        borderStyle: 'solid',
-        borderColor: 'grey'
-    },
     contentContainer: {
         flex: 1,
         justifyContent: 'space-between',

@@ -14,12 +14,16 @@ export interface IngredientUse {
     amount: number
     unit: string
 }
+
+export interface RecipeImage {
+    uuid: string
+}
 export interface Recipe {
     id?: number
     title: string;
     neededIngredients: IngredientUse[];
     preparationSteps: string[];
-    images: { uuid: string }[];
+    images: RecipeImage[];
 }
 class RestAPI {
 
