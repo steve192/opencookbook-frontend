@@ -3,7 +3,7 @@ import { CompositeScreenProps } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { Card, Layout, List, Text, useTheme } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
-import { Image, ListRenderItem, ListRenderItemInfo, StyleSheet, View, ViewProps } from 'react-native';
+import { Dimensions, Image, ListRenderItem, ListRenderItemInfo, StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
 import { FloatingAction, IActionProps } from 'react-native-floating-action';
 import { RecipeImageComponent } from '../components/RecipeImageComponent';
 import { StatusBar } from '../components/StatusBar';
@@ -15,6 +15,7 @@ type Props = CompositeScreenProps<
   BottomTabScreenProps<OverviewNavigationProps, "RecipesListScreen">,
   StackScreenProps<MainNavigationProps, "OverviewScreen">
 >;
+
 
 const RecipeListScreen = (props: Props) => {
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
@@ -52,9 +53,9 @@ const RecipeListScreen = (props: Props) => {
 
   const renderItemHeader = (headerProps: ViewProps | undefined, info: Recipe) => (
     // <View {...headerProps} style={{height: 50 }}>
-      <Text numberOfLines={2} style={{height:70, padding: 10, fontWeight: "bold"}} >
-        {info.title}
-      </Text>
+    <Text numberOfLines={2} style={{ height: 70, padding: 10, fontWeight: "bold" }} >
+      {info.title}
+    </Text>
     // </View>
   );
 
@@ -83,6 +84,10 @@ const RecipeListScreen = (props: Props) => {
     props.navigation.push("RecipeScreen", { recipeId: recipe.id });
   }
 
+  const windowDimensions = useWindowDimensions();
+  const numberOfColumns = Math.ceil(windowDimensions.width / 300);
+
+
   const queryRecipes = () => {
     RestAPI.getRecipes()
       .then(setMyRecipes);
@@ -98,7 +103,7 @@ const RecipeListScreen = (props: Props) => {
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
           data={myRecipes}
-          numColumns={2}
+          numColumns={numberOfColumns}
           renderItem={renderItem}
         />
         <FloatingAction
