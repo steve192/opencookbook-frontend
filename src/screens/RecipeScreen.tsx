@@ -29,16 +29,16 @@ export const RecipeScreen = (props: Props) => {
     const renderIngredientsSection = () => (
         <>
             <Text category="label">Ingredients</Text>
-            <View style={{ flexDirection: "row", flexWrap:"wrap" }}>
-                <View style={{  }}>
+            {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                     {recipe ? recipe.neededIngredients.map(ingredient =>
-                        <View style={{ display: "flex", flexDirection:"row", alignItems: "stretch"}}>
-                            <Text style={{ flexGrow: 1, color: theme["color-primary-default"], fontWeight: "bold" }}>{`${ingredient.amount} ${ingredient.unit}`}</Text>
-                            <Text style={{flexGrow: 1}} >{ingredient.ingredient.name}</Text>
+                        <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row'}}>
+                            <Text style={{ flex: 1, alignSelf: 'stretch', color: theme["color-primary-default"], fontWeight: "bold" }}>{`${ingredient.amount} ${ingredient.unit}`}</Text>
+                            <Text style={{flex: 1, alignSelf: 'stretch'}} >{ingredient.ingredient.name}</Text>
                         </View>
                     ) : null}
                 </View>
-
+                <Spacer height={20}/>
                 <View style={styles.portionsContainer}>
                     <Button
                         style={CentralStyles.iconButton}
@@ -52,7 +52,7 @@ export const RecipeScreen = (props: Props) => {
                         onPress={() => setPortions(portions + 1)}
                         accessoryLeft={<PlusIcon />} />
                 </View>
-            </View>
+            {/* </View> */}
         </>
     )
 
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
         borderRadius: 0,
     },
     portionsContainer: {
-
+        
         justifyContent: "center",
         alignItems: "center",
         flexDirection: 'row',
