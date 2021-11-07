@@ -1,14 +1,14 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Autocomplete, AutocompleteItem, Avatar, Button, Icon, Input, Text, ViewPager } from '@ui-kitten/components';
-import React, { useEffect, useMemo, useState } from 'react';
-import { ImageProps, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { Avatar, Button, Icon, Input, Text, ViewPager } from '@ui-kitten/components';
+import * as ImagePicker from 'expo-image-picker';
+import React, { useEffect, useState } from 'react';
+import { ImageProps, ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
-import RestAPI, { Ingredient, IngredientUse, Recipe } from '../../dao/RestAPI';
+import RestAPI, { IngredientUse, Recipe } from '../../dao/RestAPI';
 import { MainNavigationProps } from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
 import { IngredientFormField } from './IngridientFromField';
 import { RecipeFormField } from './PreparationStepFormField';
-import * as ImagePicker from 'expo-image-picker';
 
 
 
@@ -23,13 +23,15 @@ const RecipeWizardScreen = (props: Props) => {
         images: []
     });
 
-    let [imageURIs, setImageURIs] = useState<{ [uuid: string]: string }>({});
+    let [imageDataBuffer, setImageDataBuffer] = useState<{ [uuid: string]: string }>({});
 
+
+    // Hook for loading images used in the receipe and putting them in the buffer
     useEffect(() => {
         newRecipeData.images.forEach((image) => {
-            if (!imageURIs[image.uuid]) {
+            if (!imageDataBuffer[image.uuid]) {
                 RestAPI.getImageAsDataURI(image.uuid).then((data) => {
-                    setImageURIs({ ...imageURIs, [image.uuid]: data });
+                    setImageDataBuffer({ ...imageDataBuffer, [image.uuid]: data });
                 }).catch((error) => {
                     alert("Error fetching image" + error);
                     //TODO: Error handling
@@ -133,7 +135,6 @@ const RecipeWizardScreen = (props: Props) => {
         }
 
         const result = await ImagePicker.launchImageLibraryAsync({ base64: true });
-
         if (result.cancelled) {
             return;
         }
@@ -163,7 +164,7 @@ const RecipeWizardScreen = (props: Props) => {
                                 newRecipeData.images.map((image, imageIndex) =>
                                     <Avatar
                                         key={imageIndex + "image"}
-                                        source={imageURIs[image.uuid] ? { uri: imageURIs[image.uuid] } : require('../../assets/placeholder.png')}
+                                        source={imageDataBuffer[image.uuid] ? { uri: imageDataBuffer[image.uuid] } : require('../../assets/placeholder.png')}
                                         style={styles.recipeImage} />
                                 )}
                         </ViewPager>

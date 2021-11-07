@@ -1,7 +1,7 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosRequestHeaders } from "axios";
+import { Buffer } from 'buffer';
 import { Platform } from "react-native";
 import Configuration from "../Configuration";
-import { Buffer } from 'buffer';
 
 
 export interface Ingredient {
@@ -46,13 +46,13 @@ class RestAPI {
     static async getImageAsDataURI(uuid: string) {
         let response = await axios.get(this.url("/recipes-images/" + uuid), {
             headers: {
-                "Authorization":"Bearer " + await Configuration.getAuthToken(),
+                "Authorization": "Bearer " + await Configuration.getAuthToken(),
             },
             responseType: 'arraybuffer'
         });
         // const dataURI =  "data:application/octet-stream;base64," + Buffer.from(response.data).toString("base64");
         const base64String = Buffer.from(response.data).toString("base64");
-        const dataURI = "data:image/jpg;base64," +base64String;
+        const dataURI = "data:image/jpg;base64," + base64String;
         return dataURI;
     }
     static async uploadImage(uri: string): Promise<string> {
@@ -110,15 +110,19 @@ class RestAPI {
     }
 
     static async axiosConfig(): Promise<AxiosRequestConfig> {
-        const token = await Configuration.getAuthToken();
         return {
-            headers: { "Authorization": "Bearer " + token }
+            headers: await this.getAuthHeader()
         }
     }
+
+    static async getAuthHeader(): Promise<AxiosRequestHeaders> {
+        const token = await Configuration.getAuthToken();
+        return { "Authorization": "Bearer " + token };
+    }
     static async getIngredients(filter: string = ""): Promise<Ingredient[]> {
-        //TODO: Implement API call
         let response = await axios.get(this.url("/ingredients"), await this.axiosConfig());
         if (response.status > 299) {
+            //TODO: Error handling
             throw Error("Server error");
         }
         return response.data;
