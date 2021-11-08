@@ -40,3 +40,10 @@ publish-expo:
   script:
     - npm ci
     - npm run publish-expo
+
+publish-cluster:
+  stage: publish
+  needs: ["package-docker-qa"]
+  trigger:
+    project: opencookbook/opencookbook-docker
+    branch: master
