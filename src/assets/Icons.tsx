@@ -29,3 +29,12 @@ export const SaveIcon = (style: IconProps): IconElement => (
 export const DeleteIcon = (style: IconProps): IconElement => (
   <Icon {...style} name='trash-2-outline'/>
 );
+export const HomeIcon = (style: IconProps): IconElement => (
+  <Icon {...style} name='home-outline'/>
+);
+export const SettingsIcon = (style: IconProps): IconElement => (
+  <Icon {...style} name='settings-2-outline'/>
+);
+export const CalendarIcon = (style: IconProps): IconElement => (
+  <Icon {...style} name='calendar-outline'/>
+);

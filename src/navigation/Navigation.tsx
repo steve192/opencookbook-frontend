@@ -11,6 +11,8 @@ import WeeklyRecipeListScreen from '../screens/WeeklyRecipeListScreen';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { SignupScreen } from '../screens/LoginScreen/SignupScreen';
 import { ImportScreen } from '../screens/ImportScreen';
+import { CalendarIcon, HomeIcon, SettingsIcon } from '../assets/Icons';
+import { SettingsScreen } from '../screens/SettingsScreen';
 
 
 
@@ -62,9 +64,9 @@ const MainNavigation = () => {
                         <Stack.Screen
                             name="RecipeScreen"
                             component={RecipeScreen}
-                            // options={
-                            //     { headerTransparent: true, headerStyle: {} }
-                            // }
+                        // options={
+                        //     { headerTransparent: true, headerStyle: {} }
+                        // }
                         />
                     </Stack.Navigator>
                 </KeyboardAvoidingView>
@@ -79,8 +81,9 @@ const MainNavigation = () => {
             <BottomNavigation
                 selectedIndex={props.state.index}
                 onSelect={index => props.navigation.navigate(props.state.routeNames[index])}>
-                <BottomNavigationTab title='MY RECIPES' />
-                <BottomNavigationTab title='WEEKPLAN' />
+                <BottomNavigationTab title='MY RECIPES' icon={<HomeIcon />} />
+                <BottomNavigationTab title='WEEKPLAN' icon={<CalendarIcon />} />
+                <BottomNavigationTab title='SETTINGS' icon={<SettingsIcon />} />
             </BottomNavigation>
         </>
     );
@@ -90,15 +93,23 @@ const MainNavigation = () => {
     const BottomTabNavigation = () => {
         return (
             <BottomTab.Navigator
+                screenOptions={{
+                    headerStyle: { backgroundColor: theme["color-primary-default"] },
+                    headerTintColor: theme["text-alternate-color"]
+                }}
                 tabBar={props => <BottomTabBar {...props} />}>
                 <BottomTab.Screen
                     name="RecipesListScreen"
                     component={RecipeListScreen}
-                    options={{ title: "RECIPES", tabBarIcon: FaThList, headerShown: false }} />
+                    options={{ title: "RECIPES", headerShown: false }} />
                 <BottomTab.Screen
                     name="WeeklyScreen"
                     component={WeeklyRecipeListScreen}
-                    options={{ title: "Weekly", tabBarIcon: FaCalendarWeek, headerShown: false }} />
+                    options={{ title: "Weekly", headerShown: true }} />
+                <BottomTab.Screen
+                    name="SettingsScreen"
+                    component={SettingsScreen}
+                    options={{ title: "Settings", headerShown: true }} />
 
             </BottomTab.Navigator>
         );
