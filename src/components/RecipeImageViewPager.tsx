@@ -1,7 +1,8 @@
-import { Avatar, Button, Icon, ViewPager, Text } from '@ui-kitten/components';
+import { Avatar, Button, Icon, Text, ViewPager } from '@ui-kitten/components';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
 import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { ArrowBackwardIcon, ArrowForwardIcon, PlusIcon } from '../assets/Icons';
 import RestAPI, { RecipeImage } from '../dao/RestAPI';
 import { RecipeImageComponent } from './RecipeImageComponent';
 
@@ -52,7 +53,7 @@ export const RecipeImageViewPager = (props: Props) => {
 
                     props.images.map((image, imageIndex) =>
                         <RecipeImageComponent
-                            uuid={image.uuid}/>
+                            uuid={image.uuid} />
                     )}
             </ViewPager>
             {!props.allowEdit ? null :
@@ -60,20 +61,61 @@ export const RecipeImageViewPager = (props: Props) => {
             }
 
             <Text style={styles.indexIndicator}>{shownImageIndex + 1} / {props.images.length}</Text>
+
+            {shownImageIndex === 0 ? null :
+                <View style={styles.backwardButton}>
+                    <Button
+                        appearance="ghost"
+                        onPress={() => setShownImageIndex(shownImageIndex - 1)}
+                        accessoryLeft={<ArrowBackwardIcon width={50} height={50} fill="rgb(209,209,209)" />} />
+                </View>
+            }
+
+            {shownImageIndex === props.images.length - 1 ? null :
+                <View style={styles.forwardButton}>
+                    <Button
+                        appearance="ghost"
+                        onPress={() => setShownImageIndex(shownImageIndex + 1)}
+                        accessoryLeft={<ArrowForwardIcon width={50} height={50} fill="rgb(209,209,209)" />} />
+                </View>
+            }
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    backwardButton: {
+        position: "absolute",
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        justifyContent: "center",
+        alignItems: "flex-start",
+        flex: 1,
+
+    },
+    forwardButton: {
+        position: "absolute",
+        left: 0,
+        right: 5,
+        top: 0,
+        bottom: 0,
+        justifyContent: "center",
+        alignItems: "flex-end",
+        flex: 1,
+    },
     indexIndicator: {
-        fontWeight: "bold",
+        // fontWeight: "bold",
         position: "absolute",
         bottom: 10,
         left: 10,
         color: "white",
         backgroundColor: "rgba( 0,0,0,0.3)",
-        borderRadius: 5,
-        padding: 10
+        borderRadius: 16,
+        paddingHorizontal: 7,
+        paddingVertical: 3,
+        fontSize: 13
     },
     recipeImageContainer: {
         alignSelf: 'center',

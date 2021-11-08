@@ -2,7 +2,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import { MainNavigationProps } from "../navigation/NavigationRoutes";
-import { Avatar, Button, Text, useTheme, ViewPager } from '@ui-kitten/components';
+import { Avatar, Button, Divider, Text, useTheme, ViewPager } from '@ui-kitten/components';
 import { StatusBar } from "../components/StatusBar";
 import CentralStyles from "../styles/CentralStyles";
 import { ScrollView } from "react-native-gesture-handler";
@@ -30,7 +30,7 @@ export const RecipeScreen = (props: Props) => {
         <>
             <Text category="label">Ingredients</Text>
             {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{  alignItems: 'center', justifyContent: 'center' }}>
                 {recipe ? recipe.neededIngredients.map(ingredient =>
                     <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row' }}>
                         <Text style={{ flex: 1, alignSelf: 'stretch', color: theme["color-primary-default"], fontWeight: "bold" }}>{`${ingredient.amount} ${ingredient.unit}`}</Text>
@@ -62,7 +62,8 @@ export const RecipeScreen = (props: Props) => {
             <Spacer height={20} />
             {recipe ? recipe.preparationSteps.map((preparationStep, index) => (
                 <>
-                    <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+                    <Divider/>
+                    <View style={{ flexDirection: "row", alignItems: "center", paddingVertical: 10 }}>
                         <View style={styles.textBulletContrainer}>
                             <Text style={styles.textBullet}>{index + 1}</Text>
                         </View>

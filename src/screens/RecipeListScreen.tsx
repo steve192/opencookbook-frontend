@@ -100,6 +100,7 @@ const RecipeListScreen = (props: Props) => {
       <StatusBar />
       <Layout style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'baseline' }}>
         <List
+          key={numberOfColumns} //To force re render when number of columns changes
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
           data={myRecipes}
