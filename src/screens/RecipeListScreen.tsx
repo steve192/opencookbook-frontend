@@ -19,7 +19,7 @@ type Props = CompositeScreenProps<
 
 const RecipeListScreen = (props: Props) => {
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
-const [listRefreshing, setListRefreshing] = useState<boolean>(false);
+  const [listRefreshing, setListRefreshing] = useState<boolean>(false);
 
   const theme = useTheme();
 
@@ -53,9 +53,9 @@ const [listRefreshing, setListRefreshing] = useState<boolean>(false);
   }
 
 
-  const renderItemHeader = (headerProps: ViewProps | undefined, info: Recipe) => (
+  const renderRecipeTitle = (headerProps: ViewProps | undefined,info: Recipe) => (
     // <View {...headerProps} style={{height: 50 }}>
-    <Text numberOfLines={2} style={{ height: 70, padding: 10, fontWeight: "bold" }} >
+    <Text numberOfLines={2} style={{ height: 60, padding: 10, fontWeight: "bold" }} >
       {info.title}
     </Text>
     // </View>
@@ -69,16 +69,22 @@ const [listRefreshing, setListRefreshing] = useState<boolean>(false);
 
 
   const renderItem = (info: ListRenderItemInfo<Recipe>) => (
+    // <Layout style={{height: 200, width: 100, flex: 1, margin: 5, borderColor: "black", borderWidth: 1}}>
+    //   {renderItemHeader(info.item)}
+    //   <RecipeImageComponent
+    //       uuid={info.item.images.length > 0 ? info.item.images[0].uuid : null} />
+    // </Layout>
     <Card
       style={styles.item}
-      status='basic'
+      status='control'
       onPress={() => openRecipe(info.item)}
-      header={headerProps => renderItemHeader(headerProps, info.item)}
-      footer={renderItemFooter}>
-      <View style={{ height: 100 }}>
+      footer={headerProps => renderRecipeTitle(headerProps, info.item)}
+      >
+      <Layout style={{ height: 180}}>
         <RecipeImageComponent
+          forceFitScaling={true}
           uuid={info.item.images.length > 0 ? info.item.images[0].uuid : null} />
-      </View>
+      </Layout>
     </Card>
   );
 
@@ -131,11 +137,12 @@ const styles = StyleSheet.create({
     width: "100%"
   },
   contentContainer: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    // paddingHorizontal: 8,
+    // paddingVertical: 4,
   },
   item: {
-    marginVertical: 4,
+    // marginVertical: 4,
+    margin: 1,
     flex: 1
   },
   cardcontainer: {

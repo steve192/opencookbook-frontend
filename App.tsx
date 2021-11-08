@@ -8,13 +8,17 @@ import { enableScreens } from 'react-native-screens'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { myTheme } from './src/styles/custom-theme-light';
 import { KeyboardAvoidingView, Platform } from 'react-native';
+import { default as customMapping } from './mapping.json';
 
 enableScreens()
 
 export default () => (
   <>
     <IconRegistry icons={EvaIconsPack} />
-    <ApplicationProvider {...eva} theme={myTheme}>
+    <ApplicationProvider 
+      {...eva} 
+      customMapping={customMapping}
+      theme={myTheme}>
       {/* <SafeAreaProvider> */}
         {/* <SafeAreaView style={{ flex: 1 }}> */}
   

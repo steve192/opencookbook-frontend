@@ -5,6 +5,7 @@ import RestAPI from '../dao/RestAPI';
 
 interface Props {
     uuid?: string | undefined
+    forceFitScaling?: boolean
 }
 export const RecipeImageComponent = (props: Props) => {
 
@@ -27,6 +28,8 @@ export const RecipeImageComponent = (props: Props) => {
         }
     });
 
+    const resizeMode = Platform.OS === "web" && !props.forceFitScaling ? 'center' : 'cover';
+
     return (
         // <Avatar
         //     source={imageData ? { uri: imageData } : require('../../assets/placeholder.png')}
@@ -34,7 +37,7 @@ export const RecipeImageComponent = (props: Props) => {
         <>
             <Image
                 source={imageData ? { uri: imageData } : require('../../assets/placeholder.png')}
-                style={styles.recipeImage} />
+                style={[styles.recipeImage, {resizeMode: resizeMode}]} />
             {!requestPending ? null :
                 <View style={styles.loadingSpinner}>
                     <Spinner size="giant" />
@@ -59,6 +62,6 @@ const styles = StyleSheet.create({
     recipeImage: {
         width: "100%",
         height: "100%",
-        resizeMode: Platform.OS === "web" ? 'center' : 'cover'
+        
     },
 });
