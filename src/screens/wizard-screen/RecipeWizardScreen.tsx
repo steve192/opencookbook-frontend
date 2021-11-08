@@ -1,8 +1,9 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Avatar, Button, Icon, Input, Text, ViewPager } from '@ui-kitten/components';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { ImageProps, ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
+import { SaveIcon } from '../../assets/Icons';
 import { RecipeImageViewPager } from '../../components/RecipeImageViewPager';
 import RestAPI, { IngredientUse, Recipe } from '../../dao/RestAPI';
 import { MainNavigationProps } from '../../navigation/NavigationRoutes';
@@ -16,15 +17,27 @@ import { RecipeFormField } from './PreparationStepFormField';
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeWizardScreen'>;
 const RecipeWizardScreen = (props: Props) => {
 
-    let [newRecipeData, setNewRecipeData] = useState<Recipe>({
-        title: "",
-        neededIngredients: [{ ingredient: { name: "" }, amount: 0, unit: "" }],
-        preparationSteps: [""],
-        images: []
-    });
+    let [newRecipeData, setNewRecipeData] = useState<Recipe>(
+        props.route.params.recipe ?
+            props.route.params.recipe
+            :
+            {
+                title: "",
+                neededIngredients: [{ ingredient: { name: "" }, amount: 0, unit: "" }],
+                preparationSteps: [""],
+                images: []
+            });
 
+    props.navigation.setOptions({ title: props.route.params.editing ? "Edit recipe" : "Create recipe" });
+    useLayoutEffect(() => {
 
-   
+        props.navigation.setOptions({
+            headerRight: () => (
+                <Button onPress={() => saveRecipe()} accessoryLeft={<SaveIcon />} />
+            ),
+        });
+    }, [props.navigation]);
+
 
     const AddIcon = (props: Partial<ImageProps> | undefined) => (
         <Icon {...props} name="plus-outline" />
@@ -79,8 +92,14 @@ const RecipeWizardScreen = (props: Props) => {
 
 
 
-    const createNewRecipe = () => {
-        RestAPI.createNewRecipe(newRecipeData).then(() => props.navigation.goBack());
+    const saveRecipe = () => {
+        if (props.route.params.editing) {
+            //TODO: Error handling
+            RestAPI.updateRecipe(newRecipeData).then(() => props.navigation.goBack());
+        } else {
+            //TODO: Error handling
+            RestAPI.createNewRecipe(newRecipeData).then(() => props.navigation.goBack());
+        }
     };
 
     const renderIngredientsSection = () =>
@@ -114,14 +133,14 @@ const RecipeWizardScreen = (props: Props) => {
             <Button size="small" key="addStep" accessoryLeft={AddIcon} onPress={addPreparationStep} />
         </>
 
-   
+
 
     return (
         <>
             <View style={styles.contentContainer}>
                 <ScrollView>
                     <RecipeImageViewPager
-                        style={{height: 320}}
+                        style={{ height: 320 }}
                         onImageAdded={addRecipeImage}
                         images={newRecipeData.images}
                         allowEdit={true}
@@ -140,7 +159,7 @@ const RecipeWizardScreen = (props: Props) => {
                     </View>
                     <Button
                         size="giant"
-                        onPress={() => createNewRecipe()}>Create</Button>
+                        onPress={() => saveRecipe()}>{props.route.params.editing ? "Save" : "Create"}</Button>
                 </ScrollView>
             </View>
         </>

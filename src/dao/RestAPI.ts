@@ -26,6 +26,11 @@ export interface Recipe {
     images: RecipeImage[];
 }
 class RestAPI {
+    static async updateRecipe(newRecipeData: Recipe): Promise<Recipe> {
+        let response = await axios.put(this.url("/recipes/" + newRecipeData.id), newRecipeData, await this.axiosConfig());
+        return response.data;
+
+    }
     static async importRecipe(importURL: string): Promise<Recipe> {
         let response = await axios.get(this.url("/recipes/import?importUrl=" + encodeURI(importURL)), await this.axiosConfig());
         return response.data;

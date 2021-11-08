@@ -45,7 +45,7 @@ const RecipeListScreen = (props: Props) => {
         props.navigation.navigate("ImportScreen", {});
         break;
       case 'addRecipe':
-        props.navigation.navigate("RecipeWizardScreen");
+        props.navigation.navigate("RecipeWizardScreen", {});
         break;
     }
   }

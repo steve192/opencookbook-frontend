@@ -19,3 +19,10 @@ export const ArrowForwardIcon = (style: IconProps): IconElement => (
 export const ArrowBackwardIcon = (style: IconProps): IconElement => (
   <Icon {...style} name='arrow-ios-back-outline'/>
 );
+
+export const EditIcon = (style: IconProps): IconElement => (
+  <Icon {...style} name='edit-outline'/>
+);
+export const SaveIcon = (style: IconProps): IconElement => (
+  <Icon {...style} name='save-outline'/>
+);
