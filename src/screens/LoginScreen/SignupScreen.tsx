@@ -54,6 +54,7 @@ export const SignupScreen = ({ route, navigation }: Props) => {
                     <View style={{ flexDirection: "row" }}>
                         <CheckBox checked={termsAccepted} onChange={setTermsAccepted} />
                         <Text
+                            onPress={() => setTermsAccepted(!termsAccepted)}
                             style={{ paddingLeft: 10, color: "white" }}>
                             I accept the{" "}
                             <Text
