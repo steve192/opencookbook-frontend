@@ -6,7 +6,7 @@ import React from 'react';
 import { enableScreens } from 'react-native-screens';
 import { default as customMapping } from './mapping.json';
 import MainNavigation from './src/navigation/Navigation';
-import { myTheme } from './src/styles/custom-theme-dark';
+import { myTheme } from './src/styles/custom-theme-light';
 
 enableScreens()
 
