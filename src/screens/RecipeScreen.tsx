@@ -23,7 +23,7 @@ export const RecipeScreen = (props: Props) => {
 
         props.navigation.setOptions({
             headerRight: () => (
-                <Button onPress={() => props.navigation.navigate("RecipeWizardScreen", { editing: true, recipe: getRecipe() })} accessoryLeft={<EditIcon />} />
+                <Button onPress={() => props.navigation.navigate("RecipeWizardScreen", { editing: true, recipe: recipe })} accessoryLeft={<EditIcon />} />
             ),
         });
     // }, [props.navigation]);
@@ -31,10 +31,6 @@ export const RecipeScreen = (props: Props) => {
         RestAPI.getRecipeById(props.route.params.recipeId)
             .then(setRecipe);
     }, [props.route.params.recipeId]);
-
-    const getRecipe = () => {
-        return recipe;
-    }
 
     const theme = useTheme();
 

@@ -9,6 +9,7 @@ import Configuration from '../../Configuration';
 import Spacer from 'react-spacer';
 import { color } from 'react-native-reanimated';
 import { LoginBackdrop } from './LoginBackdrop';
+import Constants from 'expo-constants';
 
 
 
@@ -78,6 +79,7 @@ const LoginScreen = ({ route, navigation }: Props) => {
                     </Button>
                 </View>
             </View>
+            <Text style={styles.footer}>Alpha build @ {Constants.manifest && Constants.manifest.extra ? Constants.manifest.extra.buildTime : null}</Text>
             {settingsModal}
         </LoginBackdrop>
     )
@@ -85,6 +87,12 @@ const LoginScreen = ({ route, navigation }: Props) => {
 }
 
 const styles = StyleSheet.create({
+    footer: {
+        position: "absolute",
+        bottom: 10,
+        color: "white",
+        fontSize: 10
+    },
     modalBackdrop: {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
