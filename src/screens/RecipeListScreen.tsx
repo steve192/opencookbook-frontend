@@ -1,9 +1,9 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { Card, Layout, List, Text, useTheme } from '@ui-kitten/components';
+import { Card, Layout, List, Spinner, Text, useTheme } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
-import { Dimensions, Image, ListRenderItem, ListRenderItemInfo, StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
+import { ListRenderItemInfo, RefreshControl, StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
 import { FloatingAction, IActionProps } from 'react-native-floating-action';
 import { RecipeImageComponent } from '../components/RecipeImageComponent';
 import { StatusBar } from '../components/StatusBar';
@@ -19,6 +19,8 @@ type Props = CompositeScreenProps<
 
 const RecipeListScreen = (props: Props) => {
   const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
+const [listRefreshing, setListRefreshing] = useState<boolean>(false);
+
   const theme = useTheme();
 
   const addActions: IActionProps[] = [
@@ -89,8 +91,12 @@ const RecipeListScreen = (props: Props) => {
 
 
   const queryRecipes = () => {
+    setListRefreshing(true);
     RestAPI.getRecipes()
-      .then(setMyRecipes);
+      .then((fetchedRecipes) => {
+        setMyRecipes(fetchedRecipes);
+        setListRefreshing(false);
+      });
   }
 
   useEffect(queryRecipes, []);
@@ -106,6 +112,8 @@ const RecipeListScreen = (props: Props) => {
           data={myRecipes}
           numColumns={numberOfColumns}
           renderItem={renderItem}
+          refreshing={listRefreshing}
+          onRefresh={queryRecipes}
         />
         <FloatingAction
           actions={addActions}

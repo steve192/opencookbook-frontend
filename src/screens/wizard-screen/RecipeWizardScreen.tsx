@@ -1,9 +1,9 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Avatar, Button, Icon, Input, Text, ViewPager } from '@ui-kitten/components';
+import { Avatar, Button, Icon, Input, Text, useTheme, ViewPager } from '@ui-kitten/components';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { ImageProps, ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
-import { SaveIcon } from '../../assets/Icons';
+import { DeleteIcon, SaveIcon } from '../../assets/Icons';
 import { RecipeImageViewPager } from '../../components/RecipeImageViewPager';
 import RestAPI, { IngredientUse, Recipe } from '../../dao/RestAPI';
 import { MainNavigationProps } from '../../navigation/NavigationRoutes';
@@ -16,6 +16,8 @@ import { RecipeFormField } from './PreparationStepFormField';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeWizardScreen'>;
 const RecipeWizardScreen = (props: Props) => {
+
+    const theme = useTheme()
 
     let [newRecipeData, setNewRecipeData] = useState<Recipe>(
         props.route.params.recipe ?
@@ -33,7 +35,10 @@ const RecipeWizardScreen = (props: Props) => {
 
         props.navigation.setOptions({
             headerRight: () => (
+                <>
+                <Button onPress={() => deleteRecipe()} accessoryLeft={<DeleteIcon fill={theme["color-danger-default"]} />} />
                 <Button onPress={() => saveRecipe()} accessoryLeft={<SaveIcon />} />
+                </>
             ),
         });
     }, [props.navigation]);
@@ -101,6 +106,15 @@ const RecipeWizardScreen = (props: Props) => {
             RestAPI.createNewRecipe(newRecipeData).then(() => props.navigation.goBack());
         }
     };
+
+    const deleteRecipe = () => {
+        if (props.route.params.editing) {
+            //TODO: Error handling
+            RestAPI.deleteRecipe(newRecipeData).then(() => props.navigation.goBack());
+        } else {
+            props.navigation.goBack()
+        }
+    }
 
     const renderIngredientsSection = () =>
         <>

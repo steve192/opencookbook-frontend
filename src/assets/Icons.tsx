@@ -26,3 +26,6 @@ export const EditIcon = (style: IconProps): IconElement => (
 export const SaveIcon = (style: IconProps): IconElement => (
   <Icon {...style} name='save-outline'/>
 );
+export const DeleteIcon = (style: IconProps): IconElement => (
+  <Icon {...style} name='trash-2-outline'/>
+);

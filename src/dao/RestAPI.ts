@@ -26,6 +26,9 @@ export interface Recipe {
     images: RecipeImage[];
 }
 class RestAPI {
+    static async deleteRecipe(newRecipeData: Recipe): Promise<void> {
+        await axios.delete(this.url("/recipes/" + newRecipeData.id), await this.axiosConfig());
+    }
     static async updateRecipe(newRecipeData: Recipe): Promise<Recipe> {
         let response = await axios.put(this.url("/recipes/" + newRecipeData.id), newRecipeData, await this.axiosConfig());
         return response.data;
