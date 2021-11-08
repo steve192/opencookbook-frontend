@@ -1,15 +1,14 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import React, { useEffect, useLayoutEffect, useState } from 'react';
-import { StyleSheet, View, Image } from 'react-native';
-import { MainNavigationProps } from "../navigation/NavigationRoutes";
-import { Avatar, Button, Divider, Text, useTheme, ViewPager } from '@ui-kitten/components';
-import { StatusBar } from "../components/StatusBar";
-import CentralStyles from "../styles/CentralStyles";
+import { Button, Divider, Layout, Text, useTheme } from '@ui-kitten/components';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { ScrollView } from "react-native-gesture-handler";
 import Spacer from "react-spacer";
 import { EditIcon, MinusIcon, PlusIcon } from "../assets/Icons";
-import RestAPI, { Recipe } from "../dao/RestAPI";
 import { RecipeImageViewPager } from "../components/RecipeImageViewPager";
+import RestAPI, { Recipe } from "../dao/RestAPI";
+import { MainNavigationProps } from "../navigation/NavigationRoutes";
+import CentralStyles from "../styles/CentralStyles";
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
@@ -21,11 +20,11 @@ export const RecipeScreen = (props: Props) => {
     props.navigation.setOptions({ title: recipe ? recipe.title : "Loading" });
     // useLayoutEffect(() => {
 
-        props.navigation.setOptions({
-            headerRight: () => (
-                <Button onPress={() => props.navigation.navigate("RecipeWizardScreen", { editing: true, recipe: recipe })} accessoryLeft={<EditIcon />} />
-            ),
-        });
+    props.navigation.setOptions({
+        headerRight: () => (
+            <Button onPress={() => props.navigation.navigate("RecipeWizardScreen", { editing: true, recipe: recipe })} accessoryLeft={<EditIcon />} />
+        ),
+    });
     // }, [props.navigation]);
     useEffect(() => {
         RestAPI.getRecipeById(props.route.params.recipeId)
@@ -86,22 +85,24 @@ export const RecipeScreen = (props: Props) => {
     return (
         <>
             {/* <StatusBar /> */}
-            <ScrollView>
-                <RecipeImageViewPager
-                    style={{ height: 320 }}
-                    images={recipe ? recipe?.images : []}
-                />
-                <View style={[CentralStyles.contentContainer, { flex: 1 }]} >
-                    {renderIngredientsSection()}
+            <Layout>
+                <ScrollView>
+                    <RecipeImageViewPager
+                        style={{ height: 320 }}
+                        images={recipe ? recipe?.images : []}
+                    />
+                    <View style={[CentralStyles.contentContainer, { flex: 1 }]} >
+                        {renderIngredientsSection()}
 
-                    <Spacer height={20} />
-                    <Button>Start cooking</Button>
-                    <Spacer height={20} />
+                        <Spacer height={20} />
+                        <Button>Start cooking</Button>
+                        <Spacer height={20} />
 
-                    {renderStepsSection()}
+                        {renderStepsSection()}
 
-                </View>
-            </ScrollView>
+                    </View>
+                </ScrollView>
+            </Layout>
         </>
     );
 }

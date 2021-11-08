@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Avatar, Button, Icon, Input, Text, useTheme, ViewPager } from '@ui-kitten/components';
+import { Avatar, Button, Icon, Input, Layout, Text, useTheme, ViewPager } from '@ui-kitten/components';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { ImageProps, ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
@@ -151,7 +151,7 @@ const RecipeWizardScreen = (props: Props) => {
 
     return (
         <>
-            <View style={styles.contentContainer}>
+            <Layout style={styles.contentContainer}>
                 <ScrollView>
                     <RecipeImageViewPager
                         style={{ height: 320 }}
@@ -175,7 +175,7 @@ const RecipeWizardScreen = (props: Props) => {
                         size="giant"
                         onPress={() => saveRecipe()}>{props.route.params.editing ? "Save" : "Create"}</Button>
                 </ScrollView>
-            </View>
+            </Layout>
         </>
     )
 

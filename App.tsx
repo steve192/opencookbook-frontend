@@ -1,30 +1,29 @@
-import React from 'react';
 import * as eva from '@eva-design/eva';
-import { ApplicationProvider, IconRegistry, TopNavigation } from '@ui-kitten/components';
 import { NavigationContainer } from '@react-navigation/native';
-import MainNavigation from './src/navigation/Navigation';
+import { ApplicationProvider, IconRegistry } from '@ui-kitten/components';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
-import { enableScreens } from 'react-native-screens'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { myTheme } from './src/styles/custom-theme-light';
-import { KeyboardAvoidingView, Platform } from 'react-native';
+import React from 'react';
+import { enableScreens } from 'react-native-screens';
 import { default as customMapping } from './mapping.json';
+import MainNavigation from './src/navigation/Navigation';
+import { myTheme } from './src/styles/custom-theme-dark';
 
 enableScreens()
 
 export default () => (
   <>
     <IconRegistry icons={EvaIconsPack} />
-    <ApplicationProvider 
-      {...eva} 
+    <ApplicationProvider
+      {...eva}
+      // @ts-ignore
       customMapping={customMapping}
       theme={myTheme}>
       {/* <SafeAreaProvider> */}
-        {/* <SafeAreaView style={{ flex: 1 }}> */}
-  
-        <NavigationContainer>
-          <MainNavigation />
-        </NavigationContainer>
+      {/* <SafeAreaView style={{ flex: 1 }}> */}
+
+      <NavigationContainer>
+        <MainNavigation />
+      </NavigationContainer>
       {/* </SafeAreaView> */}
       {/* </SafeAreaProvider> */}
     </ApplicationProvider>
