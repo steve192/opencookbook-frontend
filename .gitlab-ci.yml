@@ -46,4 +46,4 @@ publish-cluster:
   needs: ["package-docker-qa"]
   trigger:
     project: opencookbook/opencookbook-docker
-    branch: master
+    branch: main
