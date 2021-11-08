@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteItem, Button, Divider, Input, InputProps } from "@ui-kitten/components";
+import { Autocomplete, AutocompleteItem, Button, Divider, IndexPath, Input, Select, SelectItem } from "@ui-kitten/components";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Spacer from "react-spacer";
@@ -14,11 +14,13 @@ interface Props {
 export const IngredientFormField = (props: Props) => {
 
     const [ingredientQuery, setIngredientQuery] = useState<string>(props.ingredient.ingredient.name);
-    const [amountAndUnit, setAmountAndUnit] = useState<string>(props.ingredient.amount + " " + props.ingredient.unit);
     const [unit, setUnit] = useState<string>(props.ingredient.unit);
     const [amount, setAmount] = useState<number | undefined>(props.ingredient.amount);
 
+    const [availableUnits, setAvailableUnits] = useState<string[]>([]);
+
     const [availableIngredients, setAvailableIngredients] = useState<Ingredient[]>([]);
+    const [selectedUnitIndex, setSelectedUnitIndex] = useState<IndexPath>();
 
     const setIngredient = (text: string) => {
         setIngredientQuery(text);
@@ -69,25 +71,45 @@ export const IngredientFormField = (props: Props) => {
         setUnit(text);
     }
 
+    const onUnitSelect = (index: IndexPath | IndexPath[]) => {
+        if (!Array.isArray(index)) {
+            setSelectedUnitIndex(index);
+            setUnit(availableUnits[index.row]);
+        }
+    }
+
     useEffect(queryIngredients, [ingredientQuery]);
+    useEffect(() => {
+        RestAPI.getUnits().then((units) => {
+            setAvailableUnits(units);
+        });
+    }, []);
 
     return (
         <>
             <View style={{ flex: 1, flexDirection: "column" }}>
                 <View style={{ flex: 1, flexDirection: "row" }}>
                     <Input
-                        style={{  width: 100 }}
+                        style={{ width: 100 }}
                         value={(amount ? amount.toString() : "")}
                         placeholder="Amount"
                         onChangeText={onAmountChange} />
-                        <Spacer width={5}/>
+                    <Spacer width={5} />
+                    <Select
+                        selectedIndex={selectedUnitIndex}
+                        value={unit}
+                        onSelect={onUnitSelect}>
+                        {availableUnits.map((unit) =>
+                            <SelectItem title={unit} />
+                        )}
+                    </Select>
                     <Input
                         style={{ width: 150 }}
                         value={unit}
                         placeholder="Unit"
                         onChangeText={onUnitChange} />
                 </View>
-                <Spacer height={5}/>
+                <Spacer height={5} />
                 <View style={{ justifyContent: "center", flex: 1 }}>
                     <Autocomplete
                         placeholder='Ingredient'
