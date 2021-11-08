@@ -1,8 +1,8 @@
 import { Avatar, Button, Icon, Text, ViewPager } from '@ui-kitten/components';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useState } from 'react';
-import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import { ArrowBackwardIcon, ArrowForwardIcon, PlusIcon } from '../assets/Icons';
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { ArrowBackwardIcon, ArrowForwardIcon } from '../assets/Icons';
 import RestAPI, { RecipeImage } from '../dao/RestAPI';
 import { RecipeImageComponent } from './RecipeImageComponent';
 
@@ -45,7 +45,6 @@ export const RecipeImageViewPager = (props: Props) => {
                 selectedIndex={shownImageIndex}
                 onSelect={setShownImageIndex}
                 style={styles.recipeImage}>
-
                 {props.images.length === 0 ?
                     <Avatar
                         source={require('../../assets/placeholder.png')}
@@ -55,6 +54,9 @@ export const RecipeImageViewPager = (props: Props) => {
                         <RecipeImageComponent
                             uuid={image.uuid} />
                     )}
+
+
+
             </ViewPager>
             {!props.allowEdit ? null :
                 <Button onPress={selectImage} style={styles.imageButton} status="basic" accessoryLeft={<Icon name="camera" />} />
@@ -63,21 +65,19 @@ export const RecipeImageViewPager = (props: Props) => {
             <Text style={styles.indexIndicator}>{shownImageIndex + 1} / {props.images.length}</Text>
 
             {shownImageIndex === 0 ? null :
-                <View style={styles.backwardButton}>
-                    <Button
-                        appearance="ghost"
-                        onPress={() => setShownImageIndex(shownImageIndex - 1)}
-                        accessoryLeft={<ArrowBackwardIcon width={50} height={50} fill="rgb(209,209,209)" />} />
-                </View>
+                <Pressable
+                onPress={() => setShownImageIndex(shownImageIndex - 1)}
+                    style={styles.backwardButton}>
+                        <ArrowBackwardIcon width={50} height={50} fill="rgb(209,209,209)" />
+                </Pressable>
             }
 
             {shownImageIndex === props.images.length - 1 ? null :
-                <View style={styles.forwardButton}>
-                    <Button
-                        appearance="ghost"
-                        onPress={() => setShownImageIndex(shownImageIndex + 1)}
-                        accessoryLeft={<ArrowForwardIcon width={50} height={50} fill="rgb(209,209,209)" />} />
-                </View>
+                <Pressable 
+                    style={styles.forwardButton}
+                    onPress={() => setShownImageIndex(shownImageIndex + 1)}>
+                    <ArrowForwardIcon width={50} height={50} fill="rgb(209,209,209)" />
+                </Pressable>
             }
         </View>
     );
@@ -87,23 +87,19 @@ const styles = StyleSheet.create({
     backwardButton: {
         position: "absolute",
         left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
         justifyContent: "center",
         alignItems: "flex-start",
         flex: 1,
+        height: "100%"
 
     },
     forwardButton: {
         position: "absolute",
-        left: 0,
-        right: 5,
-        top: 0,
-        bottom: 0,
+        right: 0,
         justifyContent: "center",
         alignItems: "flex-end",
         flex: 1,
+        height: "100%"
     },
     indexIndicator: {
         // fontWeight: "bold",
