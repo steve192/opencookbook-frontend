@@ -19,6 +19,6 @@ export default StyleSheet.create({
         justifyContent: "center",
         paddingVertical: 24,
         paddingHorizontal: 16,
-        maxWidth: 600
+        maxWidth: 800
     }
 });

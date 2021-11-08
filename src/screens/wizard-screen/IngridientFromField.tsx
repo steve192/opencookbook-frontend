@@ -1,16 +1,16 @@
-import { Autocomplete, AutocompleteItem, Button, Input, InputProps } from "@ui-kitten/components";
+import { Autocomplete, AutocompleteItem, Button, Divider, Input, InputProps } from "@ui-kitten/components";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import RestAPI, { Ingredient, IngredientUse } from "../../dao/RestAPI";
 
 
 interface Props {
-     ingredient: IngredientUse
-     onIngredientChange: (newIngredient: IngredientUse) => void
-     onRemovePress: () => void 
+    ingredient: IngredientUse
+    onIngredientChange: (newIngredient: IngredientUse) => void
+    onRemovePress: () => void
 }
 
-export const IngredientFormField = (props: Props ) => {
+export const IngredientFormField = (props: Props) => {
 
     const [ingredientQuery, setIngredientQuery] = useState<string>(props.ingredient.ingredient.name);
     const [amountAndUnit, setAmountAndUnit] = useState<string>(props.ingredient.amount + " " + props.ingredient.unit);
@@ -60,27 +60,45 @@ export const IngredientFormField = (props: Props ) => {
         }
     }
 
+    const onAmountChange = (text: string) => {
+        setAmount(parseFloat(text));
+    }
+
+    const onUnitChange = (text: string) => {
+        setUnit(text);
+    }
+
     useEffect(queryIngredients, [ingredientQuery]);
 
     return (
-        <View style={{ flex: 1, flexDirection: "row" }}>
-            <Input
-                value={(amount ? amount.toString() : "") + (amount && unit ? " " : "") + unit}
-                placeholder="Amount and Unit"
-                onChangeText={onAmountUnitFieldChange} />
-            <View style={{ justifyContent: "center", flexGrow: 1 }}>
-                <Autocomplete
-                    placeholder='Ingredient'
-                    value={ingredientQuery}
-                    // accessoryRight={renderCloseIcon}
-                    onChangeText={(text) => setIngredient(text)}
-                    onSelect={(index) => setIngredient(availableIngredients[index].name)}>
-                    {availableIngredients.map((ingredient, index) => renderIngredientOptions(ingredient, index))}
-                </Autocomplete>
-                <Button style={{ position: "absolute", right: 5 }} size="tiny" onPress={() => props.onRemovePress()}>X</Button>
+        <>
+            <View style={{ flex: 1, flexDirection: "column" }}>
+                <View style={{ flex: 1, flexDirection: "row" }}>
+                    <Input
+                        style={{  width: 100 }}
+                        value={(amount ? amount.toString() : "")}
+                        placeholder="Amount"
+                        onChangeText={onAmountChange} />
+                    <Input
+                        style={{ width: 150 }}
+                        value={unit}
+                        placeholder="Unit"
+                        onChangeText={onUnitChange} />
+                </View>
+                <View style={{ justifyContent: "center", flex: 1 }}>
+                    <Autocomplete
+                        placeholder='Ingredient'
+                        value={ingredientQuery}
+                        // accessoryRight={renderCloseIcon}
+                        onChangeText={(text) => setIngredient(text)}
+                        onSelect={(index) => setIngredient(availableIngredients[index].name)}>
+                        {availableIngredients.map((ingredient, index) => renderIngredientOptions(ingredient, index))}
+                    </Autocomplete>
+                    <Button style={{ position: "absolute", right: 5 }} size="tiny" onPress={() => props.onRemovePress()}>X</Button>
 
+                </View>
             </View>
-
-        </View>
+            <Divider style={{ marginVertical: 10 }} />
+        </>
     )
 }
