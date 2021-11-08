@@ -36,8 +36,8 @@ const RecipeWizardScreen = (props: Props) => {
         props.navigation.setOptions({
             headerRight: () => (
                 <>
-                <Button onPress={() => deleteRecipe()} accessoryLeft={<DeleteIcon fill={theme["color-danger-default"]} />} />
-                <Button onPress={() => saveRecipe()} accessoryLeft={<SaveIcon />} />
+                    <Button onPress={() => deleteRecipe()} accessoryLeft={<DeleteIcon fill={theme["color-danger-default"]} />} />
+                    <Button onPress={() => saveRecipe()} accessoryLeft={<SaveIcon />} />
                 </>
             ),
         });
@@ -134,14 +134,17 @@ const RecipeWizardScreen = (props: Props) => {
     const renderPreparationStepsSection = () =>
         <>
             {newRecipeData.preparationSteps.map((preparationStep, preparationStepIndex) =>
-                <RecipeFormField
-                    onRemovePress={() => removePreparationStep(preparationStepIndex)}
-                    key={preparationStepIndex + "prepstep"}
-                    multiline={true}
-                    numberOfLines={5}
-                    value={newRecipeData.preparationSteps[preparationStepIndex]}
-                    onChangeText={newText => changePreparationStep(newText, preparationStepIndex)}
-                    placeholder="Add description of preparation step..." />
+                <>
+                    <RecipeFormField
+                        onRemovePress={() => removePreparationStep(preparationStepIndex)}
+                        key={preparationStepIndex + "prepstep"}
+                        multiline={true}
+                        numberOfLines={5}
+                        value={newRecipeData.preparationSteps[preparationStepIndex]}
+                        onChangeText={newText => changePreparationStep(newText, preparationStepIndex)}
+                        placeholder="Add description of preparation step..." />
+                    <Spacer height={5} />
+                </>
             )}
             <Spacer height={10} />
             <Button size="small" key="addStep" accessoryLeft={AddIcon} onPress={addPreparationStep} />

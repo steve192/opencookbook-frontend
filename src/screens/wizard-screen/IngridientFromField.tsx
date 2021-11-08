@@ -1,6 +1,7 @@
 import { Autocomplete, AutocompleteItem, Button, Divider, Input, InputProps } from "@ui-kitten/components";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
+import Spacer from "react-spacer";
 import RestAPI, { Ingredient, IngredientUse } from "../../dao/RestAPI";
 
 
@@ -79,12 +80,14 @@ export const IngredientFormField = (props: Props) => {
                         value={(amount ? amount.toString() : "")}
                         placeholder="Amount"
                         onChangeText={onAmountChange} />
+                        <Spacer width={5}/>
                     <Input
                         style={{ width: 150 }}
                         value={unit}
                         placeholder="Unit"
                         onChangeText={onUnitChange} />
                 </View>
+                <Spacer height={5}/>
                 <View style={{ justifyContent: "center", flex: 1 }}>
                     <Autocomplete
                         placeholder='Ingredient'
