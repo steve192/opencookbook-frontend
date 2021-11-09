@@ -77,7 +77,6 @@ const LoginScreen = ({ route, navigation }: Props) => {
                     >
                         Don't have an account? Create
                     </Button>
-                    { true && <Text>Hello1</Text> && <Text>Hello 2</Text>}
                 </View>
             </View>
             <Text style={styles.footer}>Alpha build @ {Constants.manifest?.extra?.buildTime}</Text>
