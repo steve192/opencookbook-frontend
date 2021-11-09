@@ -19,7 +19,7 @@ const RecipeWizardScreen = (props: Props) => {
 
     const theme = useTheme()
 
-    let [newRecipeData, setNewRecipeData] = useState<Recipe>(
+    const [newRecipeData, setNewRecipeData] = useState<Recipe>(
         props.route.params.recipe ?
             props.route.params.recipe
             :
@@ -31,6 +31,7 @@ const RecipeWizardScreen = (props: Props) => {
             });
 
     props.navigation.setOptions({ title: props.route.params.editing ? "Edit recipe" : "Create recipe" });
+
     useLayoutEffect(() => {
 
         props.navigation.setOptions({
@@ -41,7 +42,7 @@ const RecipeWizardScreen = (props: Props) => {
                 </>
             ),
         });
-    }, [props.navigation]);
+    }, [props.navigation, newRecipeData]);
 
 
     const AddIcon = (props: Partial<ImageProps> | undefined) => (
