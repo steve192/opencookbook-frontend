@@ -14,7 +14,7 @@ import CentralStyles from "../styles/CentralStyles";
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
 export const RecipeScreen = (props: Props) => {
 
-    const [portions, setPortions] = useState<number>(1);
+    const [servings, setServings] = useState<number>(0);
     const [recipe, setRecipe] = useState<Recipe>();
 
     props.navigation.setOptions({ title: recipe ? recipe.title : "Loading" });
@@ -39,10 +39,18 @@ export const RecipeScreen = (props: Props) => {
     // }, [props.navigation]);
     useEffect(() => {
         RestAPI.getRecipeById(props.route.params.recipeId)
-            .then(setRecipe);
+            .then((loadedRecipe) => {
+                setRecipe(loadedRecipe);
+                setServings(loadedRecipe.servings);
+            });
     }, [props.route.params.recipeId]);
 
     const theme = useTheme();
+
+    const getServingMultiplier = () => {
+        if (!recipe) { return 1 };
+        return servings / recipe?.servings;
+    }
 
     const renderIngredientsSection = () => (
         <>
@@ -51,23 +59,23 @@ export const RecipeScreen = (props: Props) => {
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 {recipe?.neededIngredients.map(ingredient =>
                     <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row' }}>
-                        <Text style={{ flex: 1, alignSelf: 'stretch', color: theme["color-primary-default"], fontWeight: "bold" }}>{`${ingredient.amount} ${ingredient.unit}`}</Text>
+                        <Text style={{ flex: 1, alignSelf: 'stretch', color: theme["color-primary-default"], fontWeight: "bold" }}>{`${ingredient.amount * getServingMultiplier()} ${ingredient.unit}`}</Text>
                         <Text style={{ flex: 3, alignSelf: 'stretch' }} >{ingredient.ingredient.name}</Text>
                     </View>
                 )}
             </View>
             <Spacer height={20} />
-            <View style={styles.portionsContainer}>
+            <View style={styles.servingsContainer}>
                 <Button
                     style={CentralStyles.iconButton}
                     size='tiny'
-                    onPress={() => setPortions(portions - 1)}
+                    onPress={() => setServings(servings - 1)}
                     accessoryLeft={<MinusIcon />} />
-                <Text style={{ paddingHorizontal: 20 }}> {portions} Portions</Text>
+                <Text style={{ paddingHorizontal: 20 }}> {servings} Servings</Text>
                 <Button
                     style={CentralStyles.iconButton}
                     size='tiny'
-                    onPress={() => setPortions(portions + 1)}
+                    onPress={() => setServings(servings + 1)}
                     accessoryLeft={<PlusIcon />} />
             </View>
             {/* </View> */}
@@ -103,13 +111,13 @@ export const RecipeScreen = (props: Props) => {
                         images={recipe ? recipe?.images : []}
                     />
                     <View style={[CentralStyles.contentContainer, { flex: 1 }]} >
-                        {renderIngredientsSection()}
+                        {recipe && renderIngredientsSection()}
 
                         <Spacer height={20} />
                         <Button>Start cooking</Button>
                         <Spacer height={20} />
 
-                        {renderStepsSection()}
+                        {recipe && renderStepsSection()}
 
                     </View>
                 </ScrollView>
@@ -138,7 +146,7 @@ const styles = StyleSheet.create({
         height: 320,
         borderRadius: 0,
     },
-    portionsContainer: {
+    servingsContainer: {
 
         justifyContent: "center",
         alignItems: "center",

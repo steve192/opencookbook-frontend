@@ -27,7 +27,8 @@ const RecipeWizardScreen = (props: Props) => {
                 title: "",
                 neededIngredients: [{ ingredient: { name: "" }, amount: 0, unit: "" }],
                 preparationSteps: [""],
-                images: []
+                images: [],
+                servings: 1
             });
 
     props.navigation.setOptions({ title: props.route.params.editing ? "Edit recipe" : "Create recipe" });
@@ -186,6 +187,14 @@ const RecipeWizardScreen = (props: Props) => {
                             placeholder="Name" />
                         <Spacer height={15} />
                         {renderIngredientsSection()}
+                        <Divider style={{ marginVertical: 10 }} />
+                        <Spacer height={15} />
+                        <Text category="label">Servings</Text>
+                        <Input
+                            placeholder="Serving size"
+                            keyboardType='numeric'
+                            value={newRecipeData.servings.toString()}
+                            onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, servings: parseInt(newText)})} />
                         <Divider style={{ marginVertical: 10 }} />
                         <Spacer height={15} />
                         <Text category="label">Preparation Steps</Text>

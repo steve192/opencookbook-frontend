@@ -24,6 +24,7 @@ export interface Recipe {
     neededIngredients: IngredientUse[];
     preparationSteps: string[];
     images: RecipeImage[];
+    servings: number;
 }
 class RestAPI {
     static async getUnits(): Promise<string[]> {
