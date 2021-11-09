@@ -100,17 +100,26 @@ const RecipeWizardScreen = (props: Props) => {
     const saveRecipe = () => {
         if (props.route.params.editing) {
             //TODO: Error handling
-            RestAPI.updateRecipe(newRecipeData).then(() => props.navigation.goBack());
+            RestAPI.updateRecipe(newRecipeData).then((recipe) => {
+                props.navigation.goBack();
+                props.route.params.onRecipeChanged ? props.route.params.onRecipeChanged(recipe) : null;
+            });
         } else {
             //TODO: Error handling
-            RestAPI.createNewRecipe(newRecipeData).then(() => props.navigation.goBack());
+            RestAPI.createNewRecipe(newRecipeData).then((recipe) => {
+                props.navigation.goBack();
+                props.route.params.onRecipeChanged ? props.route.params.onRecipeChanged(recipe) : null;
+            });
         }
     };
 
     const deleteRecipe = () => {
         if (props.route.params.editing) {
             //TODO: Error handling
-            RestAPI.deleteRecipe(newRecipeData).then(() => props.navigation.goBack());
+            RestAPI.deleteRecipe(newRecipeData).then(() => {
+                props.navigation.goBack();
+                props.route.params.onRecipeDeleted ? props.route.params.onRecipeDeleted() : null;
+            });
         } else {
             props.navigation.goBack()
         }

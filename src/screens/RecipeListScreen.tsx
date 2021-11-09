@@ -47,13 +47,15 @@ const RecipeListScreen = (props: Props) => {
         props.navigation.navigate("ImportScreen", {});
         break;
       case 'addRecipe':
-        props.navigation.navigate("RecipeWizardScreen", {});
+        props.navigation.navigate("RecipeWizardScreen", {
+          onRecipeChanged: queryRecipes,
+        });
         break;
     }
   }
 
 
-  const renderRecipeTitle = (headerProps: ViewProps | undefined,info: Recipe) => (
+  const renderRecipeTitle = (headerProps: ViewProps | undefined, info: Recipe) => (
     // <View {...headerProps} style={{height: 50 }}>
     <Text numberOfLines={2} style={{ height: 60, padding: 10, fontWeight: "bold" }} >
       {info.title}
@@ -62,9 +64,11 @@ const RecipeListScreen = (props: Props) => {
   );
 
   const renderItemFooter = () => (
-    <Text >
-      TODO
-    </Text>
+    <>
+    </>
+    // <Text >
+    //   TODO
+    // </Text>
   );
 
 
@@ -79,17 +83,19 @@ const RecipeListScreen = (props: Props) => {
       status='control'
       onPress={() => openRecipe(info.item)}
       footer={headerProps => renderRecipeTitle(headerProps, info.item)}
-      >
-      <Layout style={{ height: 180}}>
+    >
+      <Layout style={{ height: 180 }}>
         <RecipeImageComponent
           forceFitScaling={true}
-          uuid={info.item.images.length > 0 ? info.item.images[0].uuid : null} />
+          uuid={info.item.images.length > 0 ? info.item.images[0].uuid : undefined} />
       </Layout>
     </Card>
   );
 
   const openRecipe = (recipe: Recipe) => {
-    props.navigation.push("RecipeScreen", { recipeId: recipe.id });
+    if (recipe.id) {
+      props.navigation.push("RecipeScreen", { recipeId: recipe.id, onRecipeChanged: queryRecipes });
+    }
   }
 
   const windowDimensions = useWindowDimensions();

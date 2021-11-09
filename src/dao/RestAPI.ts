@@ -271,12 +271,9 @@ class RestAPI {
         }
         return response.data;
     }
-    static async createNewRecipe(newRecipeData: Recipe) {
+    static async createNewRecipe(newRecipeData: Recipe): Promise<Recipe> {
         let response = await axios.post(this.url("/recipes"), newRecipeData, await this.axiosConfig());
-
-        if (response.status > 299) {
-            throw Error("Server responded with http " + response.status);
-        }
+        return response.data;
     }
 
 

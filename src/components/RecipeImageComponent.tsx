@@ -16,7 +16,7 @@ export const RecipeImageComponent = (props: Props) => {
 
     // Hook for loading images used and putting them in the buffer
     useEffect(() => {
-        if (!imageData && !requestPending && props.uuid) {
+        if (!requestPending && props.uuid) {
             setRequestPending(true);
             RestAPI.getImageAsDataURI(props.uuid).then((data) => {
                 setImageData(data);
@@ -26,14 +26,11 @@ export const RecipeImageComponent = (props: Props) => {
                 //TODO: Error handling
             });
         }
-    });
+    },[props.uuid]);
 
     const resizeMode = Platform.OS === "web" && !props.forceFitScaling ? 'center' : 'cover';
 
     return (
-        // <Avatar
-        //     source={imageData ? { uri: imageData } : require('../../assets/placeholder.png')}
-        //     style={styles.recipeImage} />
         <>
             <Image
                 source={imageData ? { uri: imageData } : require('../../assets/placeholder.png')}

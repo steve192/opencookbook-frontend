@@ -22,7 +22,18 @@ export const RecipeScreen = (props: Props) => {
 
     props.navigation.setOptions({
         headerRight: () => (
-            <Button onPress={() => props.navigation.navigate("RecipeWizardScreen", { editing: true, recipe: recipe })} accessoryLeft={<EditIcon />} />
+            <Button
+                onPress={() => props.navigation.navigate("RecipeWizardScreen", {
+                    editing: true,
+                    recipe: recipe,
+                    onRecipeChanged: setRecipe,
+                    onRecipeDeleted: () => {
+                        props.navigation.goBack();
+                        if (props.route.params.onRecipeChanged) {
+                            props.route.params.onRecipeChanged();
+                        }
+                    }
+                })} accessoryLeft={<EditIcon />} />
         ),
     });
     // }, [props.navigation]);
