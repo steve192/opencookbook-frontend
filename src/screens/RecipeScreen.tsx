@@ -49,12 +49,12 @@ export const RecipeScreen = (props: Props) => {
             <Text category="label">Ingredients</Text>
             {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                {recipe ? recipe.neededIngredients.map(ingredient =>
+                {recipe?.neededIngredients.map(ingredient =>
                     <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row' }}>
                         <Text style={{ flex: 1, alignSelf: 'stretch', color: theme["color-primary-default"], fontWeight: "bold" }}>{`${ingredient.amount} ${ingredient.unit}`}</Text>
                         <Text style={{ flex: 3, alignSelf: 'stretch' }} >{ingredient.ingredient.name}</Text>
                     </View>
-                ) : null}
+                )}
             </View>
             <Spacer height={20} />
             <View style={styles.portionsContainer}>
@@ -78,7 +78,7 @@ export const RecipeScreen = (props: Props) => {
         <>
             <Text category="label">Preparation steps</Text>
             <Spacer height={20} />
-            {recipe ? recipe.preparationSteps.map((preparationStep, index) => (
+            {recipe && recipe.preparationSteps.map((preparationStep, index) => (
                 <>
                     <Divider />
                     <View style={{ flexDirection: "row", alignItems: "center", paddingVertical: 10 }}>
@@ -88,7 +88,7 @@ export const RecipeScreen = (props: Props) => {
                         <Text style={{ flex: 1 }}>{preparationStep}</Text>
                     </View>
                 </>
-            )) : null}
+            ))}
         </>
     );
 

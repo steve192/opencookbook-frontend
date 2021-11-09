@@ -49,7 +49,7 @@ export const SignupScreen = ({ route, navigation }: Props) => {
                     <Input status={passwordsMatching ? "basic" : "danger"} value={password} onChangeText={setPassword} placeholder="Password" secureTextEntry={true} />
                     <Spacer height={5} />
                     <Input status={passwordsMatching ? "basic" : "danger"} value={passwordConfirm} onChangeText={setPasswordConfirm} placeholder="Password Confirm" secureTextEntry={true} />
-                    {!passwordsMatching ? <Text status="danger">Passwords do not match</Text> : null}
+                    {!passwordsMatching && <Text status="danger">Passwords do not match</Text> }
                     <Spacer height={20} />
                     <View style={{ flexDirection: "row" }}>
                         <CheckBox checked={termsAccepted} onChange={setTermsAccepted} />
@@ -66,7 +66,7 @@ export const SignupScreen = ({ route, navigation }: Props) => {
                     </View>
                     <Spacer height={20} />
                     <Button disabled={allFieldsOk ? false : true} style={CentralStyles.elementSpacing} onPress={register}>Register</Button>
-                    {apiErrorMessage ? <Text status="danger">{apiErrorMessage}</Text> : null}
+                    {apiErrorMessage && <Text status="danger">{apiErrorMessage}</Text>}
                 </View>
             </View>
         </LoginBackdrop>

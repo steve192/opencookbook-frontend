@@ -69,7 +69,7 @@ const LoginScreen = ({ route, navigation }: Props) => {
                         </Button>
                     </View>
                     <Button style={CentralStyles.elementSpacing} onPress={doLogin}>Login</Button>
-                    {apiErrorMessage ? <Text status="danger">{apiErrorMessage}</Text> : null}
+                    {apiErrorMessage && <Text status="danger">{apiErrorMessage}</Text>}
                     <Button
                         appearance='ghost'
                         status='basic'
@@ -77,9 +77,10 @@ const LoginScreen = ({ route, navigation }: Props) => {
                     >
                         Don't have an account? Create
                     </Button>
+                    { true && <Text>Hello1</Text> && <Text>Hello 2</Text>}
                 </View>
             </View>
-            <Text style={styles.footer}>Alpha build @ {Constants.manifest && Constants.manifest.extra ? Constants.manifest.extra.buildTime : null}</Text>
+            <Text style={styles.footer}>Alpha build @ {Constants.manifest?.extra?.buildTime}</Text>
             {settingsModal}
         </LoginBackdrop>
     )

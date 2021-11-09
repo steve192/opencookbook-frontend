@@ -35,15 +35,15 @@ export const ImportScreen = (props: Props) => {
             <Button onPress={startImport}>Import</Button>
             <Spacer height={80} />
             <View>
-                {!importPending ? null :
+                {importPending &&
                     <Spinner size="giant" />
                 }
 
-                {!importError ? null :
+                {importError &&
                     <Text status="danger">Error while importing: {importError}</Text>
                 }
 
-                {!importSuccess ? null :
+                {importSuccess &&
                     <Text status="success">Import successful</Text>
                 }
             </View>

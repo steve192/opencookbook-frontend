@@ -32,7 +32,7 @@ export const RecipeImageViewPager = (props: Props) => {
         }
 
         await RestAPI.uploadImage(result.uri).then((uuid) => {
-            props.onImageAdded ? props.onImageAdded(uuid) : null;
+            props.onImageAdded?.(uuid);
         }).catch((error) => {
             //TODO: Error handling
             alert("Error uploading picture");
@@ -58,13 +58,13 @@ export const RecipeImageViewPager = (props: Props) => {
 
 
             </ViewPager>
-            {!props.allowEdit ? null :
+            {props.allowEdit &&
                 <Button onPress={selectImage} style={styles.imageButton} status="basic" accessoryLeft={<Icon name="camera" />} />
             }
 
             <Text style={styles.indexIndicator}>{shownImageIndex + 1} / {props.images.length}</Text>
 
-            {shownImageIndex === 0 ? null :
+            {shownImageIndex !== 0 &&
                 <Pressable
                 onPress={() => setShownImageIndex(shownImageIndex - 1)}
                     style={styles.backwardButton}>
@@ -72,7 +72,7 @@ export const RecipeImageViewPager = (props: Props) => {
                 </Pressable>
             }
 
-            {shownImageIndex === props.images.length - 1 ? null :
+            {shownImageIndex !== props.images.length - 1 &&
                 <Pressable 
                     style={styles.forwardButton}
                     onPress={() => setShownImageIndex(shownImageIndex + 1)}>

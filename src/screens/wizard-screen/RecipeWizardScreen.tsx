@@ -103,13 +103,13 @@ const RecipeWizardScreen = (props: Props) => {
             //TODO: Error handling
             RestAPI.updateRecipe(newRecipeData).then((recipe) => {
                 props.navigation.goBack();
-                props.route.params.onRecipeChanged ? props.route.params.onRecipeChanged(recipe) : null;
+                props.route.params.onRecipeChanged?.(recipe);
             });
         } else {
             //TODO: Error handling
             RestAPI.createNewRecipe(newRecipeData).then((recipe) => {
                 props.navigation.goBack();
-                props.route.params.onRecipeChanged ? props.route.params.onRecipeChanged(recipe) : null;
+                props.route.params.onRecipeChanged?.(recipe);
             });
         }
     };
@@ -119,7 +119,7 @@ const RecipeWizardScreen = (props: Props) => {
             //TODO: Error handling
             RestAPI.deleteRecipe(newRecipeData).then(() => {
                 props.navigation.goBack();
-                props.route.params.onRecipeDeleted ? props.route.params.onRecipeDeleted() : null;
+                props.route.params.onRecipeDeleted?.();
             });
         } else {
             props.navigation.goBack()
@@ -137,7 +137,7 @@ const RecipeWizardScreen = (props: Props) => {
                         onIngredientChange={(ingredient) => changeIngredient(ingredientIndex, ingredient)}
                         onRemovePress={() => removeIngredient(ingredientIndex)} />
 
-                    {ingredientIndex === newRecipeData.neededIngredients.length - 1 ? null :
+                    {ingredientIndex !== newRecipeData.neededIngredients.length - 1 &&
                         <Divider style={{ marginVertical: 10 }} />
                     }
                 </>

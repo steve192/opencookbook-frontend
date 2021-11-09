@@ -35,7 +35,7 @@ export const RecipeImageComponent = (props: Props) => {
             <Image
                 source={imageData ? { uri: imageData } : require('../../assets/placeholder.png')}
                 style={[styles.recipeImage, {resizeMode: resizeMode}]} />
-            {!requestPending ? null :
+            {requestPending  &&
                 <View style={styles.loadingSpinner}>
                     <Spinner size="giant" />
                 </View>}

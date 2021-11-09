@@ -11,7 +11,7 @@ export const StatusBar = () => {
     return (
         <>
             <SafeAreaInsetsContext.Consumer>
-                {insets => insets ? <View style={{ paddingTop: insets.top, backgroundColor: theme['color-primary-default'] }} /> : null}
+                {insets => insets && <View style={{ paddingTop: insets.top, backgroundColor: theme['color-primary-default'] }} /> }
             </SafeAreaInsetsContext.Consumer>
             <ExpoStatusBar style="light"/>
         </>
