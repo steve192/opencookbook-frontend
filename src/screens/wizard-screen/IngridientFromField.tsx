@@ -2,6 +2,7 @@ import { Autocomplete, AutocompleteItem, Button, IndexPath, Input, Select, Selec
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Spacer from "react-spacer";
+import { SelectionPopup } from "../../components/SelectionPopup";
 import RestAPI, { Ingredient, IngredientUse } from "../../dao/RestAPI";
 
 
@@ -95,19 +96,12 @@ export const IngredientFormField = (props: Props) => {
                         placeholder="Amount"
                         onChangeText={onAmountChange} />
                     <Spacer width={5} />
-                    <Select
-                        selectedIndex={selectedUnitIndex}
+                    <SelectionPopup
                         value={unit}
-                        onSelect={onUnitSelect}>
-                        {availableUnits.map((unit) =>
-                            <SelectItem title={unit} />
-                        )}
-                    </Select>
-                    <Input
-                        style={{ width: 150 }}
-                        value={unit}
+                        options={availableUnits}
+                        onValueChanged={setUnit}
                         placeholder="Unit"
-                        onChangeText={onUnitChange} />
+                        />
                 </View>
                 <Spacer height={5} />
                 <View style={{ justifyContent: "center", flex: 1 }}>

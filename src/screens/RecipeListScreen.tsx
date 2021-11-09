@@ -73,11 +73,6 @@ const RecipeListScreen = (props: Props) => {
 
 
   const renderItem = (info: ListRenderItemInfo<Recipe>) => (
-    // <Layout style={{height: 200, width: 100, flex: 1, margin: 5, borderColor: "black", borderWidth: 1}}>
-    //   {renderItemHeader(info.item)}
-    //   <RecipeImageComponent
-    //       uuid={info.item.images.length > 0 ? info.item.images[0].uuid : null} />
-    // </Layout>
     <Card
       style={styles.item}
       status='control'
