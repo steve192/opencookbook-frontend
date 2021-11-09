@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteItem, Button, Divider, IndexPath, Input, Select, SelectItem } from "@ui-kitten/components";
+import { Autocomplete, AutocompleteItem, Button, IndexPath, Input, Select, SelectItem } from "@ui-kitten/components";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Spacer from "react-spacer";
@@ -123,7 +123,6 @@ export const IngredientFormField = (props: Props) => {
 
                 </View>
             </View>
-            <Divider style={{ marginVertical: 10 }} />
         </>
     )
 }

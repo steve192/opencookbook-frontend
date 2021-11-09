@@ -1,5 +1,5 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Avatar, Button, Icon, Input, Layout, Text, useTheme, ViewPager } from '@ui-kitten/components';
+import { Avatar, Button, Divider, Icon, Input, Layout, Text, useTheme, ViewPager } from '@ui-kitten/components';
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { ImageProps, ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
@@ -120,11 +120,17 @@ const RecipeWizardScreen = (props: Props) => {
         <>
             <Text category="label">Ingredients</Text>
             {newRecipeData.neededIngredients.map((neededIngredient, ingredientIndex) =>
-                <IngredientFormField
-                    key={ingredientIndex + "ingredient"}
-                    ingredient={neededIngredient}
-                    onIngredientChange={(ingredient) => changeIngredient(ingredientIndex, ingredient)}
-                    onRemovePress={() => removeIngredient(ingredientIndex)} />
+                <>
+                    <IngredientFormField
+                        key={ingredientIndex + "ingredient"}
+                        ingredient={neededIngredient}
+                        onIngredientChange={(ingredient) => changeIngredient(ingredientIndex, ingredient)}
+                        onRemovePress={() => removeIngredient(ingredientIndex)} />
+
+                    {ingredientIndex === newRecipeData.neededIngredients.length - 1 ? null :
+                        <Divider style={{ marginVertical: 10 }} />
+                    }
+                </>
             )}
             <Spacer height={10} />
             <Button size="small" key="addIngredient" accessoryLeft={AddIcon} onPress={addIngredient} />
@@ -170,6 +176,7 @@ const RecipeWizardScreen = (props: Props) => {
                             placeholder="Name" />
                         <Spacer height={15} />
                         {renderIngredientsSection()}
+                        <Divider style={{ marginVertical: 10 }} />
                         <Spacer height={15} />
                         <Text category="label">Preparation Steps</Text>
                         {renderPreparationStepsSection()}
