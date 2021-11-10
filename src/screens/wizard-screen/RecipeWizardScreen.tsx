@@ -193,8 +193,8 @@ const RecipeWizardScreen = (props: Props) => {
                         <Input
                             placeholder="Serving size"
                             keyboardType='numeric'
-                            value={newRecipeData.servings.toString()}
-                            onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, servings: parseInt(newText)})} />
+                            value={newRecipeData.servings?.toString()}
+                            onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, servings: parseInt(newText) ? parseInt(newText) : undefined })} />
                         <Divider style={{ marginVertical: 10 }} />
                         <Spacer height={15} />
                         <Text category="label">Preparation Steps</Text>
