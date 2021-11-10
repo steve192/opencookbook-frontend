@@ -48,8 +48,14 @@ export const RecipeScreen = (props: Props) => {
     const theme = useTheme();
 
     const getServingMultiplier = () => {
-        if (!recipe) { return 1 };
+        if (!recipe) {
+            return 1;
+        };
         return servings / recipe?.servings;
+    }
+
+    const scaleIngredient = (originalAmount: number) => {
+        return Math.round(originalAmount * getServingMultiplier() * 10) / 10;
     }
 
     const renderIngredientsSection = () => (
@@ -61,7 +67,7 @@ export const RecipeScreen = (props: Props) => {
                     <>
                         <Divider />
                         <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row' }}>
-                            <Text style={{ flex: 2, alignSelf: 'stretch', color: theme["color-primary-default"], fontWeight: "bold" }}>{`${ingredient.amount * getServingMultiplier()} ${ingredient.unit}`}</Text>
+                            <Text style={{ flex: 2, alignSelf: 'stretch', color: theme["color-primary-default"], fontWeight: "bold" }}>{`${scaleIngredient(ingredient.amount)} ${ingredient.unit}`}</Text>
                             <Text style={{ flex: 4, alignSelf: 'stretch' }} >{ingredient.ingredient.name}</Text>
                         </View>
                     </>

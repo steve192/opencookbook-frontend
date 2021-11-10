@@ -44,7 +44,8 @@ export const IngredientFormField = (props: Props) => {
         RestAPI.getIngredients(ingredientQuery)
             .then((ingredients) => {
                 setAvailableIngredients(
-                    ingredients.filter(item => item.name.toLowerCase().includes(ingredientQuery.toLowerCase()))
+                    ingredients
+                    // ingredients.filter(item => item.name.toLowerCase().includes(ingredientQuery.toLowerCase()))
                 );
             });
     }
