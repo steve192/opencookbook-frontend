@@ -58,10 +58,13 @@ export const RecipeScreen = (props: Props) => {
             {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 {recipe?.neededIngredients.map(ingredient =>
+                <>
+                    <Divider/>
                     <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row' }}>
-                        <Text style={{ flex: 1, alignSelf: 'stretch', color: theme["color-primary-default"], fontWeight: "bold" }}>{`${ingredient.amount * getServingMultiplier()} ${ingredient.unit}`}</Text>
-                        <Text style={{ flex: 3, alignSelf: 'stretch' }} >{ingredient.ingredient.name}</Text>
+                        <Text style={{ flex: 2, alignSelf: 'stretch', color: theme["color-primary-default"], fontWeight: "bold" }}>{`${ingredient.amount * getServingMultiplier()} ${ingredient.unit}`}</Text>
+                        <Text style={{ flex: 4, alignSelf: 'stretch' }} >{ingredient.ingredient.name}</Text>
                     </View>
+                    </>
                 )}
             </View>
             <Spacer height={20} />
