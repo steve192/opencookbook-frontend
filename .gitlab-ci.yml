@@ -39,7 +39,7 @@ publish-expo:
     EXPO_TOKEN: $EXPO_TOKEN
   script:
     - npm ci
-    - npm run publish-expo
+    - npm run publish-expo --release-channel beta
 
 publish-cluster:
   stage: publish
