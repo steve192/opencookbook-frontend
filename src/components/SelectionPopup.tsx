@@ -1,4 +1,4 @@
-import { Button, Card, Divider, Input, List, ListItem, Text } from '@ui-kitten/components';
+import { Button, Card, Divider, Input, Layout, List, ListItem, Text } from '@ui-kitten/components';
 import React, { useState } from 'react';
 import { ListRenderItemInfo, Pressable, StyleSheet, View, Modal } from 'react-native';
 import { SafeAreaInsetsContext, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -59,23 +59,24 @@ export const SelectionPopup = (props: Props) => {
                     onRequestClose={() => setModalVisible(false)}
                 >
                     <HeaderHeightContext.Consumer>
-                        {headerHeight =>
+                        {headerHeight => headerHeight &&
                             <>
                                 <View style={styles.centeredView}>
-                                        <Card style={[{ marginTop: headerHeight, width: "100%" }, styles.modalView]}>
-                                        {/* <Text style={styles.modalText}>Hello World! long text</Text> */}
-                                            <View style={{ flexDirection: "row", alignContent: "center" }}>
-                                                <Input onChangeText={onSearchInputChange} style={{ flex: 1 }} value={value} />
-                                                <Spacer width={10} />
-                                                <Button size="tiny" accessoryLeft={PlusIcon} />
-                                            </View>
-                                            <List
-                                                renderItem={renderListItem}
-                                                ItemSeparatorComponent={Divider}
-                                                data={props.options.filter((option) => option.toLowerCase().includes(value.toLowerCase()))}
-                                            />
-
-                                        </Card>
+                                    {/*headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
+                                    <Layout style={[{ flex: 1, marginTop: (headerHeight / 2), width: "100%"}, styles.modalView]}>
+                                        <View style={{ flexDirection: "row", alignContent: "center" }}>
+                                            <Input onChangeText={onSearchInputChange} style={{ flex: 1 }} value={value} />
+                                            <Spacer width={10} />
+                                            <Button size="tiny" accessoryLeft={PlusIcon} />
+                                        </View>
+                                        <Divider style={{paddingVertical: 2, marginVertical: 10}}/>
+                                        <List
+                                            style={{ flex: 1 }}
+                                            renderItem={renderListItem}
+                                            ItemSeparatorComponent={Divider}
+                                            data={props.options.filter((option) => option.toLowerCase().includes(value.toLowerCase()))}
+                                        />
+                                    </Layout>
                                 </View>
                             </>
                         }
@@ -97,7 +98,7 @@ const styles = StyleSheet.create({
         width: "100%"
     },
     modalView: {
-        width: "100%",
+        width: "90%",
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -110,7 +111,8 @@ const styles = StyleSheet.create({
         maxHeight: 800,
         flex: 1,
         marginBottom: 10,
-        padding: 10
+        padding: 10,
+        marginHorizontal: 10
     },
     modalText: {
         marginBottom: 15,
