@@ -49,35 +49,10 @@ export const IngredientFormField = (props: Props) => {
             });
     }
 
-    const onAmountUnitFieldChange = (text: string) => {
-        const splitted = text.split(" ");
-        if (splitted.length >= 2 && parseFloat(splitted[0])) {
-            setAmount(parseFloat(splitted[0]));
-            const [, ...unitPart] = splitted;
-            setUnit(unitPart.join(""));
-        } else if (parseFloat(text)) {
-            setAmount(parseFloat(text));
-            setUnit("");
-        } else {
-            setAmount(undefined);
-            setUnit(text);
-        }
-    }
-
     const onAmountChange = (text: string) => {
         setAmount(parseFloat(text));
     }
 
-    const onUnitChange = (text: string) => {
-        setUnit(text);
-    }
-
-    const onUnitSelect = (index: IndexPath | IndexPath[]) => {
-        if (!Array.isArray(index)) {
-            setSelectedUnitIndex(index);
-            setUnit(availableUnits[index.row]);
-        }
-    }
 
     useEffect(queryIngredients, [ingredientQuery]);
     useEffect(() => {
@@ -101,18 +76,25 @@ export const IngredientFormField = (props: Props) => {
                         options={availableUnits}
                         onValueChanged={setUnit}
                         placeholder="Unit"
-                        />
+                    />
                 </View>
                 <Spacer height={5} />
                 <View style={{ justifyContent: "center", flex: 1 }}>
-                    <Autocomplete
+                    <SelectionPopup
+                        value={ingredientQuery}
+                        options={availableIngredients.map(ingredient => ingredient.name)}
+                        onValueChanged={setIngredient}
+                        placeholder="Ingredient"
+                        allowAdditionalValues={true}
+                    />
+                    {/* <Autocomplete
                         placeholder='Ingredient'
                         value={ingredientQuery}
                         // accessoryRight={renderCloseIcon}
                         onChangeText={(text) => setIngredient(text)}
                         onSelect={(index) => setIngredient(availableIngredients[index].name)}>
-                        {availableIngredients.map((ingredient, index) => renderIngredientOptions(ingredient, index))}
-                    </Autocomplete>
+                        {availableIngredients.map((ingredient, index) => renderIngredientOptions(ingredient, index))} */}
+                    {/* </Autocomplete> */}
                     <Button style={{ position: "absolute", right: 5 }} size="tiny" onPress={() => props.onRemovePress()}>X</Button>
 
                 </View>

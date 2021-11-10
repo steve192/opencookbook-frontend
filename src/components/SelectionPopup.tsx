@@ -13,7 +13,13 @@ interface Props {
     value: string,
     options: string[],
     onValueChanged?: (newValue: string) => void,
-    placeholder?: string
+    placeholder?: string,
+    allowAdditionalValues?: boolean
+}
+
+interface ListItem {
+    text: string
+    isCreationItem: boolean
 }
 
 export const SelectionPopup = (props: Props) => {
@@ -25,17 +31,39 @@ export const SelectionPopup = (props: Props) => {
         setModalVisible(true);
     }
 
-    const renderListItem = (info: ListRenderItemInfo<string>) =>
+    const renderListItem = (info: ListRenderItemInfo<ListItem>) =>
         <ListItem
-            title={info.item}
-            onPress={() => {
-                props.onValueChanged?.(info.item);
-                setModalVisible(false);
-            }}
+            title={
+                <Text
+                    style={{ fontWeight: info.item.isCreationItem ? "bold" : "normal" }}>
+                    {info.item.text}
+                </Text>}
+            onPress={() => info.item.isCreationItem ? applySelection(value) : applySelection(info.item.text)}
         />
 
     const onSearchInputChange = (newText: string) => {
         setValue(newText);
+    }
+
+    const applySelection = (selectedValue: string) => {
+        props.onValueChanged?.(selectedValue);
+        setModalVisible(false);
+    }
+
+    const getListItemData = (): ListItem[] => {
+        const filteredItems = value ?
+            props.options.filter((option) => option.toLowerCase().includes(value.toLowerCase()))
+            : props.options;
+            
+        if (filteredItems.length > 0) {
+            let listItems: ListItem[] = [];
+            filteredItems.forEach(item => {
+                listItems.push({ text: item, isCreationItem: false });
+            });
+            return listItems;
+        }
+
+        return [{ text: "Create " + value, isCreationItem: true }];
     }
 
 
@@ -63,18 +91,17 @@ export const SelectionPopup = (props: Props) => {
                             <>
                                 <View style={styles.centeredView}>
                                     {/*headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
-                                    <Layout style={[{ flex: 1, marginTop: (headerHeight / 2), width: "100%"}, styles.modalView]}>
+                                    <Layout style={[{ flex: 1, marginTop: (headerHeight / 2), width: "100%" }, styles.modalView]}>
                                         <View style={{ flexDirection: "row", alignContent: "center" }}>
                                             <Input onChangeText={onSearchInputChange} style={{ flex: 1 }} value={value} />
                                             <Spacer width={10} />
-                                            <Button size="tiny" accessoryLeft={PlusIcon} />
                                         </View>
-                                        <Divider style={{paddingVertical: 2, marginVertical: 10}}/>
+                                        <Divider style={{ paddingVertical: 2, marginVertical: 10 }} />
                                         <List
                                             style={{ flex: 1 }}
                                             renderItem={renderListItem}
                                             ItemSeparatorComponent={Divider}
-                                            data={props.options.filter((option) => option.toLowerCase().includes(value.toLowerCase()))}
+                                            data={getListItemData()}
                                         />
                                     </Layout>
                                 </View>
