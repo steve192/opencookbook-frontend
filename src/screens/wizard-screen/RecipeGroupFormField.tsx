@@ -7,7 +7,7 @@ import RestAPI, { Ingredient, IngredientUse, RecipeGroup } from "../../dao/RestA
 
 
 interface Props {
-    recipeGroup: RecipeGroup
+    recipeGroup?: RecipeGroup
     onRecipeGroupChange: (newIngredient: RecipeGroup) => void
 }
 
@@ -45,7 +45,7 @@ export const RecipeGroupFormField = (props: Props) => {
         <>
             <SelectionPopup
                 placeholder="Recipe group"
-                value={props.recipeGroup.title}
+                value={props.recipeGroup ? props.recipeGroup.title : ""}
                 onValueChanged={setRecipeGroup}
                 options={getGroupsAsStringlist(availableGroups)}
                 allowAdditionalValues={true}
