@@ -5,11 +5,13 @@ import { ImageProps, ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
 import { DeleteIcon, SaveIcon } from '../../assets/Icons';
 import { RecipeImageViewPager } from '../../components/RecipeImageViewPager';
-import RestAPI, { IngredientUse, Recipe } from '../../dao/RestAPI';
+import { SelectionPopup } from '../../components/SelectionPopup';
+import RestAPI, { IngredientUse, Recipe, RecipeGroup } from '../../dao/RestAPI';
 import { MainNavigationProps } from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
 import { IngredientFormField } from './IngridientFromField';
 import { RecipeFormField } from './PreparationStepFormField';
+import { RecipeGroupFormField } from './RecipeGroupFormField';
 
 
 
@@ -28,7 +30,9 @@ const RecipeWizardScreen = (props: Props) => {
                 neededIngredients: [{ ingredient: { name: "" }, amount: 0, unit: "" }],
                 preparationSteps: [""],
                 images: [],
-                servings: 1
+                servings: 1,
+                recipeGroups: [{ title: "", type: "RecipeGroup" }],
+                type: "Recipe"
             });
 
     props.navigation.setOptions({ title: props.route.params.editing ? "Edit recipe" : "Create recipe" });
@@ -95,6 +99,10 @@ const RecipeWizardScreen = (props: Props) => {
         let ingredientsCopy = newRecipeData.neededIngredients;
         ingredientsCopy[index] = ingredient
         setNewRecipeData({ ...newRecipeData, neededIngredients: ingredientsCopy })
+    }
+
+    const setRecipeGroup = (recipeGroup: RecipeGroup) => {
+        setNewRecipeData({ ...newRecipeData, recipeGroups: [recipeGroup] });
     }
 
 
@@ -167,7 +175,11 @@ const RecipeWizardScreen = (props: Props) => {
             <Button size="small" key="addStep" accessoryLeft={AddIcon} onPress={addPreparationStep} />
         </>
 
-
+    const renderGroupSelectionSection = () => (
+        <RecipeGroupFormField
+            recipeGroup={newRecipeData.recipeGroups?.[0]}
+            onRecipeGroupChange={setRecipeGroup} />
+    )
 
     return (
         <>
@@ -200,6 +212,8 @@ const RecipeWizardScreen = (props: Props) => {
                         <Text category="label">Preparation Steps</Text>
                         {renderPreparationStepsSection()}
                     </View>
+                    <Text category="label">Recipe Groups</Text>
+                    {renderGroupSelectionSection()}
                     <Button
                         size="giant"
                         onPress={() => saveRecipe()}>{props.route.params.editing ? "Save" : "Create"}</Button>

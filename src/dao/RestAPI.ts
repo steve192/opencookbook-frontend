@@ -25,8 +25,23 @@ export interface Recipe {
     preparationSteps: string[];
     images: RecipeImage[];
     servings?: number;
+    recipeGroups: RecipeGroup[];
+    type: string
+}
+
+export interface RecipeGroup {
+    id?: number;
+    title: string;
+    type: string
 }
 class RestAPI {
+    static async getRecipeGroups(): Promise<RecipeGroup[]> {
+        let response = await axios.get(this.url("/recipe-groups"), await this.axiosConfig());
+        return response.data.map((item: RecipeGroup) => {
+            return { ...item, type: "RecipeGroup" }
+        });
+    }
+
     static async getUnits(): Promise<string[]> {
         return [
             "",
@@ -158,12 +173,12 @@ class RestAPI {
     }
     static async updateRecipe(newRecipeData: Recipe): Promise<Recipe> {
         let response = await axios.put(this.url("/recipes/" + newRecipeData.id), newRecipeData, await this.axiosConfig());
-        return response.data;
+        return { ...response.data, type: "Recipe" }
 
     }
     static async importRecipe(importURL: string): Promise<Recipe> {
         let response = await axios.get(this.url("/recipes/import?importUrl=" + encodeURI(importURL)), await this.axiosConfig());
-        return response.data;
+        return { ...response.data, type: "Recipe" }
     }
 
     private static dataURItoBlob(dataURI: string) {
@@ -228,30 +243,18 @@ class RestAPI {
         if (response.status > 299) {
             throw new Error();
         }
-
-        return response.data;
-        // return {
-        //     id : 1,
-        //     title: "Demo recipe",
-        //     preparationSteps: [
-        //         "Do stuff and prepare shit. This is a very long description with a lot of words in it\nIt also\n has multiple\n lines",
-        //         "Do more stuff",
-        //         "Bake the shit out of that thing\n also make sure to check every 30 seconds\nok?",
-        //         "Done"],
-        //     neededIngredients: [
-        //         { ingredient: { id: 0, name: "Eatable stuff with long name" }, amount: 1, unit: "Parts" },
-        //         { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" },
-        //         { ingredient: { id: 0, name: "Eatable" }, amount: 1, unit: "" }
-        //     ]
-        // }
+        return { ...response.data, type: "Recipe" }
     }
+
     static async getRecipes(): Promise<Recipe[]> {
         const response = await axios.get(this.url("/recipes"), await this.axiosConfig());
         if (response.status > 299) {
             throw new Error();
         }
 
-        return response.data;
+        return response.data.map((item: Recipe) => {
+            return { ...item, type: "Recipe" }
+        });
     }
 
     static async axiosConfig(): Promise<AxiosRequestConfig> {
@@ -274,7 +277,7 @@ class RestAPI {
     }
     static async createNewRecipe(newRecipeData: Recipe): Promise<Recipe> {
         let response = await axios.post(this.url("/recipes"), newRecipeData, await this.axiosConfig());
-        return response.data;
+        return { ...response.data, type: "Recipe" }
     }
 
 

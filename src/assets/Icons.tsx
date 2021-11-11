@@ -38,3 +38,6 @@ export const SettingsIcon = (style: IconProps): IconElement => (
 export const CalendarIcon = (style: IconProps): IconElement => (
   <Icon {...style} name='calendar-outline'/>
 );
+export const FolderIcon = (style: IconProps): IconElement => (
+  <Icon {...style} name='folder-outline'/>
+);

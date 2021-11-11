@@ -1,14 +1,16 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { Card, Layout, List, Spinner, Text, useTheme } from '@ui-kitten/components';
+import { Card, Layout, List, Text, useTheme } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
-import { ListRenderItemInfo, RefreshControl, StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
+import { ListRenderItemInfo, StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
 import { FloatingAction, IActionProps } from 'react-native-floating-action';
 import { RecipeImageComponent } from '../components/RecipeImageComponent';
 import { StatusBar } from '../components/StatusBar';
-import RestAPI, { Recipe } from '../dao/RestAPI';
+import RestAPI, { Recipe, RecipeGroup } from '../dao/RestAPI';
 import { MainNavigationProps, OverviewNavigationProps } from '../navigation/NavigationRoutes';
+import { useBackHandler } from '@react-native-community/hooks'
+import { FolderIcon } from '../assets/Icons';
 
 
 type Props = CompositeScreenProps<
@@ -18,8 +20,11 @@ type Props = CompositeScreenProps<
 
 
 const RecipeListScreen = (props: Props) => {
-  const [myRecipes, setMyRecipes] = useState<Recipe[]>([]);
+  const [myRecipes, setMyRecipes] = useState<(Recipe)[]>([]);
+  const [myRecipeGroups, setMyRecipeGroups] = useState<(RecipeGroup)[]>([]);
   const [listRefreshing, setListRefreshing] = useState<boolean>(false);
+
+  const [shownRecipeGroup, setShownRecipeGroup] = useState<RecipeGroup>();
 
   const theme = useTheme();
 
@@ -55,37 +60,64 @@ const RecipeListScreen = (props: Props) => {
   }
 
 
-  const renderRecipeTitle = (headerProps: ViewProps | undefined, info: Recipe) => (
-    // <View {...headerProps} style={{height: 50 }}>
+  const renderRecipeTitle = (headerProps: ViewProps | undefined, title: string) => (
     <Text numberOfLines={2} style={{ height: 60, padding: 10, fontWeight: "bold" }} >
-      {info.title}
+      {title}
     </Text>
-    // </View>
+  );
+  const renderRecipeGroupTitle = (headerProps: ViewProps | undefined, title: string) => (
+    <View style={{ padding: 10, flexDirection: "row", alignItems: "center" }}>
+      <Text numberOfLines={1} style={{ fontWeight: "bold" }} >
+        {title}
+      </Text>
+    </View>
   );
 
-  const renderItemFooter = () => (
-    <>
-    </>
-    // <Text >
-    //   TODO
-    // </Text>
-  );
+  const createRecipeListItem = (recipe: Recipe) => {
+    return (
+      < Card
+        style={styles.recipeCard}
+        status='control'
+        onPress={() => openRecipe(recipe)}
+        footer={headerProps => renderRecipeTitle(headerProps, recipe.title)}
 
+      >
+        <Layout style={{ height: 180 }}>
+          <RecipeImageComponent
+            forceFitScaling={true}
+            uuid={recipe.images.length > 0 ? recipe.images[0].uuid : undefined} />
+        </Layout>
+      </Card >
+    );
+  }
+  const createRecipeGroupListItem = (recipeGroup: RecipeGroup) => {
+    return (
+      < Card
+        style={styles.recipeGroupCard}
+        status='basic'
+        onPress={() => setShownRecipeGroup(recipeGroup)}
+        footer={headerProps => renderRecipeGroupTitle(headerProps, recipeGroup.title)}
+        header={
+          <View>
+            <View style={{ flexDirection: "row", justifyContent:"center"}}>
+              <FolderIcon width={32} height={32} />
+            </View>
+          </View>}
+      >
+        <Layout style={{ height: 180 }}>
+            
+        </Layout>
+      </Card >)
+  }
 
-  const renderItem = (info: ListRenderItemInfo<Recipe>) => (
-    <Card
-      style={styles.item}
-      status='control'
-      onPress={() => openRecipe(info.item)}
-      footer={headerProps => renderRecipeTitle(headerProps, info.item)}
-    >
-      <Layout style={{ height: 180 }}>
-        <RecipeImageComponent
-          forceFitScaling={true}
-          uuid={info.item.images.length > 0 ? info.item.images[0].uuid : undefined} />
-      </Layout>
-    </Card>
-  );
+  const renderItem = (info: ListRenderItemInfo<Recipe | RecipeGroup>): JSX.Element => {
+    if (info.item.type === "Recipe") {
+      return createRecipeListItem(info.item as Recipe);
+    } else if (info.item.type === "RecipeGroup") {
+      return createRecipeGroupListItem(info.item as RecipeGroup);
+    }
+    return <View></View>
+  };
 
   const openRecipe = (recipe: Recipe) => {
     if (recipe.id) {
@@ -104,7 +136,28 @@ const RecipeListScreen = (props: Props) => {
         setMyRecipes(fetchedRecipes);
         setListRefreshing(false);
       });
+    RestAPI.getRecipeGroups().then(groups => {
+      setMyRecipeGroups(groups);
+    })
   }
+
+  const getShownItems = (): (RecipeGroup | Recipe)[] => {
+    if (!shownRecipeGroup) {
+      return [...myRecipeGroups, ...myRecipes.filter(recipe => recipe.recipeGroups.length === 0)];
+    } else {
+      return myRecipes.filter(recipe => recipe.recipeGroups.filter(group => group.id === shownRecipeGroup.id).length > 0);
+    }
+  }
+
+  useBackHandler(() => {
+    if (shownRecipeGroup) {
+      setShownRecipeGroup(undefined);
+      return true
+    }
+
+    // Default handling
+    return false
+  })
 
   useEffect(queryRecipes, []);
 
@@ -116,7 +169,7 @@ const RecipeListScreen = (props: Props) => {
           key={numberOfColumns} //To force re render when number of columns changes
           style={styles.container}
           contentContainerStyle={styles.contentContainer}
-          data={myRecipes}
+          data={getShownItems()}
           numColumns={numberOfColumns}
           renderItem={renderItem}
           refreshing={listRefreshing}
@@ -141,7 +194,12 @@ const styles = StyleSheet.create({
     // paddingHorizontal: 8,
     // paddingVertical: 4,
   },
-  item: {
+  recipeCard: {
+    // marginVertical: 4,
+    margin: 1,
+    flex: 1
+  },
+  recipeGroupCard: {
     // marginVertical: 4,
     margin: 1,
     flex: 1
