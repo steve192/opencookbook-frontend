@@ -39,7 +39,7 @@ export const ImportScreen = (props: Props) => {
                     <Spinner size="giant" />
                 }
 
-                {importError &&
+                {importError.length > 0 &&
                     <Text status="danger">Error while importing: {importError}</Text>
                 }
 
