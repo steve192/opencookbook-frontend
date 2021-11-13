@@ -211,9 +211,9 @@ const RecipeWizardScreen = (props: Props) => {
                         <Spacer height={15} />
                         <Text category="label">Preparation Steps</Text>
                         {renderPreparationStepsSection()}
+                        <Text category="label">Recipe Groups</Text>
+                        {renderGroupSelectionSection()}
                     </View>
-                    <Text category="label">Recipe Groups</Text>
-                    {renderGroupSelectionSection()}
                     <Button
                         size="giant"
                         onPress={() => saveRecipe()}>{props.route.params.editing ? "Save" : "Create"}</Button>
