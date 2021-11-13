@@ -13,6 +13,7 @@ import { SignupScreen } from '../screens/LoginScreen/SignupScreen';
 import { ImportScreen } from '../screens/ImportScreen';
 import { CalendarIcon, HomeIcon, SettingsIcon } from '../assets/Icons';
 import { SettingsScreen } from '../screens/SettingsScreen';
+import { RecipeGroupEditScreen } from '../screens/RecipeGroupEditScreen';
 
 
 
@@ -59,6 +60,13 @@ const MainNavigation = () => {
                             component={ImportScreen}
                             options={{
                                 title: "Import recipe"
+                            }}
+                        />
+                        <Stack.Screen
+                            name="RecipeGroupEditScreen"
+                            component={RecipeGroupEditScreen}
+                            options={{
+                                title: "Create recipe group"
                             }}
                         />
                         <Stack.Screen

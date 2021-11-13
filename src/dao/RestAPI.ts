@@ -35,6 +35,10 @@ export interface RecipeGroup {
     type: string
 }
 class RestAPI {
+    static async createNewRecipeGroup(recipeGroup: RecipeGroup): Promise<RecipeGroup> {
+        let response = await axios.post(this.url("/recipe-groups"), recipeGroup, await this.axiosConfig());
+        return { ...response.data, type: "RecipeGroup" };
+    }
     static async getRecipeGroups(): Promise<RecipeGroup[]> {
         let response = await axios.get(this.url("/recipe-groups"), await this.axiosConfig());
         return response.data.map((item: RecipeGroup) => {

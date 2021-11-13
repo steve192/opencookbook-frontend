@@ -58,6 +58,9 @@ const RecipeListScreen = (props: Props) => {
         });
         break;
       case 'addRecipeGroup':
+        props.navigation.navigate("RecipeGroupEditScreen", {onRecipeGroupChanges: () => {
+          fetchData();
+        }})
         break;
     }
   }
