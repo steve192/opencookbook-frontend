@@ -21,7 +21,7 @@ const MainNavigation = () => {
 
 
     const Stack = createNativeStackNavigator();
-    const StackNavigator = () => {
+    const MainStackNavigation = () => {
         return (
             <>
                 <KeyboardAvoidingView
@@ -101,7 +101,7 @@ const MainNavigation = () => {
                 <BottomTab.Screen
                     name="RecipesListScreen"
                     component={RecipeListScreen}
-                    options={{ title: "RECIPES", headerShown: false }} />
+                    options={{ title: "My recipes", headerShown: true }} />
                 <BottomTab.Screen
                     name="WeeklyScreen"
                     component={WeeklyRecipeListScreen}
@@ -114,8 +114,9 @@ const MainNavigation = () => {
             </BottomTab.Navigator>
         );
     }
+
     return (
-        <StackNavigator />
+        <MainStackNavigation />
     )
 }
 

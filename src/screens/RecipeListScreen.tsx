@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react';
 import { ListRenderItemInfo, StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
 import { FloatingAction, IActionProps } from 'react-native-floating-action';
 import { RecipeImageComponent } from '../components/RecipeImageComponent';
-import { StatusBar } from '../components/StatusBar';
 import RestAPI, { Recipe, RecipeGroup } from '../dao/RestAPI';
 import { MainNavigationProps, OverviewNavigationProps } from '../navigation/NavigationRoutes';
 import { FolderIcon } from '../assets/Icons';
@@ -23,8 +22,6 @@ const RecipeListScreen = (props: Props) => {
   const [myRecipeGroups, setMyRecipeGroups] = useState<(RecipeGroup)[]>([]);
   const [listRefreshing, setListRefreshing] = useState<boolean>(false);
 
-  const [shownRecipeGroup, setShownRecipeGroup] = useState<RecipeGroup>();
-
   const theme = useTheme();
 
   const addActions: IActionProps[] = [
@@ -36,6 +33,11 @@ const RecipeListScreen = (props: Props) => {
     {
       text: "Import recipe",
       name: "importRecipe",
+      color: theme["color-primary-default"]
+    },
+    {
+      text: "Add recipe group",
+      name: "addRecipeGroup",
       color: theme["color-primary-default"]
     }
 
@@ -52,8 +54,10 @@ const RecipeListScreen = (props: Props) => {
         break;
       case 'addRecipe':
         props.navigation.navigate("RecipeWizardScreen", {
-          onRecipeChanged: queryRecipes,
+          onRecipeChanged: fetchData,
         });
+        break;
+      case 'addRecipeGroup':
         break;
     }
   }
@@ -94,7 +98,7 @@ const RecipeListScreen = (props: Props) => {
       < Card
         style={styles.recipeGroupCard}
         status='basic'
-        onPress={() => setShownRecipeGroup(recipeGroup)}
+        onPress={() => props.navigation.navigate("RecipesListScreen", {shownRecipeGroup: recipeGroup})}
         footer={headerProps => renderRecipeGroupTitle(headerProps, recipeGroup.title)}
         header={
           <View>
@@ -120,7 +124,7 @@ const RecipeListScreen = (props: Props) => {
 
   const openRecipe = (recipe: Recipe) => {
     if (recipe.id) {
-      props.navigation.push("RecipeScreen", { recipeId: recipe.id, onRecipeChanged: queryRecipes });
+      props.navigation.push("RecipeScreen", { recipeId: recipe.id, onRecipeChanged: fetchData });
     }
   }
 
@@ -128,7 +132,7 @@ const RecipeListScreen = (props: Props) => {
   const numberOfColumns = Math.ceil(windowDimensions.width / 300);
 
 
-  const queryRecipes = () => {
+  const fetchData = () => {
     setListRefreshing(true);
     RestAPI.getRecipes()
       .then((fetchedRecipes) => {
@@ -141,28 +145,18 @@ const RecipeListScreen = (props: Props) => {
   }
 
   const getShownItems = (): (RecipeGroup | Recipe)[] => {
-    if (!shownRecipeGroup) {
+    if (!props.route.params?.shownRecipeGroup) {
       return [...myRecipeGroups, ...myRecipes.filter(recipe => recipe.recipeGroups.length === 0)];
     } else {
-      return myRecipes.filter(recipe => recipe.recipeGroups.filter(group => group.id === shownRecipeGroup.id).length > 0);
+      return myRecipes.filter(recipe => recipe.recipeGroups.filter(group => group.id === props.route.params.shownRecipeGroup?.id).length > 0);
     }
   }
 
-  useBackHandler(() => {
-    if (shownRecipeGroup) {
-      setShownRecipeGroup(undefined);
-      return true
-    }
 
-    // Default handling
-    return false
-  })
-
-  useEffect(queryRecipes, []);
+  useEffect(fetchData, []);
 
   return (
     <>
-      <StatusBar />
       <Layout style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'baseline' }}>
         <List
           key={numberOfColumns} //To force re render when number of columns changes
@@ -172,7 +166,7 @@ const RecipeListScreen = (props: Props) => {
           numColumns={numberOfColumns}
           renderItem={renderItem}
           refreshing={listRefreshing}
-          onRefresh={queryRecipes}
+          onRefresh={fetchData}
         />
         <FloatingAction
           actions={addActions}
