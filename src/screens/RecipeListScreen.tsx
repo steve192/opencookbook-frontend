@@ -3,7 +3,7 @@ import { CompositeScreenProps } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { Card, Layout, List, Text, useTheme } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
-import { ListRenderItemInfo, StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
+import { ListRenderItemInfo, Pressable, StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
 import { FloatingAction, IActionProps } from 'react-native-floating-action';
 import { RecipeImageComponent } from '../components/RecipeImageComponent';
 import RestAPI, { Recipe, RecipeGroup } from '../dao/RestAPI';
@@ -58,9 +58,11 @@ const RecipeListScreen = (props: Props) => {
         });
         break;
       case 'addRecipeGroup':
-        props.navigation.navigate("RecipeGroupEditScreen", {onRecipeGroupChanges: () => {
-          fetchData();
-        }})
+        props.navigation.navigate("RecipeGroupEditScreen", {
+          onRecipeGroupChanges: () => {
+            fetchData();
+          }
+        })
         break;
     }
   }
@@ -81,19 +83,16 @@ const RecipeListScreen = (props: Props) => {
 
   const createRecipeListItem = (recipe: Recipe) => {
     return (
-      < Card
+      <Pressable 
         style={styles.recipeCard}
-        status='control'
-        onPress={() => openRecipe(recipe)}
-        footer={headerProps => renderRecipeTitle(headerProps, recipe.title)}
-
-      >
+        onPress={() => openRecipe(recipe)}>
         <Layout style={{ height: 180 }}>
           <RecipeImageComponent
             forceFitScaling={true}
             uuid={recipe.images.length > 0 ? recipe.images[0].uuid : undefined} />
         </Layout>
-      </Card >
+        {renderRecipeTitle(undefined, recipe.title)}
+      </Pressable>
     );
   }
   const createRecipeGroupListItem = (recipeGroup: RecipeGroup) => {
@@ -101,17 +100,17 @@ const RecipeListScreen = (props: Props) => {
       < Card
         style={styles.recipeGroupCard}
         status='basic'
-        onPress={() => props.navigation.navigate("RecipesListScreen", {shownRecipeGroup: recipeGroup})}
+        onPress={() => props.navigation.navigate("RecipesListScreen", { shownRecipeGroup: recipeGroup })}
         footer={headerProps => renderRecipeGroupTitle(headerProps, recipeGroup.title)}
         header={
           <View>
-            <View style={{ flexDirection: "row", justifyContent:"center"}}>
+            <View style={{ flexDirection: "row", justifyContent: "center" }}>
               <FolderIcon width={32} height={32} />
             </View>
           </View>}
       >
         <Layout style={{ height: 180 }}>
-            
+
         </Layout>
       </Card >)
   }
@@ -192,8 +191,13 @@ const styles = StyleSheet.create({
   },
   recipeCard: {
     // marginVertical: 4,
-    margin: 1,
-    flex: 1
+    margin: 3,
+    maxWidth: 300,
+    flex: 1,
+    borderRadius: 16,
+    overflow: "hidden",
+    backgroundColor: "rgb(240,240,240)" //TODO: Theme color
+    
   },
   recipeGroupCard: {
     // marginVertical: 4,
