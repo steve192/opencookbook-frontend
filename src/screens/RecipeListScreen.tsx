@@ -9,7 +9,6 @@ import { RecipeImageComponent } from '../components/RecipeImageComponent';
 import { StatusBar } from '../components/StatusBar';
 import RestAPI, { Recipe, RecipeGroup } from '../dao/RestAPI';
 import { MainNavigationProps, OverviewNavigationProps } from '../navigation/NavigationRoutes';
-import { useBackHandler } from '@react-native-community/hooks'
 import { FolderIcon } from '../assets/Icons';
 
 
