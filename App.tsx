@@ -7,26 +7,25 @@ import { enableScreens } from 'react-native-screens';
 import { default as customMapping } from './mapping.json';
 import MainNavigation from './src/navigation/Navigation';
 import { myTheme } from './src/styles/custom-theme-light';
+import { Provider } from 'react-redux'
+import { store } from './src/redux/store';
 
 enableScreens()
 
 export default () => (
   <>
+  <Provider store={store}>
     <IconRegistry icons={EvaIconsPack} />
     <ApplicationProvider
       {...eva}
       // @ts-ignore
       customMapping={customMapping}
       theme={myTheme}>
-      {/* <SafeAreaProvider> */}
-      {/* <SafeAreaView style={{ flex: 1 }}> */}
-
       <NavigationContainer>
         <MainNavigation />
       </NavigationContainer>
-      {/* </SafeAreaView> */}
-      {/* </SafeAreaProvider> */}
     </ApplicationProvider>
+    </Provider>
   </>
 );
 

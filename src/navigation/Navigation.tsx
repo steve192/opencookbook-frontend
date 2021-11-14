@@ -15,14 +15,41 @@ import { CalendarIcon, HomeIcon, SettingsIcon } from '../assets/Icons';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { RecipeGroupEditScreen } from '../screens/RecipeGroupEditScreen';
 import { GuidedCookingScreen } from '../screens/GuidedCookingScreen';
+import { SplashScreen } from '../screens/LoginScreen/SplashScreen';
+import { useSelector, useDispatch } from 'react-redux'
+import { RootState } from '../redux/store';
 
 
 
 const MainNavigation = () => {
     const theme = useTheme();
 
+    const loggedIn = useSelector((state: RootState) => state.auth.loggedIn);
+    const isLoading = useSelector((state: RootState) => state.auth.isLoading);
 
     const Stack = createNativeStackNavigator();
+
+    const LoginStackNavigation = () => (
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}>
+            <Stack.Navigator
+                screenOptions={{
+                    headerStyle: { backgroundColor: theme["color-primary-default"] },
+                    headerTintColor: theme["text-alternate-color"]
+                }}>
+                <Stack.Screen
+                    name="LoginScreen"
+                    component={LoginScreen}
+                    options={{ headerShown: false }} />
+                <Stack.Screen
+                    name="SignupScreen"
+                    component={SignupScreen}
+                    options={{ headerShown: false }} />
+            </Stack.Navigator>
+        </KeyboardAvoidingView>
+    )
+
     const MainStackNavigation = () => {
         return (
             <>
@@ -34,14 +61,6 @@ const MainNavigation = () => {
                             headerStyle: { backgroundColor: theme["color-primary-default"] },
                             headerTintColor: theme["text-alternate-color"]
                         }}>
-                        <Stack.Screen
-                            name="LoginScreen"
-                            component={LoginScreen}
-                            options={{ headerShown: false }} />
-                        <Stack.Screen
-                            name="SignupScreen"
-                            component={SignupScreen}
-                            options={{ headerShown: false }} />
                         <Stack.Screen
                             name="OverviewScreen"
                             component={BottomTabNavigation}
@@ -145,9 +164,7 @@ const MainNavigation = () => {
         </Stack.Navigator>
     )
 
-    return (
-        <MainStackNavigation />
-    )
+    return isLoading ? <SplashScreen /> : loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />
 }
 
 export default MainNavigation;

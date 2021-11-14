@@ -7,17 +7,17 @@ export default class Configuration {
 
 
     static async setAuthToken(token: string) {
-        // if (Platform.OS == 'web') {
+        if (Platform.OS == 'web') {
             Configuration.authToken = token;
             return;
-        // }
+        }
         await SecureStore.setItemAsync("authToken", token);
     }
 
     static async getAuthToken(): Promise<string | null> {
-        // if (Platform.OS == 'web') {
+        if (Platform.OS == 'web') {
             return Configuration.authToken;
-        // }
+        }
         const token = await SecureStore.getItemAsync("authToken");
         return token;
     }

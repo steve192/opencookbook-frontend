@@ -3,7 +3,7 @@ import { Button, Card, Icon, Input, Layout, Modal, Text } from '@ui-kitten/compo
 import { ScrollView, View, StyleSheet, ImageBackground, KeyboardAvoidingView, Platform } from 'react-native';
 import RestAPI from '../../dao/RestAPI';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { MainNavigationProps } from '../../navigation/NavigationRoutes';
+import { LoginNavigationProps, MainNavigationProps } from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
 import Configuration from '../../Configuration';
 import Spacer from 'react-spacer';
@@ -11,10 +11,11 @@ import { color } from 'react-native-reanimated';
 import { LoginBackdrop } from './LoginBackdrop';
 import Constants from 'expo-constants';
 import { SelectionPopup } from '../../components/SelectionPopup';
+import { useSelector, useDispatch } from 'react-redux'
+import { login } from '../../redux/features/authSlice';
 
 
-
-type Props = NativeStackScreenProps<MainNavigationProps, 'LoginScreen'>;
+type Props = NativeStackScreenProps<LoginNavigationProps, 'LoginScreen'>;
 
 const LoginScreen = ({ route, navigation }: Props) => {
 
@@ -24,14 +25,14 @@ const LoginScreen = ({ route, navigation }: Props) => {
     const [serverUrl, setServerUrl] = useState<string>(Configuration.getBackendURL());
     const [apiErrorMessage, setApiErrorMessage] = useState<string>();
 
-    const doLogin = () => {
+    const dispatch = useDispatch();
 
+    const doLogin = () => {
         RestAPI.authenticate(email, password).then(() => {
-            navigation.navigate('OverviewScreen');
+            dispatch(login());
         }).catch((error: Error) => {
             setApiErrorMessage(error.toString());
         });
-
     };
 
     const settingsModal = (

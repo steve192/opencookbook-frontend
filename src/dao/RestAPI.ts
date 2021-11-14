@@ -35,6 +35,10 @@ export interface RecipeGroup {
     type: string
 }
 class RestAPI {
+    static async renewToken(oldToken: string) {
+        let response = await axios.get(this.url("/users/renewToken"), await this.axiosConfig());
+        //TODO: Implement this correcly. Currently this is only used to check if the token is still valid
+    }
     static async createNewRecipeGroup(recipeGroup: RecipeGroup): Promise<RecipeGroup> {
         let response = await axios.post(this.url("/recipe-groups"), recipeGroup, await this.axiosConfig());
         return { ...response.data, type: "RecipeGroup" };
@@ -297,10 +301,6 @@ class RestAPI {
 
         Configuration.setAuthToken(response.data.token);
 
-    }
-
-    static async isAuthTokenValid(token: string) {
-        return true;
     }
 
     static async registerUser(emailAddress: string, password: string) {
