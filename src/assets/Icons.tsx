@@ -41,3 +41,9 @@ export const CalendarIcon = (style: IconProps): IconElement => (
 export const FolderIcon = (style: IconProps): IconElement => (
   <Icon {...style} name='folder-outline'/>
 );
+export const CheckmarkIcon = (style: IconProps): IconElement => (
+  <Icon {...style} name='checkmark-circle-outline'/>
+);
+export const WarningIcon = (style: IconProps): IconElement => (
+  <Icon {...style} name='alert-triangle-outline'/>
+);
