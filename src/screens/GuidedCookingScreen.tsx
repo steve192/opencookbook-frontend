@@ -18,6 +18,7 @@ export const GuidedCookingScreen = (props: Props) => {
 
 
     useEffect(() => {
+        // Prevent the screen from turning off
         IdleTimerManager.setIdleTimerDisabled(true);
 
         // Cleanup
