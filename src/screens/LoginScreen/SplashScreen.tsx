@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import Configuration from '../../Configuration';
 import RestAPI from '../../dao/RestAPI';
-import { logout } from '../../redux/features/authSlice';
+import { login, logout } from '../../redux/features/authSlice';
 import { LoginBackdrop } from './LoginBackdrop';
 
 
@@ -23,6 +23,7 @@ export const SplashScreen = () => {
                     return;
                 }
                 await RestAPI.renewToken(authToken);
+                dispatch(login());
             } catch (e) {
                 dispatch(logout());
             }
