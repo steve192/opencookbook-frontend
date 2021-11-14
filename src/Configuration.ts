@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
@@ -8,7 +9,8 @@ export default class Configuration {
 
     static async setAuthToken(token: string) {
         if (Platform.OS == 'web') {
-            Configuration.authToken = token;
+            // Configuration.authToken = token;
+            await AsyncStorage.setItem("authToken", token);
             return;
         }
         await SecureStore.setItemAsync("authToken", token);
@@ -16,7 +18,7 @@ export default class Configuration {
 
     static async getAuthToken(): Promise<string | null> {
         if (Platform.OS == 'web') {
-            return Configuration.authToken;
+            return await AsyncStorage.getItem("authToken");
         }
         const token = await SecureStore.getItemAsync("authToken");
         return token;
