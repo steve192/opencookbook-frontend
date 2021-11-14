@@ -7,7 +7,7 @@ import Spacer from 'react-spacer';
 import { TextBullet } from '../components/TextBullet';
 import { MainNavigationProps } from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
-import IdleTimerManager from 'react-native-idle-timer';
+import { useKeepAwake } from 'expo-keep-awake';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 export const GuidedCookingScreen = (props: Props) => {
@@ -15,17 +15,8 @@ export const GuidedCookingScreen = (props: Props) => {
     const [textSize, setTextSize] = useState<number>(15);
 
     const recipe = props.route.params.recipe;
+    useKeepAwake();
 
-
-    useEffect(() => {
-        // Prevent the screen from turning off
-        IdleTimerManager.setIdleTimerDisabled(true);
-
-        // Cleanup
-        return () => {
-            IdleTimerManager.setIdleTimerDisabled(false);
-        }
-    });
     return (
         <Layout >
             <View style={CentralStyles.contentContainer}>
