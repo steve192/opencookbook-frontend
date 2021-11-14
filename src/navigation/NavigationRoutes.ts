@@ -11,6 +11,10 @@ export type MainNavigationProps = {
 };
 
 export type OverviewNavigationProps = {
-    RecipesListScreen: { shownRecipeGroup?: RecipeGroup },
+    RecipesListScreen: undefined,
     WeeklyScreen: undefined,
+}
+
+export type RecipeScreenNavigation = {
+    RecipeListDetailScreen: { shownRecipeGroup?: RecipeGroup }
 }

@@ -5,15 +5,19 @@ import { Card, Layout, List, Text, useTheme } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
 import { ListRenderItemInfo, Pressable, StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
 import { FloatingAction, IActionProps } from 'react-native-floating-action';
+import { FolderIcon } from '../assets/Icons';
 import { RecipeImageComponent } from '../components/RecipeImageComponent';
 import RestAPI, { Recipe, RecipeGroup } from '../dao/RestAPI';
-import { MainNavigationProps, OverviewNavigationProps } from '../navigation/NavigationRoutes';
-import { FolderIcon } from '../assets/Icons';
+import { MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation } from '../navigation/NavigationRoutes';
 
 
 type Props = CompositeScreenProps<
-  BottomTabScreenProps<OverviewNavigationProps, "RecipesListScreen">,
-  StackScreenProps<MainNavigationProps, "OverviewScreen">
+
+  StackScreenProps<RecipeScreenNavigation, "RecipeListDetailScreen">,
+  CompositeScreenProps<
+    StackScreenProps<MainNavigationProps, "OverviewScreen">,
+    BottomTabScreenProps<OverviewNavigationProps, "RecipesListScreen">,
+  >
 >;
 
 
@@ -23,6 +27,12 @@ const RecipeListScreen = (props: Props) => {
   const [listRefreshing, setListRefreshing] = useState<boolean>(false);
 
   const theme = useTheme();
+
+  if (props.route.params?.shownRecipeGroup) {
+    props.navigation.setOptions({ title: props.route.params?.shownRecipeGroup?.title });
+  } else {
+    props.navigation.setOptions({ title: "My recipes" });
+  }
 
   const addActions: IActionProps[] = [
     {
@@ -83,7 +93,7 @@ const RecipeListScreen = (props: Props) => {
 
   const createRecipeListItem = (recipe: Recipe) => {
     return (
-      <Pressable 
+      <Pressable
         style={styles.recipeCard}
         onPress={() => openRecipe(recipe)}>
         <Layout style={{ height: 180 }}>
@@ -100,7 +110,7 @@ const RecipeListScreen = (props: Props) => {
       < Card
         style={styles.recipeGroupCard}
         status='basic'
-        onPress={() => props.navigation.navigate("RecipesListScreen", { shownRecipeGroup: recipeGroup })}
+        onPress={() => props.navigation.push("RecipeListDetailScreen", { shownRecipeGroup: recipeGroup })}
         footer={headerProps => renderRecipeGroupTitle(headerProps, recipeGroup.title)}
         header={
           <View>
@@ -197,7 +207,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: "hidden",
     backgroundColor: "rgb(240,240,240)" //TODO: Theme color
-    
+
   },
   recipeGroupCard: {
     // marginVertical: 4,

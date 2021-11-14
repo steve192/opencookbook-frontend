@@ -101,15 +101,16 @@ const MainNavigation = () => {
     const BottomTabNavigation = () => {
         return (
             <BottomTab.Navigator
+                backBehavior="history"
                 screenOptions={{
                     headerStyle: { backgroundColor: theme["color-primary-default"] },
-                    headerTintColor: theme["text-alternate-color"]
+                    headerTintColor: theme["text-alternate-color"],
                 }}
                 tabBar={props => <BottomTabBar {...props} />}>
                 <BottomTab.Screen
                     name="RecipesListScreen"
-                    component={RecipeListScreen}
-                    options={{ title: "My recipes", headerShown: true }} />
+                    component={recipeScrenNavigation}
+                    options={{ title: "My recipes", headerShown: false }} />
                 <BottomTab.Screen
                     name="WeeklyScreen"
                     component={WeeklyRecipeListScreen}
@@ -122,6 +123,19 @@ const MainNavigation = () => {
             </BottomTab.Navigator>
         );
     }
+
+    const recipeScrenNavigation = () => (
+        <Stack.Navigator
+            screenOptions={{
+                headerStyle: { backgroundColor: theme["color-primary-default"] },
+                headerTintColor: theme["text-alternate-color"]
+            }}>
+            <Stack.Screen
+                name="RecipeListDetailScreen"
+                component={RecipeListScreen}
+                options={{ headerShown: true }} />
+        </Stack.Navigator>
+    )
 
     return (
         <MainStackNavigation />
