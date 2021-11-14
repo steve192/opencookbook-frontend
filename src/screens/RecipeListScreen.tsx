@@ -16,7 +16,7 @@ type Props = CompositeScreenProps<
   StackScreenProps<RecipeScreenNavigation, "RecipeListDetailScreen">,
   CompositeScreenProps<
     StackScreenProps<MainNavigationProps, "OverviewScreen">,
-    BottomTabScreenProps<OverviewNavigationProps, "RecipesListScreen">,
+    BottomTabScreenProps<OverviewNavigationProps, "RecipesListScreen">
   >
 >;
 
