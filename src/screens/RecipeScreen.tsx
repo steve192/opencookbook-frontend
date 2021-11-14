@@ -6,6 +6,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import Spacer from "react-spacer";
 import { EditIcon, MinusIcon, PlusIcon } from "../assets/Icons";
 import { RecipeImageViewPager } from "../components/RecipeImageViewPager";
+import { TextBullet } from "../components/TextBullet";
 import RestAPI, { Recipe } from "../dao/RestAPI";
 import { MainNavigationProps } from "../navigation/NavigationRoutes";
 import CentralStyles from "../styles/CentralStyles";
@@ -105,9 +106,8 @@ export const RecipeScreen = (props: Props) => {
                 <>
                     <Divider />
                     <View style={{ flexDirection: "row", alignItems: "center", paddingVertical: 10 }}>
-                        <View style={styles.textBulletContrainer}>
-                            <Text style={styles.textBullet}>{index + 1}</Text>
-                        </View>
+                        <TextBullet
+                            value={(index + 1).toString()}/>
                         <Text style={{ flex: 1 }}>{preparationStep}</Text>
                     </View>
                 </>
@@ -129,7 +129,7 @@ export const RecipeScreen = (props: Props) => {
                         {recipe && renderIngredientsSection()}
 
                         <Spacer height={20} />
-                        <Button>Start cooking</Button>
+                        <Button onPress={() => recipe && props.navigation.navigate("GuidedCookingScreen", {recipe: recipe})}>Start cooking</Button>
                         <Spacer height={20} />
 
                         {recipe && renderStepsSection()}
@@ -142,20 +142,6 @@ export const RecipeScreen = (props: Props) => {
 }
 
 const styles = StyleSheet.create({
-    textBulletContrainer: {
-        borderColor: "green",
-        borderWidth: 2,
-        borderRadius: 16,
-        width: 32,
-        height: 32,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 10
-    },
-    textBullet: {
-        color: "green",
-        fontWeight: "bold"
-    },
     recipeImage: {
         width: "100%",
         height: 320,

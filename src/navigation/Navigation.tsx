@@ -14,6 +14,7 @@ import { ImportScreen } from '../screens/ImportScreen';
 import { CalendarIcon, HomeIcon, SettingsIcon } from '../assets/Icons';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { RecipeGroupEditScreen } from '../screens/RecipeGroupEditScreen';
+import { GuidedCookingScreen } from '../screens/GuidedCookingScreen';
 
 
 
@@ -67,6 +68,13 @@ const MainNavigation = () => {
                             component={RecipeGroupEditScreen}
                             options={{
                                 title: "Create recipe group"
+                            }}
+                        />
+                        <Stack.Screen
+                            name="GuidedCookingScreen"
+                            component={GuidedCookingScreen}
+                            options={{
+                                title: "Guided cooking"
                             }}
                         />
                         <Stack.Screen
