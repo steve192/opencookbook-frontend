@@ -1,11 +1,11 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { Card, Layout, List, Text, useTheme } from '@ui-kitten/components';
+import { Button, Card, Layout, List, Text, useTheme } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
 import { ListRenderItemInfo, Pressable, StyleSheet, useWindowDimensions, View, ViewProps } from 'react-native';
 import { FloatingAction, IActionProps } from 'react-native-floating-action';
-import { FolderIcon } from '../assets/Icons';
+import { DeleteIcon, FolderIcon } from '../assets/Icons';
 import { RecipeImageComponent } from '../components/RecipeImageComponent';
 import RestAPI, { Recipe, RecipeGroup } from '../dao/RestAPI';
 import { MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation } from '../navigation/NavigationRoutes';
@@ -28,10 +28,28 @@ const RecipeListScreen = (props: Props) => {
 
   const theme = useTheme();
 
-  if (props.route.params?.shownRecipeGroup) {
-    props.navigation.setOptions({ title: props.route.params?.shownRecipeGroup?.title });
+  if (props.route.params?.shownRecipeGroup?.id) {
+    props.navigation.setOptions({
+      title: props.route.params?.shownRecipeGroup?.title,
+      headerRight: () => (
+        <>
+          <Button 
+            onPress={() => deleteRecipeGroup(props.route.params.shownRecipeGroup)} 
+            accessoryLeft={<DeleteIcon fill={theme["color-danger-default"]} />} />
+        </>
+      ),
+    });
   } else {
     props.navigation.setOptions({ title: "My recipes" });
+  }
+
+  const deleteRecipeGroup = (group: RecipeGroup | undefined) => {
+    if (!group) return;
+    RestAPI.deleteRecipeGroup(group)
+      .then(() => props.navigation.goBack())
+      .catch(() => {
+        //TODO: Error handling
+      });
   }
 
   const addActions: IActionProps[] = [

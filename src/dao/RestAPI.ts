@@ -35,6 +35,9 @@ export interface RecipeGroup {
     type: string
 }
 class RestAPI {
+    static async deleteRecipeGroup(group: RecipeGroup) {
+        await axios.delete(this.url("/recipe-groups/" + group.id), await this.axiosConfig());
+    }
     static async renewToken(oldToken: string) {
         let response = await axios.get(this.url("/users/renewToken"), await this.axiosConfig());
         //TODO: Implement this correcly. Currently this is only used to check if the token is still valid
@@ -176,8 +179,8 @@ class RestAPI {
             "Zweig/e"
         ];
     }
-    static async deleteRecipe(newRecipeData: Recipe): Promise<void> {
-        await axios.delete(this.url("/recipes/" + newRecipeData.id), await this.axiosConfig());
+    static async deleteRecipe(recipe: Recipe): Promise<void> {
+        await axios.delete(this.url("/recipes/" + recipe.id), await this.axiosConfig());
     }
     static async updateRecipe(newRecipeData: Recipe): Promise<Recipe> {
         let response = await axios.put(this.url("/recipes/" + newRecipeData.id), newRecipeData, await this.axiosConfig());
