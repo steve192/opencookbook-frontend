@@ -104,6 +104,7 @@ export const SelectionPopup = (props: Props) => {
                                         </View>
                                         <Divider style={{ paddingVertical: 2, marginVertical: 10 }} />
                                         <List
+                                            keyboardShouldPersistTaps='handled'
                                             style={{ flex: 1 }}
                                             renderItem={renderListItem}
                                             ItemSeparatorComponent={Divider}

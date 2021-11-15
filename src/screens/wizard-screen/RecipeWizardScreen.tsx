@@ -187,7 +187,8 @@ const RecipeWizardScreen = (props: Props) => {
     return (
         <>
             <Layout style={styles.contentContainer}>
-                <ScrollView>
+                <ScrollView
+                    keyboardShouldPersistTaps='handled'>
                     <RecipeImageViewPager
                         style={{ height: 320 }}
                         onImageAdded={addRecipeImage}
