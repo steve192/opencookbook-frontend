@@ -234,8 +234,11 @@ class RestAPI {
             // Converting to blob etc does not work..
             let filename = uri.split('/').pop();
 
+            //@ts-ignore
             const extArr = /\.(\w+)$/.exec(filename);
+            //@ts-ignore
             const type = "image/" + extArr[1];
+            //@ts-ignore
             formData.append("image", { uri: uri, name: filename, type });
         }
 
