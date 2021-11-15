@@ -1,11 +1,9 @@
-import { Button, Card, Divider, Input, Layout, List, ListItem, Text } from '@ui-kitten/components';
-import React, { useState } from 'react';
-import { ListRenderItemInfo, Pressable, StyleSheet, View, Modal } from 'react-native';
-import { SafeAreaInsetsContext, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { StatusBar } from './StatusBar';
 import { HeaderHeightContext } from '@react-navigation/elements';
-import { PlusIcon } from '../assets/Icons';
+import { Divider, Input, Layout, List, ListItem, Text } from '@ui-kitten/components';
+import React, { useRef, useState } from 'react';
+import { ListRenderItemInfo, Modal, Pressable, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
+import useAutoFocus from '../customHooks/useAutofocus';
 
 
 
@@ -17,7 +15,7 @@ interface Props {
     allowAdditionalValues?: boolean
 }
 
-interface ListItem {
+interface ListItemData {
     text: string
     isCreationItem: boolean
 }
@@ -27,11 +25,15 @@ export const SelectionPopup = (props: Props) => {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [value, setValue] = useState<string>("");
 
+    const modalInputRef = useRef<Input>(null);
+
+
     const openModal = () => {
         setModalVisible(true);
     }
 
-    const renderListItem = (info: ListRenderItemInfo<ListItem>) =>
+
+    const renderListItem = (info: ListRenderItemInfo<ListItemData>) =>
         <ListItem
             title={
                 <Text
@@ -50,13 +52,13 @@ export const SelectionPopup = (props: Props) => {
         setModalVisible(false);
     }
 
-    const getListItemData = (): ListItem[] => {
+    const getListItemData = (): ListItemData[] => {
         const filteredItems = value ?
             props.options.filter((option) => option.toLowerCase().includes(value.toLowerCase()))
             : props.options;
-            
+
         if (filteredItems.length > 0) {
-            let listItems: ListItem[] = [];
+            let listItems: ListItemData[] = [];
             filteredItems.forEach(item => {
                 listItems.push({ text: item, isCreationItem: false });
             });
@@ -84,6 +86,7 @@ export const SelectionPopup = (props: Props) => {
                     animationType="slide"
                     transparent={true}
                     visible={modalVisible}
+                    onShow={() => modalInputRef.current?.focus()}
                     onRequestClose={() => setModalVisible(false)}
                 >
                     <HeaderHeightContext.Consumer>
@@ -92,8 +95,9 @@ export const SelectionPopup = (props: Props) => {
                                 <View style={styles.centeredView}>
                                     {/*headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
                                     <Layout style={[{ flex: 1, marginTop: (headerHeight / 2), width: "100%" }, styles.modalView]}>
-                                        <View style={{ flexDirection: "row", alignContent: "center" }}>
-                                            <Input onChangeText={onSearchInputChange} style={{ flex: 1 }} value={value} />
+                                        <View
+                                            style={{ flexDirection: "row", alignContent: "center" }}>
+                                            <Input ref={modalInputRef} onChangeText={onSearchInputChange} style={{ flex: 1 }} value={value} />
                                             <Spacer width={10} />
                                         </View>
                                         <Divider style={{ paddingVertical: 2, marginVertical: 10 }} />
