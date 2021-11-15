@@ -2,25 +2,31 @@ import { Autocomplete, AutocompleteItem, Button, IndexPath, Input, Select, Selec
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Spacer from "react-spacer";
-import { SelectionPopup } from "../../components/SelectionPopup";
+import { Option, SelectionPopup } from "../../components/SelectionPopup";
 import RestAPI, { Ingredient, IngredientUse, RecipeGroup } from "../../dao/RestAPI";
 
 
 interface Props {
     recipeGroup?: RecipeGroup
-    onRecipeGroupChange: (newIngredient: RecipeGroup) => void
+    onRecipeGroupChange: (newIngredient: RecipeGroup | undefined) => void
 }
 
 export const RecipeGroupFormField = (props: Props) => {
 
     const [availableGroups, setAvailableGroups] = useState<RecipeGroup[]>([]);
 
-    const setRecipeGroup = (text: string) => {
-        const existingGroup = availableGroups.find(group => group.title.toLowerCase() === text.toLowerCase());
-        if (existingGroup) {
-            props.onRecipeGroupChange(existingGroup);
+    const setRecipeGroup = (option: Option) => {
+        if (option.newlyCreated) {
+            // Newly created
+            props.onRecipeGroupChange({ title: option.value, type: "RecipeGroup" });
         } else {
-            props.onRecipeGroupChange({ title: text, type: "RecipeGroup" });
+            const existingGroup = availableGroups.find(group => group.id?.toString() == option.key);
+            if (existingGroup) {
+                props.onRecipeGroupChange(existingGroup);
+            } else {
+                // No group selected
+                props.onRecipeGroupChange(undefined);
+            }
         }
     };
 
@@ -32,14 +38,15 @@ export const RecipeGroupFormField = (props: Props) => {
             });
     }
 
+    const getOptions = () => {
+        // The key for "no group selected". Can be anything that will never exist in the real ids
+        let groups: Option[] = [{ key: "none", value: "No group" }];
+        groups = [...groups, ...availableGroups.map(group => ({ key: group.id ? group.id.toString() : "", value: group.title }))];
+        return groups;
+    }
+
 
     useEffect(queryGroups, []);
-
-    const getGroupsAsStringlist = (groups: RecipeGroup[]) => {
-        let stringList: string[] = [];
-        groups.forEach(group => stringList.push(group.title));
-        return stringList;
-    }
 
     return (
         <>
@@ -47,7 +54,7 @@ export const RecipeGroupFormField = (props: Props) => {
                 placeholder="Recipe group"
                 value={props.recipeGroup ? props.recipeGroup.title : ""}
                 onValueChanged={setRecipeGroup}
-                options={getGroupsAsStringlist(availableGroups)}
+                options={getOptions()}
                 allowAdditionalValues={true}
             />
         </>

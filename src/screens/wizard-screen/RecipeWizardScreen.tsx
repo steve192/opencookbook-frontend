@@ -1,11 +1,10 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Avatar, Button, Divider, Icon, Input, Layout, Text, useTheme, ViewPager } from '@ui-kitten/components';
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import { Button, Divider, Icon, Input, Layout, Text, useTheme } from '@ui-kitten/components';
+import React, { useLayoutEffect, useState } from 'react';
 import { ImageProps, ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
 import { DeleteIcon, SaveIcon } from '../../assets/Icons';
 import { RecipeImageViewPager } from '../../components/RecipeImageViewPager';
-import { SelectionPopup } from '../../components/SelectionPopup';
 import RestAPI, { IngredientUse, Recipe, RecipeGroup } from '../../dao/RestAPI';
 import { MainNavigationProps } from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
@@ -101,8 +100,12 @@ const RecipeWizardScreen = (props: Props) => {
         setNewRecipeData({ ...newRecipeData, neededIngredients: ingredientsCopy })
     }
 
-    const setRecipeGroup = (recipeGroup: RecipeGroup) => {
-        setNewRecipeData({ ...newRecipeData, recipeGroups: [recipeGroup] });
+    const setRecipeGroup = (recipeGroup: RecipeGroup | undefined) => {
+        if (!recipeGroup) {
+            setNewRecipeData({ ...newRecipeData, recipeGroups: [] });
+        } else {
+            setNewRecipeData({ ...newRecipeData, recipeGroups: [recipeGroup] });
+        }
     }
 
 
@@ -211,6 +214,7 @@ const RecipeWizardScreen = (props: Props) => {
                         <Spacer height={15} />
                         <Text category="label">Preparation Steps</Text>
                         {renderPreparationStepsSection()}
+                        <Spacer height={15} />
                         <Text category="label">Recipe Groups</Text>
                         {renderGroupSelectionSection()}
                     </View>

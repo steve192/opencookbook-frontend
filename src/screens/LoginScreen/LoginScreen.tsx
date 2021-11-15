@@ -1,18 +1,16 @@
-import React, { useState } from 'react';
-import { Button, Card, Icon, Input, Layout, Modal, Text } from '@ui-kitten/components';
-import { ScrollView, View, StyleSheet, ImageBackground, KeyboardAvoidingView, Platform } from 'react-native';
-import RestAPI from '../../dao/RestAPI';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { LoginNavigationProps, MainNavigationProps } from '../../navigation/NavigationRoutes';
-import CentralStyles from '../../styles/CentralStyles';
-import Configuration from '../../Configuration';
-import Spacer from 'react-spacer';
-import { color } from 'react-native-reanimated';
-import { LoginBackdrop } from './LoginBackdrop';
+import { Button, Card, Icon, Input, Modal, Text } from '@ui-kitten/components';
 import Constants from 'expo-constants';
-import { SelectionPopup } from '../../components/SelectionPopup';
-import { useSelector, useDispatch } from 'react-redux'
+import React, { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { useDispatch } from 'react-redux';
+import Spacer from 'react-spacer';
+import Configuration from '../../Configuration';
+import RestAPI from '../../dao/RestAPI';
+import { LoginNavigationProps } from '../../navigation/NavigationRoutes';
 import { login } from '../../redux/features/authSlice';
+import CentralStyles from '../../styles/CentralStyles';
+import { LoginBackdrop } from './LoginBackdrop';
 
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'LoginScreen'>;

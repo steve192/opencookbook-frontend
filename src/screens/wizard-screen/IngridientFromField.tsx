@@ -1,4 +1,4 @@
-import { Autocomplete, AutocompleteItem, Button, IndexPath, Input, Select, SelectItem } from "@ui-kitten/components";
+import { AutocompleteItem, Button, IndexPath, Input } from "@ui-kitten/components";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Spacer from "react-spacer";
@@ -21,7 +21,6 @@ export const IngredientFormField = (props: Props) => {
     const [availableUnits, setAvailableUnits] = useState<string[]>([]);
 
     const [availableIngredients, setAvailableIngredients] = useState<Ingredient[]>([]);
-    const [selectedUnitIndex, setSelectedUnitIndex] = useState<IndexPath>();
 
     const setIngredient = (text: string) => {
         setIngredientQuery(text);
@@ -33,12 +32,6 @@ export const IngredientFormField = (props: Props) => {
         }
     };
 
-    const renderIngredientOptions = (item: Ingredient, index: number) => (
-        <AutocompleteItem
-            key={index}
-            title={item.name}
-        />
-    );
 
     const queryIngredients = () => {
         RestAPI.getIngredients(ingredientQuery)
@@ -74,8 +67,8 @@ export const IngredientFormField = (props: Props) => {
                     <Spacer width={5} />
                     <SelectionPopup
                         value={unit}
-                        options={availableUnits}
-                        onValueChanged={setUnit}
+                        options={availableUnits.map((unit, index) => ({ key: index.toString(), value: unit }))}
+                        onValueChanged={selectedOption => setUnit(selectedOption.value)}
                         placeholder="Unit"
                     />
                 </View>
@@ -83,19 +76,11 @@ export const IngredientFormField = (props: Props) => {
                 <View style={{ justifyContent: "center", flex: 1 }}>
                     <SelectionPopup
                         value={ingredientQuery}
-                        options={availableIngredients.map(ingredient => ingredient.name)}
-                        onValueChanged={setIngredient}
+                        options={availableIngredients.map(ingredient => ({ key: ingredient.id ? ingredient.id.toString() : "", value: ingredient.name }))}
+                        onValueChanged={(selectedOption) => setIngredient(selectedOption.value)}
                         placeholder="Ingredient"
                         allowAdditionalValues={true}
                     />
-                    {/* <Autocomplete
-                        placeholder='Ingredient'
-                        value={ingredientQuery}
-                        // accessoryRight={renderCloseIcon}
-                        onChangeText={(text) => setIngredient(text)}
-                        onSelect={(index) => setIngredient(availableIngredients[index].name)}>
-                        {availableIngredients.map((ingredient, index) => renderIngredientOptions(ingredient, index))} */}
-                    {/* </Autocomplete> */}
                     <Button style={{ position: "absolute", right: 5 }} size="tiny" onPress={() => props.onRemovePress()}>X</Button>
 
                 </View>

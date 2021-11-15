@@ -3,21 +3,23 @@ import { Divider, Input, Layout, List, ListItem, Text } from '@ui-kitten/compone
 import React, { useRef, useState } from 'react';
 import { ListRenderItemInfo, Modal, Pressable, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
-import useAutoFocus from '../customHooks/useAutofocus';
 
 
-
+export interface Option {
+    key: string;
+    value: string;
+    newlyCreated?: boolean;
+}
 interface Props {
     value: string,
-    options: string[],
-    onValueChanged?: (newValue: string) => void,
+    options: Option[],
+    onValueChanged?: (newValue: Option) => void,
     placeholder?: string,
     allowAdditionalValues?: boolean
 }
 
 interface ListItemData {
-    text: string
-    isCreationItem: boolean
+    option: Option
 }
 
 export const SelectionPopup = (props: Props) => {
@@ -37,35 +39,35 @@ export const SelectionPopup = (props: Props) => {
         <ListItem
             title={
                 <Text
-                    style={{ fontWeight: info.item.isCreationItem ? "bold" : "normal" }}>
-                    {info.item.text}
+                    style={{ fontWeight: info.item.option.newlyCreated ? "bold" : "normal" }}>
+                    {info.item.option.value}
                 </Text>}
-            onPress={() => info.item.isCreationItem ? applySelection(value) : applySelection(info.item.text)}
+            onPress={() => info.item.option.newlyCreated ? applySelection({ key: "", value: value, newlyCreated: true }) : applySelection(info.item.option)}
         />
 
     const onSearchInputChange = (newText: string) => {
         setValue(newText);
     }
 
-    const applySelection = (selectedValue: string) => {
+    const applySelection = (selectedValue: Option) => {
         props.onValueChanged?.(selectedValue);
         setModalVisible(false);
     }
 
     const getListItemData = (): ListItemData[] => {
         const filteredItems = value ?
-            props.options.filter((option) => option.toLowerCase().includes(value.toLowerCase()))
+            props.options.filter((option) => option.value.toLowerCase().startsWith(value.toLowerCase()))
             : props.options;
 
         if (filteredItems.length > 0) {
             let listItems: ListItemData[] = [];
             filteredItems.forEach(item => {
-                listItems.push({ text: item, isCreationItem: false });
+                listItems.push({ option: item });
             });
             return listItems;
         }
 
-        return [{ text: "Create " + value, isCreationItem: true }];
+        return [{ option: { key: "", value: "Create " + value, newlyCreated: true } }];
     }
 
 
