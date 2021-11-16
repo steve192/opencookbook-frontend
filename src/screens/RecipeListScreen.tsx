@@ -112,7 +112,7 @@ const RecipeListScreen = (props: Props) => {
   const createRecipeListItem = (recipe: Recipe) => {
     return (
       <Pressable
-        style={styles.recipeCard}
+        style={[styles.recipeCard, {flex: 1 / numberOfColumns}]}
         onPress={() => openRecipe(recipe)}>
         <Layout style={{ height: 180 }}>
           <RecipeImageComponent
@@ -126,7 +126,7 @@ const RecipeListScreen = (props: Props) => {
   const createRecipeGroupListItem = (recipeGroup: RecipeGroup) => {
     return (
       < Card
-        style={styles.recipeGroupCard}
+        style={[styles.recipeGroupCard, {flex: 1 / numberOfColumns}]}
         status='basic'
         onPress={() => props.navigation.push("RecipeListDetailScreen", { shownRecipeGroup: recipeGroup })}
         footer={headerProps => renderRecipeGroupTitle(headerProps, recipeGroup.title)}
@@ -220,11 +220,9 @@ const styles = StyleSheet.create({
   recipeCard: {
     // marginVertical: 4,
     margin: 3,
-    maxWidth: 300,
-    flex: 1,
     borderRadius: 16,
     overflow: "hidden",
-    backgroundColor: "rgb(240,240,240)" //TODO: Theme color
+    backgroundColor: "rgba(127,127,127, 0.05)" //TODO: Theme color
 
   },
   recipeGroupCard: {
