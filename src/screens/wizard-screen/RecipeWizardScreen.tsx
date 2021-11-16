@@ -4,6 +4,7 @@ import React, { useLayoutEffect, useState } from 'react';
 import { ImageProps, ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
 import { DeleteIcon, SaveIcon } from '../../assets/Icons';
+import { CustomCard } from '../../components/CustomCard';
 import { RecipeImageViewPager } from '../../components/RecipeImageViewPager';
 import RestAPI, { IngredientUse, Recipe, RecipeGroup } from '../../dao/RestAPI';
 import { MainNavigationProps } from '../../navigation/NavigationRoutes';
@@ -139,7 +140,7 @@ const RecipeWizardScreen = (props: Props) => {
     }
 
     const renderIngredientsSection = () =>
-        <>
+        <CustomCard>
             <Text category="label">Ingredients</Text>
             {newRecipeData.neededIngredients.map((neededIngredient, ingredientIndex) =>
                 <>
@@ -148,10 +149,7 @@ const RecipeWizardScreen = (props: Props) => {
                         ingredient={neededIngredient}
                         onIngredientChange={(ingredient) => changeIngredient(ingredientIndex, ingredient)}
                         onRemovePress={() => removeIngredient(ingredientIndex)} />
-
-                    {ingredientIndex !== newRecipeData.neededIngredients.length - 1 &&
-                        <Divider style={{ marginVertical: 10 }} />
-                    }
+                    <Spacer height={10} />
                 </>
             )}
             <Spacer height={10} />
@@ -161,11 +159,12 @@ const RecipeWizardScreen = (props: Props) => {
                 key="addIngredient"
                 accessoryLeft={AddIcon}
                 onPress={addIngredient} />
-        </>
+        </CustomCard>
 
 
     const renderPreparationStepsSection = () =>
-        <>
+        <CustomCard>
+            <Text category="label">Preparation Steps</Text>
             {newRecipeData.preparationSteps.map((preparationStep, preparationStepIndex) =>
                 <>
                     <RecipeFormField
@@ -181,15 +180,15 @@ const RecipeWizardScreen = (props: Props) => {
             )}
             <Spacer height={10} />
             <Button size="small" key="addStep" accessoryLeft={AddIcon} onPress={addPreparationStep} />
-        </>
+        </CustomCard>
 
     const renderGroupSelectionSection = () => (
-        <View style={{ borderWidth: 1, borderColor: theme["background-basic-color-4"], padding: 10, borderRadius: 16 }}>
+        <CustomCard>
             <Text category="label">Recipe Groups</Text>
             <RecipeGroupFormField
                 recipeGroup={newRecipeData.recipeGroups?.[0]}
                 onRecipeGroupChange={setRecipeGroup} />
-        </View>
+        </CustomCard>
     )
 
     return (
@@ -204,28 +203,27 @@ const RecipeWizardScreen = (props: Props) => {
                         allowEdit={true}
                     />
                     <View style={[CentralStyles.contentContainer, CentralStyles.elementSpacing]}>
-                        <View style={{ borderWidth: 1, borderColor: theme["background-basic-color-4"], padding: 10, borderRadius: 16 }}>
+                        <CustomCard>
                             <Text category="label">Title</Text>
                             <Input
                                 value={newRecipeData.title}
                                 onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, title: newText })}
                                 placeholder="Name" />
-                        </View>
+                        </CustomCard>
                         <Spacer height={15} />
                         {renderIngredientsSection()}
                         <Divider style={{ marginVertical: 10 }} />
                         <Spacer height={15} />
-                        <View style={{ borderWidth: 1, borderColor: theme["background-basic-color-4"], padding: 10, borderRadius: 16 }}>
+                        <CustomCard>
                             <Text category="label">Servings</Text>
                             <Input
                                 placeholder="Serving size"
                                 keyboardType='numeric'
                                 value={newRecipeData.servings?.toString()}
                                 onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, servings: parseInt(newText) ? parseInt(newText) : undefined })} />
-                        </View>
+                        </CustomCard>
                         <Divider style={{ marginVertical: 10 }} />
                         <Spacer height={15} />
-                        <Text category="label">Preparation Steps</Text>
                         {renderPreparationStepsSection()}
                         <Spacer height={15} />
                         {renderGroupSelectionSection()}
