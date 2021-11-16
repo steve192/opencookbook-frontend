@@ -20,5 +20,6 @@ export default StyleSheet.create({
         paddingVertical: 24,
         paddingHorizontal: 16,
         maxWidth: 800
-    }
+    },
+    fullscreen: { width: "100%", height: "100%" }
 });

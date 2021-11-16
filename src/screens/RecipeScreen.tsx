@@ -119,7 +119,7 @@ export const RecipeScreen = (props: Props) => {
     return (
         <>
             {/* <StatusBar /> */}
-            <Layout>
+            <Layout style={CentralStyles.fullscreen}>
                 <ScrollView>
                     <RecipeImageViewPager
                         style={{ height: 320 }}
