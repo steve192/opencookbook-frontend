@@ -1,6 +1,6 @@
 import { light } from '@eva-design/eva';
 
-export const myTheme = {
+export const myLightTheme = {
   ...light,
 
   "color-primary-100": "#F0FBC9",

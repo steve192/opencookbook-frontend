@@ -1,6 +1,6 @@
 import { dark } from '@eva-design/eva';
 
-export const myTheme = {
+export const myDarkTheme = {
   ...dark,
 
   "color-primary-100": "#F0FBC9",
