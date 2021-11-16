@@ -155,7 +155,12 @@ const RecipeWizardScreen = (props: Props) => {
                 </>
             )}
             <Spacer height={10} />
-            <Button size="small" key="addIngredient" accessoryLeft={AddIcon} onPress={addIngredient} />
+            <Button
+                style={{ marginHorizontal: 16 }}
+                size="small"
+                key="addIngredient"
+                accessoryLeft={AddIcon}
+                onPress={addIngredient} />
         </>
 
 
@@ -179,9 +184,12 @@ const RecipeWizardScreen = (props: Props) => {
         </>
 
     const renderGroupSelectionSection = () => (
-        <RecipeGroupFormField
-            recipeGroup={newRecipeData.recipeGroups?.[0]}
-            onRecipeGroupChange={setRecipeGroup} />
+        <View style={{ borderWidth: 1, borderColor: theme["background-basic-color-4"], padding: 10, borderRadius: 16 }}>
+            <Text category="label">Recipe Groups</Text>
+            <RecipeGroupFormField
+                recipeGroup={newRecipeData.recipeGroups?.[0]}
+                onRecipeGroupChange={setRecipeGroup} />
+        </View>
     )
 
     return (
@@ -196,27 +204,30 @@ const RecipeWizardScreen = (props: Props) => {
                         allowEdit={true}
                     />
                     <View style={[CentralStyles.contentContainer, CentralStyles.elementSpacing]}>
-                        <Text category="label">Title</Text>
-                        <Input
-                            value={newRecipeData.title}
-                            onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, title: newText })}
-                            placeholder="Name" />
+                        <View style={{ borderWidth: 1, borderColor: theme["background-basic-color-4"], padding: 10, borderRadius: 16 }}>
+                            <Text category="label">Title</Text>
+                            <Input
+                                value={newRecipeData.title}
+                                onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, title: newText })}
+                                placeholder="Name" />
+                        </View>
                         <Spacer height={15} />
                         {renderIngredientsSection()}
                         <Divider style={{ marginVertical: 10 }} />
                         <Spacer height={15} />
-                        <Text category="label">Servings</Text>
-                        <Input
-                            placeholder="Serving size"
-                            keyboardType='numeric'
-                            value={newRecipeData.servings?.toString()}
-                            onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, servings: parseInt(newText) ? parseInt(newText) : undefined })} />
+                        <View style={{ borderWidth: 1, borderColor: theme["background-basic-color-4"], padding: 10, borderRadius: 16 }}>
+                            <Text category="label">Servings</Text>
+                            <Input
+                                placeholder="Serving size"
+                                keyboardType='numeric'
+                                value={newRecipeData.servings?.toString()}
+                                onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, servings: parseInt(newText) ? parseInt(newText) : undefined })} />
+                        </View>
                         <Divider style={{ marginVertical: 10 }} />
                         <Spacer height={15} />
                         <Text category="label">Preparation Steps</Text>
                         {renderPreparationStepsSection()}
                         <Spacer height={15} />
-                        <Text category="label">Recipe Groups</Text>
                         {renderGroupSelectionSection()}
                     </View>
                     <Button

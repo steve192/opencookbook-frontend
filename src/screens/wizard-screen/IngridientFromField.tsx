@@ -1,7 +1,8 @@
-import { AutocompleteItem, Button, IndexPath, Input } from "@ui-kitten/components";
+import { AutocompleteItem, Button, IndexPath, Input, useTheme } from "@ui-kitten/components";
 import React, { useEffect, useState } from "react";
 import { View } from "react-native";
 import Spacer from "react-spacer";
+import { DeleteIcon } from "../../assets/Icons";
 import { SelectionPopup } from "../../components/SelectionPopup";
 import RestAPI, { Ingredient, IngredientUse } from "../../dao/RestAPI";
 
@@ -21,6 +22,8 @@ export const IngredientFormField = (props: Props) => {
     const [availableUnits, setAvailableUnits] = useState<string[]>([]);
 
     const [availableIngredients, setAvailableIngredients] = useState<Ingredient[]>([]);
+
+    const theme = useTheme();
 
     const setIngredient = (text: string) => {
         setIngredientQuery(text);
@@ -57,32 +60,40 @@ export const IngredientFormField = (props: Props) => {
 
     return (
         <>
-            <View style={{ flex: 1, flexDirection: "column" }}>
-                <View style={{ flex: 1, flexDirection: "row" }}>
-                    <Input
-                        style={{ width: 100 }}
-                        value={(amount ? amount.toString() : "")}
-                        placeholder="Amount"
-                        onChangeText={onAmountChange} />
-                    <Spacer width={5} />
-                    <SelectionPopup
-                        value={unit}
-                        options={availableUnits.map((unit, index) => ({ key: index.toString(), value: unit }))}
-                        onValueChanged={selectedOption => setUnit(selectedOption.value)}
-                        placeholder="Unit"
-                    />
-                </View>
-                <Spacer height={5} />
-                <View style={{ justifyContent: "center", flex: 1 }}>
-                    <SelectionPopup
-                        value={ingredientQuery}
-                        options={availableIngredients.map(ingredient => ({ key: ingredient.id ? ingredient.id.toString() : "", value: ingredient.name }))}
-                        onValueChanged={(selectedOption) => setIngredient(selectedOption.value)}
-                        placeholder="Ingredient"
-                        allowAdditionalValues={true}
-                    />
-                    <Button style={{ position: "absolute", right: 5 }} size="tiny" onPress={() => props.onRemovePress()}>X</Button>
-
+            <View style={{ borderWidth: 1, borderColor: theme["background-basic-color-4"], padding: 10, borderRadius: 16 }}>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <View style={{ flex: 1, flexDirection: "column" }}>
+                        <View style={{ flex: 1, flexDirection: "row" }}>
+                            <Input
+                                style={{ width: 100 }}
+                                value={(amount ? amount.toString() : "")}
+                                placeholder="Amount"
+                                onChangeText={onAmountChange} />
+                            <Spacer width={5} />
+                            <SelectionPopup
+                                value={unit}
+                                options={availableUnits.map((unit, index) => ({ key: index.toString(), value: unit }))}
+                                onValueChanged={selectedOption => setUnit(selectedOption.value)}
+                                placeholder="Unit"
+                            />
+                        </View>
+                        <Spacer height={5} />
+                        <View style={{ justifyContent: "center", flex: 1 }}>
+                            <SelectionPopup
+                                value={ingredientQuery}
+                                options={availableIngredients.map(ingredient => ({ key: ingredient.id ? ingredient.id.toString() : "", value: ingredient.name }))}
+                                onValueChanged={(selectedOption) => setIngredient(selectedOption.value)}
+                                placeholder="Ingredient"
+                                allowAdditionalValues={true}
+                            />
+                        </View>
+                    </View>
+                    <Button 
+                        style={{ height: 32, width: 32, margin: 10 }} 
+                        size="small" 
+                        status="control"
+                        accessoryLeft={<DeleteIcon/>}
+                        onPress={() => props.onRemovePress()}/>
                 </View>
             </View>
         </>
