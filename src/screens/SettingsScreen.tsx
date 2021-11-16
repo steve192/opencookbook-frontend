@@ -17,24 +17,26 @@ export const SettingsScreen = () => {
     const dispatch = useDispatch();
     return (
         <>
-            <Layout style={[CentralStyles.contentContainer, CentralStyles.fullscreen]}>
-                <ScrollView>
-                    <CustomCard>
-                    <Text category="label">Theme</Text>
-                    <Picker
-                        selectedValue={selectedTheme}
-                        onValueChange={value => dispatch(changeTheme(value))}>
-                        <Picker.Item label="Light" value="light" />
-                        <Picker.Item label="Dark" value="dark" />
-                    </Picker>
-                    </CustomCard>
-                    <Spacer height={20} />
-                    <View style={{ padding: 10, borderWidth: 1, borderRadius: 16, borderColor: "red" }}>
-                        <Text category="label" status="danger">Danger zone</Text>
+            <Layout style={[CentralStyles.fullscreen]}>
+                <View style={CentralStyles.contentContainer}>
+                    <ScrollView>
+                        <CustomCard>
+                            <Text category="label">Theme</Text>
+                            <Picker
+                                selectedValue={selectedTheme}
+                                onValueChange={value => dispatch(changeTheme(value))}>
+                                <Picker.Item label="Light" value="light" />
+                                <Picker.Item label="Dark" value="dark" />
+                            </Picker>
+                        </CustomCard>
                         <Spacer height={20} />
-                        <Button status="danger">Delete account</Button>
-                    </View>
-                </ScrollView>
+                        <View style={{ padding: 10, borderWidth: 1, borderRadius: 16, borderColor: "red" }}>
+                            <Text category="label" status="danger">Danger zone</Text>
+                            <Spacer height={20} />
+                            <Button status="danger">Delete account</Button>
+                        </View>
+                    </ScrollView>
+                </View> 
             </Layout>
         </>
     )
