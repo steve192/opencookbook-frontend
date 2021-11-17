@@ -9,6 +9,7 @@ import { DeleteIcon, FolderIcon } from '../assets/Icons';
 import { RecipeImageComponent } from '../components/RecipeImageComponent';
 import RestAPI, { Recipe, RecipeGroup } from '../dao/RestAPI';
 import { MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation } from '../navigation/NavigationRoutes';
+import { MaterialIcons } from '@expo/vector-icons';
 
 
 type Props = CompositeScreenProps<
@@ -33,8 +34,8 @@ const RecipeListScreen = (props: Props) => {
       title: props.route.params?.shownRecipeGroup?.title,
       headerRight: () => (
         <>
-          <Button 
-            onPress={() => deleteRecipeGroup(props.route.params.shownRecipeGroup)} 
+          <Button
+            onPress={() => deleteRecipeGroup(props.route.params.shownRecipeGroup)}
             accessoryLeft={<DeleteIcon fill={theme["color-danger-default"]} />} />
         </>
       ),
@@ -112,7 +113,7 @@ const RecipeListScreen = (props: Props) => {
   const createRecipeListItem = (recipe: Recipe) => {
     return (
       <Pressable
-        style={[styles.recipeCard, {flex: 1 / numberOfColumns}]}
+        style={[styles.recipeCard, { flex: 1 / numberOfColumns }]}
         onPress={() => openRecipe(recipe)}>
         <Layout style={{ height: 180 }}>
           <RecipeImageComponent
@@ -126,7 +127,7 @@ const RecipeListScreen = (props: Props) => {
   const createRecipeGroupListItem = (recipeGroup: RecipeGroup) => {
     return (
       < Card
-        style={[styles.recipeGroupCard, {flex: 1 / numberOfColumns}]}
+        style={[styles.recipeGroupCard, { flex: 1 / numberOfColumns }]}
         status='basic'
         onPress={() => props.navigation.push("RecipeListDetailScreen", { shownRecipeGroup: recipeGroup })}
         footer={headerProps => renderRecipeGroupTitle(headerProps, recipeGroup.title)}
@@ -182,22 +183,33 @@ const RecipeListScreen = (props: Props) => {
     }
   }
 
+  const renderNoItemsNotice = () => (
+    <View style={{ width: "100%", height: "100%", justifyContent: "center", alignItems: "center", flex: 1 }}>
+      <MaterialIcons name="no-food" size={64} color={theme["text-disabled-color"]} />
+      <Text category="h4" style={{ padding: 64, color: theme["text-disabled-color"] }}>
+        Looks like you have not added any recipes yet
+      </Text>
+    </View>
+  );
 
   useEffect(fetchData, []);
 
   return (
     <>
       <Layout style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'baseline' }}>
-        <List
-          key={numberOfColumns} //To force re render when number of columns changes
-          style={styles.container}
-          contentContainerStyle={styles.contentContainer}
-          data={getShownItems()}
-          numColumns={numberOfColumns}
-          renderItem={renderItem}
-          refreshing={listRefreshing}
-          onRefresh={fetchData}
-        />
+        {getShownItems().length > 0 ?
+          <List
+            key={numberOfColumns} //To force re render when number of columns changes
+            style={styles.container}
+            contentContainerStyle={styles.contentContainer}
+            data={getShownItems()}
+            numColumns={numberOfColumns}
+            renderItem={renderItem}
+            refreshing={listRefreshing}
+            onRefresh={fetchData}
+          /> :
+          renderNoItemsNotice()
+        }
         <FloatingAction
           actions={addActions}
           onPressItem={onActionButtonPress}
