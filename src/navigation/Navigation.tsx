@@ -18,6 +18,8 @@ import { GuidedCookingScreen } from '../screens/GuidedCookingScreen';
 import { SplashScreen } from '../screens/LoginScreen/SplashScreen';
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../redux/store';
+import { NavigationContainer } from '@react-navigation/native';
+import { createURL } from 'expo-linking';
 
 
 
@@ -164,7 +166,14 @@ const MainNavigation = () => {
         </Stack.Navigator>
     )
 
-    return isLoading ? <SplashScreen /> : loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />
+    return (
+        <NavigationContainer
+            linking={{
+                prefixes: [createURL('/')],
+            }}>
+            {isLoading ? <SplashScreen /> : loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />}
+        </NavigationContainer>
+    )
 }
 
 export default MainNavigation;

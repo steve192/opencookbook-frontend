@@ -31,6 +31,7 @@
     "expo-file-system": "^13.0.3",
     "expo-image-picker": "~11.0.3",
     "expo-keep-awake": "~10.0.0",
+    "expo-linking": "~2.4.2",
     "expo-permissions": "~13.0.3",
     "expo-secure-store": "^11.0.3",
     "expo-splash-screen": "~0.13.3",

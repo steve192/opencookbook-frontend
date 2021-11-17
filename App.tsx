@@ -34,9 +34,8 @@ const ReduxWrappedApp = () => {
         // @ts-ignore
         customMapping={customMapping}
         theme={selectedTheme === "light" ? myLightTheme : myDarkTheme}>
-        <NavigationContainer>
+        
           <MainNavigation />
-        </NavigationContainer>
       </ApplicationProvider>
     </>
   )
