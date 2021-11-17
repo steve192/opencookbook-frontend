@@ -112,6 +112,10 @@ const RecipeWizardScreen = (props: Props) => {
 
 
     const saveRecipe = () => {
+        if (newRecipeData.recipeGroups[0].title === "") {
+            // As long as there are no multiple groups
+            newRecipeData.recipeGroups = [];
+        }
         if (props.route.params.editing) {
             //TODO: Error handling
             RestAPI.updateRecipe(newRecipeData).then((recipe) => {
