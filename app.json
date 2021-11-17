@@ -2,7 +2,7 @@
   "expo": {
     "name": "opencookbook",
     "slug": "opencookbook",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -17,7 +17,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "buildNumber": "0.0.1"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,7 +26,10 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.sterul.opencookbook",
-      "permissions":[ "CAMERA"]
+      "permissions": [
+        "CAMERA"
+      ],
+      "versionCode": 3
     },
     "web": {
       "favicon": "./assets/favicon.png"
