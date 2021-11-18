@@ -2,6 +2,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button, Card, Icon, Input, Modal, Text } from '@ui-kitten/components';
 import Constants from 'expo-constants';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import Spacer from 'react-spacer';
@@ -24,6 +25,8 @@ const LoginScreen = ({ route, navigation }: Props) => {
     const [apiErrorMessage, setApiErrorMessage] = useState<string>();
 
     const dispatch = useDispatch();
+
+    const { t } = useTranslation("translation");
 
     const doLogin = () => {
         RestAPI.authenticate(email, password).then(() => {
@@ -65,7 +68,7 @@ const LoginScreen = ({ route, navigation }: Props) => {
                             appearance='ghost'
                             status='basic'
                             onPress={() => null}>
-                            Forgot your password?
+                            {t("screens.login.forgotPassword")}
                         </Button>
                     </View>
                     <Button style={CentralStyles.elementSpacing} onPress={doLogin}>Login</Button>
@@ -75,7 +78,7 @@ const LoginScreen = ({ route, navigation }: Props) => {
                         status='basic'
                         onPress={() => navigation.navigate("SignupScreen")}
                     >
-                        Don't have an account? Create
+                        {t("screens.login.createAccount")}
                     </Button>
                 </View>
             </View>

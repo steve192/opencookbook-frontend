@@ -1,0 +1,8 @@
+{
+  "screens": {
+    "login": {
+      "forgotPassword": "Passwort vergessen?",
+      "createAccount": "Noch keinen Account? Jetzt erstellen"
+    }
+  }
+}

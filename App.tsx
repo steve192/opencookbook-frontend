@@ -10,6 +10,7 @@ import { myLightTheme } from './src/styles/custom-theme-light';
 import { Provider, useSelector } from 'react-redux'
 import { RootState, store } from './src/redux/store';
 import { myDarkTheme } from './src/styles/custom-theme-dark';
+import './src/i18n/config';
 
 enableScreens()
 
