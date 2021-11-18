@@ -170,7 +170,8 @@ const MainNavigation = () => {
         <NavigationContainer
             linking={{
                 prefixes: [createURL('/')],
-            }}>
+            }}
+            >
             {isLoading ? <SplashScreen /> : loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />}
         </NavigationContainer>
     )
