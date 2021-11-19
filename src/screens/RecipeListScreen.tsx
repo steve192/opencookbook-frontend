@@ -10,6 +10,7 @@ import { RecipeImageComponent } from '../components/RecipeImageComponent';
 import RestAPI, { Recipe, RecipeGroup } from '../dao/RestAPI';
 import { MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation } from '../navigation/NavigationRoutes';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 
 type Props = CompositeScreenProps<
@@ -28,6 +29,7 @@ const RecipeListScreen = (props: Props) => {
   const [listRefreshing, setListRefreshing] = useState<boolean>(false);
 
   const theme = useTheme();
+  const { t } = useTranslation("translation");
 
   if (props.route.params?.shownRecipeGroup?.id) {
     props.navigation.setOptions({
@@ -41,7 +43,7 @@ const RecipeListScreen = (props: Props) => {
       ),
     });
   } else {
-    props.navigation.setOptions({ title: "My recipes" });
+    props.navigation.setOptions({ title: t("screens.overview.myRecipes") });
   }
 
   const deleteRecipeGroup = (group: RecipeGroup | undefined) => {
@@ -55,17 +57,17 @@ const RecipeListScreen = (props: Props) => {
 
   const addActions: IActionProps[] = [
     {
-      text: "Add recipe",
+      text:t("screens.overview.addRecipe"),
       name: "addRecipe",
       color: theme["color-primary-default"]
     },
     {
-      text: "Import recipe",
+      text: t("screens.overview.importRecipe"),
       name: "importRecipe",
       color: theme["color-primary-default"]
     },
     {
-      text: "Add recipe group",
+      text: t("screens.overview.addRecipeGroup"),
       name: "addRecipeGroup",
       color: theme["color-primary-default"]
     }
@@ -187,7 +189,7 @@ const RecipeListScreen = (props: Props) => {
     <View style={{ width: "100%", height: "100%", justifyContent: "center", alignItems: "center", flex: 1 }}>
       <MaterialIcons name="no-food" size={64} color={theme["text-disabled-color"]} />
       <Text category="h4" style={{ padding: 64, color: theme["text-disabled-color"] }}>
-        Looks like you have not added any recipes yet
+        {t("screens.overview.noRecipesMessage")}
       </Text>
     </View>
   );

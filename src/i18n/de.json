@@ -1,8 +1,63 @@
 {
+  "common": {
+    "create": "Erstellen",
+    "next": "Weiter",
+    "previous": "Zurrück"
+  },
   "screens": {
     "login": {
       "forgotPassword": "Passwort vergessen?",
       "createAccount": "Noch keinen Account? Jetzt erstellen"
+    },
+    "overview": {
+      "myRecipes": "Meine Rezepte",
+      "weekplan": "Wochenplan",
+      "settings": "Einstellungen",
+      "addRecipe": "Neues Rezept",
+      "importRecipe": "Rezept importieren",
+      "addRecipeGroup": "Neue Rezeptgruppe",
+      "noRecipesMessage": "Sieht so aus als hättest du noch keine Rezepte"
+    },
+    "settings": {
+      "theme": "Theme",
+      "light": "Hell",
+      "dark": "Dunkel",
+      "dangerZone": "Gefahrenzone",
+      "deleteAccount": "Account löschen"
+    },
+    "import": {
+      "URLToImport": "URL zum importieren",
+      "import": "Importieren",
+      "supportedServices": "Unterstützte Dienste",
+      "importSuccess": "Import erfolgreich",
+      "importFailed": "Import fehlgeschlagen"
+    },
+    "editRecipe": {
+      "screenTitleEdit": "Rezept bearbeiten",
+      "screenTitleCreate": "Rezept erstellen",
+      "title": "Titel",
+      "name": "Name",
+      "ingredients": "Zutaten",
+      "ingredient": "Zutat",
+      "amount": "Menge",
+      "unit": "Einheit",
+      "servings": "Portionen",
+      "preparationSteps": "Zubereitungsschritte",
+      "preparationStepPlaceholder": "Beschreibung hinzufügen...",
+      "recipeGroups": "Rezeptgruppen"
+    },
+    "createGroup": {
+      "groupName": "Gruppen Name"
+    },
+    "recipe": {
+      "servings": "Portionen",
+      "startCookingButton": "Kochen beginnen",
+      "ingredients": "Zutaten",
+      "preparationSteps": "Zubereitungsschritte"
+    },
+    "guidedCooking": {
+      "screenTitle": "Kochansicht",
+      "ingredients": "Zutaten"
     }
   }
 }

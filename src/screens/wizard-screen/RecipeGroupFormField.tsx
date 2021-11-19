@@ -1,5 +1,6 @@
 import { Autocomplete, AutocompleteItem, Button, IndexPath, Input, Select, SelectItem } from "@ui-kitten/components";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import Spacer from "react-spacer";
 import { Option, SelectionPopup } from "../../components/SelectionPopup";
@@ -14,6 +15,8 @@ interface Props {
 export const RecipeGroupFormField = (props: Props) => {
 
     const [availableGroups, setAvailableGroups] = useState<RecipeGroup[]>([]);
+
+    const { t } = useTranslation("translation");
 
     const setRecipeGroup = (option: Option) => {
         if (option.newlyCreated) {
@@ -51,7 +54,7 @@ export const RecipeGroupFormField = (props: Props) => {
     return (
         <>
             <SelectionPopup
-                placeholder="Recipe group"
+                placeholder={t("screens.editRecipe.recipeGroups")}
                 value={props.recipeGroup ? props.recipeGroup.title : ""}
                 onValueChanged={setRecipeGroup}
                 options={getOptions()}

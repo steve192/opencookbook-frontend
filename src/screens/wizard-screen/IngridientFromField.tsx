@@ -1,5 +1,6 @@
-import { AutocompleteItem, Button, IndexPath, Input, useTheme } from "@ui-kitten/components";
+import { Button, Input, useTheme } from "@ui-kitten/components";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { View } from "react-native";
 import Spacer from "react-spacer";
 import { DeleteIcon } from "../../assets/Icons";
@@ -24,6 +25,7 @@ export const IngredientFormField = (props: Props) => {
     const [availableIngredients, setAvailableIngredients] = useState<Ingredient[]>([]);
 
     const theme = useTheme();
+    const { t } = useTranslation("translation");
 
     const setIngredient = (text: string) => {
         setIngredientQuery(text);
@@ -67,7 +69,7 @@ export const IngredientFormField = (props: Props) => {
                             <Input
                                 style={{ width: 100 }}
                                 value={(amount ? amount.toString() : "")}
-                                placeholder="Amount"
+                                placeholder={t("screens.editRecipe.amount")}
                                 onChangeText={onAmountChange} />
                             <Spacer width={5} />
                             <SelectionPopup
@@ -83,7 +85,7 @@ export const IngredientFormField = (props: Props) => {
                                 value={ingredientQuery}
                                 options={availableIngredients.map(ingredient => ({ key: ingredient.id ? ingredient.id.toString() : "", value: ingredient.name }))}
                                 onValueChanged={(selectedOption) => setIngredient(selectedOption.value)}
-                                placeholder="Ingredient"
+                                placeholder={t("screens.editRecipe.ingredient")}
                                 allowAdditionalValues={true}
                             />
                         </View>

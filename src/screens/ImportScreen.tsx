@@ -1,5 +1,6 @@
 import { Button, Divider, Input, Layout, Spinner, Text, useTheme } from '@ui-kitten/components';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Spacer from 'react-spacer';
@@ -18,6 +19,7 @@ export const ImportScreen = (props: Props) => {
     const [importSuccess, setImportSuccess] = useState<boolean>(false);
 
     const theme = useTheme();
+    const { t } = useTranslation("translation");
 
     const startImport = () => {
         setImportPending(true);
@@ -47,21 +49,21 @@ export const ImportScreen = (props: Props) => {
                     {importError.length > 0 &&
                         <>
                             <WarningIcon width={16} height={16} fill={theme["text-danger-color"]} />
-                            <Text status="danger">Error while importing: {importError}</Text>
+                            <Text status="danger">{t("screens.import.importFailed")} {importError}</Text>
                         </>
                     }
 
                     {importSuccess &&
                         <>
                             <CheckmarkIcon width={16} height={16} fill={theme["text-success-color"]} />
-                            <Text status="success">Import successful</Text>
+                            <Text status="success">{t("screens.import.importSuccess")}</Text>
                         </>
                     }
                 </View>
                 <Spacer height={20} />
                 <Divider />
                 <Spacer height={20} />
-                <Text category="label">Supported services</Text>
+                <Text category="label">{t("screens.import.supportedServices")}</Text>
                 <Spacer height={10} />
                 <ScrollView>
                     <Text>Chefkoch</Text>

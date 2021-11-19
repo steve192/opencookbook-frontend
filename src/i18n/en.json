@@ -1,8 +1,63 @@
 {
+  "common": {
+    "create": "Create",
+    "next": "Next",
+    "previous": "Previous"
+  },
   "screens": {
     "login": {
       "forgotPassword": "Forgot your password?",
-      "createAccount":"Don't have an account? Create"
+      "createAccount": "Don't have an account? Create"
+    },
+    "overview": {
+      "myRecipes": "My recipes",
+      "weekplan": "Weekplan",
+      "settings": "Settings",
+      "addRecipe": "Add recipe",
+      "importRecipe": "Import recipe",
+      "addRecipeGroup": "Add recipe group",
+      "noRecipesMessage": "Looks like you have not added any recipes yet"
+    },
+    "settings": {
+      "theme": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "dangerZone": "Danger zone",
+      "deleteAccount": "Delete account"
+    },
+    "import": {
+      "URLToImport": "URL to import",
+      "import": "Import",
+      "supportedServices": "Supported services",
+      "importSuccess": "Import successful",
+      "importFailed": "Import failed"
+    },
+    "editRecipe": {
+      "screenTitleEdit": "Edit recipe",
+      "screenTitleCreate": "Create recipe",
+      "title": "Title",
+      "name": "Name",
+      "ingredients": "Ingredients",
+      "ingredient": "Ingredient",
+      "amount": "Amount",
+      "unit": "Unit",
+      "servings": "Servings",
+      "preparationSteps": "Preparation steps",
+      "preparationStepPlaceholder": "Add description of preparation step...",
+      "recipeGroups": "Recipe groups"
+    },
+    "createGroup": {
+      "groupName": "Group name"
+    },
+    "recipe": {
+      "servings": "Servings",
+      "startCookingButton": "Start cooking",
+      "ingredients": "Ingredients",
+      "preparationSteps": "Preparation steps"
+    },
+    "guidedCooking": {
+      "screenTitle": "Guided cooking",
+      "ingredients": "Ingredients"
     }
   }
 }

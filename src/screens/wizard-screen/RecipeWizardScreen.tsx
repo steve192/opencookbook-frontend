@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Button, Divider, Icon, Input, Layout, Text, useTheme } from '@ui-kitten/components';
 import React, { useLayoutEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ImageProps, ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
 import { DeleteIcon, SaveIcon } from '../../assets/Icons';
@@ -21,6 +22,8 @@ const RecipeWizardScreen = (props: Props) => {
 
     const theme = useTheme()
 
+    const { t } = useTranslation("translation");
+
     const [newRecipeData, setNewRecipeData] = useState<Recipe>(
         props.route.params.recipe ?
             props.route.params.recipe
@@ -35,7 +38,7 @@ const RecipeWizardScreen = (props: Props) => {
                 type: "Recipe"
             });
 
-    props.navigation.setOptions({ title: props.route.params.editing ? "Edit recipe" : "Create recipe" });
+    props.navigation.setOptions({ title: props.route.params.editing ? t("screens.editRecipe.screenTitleEdit") : t("screens.editRecipe.screenTitleCreate") });
 
     useLayoutEffect(() => {
 
@@ -145,7 +148,7 @@ const RecipeWizardScreen = (props: Props) => {
 
     const renderIngredientsSection = () =>
         <CustomCard>
-            <Text category="label">Ingredients</Text>
+            <Text category="label">{t("screens.editRecipe.ingredients")}</Text>
             {newRecipeData.neededIngredients.map((neededIngredient, ingredientIndex) =>
                 <>
                     <IngredientFormField
@@ -168,7 +171,7 @@ const RecipeWizardScreen = (props: Props) => {
 
     const renderPreparationStepsSection = () =>
         <CustomCard>
-            <Text category="label">Preparation Steps</Text>
+            <Text category="label">{t("screens.editRecipe.preparationSteps")}</Text>
             {newRecipeData.preparationSteps.map((preparationStep, preparationStepIndex) =>
                 <>
                     <RecipeFormField
@@ -178,7 +181,7 @@ const RecipeWizardScreen = (props: Props) => {
                         numberOfLines={5}
                         value={newRecipeData.preparationSteps[preparationStepIndex]}
                         onChangeText={newText => changePreparationStep(newText, preparationStepIndex)}
-                        placeholder="Add description of preparation step..." />
+                        placeholder={t("screens.editRecipe.preparationStepPlaceholder")} />
                     <Spacer height={5} />
                 </>
             )}
@@ -188,7 +191,7 @@ const RecipeWizardScreen = (props: Props) => {
 
     const renderGroupSelectionSection = () => (
         <CustomCard>
-            <Text category="label">Recipe Groups</Text>
+            <Text category="label">{t("screens.editRecipe.recipeGroups")}</Text>
             <RecipeGroupFormField
                 recipeGroup={newRecipeData.recipeGroups?.[0]}
                 onRecipeGroupChange={setRecipeGroup} />
@@ -208,7 +211,7 @@ const RecipeWizardScreen = (props: Props) => {
                     />
                     <View style={[CentralStyles.contentContainer, CentralStyles.elementSpacing]}>
                         <CustomCard>
-                            <Text category="label">Title</Text>
+                            <Text category="label">{t("screens.editRecipe.title")}</Text>
                             <Input
                                 value={newRecipeData.title}
                                 onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, title: newText })}
@@ -219,7 +222,7 @@ const RecipeWizardScreen = (props: Props) => {
                         <Divider style={{ marginVertical: 10 }} />
                         <Spacer height={15} />
                         <CustomCard>
-                            <Text category="label">Servings</Text>
+                            <Text category="label">{t("screens.editRecipe.servings")}</Text>
                             <Input
                                 placeholder="Serving size"
                                 keyboardType='numeric'

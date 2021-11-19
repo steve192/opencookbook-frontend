@@ -8,11 +8,14 @@ import { TextBullet } from '../components/TextBullet';
 import { MainNavigationProps } from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
 import { useKeepAwake } from 'expo-keep-awake';
+import { useTranslation } from 'react-i18next';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 export const GuidedCookingScreen = (props: Props) => {
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [textSize, setTextSize] = useState<number>(15);
+
+    const { t } = useTranslation("translation");
 
     const recipe = props.route.params.recipe;
     useKeepAwake();
@@ -44,7 +47,7 @@ export const GuidedCookingScreen = (props: Props) => {
                             <Spacer height={20} />
                             <Divider />
                             <Spacer height={20} />
-                            <Text category="label">Ingredients</Text>
+                            <Text category="label">{t("screens.guidedCooking.ingredients")}</Text>
                             {recipe.neededIngredients
                                 .filter(neededIngredient => step.toLowerCase().includes(neededIngredient.ingredient.name.toLowerCase()))
                                 .map((neededIngredient) => (
@@ -61,12 +64,12 @@ export const GuidedCookingScreen = (props: Props) => {
                         <Button
                             disabled={currentStep === 0}
                             onPress={() => setCurrentStep(currentStep - 1)}>
-                            Previous
+                            {t("common.previous")}
                         </Button>
                         <Button
                             disabled={currentStep === recipe.preparationSteps.length - 1}
                             onPress={() => setCurrentStep(currentStep + 1)}>
-                            Next
+                            {t("common.next")}
                         </Button>
                     </View>
                 </View>

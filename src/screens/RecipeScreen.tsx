@@ -1,6 +1,7 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Button, Divider, Layout, Text, useTheme } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from "react-i18next";
 import { StyleSheet, View } from 'react-native';
 import { ScrollView } from "react-native-gesture-handler";
 import Spacer from "react-spacer";
@@ -17,6 +18,8 @@ export const RecipeScreen = (props: Props) => {
 
     const [servings, setServings] = useState<number>(0);
     const [recipe, setRecipe] = useState<Recipe>();
+
+    const { t } = useTranslation("translation");
 
     props.navigation.setOptions({ title: recipe ? recipe.title : "Loading" });
     // useLayoutEffect(() => {
@@ -61,7 +64,7 @@ export const RecipeScreen = (props: Props) => {
 
     const renderIngredientsSection = () => (
         <>
-            <Text category="label">Ingredients</Text>
+            <Text category="label">{t("screens.recipe.ingredients")}</Text>
             {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
                 {recipe?.neededIngredients.map(ingredient =>
@@ -87,7 +90,7 @@ export const RecipeScreen = (props: Props) => {
                             servings - 1);
                     }}
                     accessoryLeft={<MinusIcon />} />
-                <Text style={{ paddingHorizontal: 20 }}> {servings} Servings</Text>
+                <Text style={{ paddingHorizontal: 20 }}> {servings} {t("screens.recipe.servings")}</Text>
                 <Button
                     style={CentralStyles.iconButton}
                     size='tiny'
@@ -100,7 +103,7 @@ export const RecipeScreen = (props: Props) => {
 
     const renderStepsSection = () => (
         <>
-            <Text category="label">Preparation steps</Text>
+            <Text category="label">{t("screens.recipe.preparationSteps")}</Text>
             <Spacer height={20} />
             {recipe && recipe.preparationSteps.map((preparationStep, index) => (
                 <>
