@@ -21,23 +21,24 @@ export const GuidedCookingScreen = (props: Props) => {
     useKeepAwake();
 
     return (
-        <Layout >
-            <View style={CentralStyles.contentContainer}>
-                <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-                    {recipe.preparationSteps.map((step, index) =>
-                        <>
-                            <TextBullet
-                                selected={index <= currentStep}
-                                value={(index + 1).toString()} />
-                            {index < currentStep && <View style={styles.stepConnector}></View>}
-                        </>
-                    )}
-                </View>
-            </View>
-            <Spacer height={20} />
-            <Divider />
-            <Spacer height={20} />
+        <Layout style={{ flex: 1 }} >
             <ScrollView>
+                <View style={CentralStyles.contentContainer}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+                        {recipe.preparationSteps.map((step, index) =>
+                            <>
+                                <TextBullet
+                                    selected={index <= currentStep}
+                                    onPress={() => setCurrentStep(index)}
+                                    value={(index + 1).toString()} />
+                                {/* {index < currentStep && <View style={styles.stepConnector}></View>} */}
+                            </>
+                        )}
+                    </View>
+                </View>
+                <Spacer height={20} />
+                <Divider />
+                <Spacer height={20} />
                 <ViewPager
                     selectedIndex={currentStep}
                     onSelect={setCurrentStep}>
@@ -57,6 +58,9 @@ export const GuidedCookingScreen = (props: Props) => {
                     )}
 
                 </ViewPager>
+
+            </ScrollView>
+            <View>
                 <Spacer height={20} />
                 <Divider />
                 <View style={CentralStyles.contentContainer}>
@@ -73,7 +77,7 @@ export const GuidedCookingScreen = (props: Props) => {
                         </Button>
                     </View>
                 </View>
-            </ScrollView>
+            </View>
         </Layout>
     );
 }
@@ -82,7 +86,7 @@ const styles = StyleSheet.create({
     stepConnector: {
         backgroundColor: "green",
         height: 2,
-        flexGrow: 1,
+        flexGrow: 0.2,
         alignSelf: "center",
         marginHorizontal: 10
 

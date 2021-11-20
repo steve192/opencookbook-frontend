@@ -1,12 +1,13 @@
 import { Text, useTheme } from '@ui-kitten/components';
 import React from 'react';
-import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
+import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
 
 interface Props {
     value: string
     style?: StyleProp<ViewStyle>
     selected?: boolean
+    onPress?: () => void
 }
 export const TextBullet = (props: Props) => {
     const theme = useTheme();
@@ -18,9 +19,11 @@ export const TextBullet = (props: Props) => {
     const additionalStylesText = props.selected ? {color: theme["text-alternate-color"]} : { color: theme["color-primary-default"]};
 
     return (
-        <View style={[styles.textBulletContrainer, additionalStylesContainer, props.style]}>
+        <Pressable 
+            style={[styles.textBulletContrainer, additionalStylesContainer, props.style]}
+            onPress={props.onPress}>
             <Text style={[styles.textBullet, additionalStylesText]}>{props.value}</Text>
-        </View>
+        </Pressable>
     );
 }
 
