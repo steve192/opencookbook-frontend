@@ -24,7 +24,7 @@ export interface Recipe {
     neededIngredients: IngredientUse[];
     preparationSteps: string[];
     images: RecipeImage[];
-    servings?: number;
+    servings: number;
     recipeGroups: RecipeGroup[];
     type: string
 }

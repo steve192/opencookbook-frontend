@@ -227,6 +227,7 @@ const RecipeWizardScreen = (props: Props) => {
                                 placeholder="Serving size"
                                 keyboardType='numeric'
                                 value={newRecipeData.servings?.toString()}
+                                //@ts-ignore
                                 onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, servings: parseInt(newText) ? parseInt(newText) : undefined })} />
                         </CustomCard>
                         <Divider style={{ marginVertical: 10 }} />

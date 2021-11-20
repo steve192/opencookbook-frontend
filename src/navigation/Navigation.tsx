@@ -20,6 +20,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../redux/store';
 import { NavigationContainer } from '@react-navigation/native';
 import { createURL } from 'expo-linking';
+import { useTranslation } from 'react-i18next';
 
 
 
@@ -30,6 +31,8 @@ const MainNavigation = () => {
     const isLoading = useSelector((state: RootState) => state.auth.isLoading);
 
     const Stack = createNativeStackNavigator();
+
+    const { t } = useTranslation("translation");
 
     const LoginStackNavigation = () => (
         <KeyboardAvoidingView
@@ -73,29 +76,26 @@ const MainNavigation = () => {
                         <Stack.Screen
                             name="RecipeWizardScreen"
                             component={RecipeWizardScreen}
-                            options={{
-                                title: "Create recipe"
-                            }}
                         />
                         <Stack.Screen
                             name="ImportScreen"
                             component={ImportScreen}
                             options={{
-                                title: "Import recipe"
+                                title: t("navigation.screenTitleImport")
                             }}
                         />
                         <Stack.Screen
                             name="RecipeGroupEditScreen"
                             component={RecipeGroupEditScreen}
                             options={{
-                                title: "Create recipe group"
+                                title: t("navigation.screenTitleCreateRecipeGroup")
                             }}
                         />
                         <Stack.Screen
                             name="GuidedCookingScreen"
                             component={GuidedCookingScreen}
                             options={{
-                                title: "Guided cooking"
+                                title: t("navigation.screenTitleGuidedCooking")
                             }}
                         />
                         <Stack.Screen
@@ -118,9 +118,9 @@ const MainNavigation = () => {
             <BottomNavigation
                 selectedIndex={props.state.index}
                 onSelect={index => props.navigation.navigate(props.state.routeNames[index])}>
-                <BottomNavigationTab title='MY RECIPES' icon={<HomeIcon />} />
-                <BottomNavigationTab title='WEEKPLAN' icon={<CalendarIcon />} />
-                <BottomNavigationTab title='SETTINGS' icon={<SettingsIcon />} />
+                <BottomNavigationTab title={t("navigation.tabMyRecipes")} icon={<HomeIcon />} />
+                <BottomNavigationTab title={t("navigation.tabWeekplan")} icon={<CalendarIcon />} />
+                <BottomNavigationTab title={t("navigation.tabSettings")} icon={<SettingsIcon />} />
             </BottomNavigation>
         </>
     );
@@ -139,15 +139,15 @@ const MainNavigation = () => {
                 <BottomTab.Screen
                     name="RecipesListScreen"
                     component={recipeScrenNavigation}
-                    options={{ title: "My recipes", headerShown: false }} />
+                    options={{  headerShown: false }} />
                 <BottomTab.Screen
                     name="WeeklyScreen"
                     component={WeeklyRecipeListScreen}
-                    options={{ title: "Weekly", headerShown: true }} />
+                    options={{ title: t("screens.weekplan.screenTitle"), headerShown: true }} />
                 <BottomTab.Screen
                     name="SettingsScreen"
                     component={SettingsScreen}
-                    options={{ title: "Settings", headerShown: true }} />
+                    options={{ title: t("screens.settings.screenTitle"), headerShown: true }} />
 
             </BottomTab.Navigator>
         );

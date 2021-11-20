@@ -3,7 +3,7 @@
     "name": "opencookbook",
     "slug": "opencookbook",
     "scheme":"opencookbook",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -30,7 +30,7 @@
       "permissions": [
         "CAMERA"
       ],
-      "versionCode": 3
+      "versionCode": 4
     },
     "web": {
       "favicon": "./assets/favicon.png"

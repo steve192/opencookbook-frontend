@@ -4,10 +4,25 @@
     "next": "Weiter",
     "previous": "Zurrück"
   },
+  "navigation": {
+    "tabMyRecipes": "MEINE REZEPTE",
+    "tabWeekplan": "WOCHENPLAN",
+    "tabSettings": "EINSTELLUNGEN",
+    "screenTitleImport": "Rezept importieren",
+    "screenTitleCreateRecipeGroup": "Rezeptgruppe erstellen",
+    "screenTitleGuidedCooking": "Kochmodus"
+  },
   "screens": {
     "login": {
       "forgotPassword": "Passwort vergessen?",
-      "createAccount": "Noch keinen Account? Jetzt erstellen"
+      "createAccount": "Noch keinen Account? Jetzt erstellen",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "acceptTOC": "Ich akzeptiere die",
+      "toc": "Nutzungsbedingungen",
+      "register": "Registrieren",
+      "passwordConfirm": "Passwort bestätigen",
+      "errorNoPasswordMatch": "Passwörter stimmen nicht überein"
     },
     "overview": {
       "myRecipes": "Meine Rezepte",
@@ -19,6 +34,7 @@
       "noRecipesMessage": "Sieht so aus als hättest du noch keine Rezepte"
     },
     "settings": {
+      "screenTitle": "Einstellungen",
       "theme": "Theme",
       "light": "Hell",
       "dark": "Dunkel",
@@ -58,6 +74,9 @@
     "guidedCooking": {
       "screenTitle": "Kochansicht",
       "ingredients": "Zutaten"
+    },
+    "weekplan": {
+      "screenTitle": "Wochenplan"
     }
   }
 }

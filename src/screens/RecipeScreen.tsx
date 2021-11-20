@@ -132,7 +132,7 @@ export const RecipeScreen = (props: Props) => {
                         {recipe && renderIngredientsSection()}
 
                         <Spacer height={20} />
-                        <Button onPress={() => recipe && props.navigation.navigate("GuidedCookingScreen", {recipe: recipe})}>Start cooking</Button>
+                        <Button onPress={() => recipe && props.navigation.navigate("GuidedCookingScreen", {recipe: recipe})}>{t("screens.recipe.startCookingButton")}</Button>
                         <Spacer height={20} />
 
                         {recipe && renderStepsSection()}
