@@ -9,6 +9,7 @@ import { MainNavigationProps } from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
 import { useKeepAwake } from 'expo-keep-awake';
 import { useTranslation } from 'react-i18next';
+import { PreparationStepText } from '../components/PreparationStepText';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 export const GuidedCookingScreen = (props: Props) => {
@@ -44,7 +45,10 @@ export const GuidedCookingScreen = (props: Props) => {
                     onSelect={setCurrentStep}>
                     {recipe.preparationSteps.map((step, index) =>
                         <View style={CentralStyles.contentContainer}>
-                            <Text style={[styles.preparationStep, { fontSize: textSize }]}>{step}</Text>
+                            <PreparationStepText 
+                                style={[styles.preparationStep, { fontSize: textSize }]} 
+                                value={step}
+                                ingredients={recipe.neededIngredients}/>
                             <Spacer height={20} />
                             <Divider />
                             <Spacer height={20} />
