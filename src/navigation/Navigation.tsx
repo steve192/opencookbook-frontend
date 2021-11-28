@@ -7,7 +7,6 @@ import LoginScreen from '../screens/LoginScreen/LoginScreen';
 import RecipeListScreen from '../screens/RecipeListScreen';
 import { RecipeScreen } from '../screens/RecipeScreen';
 import RecipeWizardScreen from '../screens/wizard-screen/RecipeWizardScreen';
-import WeeklyRecipeListScreen from '../screens/WeeklyRecipeListScreen';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { SignupScreen } from '../screens/LoginScreen/SignupScreen';
 import { ImportScreen } from '../screens/ImportScreen';
@@ -21,6 +20,7 @@ import { RootState } from '../redux/store';
 import { NavigationContainer } from '@react-navigation/native';
 import { createURL } from 'expo-linking';
 import { useTranslation } from 'react-i18next';
+import { WeeklyRecipeListScreen } from '../screens/WeeklyRecipeListScreen';
 
 
 

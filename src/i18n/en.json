@@ -1,4 +1,13 @@
 {
+  "weekdays": {
+    "monday":"Monday",
+    "tuesday": "Tuesday",
+    "wednesday":"Wdnesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
   "common": {
     "create": "Create",
     "next": "Next",

@@ -5,7 +5,7 @@ import React from 'react';
 export const CustomCard = (props: LayoutProps) => {
     const theme = useTheme();
     return (
-        <Layout style={{
+        <Layout style={[{
             borderWidth: 1,
             borderColor: theme["background-basic-color-4"],
             padding: 10,
@@ -19,7 +19,7 @@ export const CustomCard = (props: LayoutProps) => {
             shadowRadius: 3.84,
 
             elevation: 1
-        }}>
+        }, props.style]}>
             {props.children}
         </Layout>
     )
