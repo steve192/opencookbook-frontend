@@ -69,7 +69,10 @@
       "servings": "Servings",
       "preparationSteps": "Preparation steps",
       "preparationStepPlaceholder": "Add description of preparation step...",
-      "recipeGroups": "Recipe groups"
+      "recipeGroups": "Recipe groups",
+      "searchOrCreateUnit": "Search or create unit",
+      "searchOrCreateIngredients": "Search or create ingredients",
+      "searchOrCreateRecipeGroup": "Search or create recipe group"
     },
     "createGroup": {
       "groupName": "Group name"

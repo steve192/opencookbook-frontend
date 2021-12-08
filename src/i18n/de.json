@@ -69,7 +69,10 @@
       "servings": "Portionen",
       "preparationSteps": "Zubereitungsschritte",
       "preparationStepPlaceholder": "Beschreibung hinzufügen...",
-      "recipeGroups": "Rezeptgruppen"
+      "recipeGroups": "Rezeptgruppen",
+      "searchOrCreateUnit": "Einheit suchen oder Erstellen",
+      "searchOrCreateIngredients": "Zutat suchen oder erstellen",
+      "searchOrCreateRecipeGroup": "Rezeptgruppe suchen oder erstellen"
     },
     "createGroup": {
       "groupName": "Gruppen Name"

@@ -76,7 +76,7 @@ export const IngredientFormField = (props: Props) => {
                                 value={unit}
                                 options={availableUnits.map((unit, index) => ({ key: index.toString(), value: unit }))}
                                 onValueChanged={selectedOption => setUnit(selectedOption.value)}
-                                placeholder="Unit"
+                                placeholder={t("screens.editRecipe.searchOrCreateUnit")}
                             />
                         </View>
                         <Spacer height={5} />
@@ -85,7 +85,7 @@ export const IngredientFormField = (props: Props) => {
                                 value={ingredientQuery}
                                 options={availableIngredients.map(ingredient => ({ key: ingredient.id ? ingredient.id.toString() : "", value: ingredient.name }))}
                                 onValueChanged={(selectedOption) => setIngredient(selectedOption.value)}
-                                placeholder={t("screens.editRecipe.ingredient")}
+                                placeholder={t("screens.editRecipe.searchOrCreateIngredients")}
                                 allowAdditionalValues={true}
                             />
                         </View>

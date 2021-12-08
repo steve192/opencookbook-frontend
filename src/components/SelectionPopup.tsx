@@ -91,30 +91,34 @@ export const SelectionPopup = (props: Props) => {
                     onShow={() => modalInputRef.current?.focus()}
                     onRequestClose={() => setModalVisible(false)}
                 >
-                    <HeaderHeightContext.Consumer>
-                        {headerHeight => headerHeight &&
-                            <>
-                                <View style={styles.centeredView}>
-                                    {/*headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
-                                    <Layout style={[{ flex: 1, marginTop: (headerHeight / 2), width: "100%" }, styles.modalView]}>
-                                        <View
-                                            style={{ flexDirection: "row", alignContent: "center" }}>
-                                            <Input ref={modalInputRef} onChangeText={onSearchInputChange} style={{ flex: 1 }} value={value} />
-                                            <Spacer width={10} />
-                                        </View>
-                                        <Divider style={{ paddingVertical: 2, marginVertical: 10 }} />
-                                        <List
-                                            keyboardShouldPersistTaps='handled'
-                                            style={{ flex: 1 }}
-                                            renderItem={renderListItem}
-                                            ItemSeparatorComponent={Divider}
-                                            data={getListItemData()}
-                                        />
-                                    </Layout>
-                                </View>
-                            </>
-                        }
-                    </HeaderHeightContext.Consumer>
+                    <Pressable 
+                        onPress={() => setModalVisible(false)}
+                        style={styles.modalBackdrop}>
+                        <HeaderHeightContext.Consumer>
+                            {headerHeight => headerHeight &&
+                                <>
+                                    <View style={styles.centeredView}>
+                                        {/*headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
+                                        <Layout style={[{ flex: 1, marginTop: (headerHeight / 2), width: "100%" }, styles.modalView]}>
+                                            <View
+                                                style={{ flexDirection: "row", alignContent: "center" }}>
+                                                <Input placeholder={props.placeholder} ref={modalInputRef} onChangeText={onSearchInputChange} style={{ flex: 1 }} value={value} />
+                                                <Spacer width={10} />
+                                            </View>
+                                            <Divider style={{ paddingVertical: 2, marginVertical: 10 }} />
+                                            <List
+                                                keyboardShouldPersistTaps='handled'
+                                                style={{ flex: 1 }}
+                                                renderItem={renderListItem}
+                                                ItemSeparatorComponent={Divider}
+                                                data={getListItemData()}
+                                            />
+                                        </Layout>
+                                    </View>
+                                </>
+                            }
+                        </HeaderHeightContext.Consumer>
+                    </Pressable>
                 </Modal>
             </View>
             {/* } */}
@@ -130,6 +134,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginTop: 22,
         width: "100%"
+    },
+    modalBackdrop: {
+        width: "100%",
+        height: "100%",
+        position: "absolute",
+        backgroundColor: "rgba(0,0,0,0.5)"
     },
     modalView: {
         width: "90%",
