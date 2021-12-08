@@ -54,7 +54,7 @@ export const WeeklyRecipeListScreen = () => {
     )
 }
 
-const getCurrentWeekNumber = (now: Date) => {
+const getCurrentWeekNumber = (now: XDate) => {
     var tdt = new Date(now.valueOf());
     var dayn = (now.getDay() + 6) % 7;
     tdt.setDate(tdt.getDate() - dayn + 3);
