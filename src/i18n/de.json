@@ -85,7 +85,10 @@
       "ingredients": "Zutaten"
     },
     "weekplan": {
-      "screenTitle": "Wochenplan"
+      "screenTitle": "Wochenplan",
+      "currentWeek": "Aktuelle Woche",
+      "nextWeek": "Nächste Woche",
+      "week": "Woche"
     }
   }
 }

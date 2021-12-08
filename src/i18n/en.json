@@ -85,7 +85,10 @@
       "ingredients": "Ingredients"
     },
     "weekplan": {
-      "screenTitle": "Weekplan"
+      "screenTitle": "Weekplan",
+      "currentWeek": "Current week",
+      "nextWeek": "Next week",
+      "week": "Week"
     }
   }
 }
