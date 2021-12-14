@@ -115,7 +115,7 @@ const RecipeWizardScreen = (props: Props) => {
 
 
     const saveRecipe = () => {
-        if (newRecipeData.recipeGroups[0].title === "") {
+        if (!newRecipeData.recipeGroups[0] || newRecipeData.recipeGroups[0].title === "") {
             // As long as there are no multiple groups
             newRecipeData.recipeGroups = [];
         }
