@@ -45,7 +45,7 @@ class RestAPI {
         const response = await axios.put(this.url(`/weekplan/${date.toISOString().split("T")[0]}`), await this.axiosConfig());
         return response.data;
     }
-    static async getWeekplanRecipes(from: XDate, to: XDate): Promise<WeekplanDay[]> {
+    static async getWeekplanDays(from: XDate, to: XDate): Promise<WeekplanDay[]> {
         const response = await axios.get(this.url(`/weekplan/${from.toISOString().split("T")[0]}/to/${to.toISOString().split("T")[0]}`), await this.axiosConfig());
 
         // Add type recipe to recipe objects

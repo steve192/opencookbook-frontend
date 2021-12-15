@@ -1,11 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authSlice from './features/authSlice'
 import settingsSlice from './features/settingsSlice'
+import weeklyRecipesSlice from './features/weeklyRecipesSlice'
 
 export const store = configureStore({
   reducer: {
     auth: authSlice,
-    settings: settingsSlice
+    settings: settingsSlice,
+    weeklyRecipes: weeklyRecipesSlice,
   },
 })
 
