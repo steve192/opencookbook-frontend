@@ -15,20 +15,18 @@ import { SettingsScreen } from '../screens/SettingsScreen';
 import { RecipeGroupEditScreen } from '../screens/RecipeGroupEditScreen';
 import { GuidedCookingScreen } from '../screens/GuidedCookingScreen';
 import { SplashScreen } from '../screens/LoginScreen/SplashScreen';
-import { useSelector, useDispatch } from 'react-redux'
-import { RootState } from '../redux/store';
 import { NavigationContainer } from '@react-navigation/native';
 import { createURL } from 'expo-linking';
 import { useTranslation } from 'react-i18next';
 import { WeeklyRecipeListScreen } from '../screens/WeeklyRecipeListScreen';
+import { useAppSelector } from '../redux/hooks';
 
 
 
 const MainNavigation = () => {
     const theme = useTheme();
-
-    const loggedIn = useSelector((state: RootState) => state.auth.loggedIn);
-    const isLoading = useSelector((state: RootState) => state.auth.isLoading);
+    const loggedIn = useAppSelector(state => state.auth.loggedIn); 
+    const isLoading = useAppSelector(state => state.auth.isLoading);
 
     const Stack = createNativeStackNavigator();
 
