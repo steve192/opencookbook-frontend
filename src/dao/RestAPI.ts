@@ -41,8 +41,8 @@ export interface WeekplanDay {
     recipes: Recipe[]
 }
 class RestAPI {
-    static async setWeekplanRecipes(date: XDate) {
-        const response = await axios.put(this.url(`/weekplan/${date.toISOString().split("T")[0]}`), await this.axiosConfig());
+    static async setWeekplanRecipes(date: XDate, recipeIds: number[]) {
+        const response = await axios.put(this.url(`/weekplan/${date.toISOString().split("T")[0]}`), recipeIds, await this.axiosConfig());
         return response.data;
     }
     static async getWeekplanDays(from: XDate, to: XDate): Promise<WeekplanDay[]> {
