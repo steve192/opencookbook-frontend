@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosRequestHeaders } from "axios";
 import { Buffer } from 'buffer';
 import { Platform } from "react-native";
+import XDate from "xdate";
 import Configuration from "../Configuration";
 
 
@@ -34,7 +35,29 @@ export interface RecipeGroup {
     title: string;
     type: string
 }
+
+export interface WeekplanDay {
+    day: string,
+    recipes: Recipe[]
+}
 class RestAPI {
+    static async setWeekplanRecipes(date: XDate) {
+        const response = await axios.put(this.url(`/weekplan/${date.toISOString().split("T")[0]}`), await this.axiosConfig());
+        return response.data;
+    }
+    static async getWeekplanRecipes(from: XDate, to: XDate): Promise<WeekplanDay[]> {
+        const response = await axios.get(this.url(`/weekplan/${from.toISOString().split("T")[0]}/to/${to.toISOString().split("T")[0]}`), await this.axiosConfig());
+
+        // Add type recipe to recipe objects
+        return response.data.map((weekplanDay: WeekplanDay) => {
+            return ({
+                ...weekplanDay,
+                recipes: weekplanDay.recipes.map(recipe => {
+                    return ({ ...recipe, type: "Recipe" });
+                })
+            })
+        });
+    }
     static async deleteRecipeGroup(group: RecipeGroup) {
         await axios.delete(this.url("/recipe-groups/" + group.id), await this.axiosConfig());
     }
