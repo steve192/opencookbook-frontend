@@ -18,7 +18,7 @@ export const IngredientFormField = (props: Props) => {
 
     const [ingredientQuery, setIngredientQuery] = useState<string>(props.ingredient.ingredient.name);
     const [unit, setUnit] = useState<string>(props.ingredient.unit);
-    const [amount, setAmount] = useState<number | undefined>(props.ingredient.amount);
+    const [amount, setAmount] = useState<string>(String(props.ingredient.amount));
 
     const [availableUnits, setAvailableUnits] = useState<string[]>([]);
 
@@ -29,13 +29,17 @@ export const IngredientFormField = (props: Props) => {
 
     const setIngredient = (text: string) => {
         setIngredientQuery(text);
-        const existingIngredient = availableIngredients.find(ingredient => ingredient.name.toLowerCase() === ingredientQuery.toLowerCase());
-        if (existingIngredient) {
-            props.onIngredientChange({ ingredient: existingIngredient, amount: amount, unit: unit });
-        } else {
-            props.onIngredientChange({ ingredient: { name: text }, amount: amount, unit: unit });
-        }
+        invokeIngredientUpdate(text, amount, unit);
     };
+
+    const invokeIngredientUpdate = (ingredientName: string, amount: string, unit: string) => {
+        const existingIngredient = availableIngredients.find(ingredient => ingredient.name.toLowerCase() === ingredientName.toLowerCase());
+        if (existingIngredient) {
+            props.onIngredientChange({ ingredient: existingIngredient, amount: parseFloat(amount), unit: unit });
+        } else {
+            props.onIngredientChange({ ingredient: { name: ingredientQuery }, amount: parseFloat(amount), unit: unit });
+        }
+    }
 
 
     const queryIngredients = () => {
@@ -49,7 +53,13 @@ export const IngredientFormField = (props: Props) => {
     }
 
     const onAmountChange = (text: string) => {
-        setAmount(parseFloat(text));
+        text = text.replace(",", ".");
+        setAmount(text);
+
+        const prasedAmount = parseFloat(text);
+        if (prasedAmount.toString() === text) {
+            invokeIngredientUpdate(ingredientQuery, text, unit);
+        }
     }
 
 
@@ -90,12 +100,12 @@ export const IngredientFormField = (props: Props) => {
                             />
                         </View>
                     </View>
-                    <Button 
-                        style={{ height: 32, width: 32, margin: 10 }} 
-                        size="small" 
+                    <Button
+                        style={{ height: 32, width: 32, margin: 10 }}
+                        size="small"
                         status="control"
-                        accessoryLeft={<DeleteIcon/>}
-                        onPress={() => props.onRemovePress()}/>
+                        accessoryLeft={<DeleteIcon />}
+                        onPress={() => props.onRemovePress()} />
                 </View>
             </View>
         </>
