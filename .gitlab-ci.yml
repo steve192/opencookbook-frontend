@@ -21,6 +21,9 @@ sonarqube:
   - master
   image: sonarsource/sonar-scanner-cli:latest
   allow_failure: true
+  variables:
+    SONAR_HOST_URL: https://sonar.sterul.com
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
   script:
     - sonar-scanner 
       -Dsonar.qualitygate.wait=true 
