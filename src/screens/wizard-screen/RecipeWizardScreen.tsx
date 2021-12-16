@@ -1,10 +1,10 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Button, Divider, Icon, Input, Layout, Text, useTheme } from '@ui-kitten/components';
+import { Button, Divider, Input, Layout, Text, useTheme } from '@ui-kitten/components';
 import React, { useLayoutEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ImageProps, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
-import { DeleteIcon, SaveIcon } from '../../assets/Icons';
+import { DeleteIcon, PlusIcon, SaveIcon } from '../../assets/Icons';
 import { CustomCard } from '../../components/CustomCard';
 import { RecipeImageViewPager } from '../../components/RecipeImageViewPager';
 import RestAPI, { IngredientUse, Recipe, RecipeGroup } from '../../dao/RestAPI';
@@ -52,10 +52,6 @@ const RecipeWizardScreen = (props: Props) => {
         });
     }, [props.navigation, newRecipeData]);
 
-
-    const AddIcon = (props: Partial<ImageProps> | undefined) => (
-        <Icon {...props} name="plus-outline" />
-    );
 
     const changePreparationStep = (newText: string, index: number) => {
         let preparationStepsCopy = newRecipeData.preparationSteps;
@@ -164,7 +160,7 @@ const RecipeWizardScreen = (props: Props) => {
                 style={{ marginHorizontal: 16 }}
                 size="small"
                 key="addIngredient"
-                accessoryLeft={AddIcon}
+                accessoryLeft={PlusIcon}
                 onPress={addIngredient} />
         </CustomCard>
 
@@ -186,7 +182,7 @@ const RecipeWizardScreen = (props: Props) => {
                 </>
             )}
             <Spacer height={10} />
-            <Button size="small" key="addStep" accessoryLeft={AddIcon} onPress={addPreparationStep} />
+            <Button size="small" key="addStep" accessoryLeft={PlusIcon} onPress={addPreparationStep} />
         </CustomCard>
 
     const renderGroupSelectionSection = () => (

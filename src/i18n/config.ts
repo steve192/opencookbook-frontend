@@ -1,8 +1,8 @@
-import i18n from 'i18next';
-import en from './en.json';
-import de from './de.json';
-import { initReactI18next } from 'react-i18next';
 import * as Localization from 'expo-localization';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import de from './de.json';
+import en from './en.json';
 
 export const resources = {
   en: {

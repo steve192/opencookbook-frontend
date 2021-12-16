@@ -32,12 +32,12 @@ export const IngredientFormField = (props: Props) => {
         invokeIngredientUpdate(text, amount, unit);
     };
 
-    const invokeIngredientUpdate = (ingredientName: string, amount: string, unit: string) => {
+    const invokeIngredientUpdate = (ingredientName: string, newAmount: string, newUnit: string) => {
         const existingIngredient = availableIngredients.find(ingredient => ingredient.name.toLowerCase() === ingredientName.toLowerCase());
         if (existingIngredient) {
-            props.onIngredientChange({ ingredient: existingIngredient, amount: parseFloat(amount), unit: unit });
+            props.onIngredientChange({ ingredient: existingIngredient, amount: parseFloat(newAmount), unit: newUnit });
         } else {
-            props.onIngredientChange({ ingredient: { name: ingredientQuery }, amount: parseFloat(amount), unit: unit });
+            props.onIngredientChange({ ingredient: { name: ingredientQuery }, amount: parseFloat(newAmount), unit: newUnit });
         }
     }
 
@@ -84,7 +84,7 @@ export const IngredientFormField = (props: Props) => {
                             <Spacer width={5} />
                             <SelectionPopup
                                 value={unit}
-                                options={availableUnits.map((unit, index) => ({ key: index.toString(), value: unit }))}
+                                options={availableUnits.map((availableUnit, index) => ({ key: index.toString(), value: availableUnit }))}
                                 onValueChanged={selectedOption => setUnit(selectedOption.value)}
                                 placeholder={t("screens.editRecipe.searchOrCreateUnit")}
                             />

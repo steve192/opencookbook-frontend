@@ -1,15 +1,15 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Layout, ViewPager, Text, Button, Divider } from '@ui-kitten/components';
-import React, { useEffect, useState } from 'react';
+import { Button, Divider, Layout, Text, ViewPager } from '@ui-kitten/components';
+import { useKeepAwake } from 'expo-keep-awake';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Spacer from 'react-spacer';
+import { PreparationStepText } from '../components/PreparationStepText';
 import { TextBullet } from '../components/TextBullet';
 import { MainNavigationProps } from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
-import { useKeepAwake } from 'expo-keep-awake';
-import { useTranslation } from 'react-i18next';
-import { PreparationStepText } from '../components/PreparationStepText';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 export const GuidedCookingScreen = (props: Props) => {
@@ -45,10 +45,10 @@ export const GuidedCookingScreen = (props: Props) => {
                     onSelect={setCurrentStep}>
                     {recipe.preparationSteps.map((step, index) =>
                         <View style={CentralStyles.contentContainer}>
-                            <PreparationStepText 
-                                style={[styles.preparationStep, { fontSize: textSize }]} 
+                            <PreparationStepText
+                                style={[styles.preparationStep, { fontSize: textSize }]}
                                 value={step}
-                                ingredients={recipe.neededIngredients}/>
+                                ingredients={recipe.neededIngredients} />
                             <Spacer height={20} />
                             <Divider />
                             <Spacer height={20} />

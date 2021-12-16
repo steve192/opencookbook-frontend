@@ -1,5 +1,4 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import Configuration from '../../Configuration';
+import { createSlice } from '@reduxjs/toolkit';
 
 export interface AuthState {
   loggedIn: boolean

@@ -1,8 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Card, Layout, List, State, Text, useTheme } from "@ui-kitten/components";
+import { Card, Layout, List, Text, useTheme } from "@ui-kitten/components";
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, useWindowDimensions, View, ViewProps, StyleSheet, ListRenderItemInfo } from "react-native";
+import { ListRenderItemInfo, Pressable, StyleSheet, useWindowDimensions, View, ViewProps } from "react-native";
 import { FolderIcon } from "../assets/Icons";
 import { Recipe, RecipeGroup } from "../dao/RestAPI";
 import { fetchMyRecipeGroups, fetchMyRecipes } from "../redux/features/recipesSlice";

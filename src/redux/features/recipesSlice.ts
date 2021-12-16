@@ -10,7 +10,7 @@ export interface RecipesState {
 }
 
 const initialState: RecipesState = {
-    recipes:[],
+    recipes: [],
     recipeGroups: [],
     loading: false
 }

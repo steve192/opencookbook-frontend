@@ -1,7 +1,6 @@
-import { Avatar, Spinner } from '@ui-kitten/components';
+import { Spinner } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Image, Platform, View } from 'react-native';
-import RestAPI from '../dao/RestAPI';
+import { Image, Platform, StyleSheet, View } from 'react-native';
 import { fetchSingleImage } from '../redux/features/imagesSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 

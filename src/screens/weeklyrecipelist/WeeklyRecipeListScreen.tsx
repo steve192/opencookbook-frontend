@@ -3,16 +3,16 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { CustomCard } from '../../components/CustomCard';
-import CentralStyles from '../../styles/CentralStyles';
-import XDate from 'xdate';
 import { useDispatch } from 'react-redux';
+import XDate from 'xdate';
+import { PlusIcon } from '../../assets/Icons';
+import { CustomCard } from '../../components/CustomCard';
+import { Recipe, WeekplanDay } from '../../dao/RestAPI';
 import { fetchWeekplanDays, updateSingleWeekplanDay } from '../../redux/features/weeklyRecipesSlice';
 import { useAppSelector } from '../../redux/hooks';
-import { WeeklyRecipeCard } from './WeeklyRecipeCard';
-import { PlusIcon } from '../../assets/Icons';
+import CentralStyles from '../../styles/CentralStyles';
 import { RecipeSelectionPopup } from './RecipeSelectionPopup';
-import { Recipe, WeekplanDay } from '../../dao/RestAPI';
+import { WeeklyRecipeCard } from './WeeklyRecipeCard';
 
 export const WeeklyRecipeListScreen = () => {
 

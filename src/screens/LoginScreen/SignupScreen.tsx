@@ -52,7 +52,7 @@ export const SignupScreen = ({ route, navigation }: Props) => {
                     <Input status={passwordsMatching ? "basic" : "danger"} value={password} onChangeText={setPassword} placeholder={t("screens.login.password")} secureTextEntry={true} />
                     <Spacer height={5} />
                     <Input status={passwordsMatching ? "basic" : "danger"} value={passwordConfirm} onChangeText={setPasswordConfirm} placeholder={t("screens.login.passwordConfirm")} secureTextEntry={true} />
-                    {!passwordsMatching && <Text status="danger">{t("screens.login.errorNoPasswordMatch")}</Text> }
+                    {!passwordsMatching && <Text status="danger">{t("screens.login.errorNoPasswordMatch")}</Text>}
                     <Spacer height={20} />
                     <View style={{ flexDirection: "row" }}>
                         <CheckBox checked={termsAccepted} onChange={setTermsAccepted} />

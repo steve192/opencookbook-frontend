@@ -1,10 +1,7 @@
-import { Autocomplete, AutocompleteItem, Button, IndexPath, Input, Select, SelectItem } from "@ui-kitten/components";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
-import Spacer from "react-spacer";
 import { Option, SelectionPopup } from "../../components/SelectionPopup";
-import RestAPI, { Ingredient, IngredientUse, RecipeGroup } from "../../dao/RestAPI";
+import RestAPI, { RecipeGroup } from "../../dao/RestAPI";
 
 
 interface Props {

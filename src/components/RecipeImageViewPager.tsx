@@ -60,27 +60,27 @@ export const RecipeImageViewPager = (props: Props) => {
             </ViewPager>
             {shownImageIndex !== 0 &&
                 <Pressable
-                onPress={() => setShownImageIndex(shownImageIndex - 1)}
+                    onPress={() => setShownImageIndex(shownImageIndex - 1)}
                     style={styles.backwardButton}>
-                        <ArrowBackwardIcon width={50} height={50} fill="rgb(209,209,209)" />
+                    <ArrowBackwardIcon width={50} height={50} fill="rgb(209,209,209)" />
                 </Pressable>
             }
 
             {shownImageIndex !== props.images.length - 1 &&
-                <Pressable 
+                <Pressable
                     style={styles.forwardButton}
                     onPress={() => setShownImageIndex(shownImageIndex + 1)}>
                     <ArrowForwardIcon width={50} height={50} fill="rgb(209,209,209)" />
                 </Pressable>
             }
-            
+
             {props.allowEdit &&
                 <Button onPress={selectImage} style={styles.imageButton} status="basic" accessoryLeft={<Icon name="camera" />} />
             }
 
             <Text style={styles.indexIndicator}>{shownImageIndex + 1} / {props.images.length}</Text>
 
-           
+
         </View>
     );
 }

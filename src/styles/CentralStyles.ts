@@ -1,4 +1,3 @@
-import { useTheme } from '@ui-kitten/components/theme';
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({

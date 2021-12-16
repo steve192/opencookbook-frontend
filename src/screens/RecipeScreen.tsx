@@ -54,7 +54,7 @@ export const RecipeScreen = (props: Props) => {
     const getServingMultiplier = () => {
         if (!recipe) {
             return 1;
-        };
+        }
         return servings / recipe?.servings;
     }
 
@@ -110,7 +110,7 @@ export const RecipeScreen = (props: Props) => {
                     <Divider />
                     <View style={{ flexDirection: "row", alignItems: "center", paddingVertical: 10 }}>
                         <TextBullet
-                            value={(index + 1).toString()}/>
+                            value={(index + 1).toString()} />
                         <Text style={{ flex: 1 }}>{preparationStep}</Text>
                     </View>
                 </>
@@ -132,7 +132,7 @@ export const RecipeScreen = (props: Props) => {
                         {recipe && renderIngredientsSection()}
 
                         <Spacer height={20} />
-                        <Button onPress={() => recipe && props.navigation.navigate("GuidedCookingScreen", {recipe: recipe})}>{t("screens.recipe.startCookingButton")}</Button>
+                        <Button onPress={() => recipe && props.navigation.navigate("GuidedCookingScreen", { recipe: recipe })}>{t("screens.recipe.startCookingButton")}</Button>
                         <Spacer height={20} />
 
                         {recipe && renderStepsSection()}

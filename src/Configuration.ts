@@ -9,7 +9,6 @@ export default class Configuration {
 
     static async setAuthToken(token: string) {
         if (Platform.OS == 'web') {
-            // Configuration.authToken = token;
             await AsyncStorage.setItem("authToken", token);
             return;
         }
@@ -18,10 +17,9 @@ export default class Configuration {
 
     static async getAuthToken(): Promise<string | null> {
         if (Platform.OS == 'web') {
-            return await AsyncStorage.getItem("authToken");
+            return AsyncStorage.getItem("authToken");
         }
-        const token = await SecureStore.getItemAsync("authToken");
-        return token;
+        return SecureStore.getItemAsync("authToken");
     }
 
 

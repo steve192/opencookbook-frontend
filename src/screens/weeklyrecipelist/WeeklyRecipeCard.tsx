@@ -1,5 +1,5 @@
 import { Text } from '@ui-kitten/components';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { CustomCard } from '../../components/CustomCard';
 
 

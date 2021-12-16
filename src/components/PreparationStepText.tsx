@@ -1,6 +1,6 @@
 import { Text, useTheme } from '@ui-kitten/components';
 import React from 'react';
-import { StyleProp, TextStyle, StyleSheet, View } from 'react-native';
+import { StyleProp, TextStyle, View } from 'react-native';
 import { IngredientUse } from '../dao/RestAPI';
 
 interface Props {

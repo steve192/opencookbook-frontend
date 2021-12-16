@@ -29,7 +29,7 @@ export const RecipeGroupEditScreen = (props: Props) => {
     return (
         <Layout style={CentralStyles.contentContainer}>
             <Text category="label">{t("screens.createGroup.groupName")}</Text>
-            <Input value={recipeGroup.title} onChangeText={(newText) => setRecipeGroup({...recipeGroup, title: newText})} />
+            <Input value={recipeGroup.title} onChangeText={(newText) => setRecipeGroup({ ...recipeGroup, title: newText })} />
             <Spacer height={10} />
             <Button onPress={saveRecipeGroup}>{t("common.create")}</Button>
         </Layout>

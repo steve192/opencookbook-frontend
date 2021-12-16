@@ -1,30 +1,30 @@
 import { BottomTabBarProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { BottomNavigation, BottomNavigationTab, useTheme } from '@ui-kitten/components';
+import { createURL } from 'expo-linking';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { KeyboardAvoidingView, Platform } from 'react-native';
+import { CalendarIcon, HomeIcon, SettingsIcon } from '../assets/Icons';
+import { useAppSelector } from '../redux/hooks';
+import { GuidedCookingScreen } from '../screens/GuidedCookingScreen';
+import { ImportScreen } from '../screens/ImportScreen';
 import LoginScreen from '../screens/LoginScreen/LoginScreen';
+import { SignupScreen } from '../screens/LoginScreen/SignupScreen';
+import { SplashScreen } from '../screens/LoginScreen/SplashScreen';
+import { RecipeGroupEditScreen } from '../screens/RecipeGroupEditScreen';
 import RecipeListScreen from '../screens/RecipeListScreen';
 import { RecipeScreen } from '../screens/RecipeScreen';
-import RecipeWizardScreen from '../screens/wizard-screen/RecipeWizardScreen';
-import { KeyboardAvoidingView, Platform } from 'react-native';
-import { SignupScreen } from '../screens/LoginScreen/SignupScreen';
-import { ImportScreen } from '../screens/ImportScreen';
-import { CalendarIcon, HomeIcon, SettingsIcon } from '../assets/Icons';
 import { SettingsScreen } from '../screens/SettingsScreen';
-import { RecipeGroupEditScreen } from '../screens/RecipeGroupEditScreen';
-import { GuidedCookingScreen } from '../screens/GuidedCookingScreen';
-import { SplashScreen } from '../screens/LoginScreen/SplashScreen';
-import { NavigationContainer } from '@react-navigation/native';
-import { createURL } from 'expo-linking';
-import { useTranslation } from 'react-i18next';
 import { WeeklyRecipeListScreen } from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
-import { useAppSelector } from '../redux/hooks';
+import RecipeWizardScreen from '../screens/wizard-screen/RecipeWizardScreen';
 
 
 
 const MainNavigation = () => {
     const theme = useTheme();
-    const loggedIn = useAppSelector(state => state.auth.loggedIn); 
+    const loggedIn = useAppSelector(state => state.auth.loggedIn);
     const isLoading = useAppSelector(state => state.auth.isLoading);
 
     const Stack = createNativeStackNavigator();
@@ -136,7 +136,7 @@ const MainNavigation = () => {
                 <BottomTab.Screen
                     name="RecipesListScreen"
                     component={recipeScrenNavigation}
-                    options={{  headerShown: false }} />
+                    options={{ headerShown: false }} />
                 <BottomTab.Screen
                     name="WeeklyScreen"
                     component={WeeklyRecipeListScreen}
@@ -166,10 +166,10 @@ const MainNavigation = () => {
     return (
         <NavigationContainer
             linking={{
-                
+
                 prefixes: [createURL('/')],
             }}
-            >
+        >
             {isLoading ? <SplashScreen /> : loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />}
         </NavigationContainer>
     )

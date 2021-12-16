@@ -248,10 +248,8 @@ class RestAPI {
             },
             responseType: 'arraybuffer'
         });
-        // const dataURI =  "data:application/octet-stream;base64," + Buffer.from(response.data).toString("base64");
         const base64String = Buffer.from(response.data).toString("base64");
-        const dataURI = "data:image/jpg;base64," + base64String;
-        return dataURI;
+        return "data:image/jpg;base64," + base64String;
     }
     static async uploadImage(uri: string): Promise<string> {
         const formData = new FormData();
