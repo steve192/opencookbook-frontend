@@ -36,17 +36,21 @@ export interface RecipeGroup {
     type: string
 }
 
+export interface WeekplanDayRecipeInfo {
+    id: number;
+    title: string;
+}
 export interface WeekplanDay {
     day: string,
-    recipes: Recipe[]
+    recipes: WeekplanDayRecipeInfo[]
 }
 class RestAPI {
-    static async setWeekplanRecipes(date: XDate, recipeIds: number[]) {
-        const response = await axios.put(this.url(`/weekplan/${date.toISOString().split("T")[0]}`), recipeIds, await this.axiosConfig());
+    static async setWeekplanRecipes(date: string, recipeIds: number[]): Promise<WeekplanDay> {
+        const response = await axios.put(this.url(`/weekplan/${date}`), { recipeIds }, await this.axiosConfig());
         return response.data;
     }
     static async getWeekplanDays(from: XDate, to: XDate): Promise<WeekplanDay[]> {
-        const response = await axios.get(this.url(`/weekplan/${from.toISOString().split("T")[0]}/to/${to.toISOString().split("T")[0]}`), await this.axiosConfig());
+        const response = await axios.get(this.url(`/weekplan/${from.toString("yyyy-MM-dd")}/to/${to.toString("yyyy-MM-dd")}`), await this.axiosConfig());
 
         // Add type recipe to recipe objects
         return response.data.map((weekplanDay: WeekplanDay) => {

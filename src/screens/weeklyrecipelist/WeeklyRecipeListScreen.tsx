@@ -1,5 +1,5 @@
 import { Button, Layout, Text } from '@ui-kitten/components';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -7,10 +7,12 @@ import { CustomCard } from '../../components/CustomCard';
 import CentralStyles from '../../styles/CentralStyles';
 import XDate from 'xdate';
 import { useDispatch } from 'react-redux';
-import { fetchWeekplanDays } from '../../redux/features/weeklyRecipesSlice';
+import { fetchWeekplanDays, updateSingleWeekplanDay } from '../../redux/features/weeklyRecipesSlice';
 import { useAppSelector } from '../../redux/hooks';
 import { WeeklyRecipeCard } from './WeeklyRecipeCard';
 import { PlusIcon } from '../../assets/Icons';
+import { RecipeSelectionPopup } from './RecipeSelectionPopup';
+import { Recipe, WeekplanDay } from '../../dao/RestAPI';
 
 export const WeeklyRecipeListScreen = () => {
 
@@ -18,8 +20,9 @@ export const WeeklyRecipeListScreen = () => {
     const { t } = useTranslation("translation");
     const dispatch = useDispatch();
 
+    const [recipeSelectionVisible, setRecipeSelectionVisible] = useState<boolean>(false);
 
-
+    const [selectedWeekplanDay, setSelectedWeekplanDay] = useState<WeekplanDay>();
     const weekplanDays = useAppSelector((state) => state.weeklyRecipes.weekplanDays);
 
     const loadData = () => {
@@ -30,7 +33,12 @@ export const WeeklyRecipeListScreen = () => {
     }
     useEffect(loadData, []);
 
-
+    const addRecipeToWeekplanDay = (recipe: Recipe, weekplanDay: WeekplanDay) => {
+        //@ts-ignore id is always set
+        weekplanDay.recipes.push({ id: recipe.id, title: recipe.title });
+        dispatch(updateSingleWeekplanDay(weekplanDay));
+        setRecipeSelectionVisible(false);
+    }
 
     const renderWeek = (weekNumber: number, year: number) => {
         let startWeekDate = getDateOfISOWeek(weekNumber, year);
@@ -45,11 +53,20 @@ export const WeeklyRecipeListScreen = () => {
             .map((weekday, weekdayIndex) => {
                 const weekdayDate = new XDate(startWeekDate);
                 weekdayDate.setDate(weekdayDate.getDate() + weekdayIndex);
+                const existingWeekplanDay = weekplanDays.filter(weekplanDay => weekplanDay.day === weekdayDate.toString("yyyy-MM-dd"))[0];
                 return (
                     <CustomCard style={{ marginVertical: 5 }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                             <Text style={styles.weekTitle}>{weekday} {weekdayDate.toLocaleDateString()}</Text>
-                            <Button size="tiny" accessoryRight={PlusIcon} appearance="outline"/>
+                            <Button
+                                size="tiny"
+                                accessoryRight={PlusIcon}
+                                appearance="outline"
+                                onPress={() => {
+                                    setRecipeSelectionVisible(true);
+                                    setSelectedWeekplanDay(existingWeekplanDay ? existingWeekplanDay : { day: weekdayDate.toString("yyyy-MM-dd"), recipes: [] });
+                                }
+                                } />
                         </View>
                         <ScrollView
                             horizontal={true}>
@@ -62,7 +79,6 @@ export const WeeklyRecipeListScreen = () => {
                         </ScrollView>
                     </CustomCard>
                 )
-
             });
     }
 
@@ -80,6 +96,13 @@ export const WeeklyRecipeListScreen = () => {
                     {renderWeek(getCurrentWeekNumber(now) + 3, now.getFullYear())}
                 </ScrollView>
             </Layout>
+
+            <RecipeSelectionPopup
+                visible={recipeSelectionVisible}
+                onClose={() => setRecipeSelectionVisible(false)}
+                //@ts-ignore cannot be undefined
+                onRecipeSelected={(recipe) => addRecipeToWeekplanDay(recipe, selectedWeekplanDay)}
+            />
         </>
     )
 }
