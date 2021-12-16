@@ -27,6 +27,7 @@ sonarqube:
     GIT_DEPTH: 0
   script:
     - npm ci
+    - npm run build-web
     - sonar-scanner 
       -Dsonar.qualitygate.wait=true 
       -Dsonar.sources=src 
