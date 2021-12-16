@@ -12,14 +12,15 @@ import { fetchWeekplanDays } from '../redux/features/weeklyRecipesSlice';
 import { useAppSelector } from '../redux/hooks';
 
 export const WeeklyRecipeListScreen = () => {
-    const weekplanDays = useAppSelector((state) => state.weeklyRecipes.weekplanDays);
-
+    
     const now = new XDate();
     const { t } = useTranslation("translation");
     const dispatch = useDispatch();
-
-
-
+    
+    
+    
+    const weekplanDays = useAppSelector((state) => state.weeklyRecipes.weekplanDays);
+    
     const loadData = () => {
         dispatch(fetchWeekplanDays({
             from: getDateOfISOWeek(getCurrentWeekNumber(now), now.getFullYear()),
@@ -60,9 +61,8 @@ export const WeeklyRecipeListScreen = () => {
 
     return (
         <>
-            <View style={CentralStyles.fullscreen}>
-                <Layout style={CentralStyles.contentContainer}>
-                    <ScrollView>
+            <Layout style={CentralStyles.fullscreen}>
+                <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
                         <Text category="h5">{t("screens.weekplan.currentWeek")}</Text>
                         {renderWeek(getCurrentWeekNumber(now), now.getFullYear())}
                         <Text category="h5">{t("screens.weekplan.nextWeek")}</Text>
@@ -71,9 +71,8 @@ export const WeeklyRecipeListScreen = () => {
                         {renderWeek(getCurrentWeekNumber(now) + 2, now.getFullYear())}
                         <Text category="h5">{t("screens.weekplan.week")} {getCurrentWeekNumber(now) + 3}</Text>
                         {renderWeek(getCurrentWeekNumber(now) + 3, now.getFullYear())}
-                    </ScrollView>
-                </Layout>
-            </View>
+                </ScrollView>
+            </Layout>
         </>
     )
 }
