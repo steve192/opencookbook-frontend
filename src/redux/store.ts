@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import authSlice from './features/authSlice'
+import imagesSlice from './features/imagesSlice'
 import recipesSlice from './features/recipesSlice'
 import settingsSlice from './features/settingsSlice'
 import weeklyRecipesSlice from './features/weeklyRecipesSlice'
@@ -9,7 +10,8 @@ export const store = configureStore({
     auth: authSlice,
     settings: settingsSlice,
     weeklyRecipes: weeklyRecipesSlice,
-    recipes: recipesSlice
+    recipes: recipesSlice,
+    images: imagesSlice
   },
 })
 
