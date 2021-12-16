@@ -2,6 +2,12 @@ import { light } from '@eva-design/eva';
 
 export const myLightTheme = {
   ...light,
+  "color-primary-transparent-100": "rgba(114, 182, 0, 0.08)",
+  "color-primary-transparent-200": "rgba(114, 182, 0, 0.16)",
+  "color-primary-transparent-300": "rgba(114, 182, 0, 0.24)",
+  "color-primary-transparent-400": "rgba(114, 182, 0, 0.32)",
+  "color-primary-transparent-500": "rgba(114, 182, 0, 0.40)",
+  "color-primary-transparent-600": "rgba(114, 182, 0, 0.48)",
 
   "color-primary-100": "#F0FBC9",
   "color-primary-200": "#DEF794",
