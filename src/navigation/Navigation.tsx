@@ -1,8 +1,7 @@
 import { BottomTabBarProps, createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { BottomNavigation, BottomNavigationTab, useTheme, Text } from '@ui-kitten/components';
+import { BottomNavigation, BottomNavigationTab, useTheme } from '@ui-kitten/components';
 import React from 'react';
-import { FaCalendarWeek, FaThList } from 'react-icons/fa';
 import LoginScreen from '../screens/LoginScreen/LoginScreen';
 import RecipeListScreen from '../screens/RecipeListScreen';
 import { RecipeScreen } from '../screens/RecipeScreen';
@@ -18,7 +17,7 @@ import { SplashScreen } from '../screens/LoginScreen/SplashScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createURL } from 'expo-linking';
 import { useTranslation } from 'react-i18next';
-import { WeeklyRecipeListScreen } from '../screens/WeeklyRecipeListScreen';
+import { WeeklyRecipeListScreen } from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import { useAppSelector } from '../redux/hooks';
 
 

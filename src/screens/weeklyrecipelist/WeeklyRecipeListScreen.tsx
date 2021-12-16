@@ -1,26 +1,27 @@
-import { Layout, Text } from '@ui-kitten/components';
+import { Button, Layout, Text } from '@ui-kitten/components';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import { CustomCard } from '../components/CustomCard';
-import CentralStyles from '../styles/CentralStyles';
+import { CustomCard } from '../../components/CustomCard';
+import CentralStyles from '../../styles/CentralStyles';
 import XDate from 'xdate';
-import RestAPI from '../dao/RestAPI';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchWeekplanDays } from '../redux/features/weeklyRecipesSlice';
-import { useAppSelector } from '../redux/hooks';
+import { useDispatch } from 'react-redux';
+import { fetchWeekplanDays } from '../../redux/features/weeklyRecipesSlice';
+import { useAppSelector } from '../../redux/hooks';
+import { WeeklyRecipeCard } from './WeeklyRecipeCard';
+import { PlusIcon } from '../../assets/Icons';
 
 export const WeeklyRecipeListScreen = () => {
-    
+
     const now = new XDate();
     const { t } = useTranslation("translation");
     const dispatch = useDispatch();
-    
-    
-    
+
+
+
     const weekplanDays = useAppSelector((state) => state.weeklyRecipes.weekplanDays);
-    
+
     const loadData = () => {
         dispatch(fetchWeekplanDays({
             from: getDateOfISOWeek(getCurrentWeekNumber(now), now.getFullYear()),
@@ -46,12 +47,19 @@ export const WeeklyRecipeListScreen = () => {
                 weekdayDate.setDate(weekdayDate.getDate() + weekdayIndex);
                 return (
                     <CustomCard style={{ marginVertical: 5 }}>
-                        <Text style={styles.weekTitle}>{weekday} {weekdayDate.toLocaleDateString()}</Text>
-                        {weekplanDays.filter(weekplanDay => weekplanDay.day === weekdayDate.toString("yyyy-MM-dd")).map(weekplanDay => (
-                            weekplanDay.recipes.map(recipe => (
-                                <Text>{recipe.title}</Text>
-                            ))
-                        ))}
+                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                            <Text style={styles.weekTitle}>{weekday} {weekdayDate.toLocaleDateString()}</Text>
+                            <Button size="tiny" accessoryRight={PlusIcon} appearance="outline"/>
+                        </View>
+                        <ScrollView
+                            horizontal={true}>
+                            {weekplanDays.filter(weekplanDay => weekplanDay.day === weekdayDate.toString("yyyy-MM-dd")).map(weekplanDay => (
+                                weekplanDay.recipes.map(recipe => (
+                                    <WeeklyRecipeCard
+                                        title={recipe.title} />
+                                ))
+                            ))}
+                        </ScrollView>
                     </CustomCard>
                 )
 
@@ -62,14 +70,14 @@ export const WeeklyRecipeListScreen = () => {
         <>
             <Layout style={CentralStyles.fullscreen}>
                 <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
-                        <Text category="h5">{t("screens.weekplan.currentWeek")}</Text>
-                        {renderWeek(getCurrentWeekNumber(now), now.getFullYear())}
-                        <Text category="h5">{t("screens.weekplan.nextWeek")}</Text>
-                        {renderWeek(getCurrentWeekNumber(now) + 1, now.getFullYear())}
-                        <Text category="h5">{t("screens.weekplan.week")} {getCurrentWeekNumber(now) + 2}</Text>
-                        {renderWeek(getCurrentWeekNumber(now) + 2, now.getFullYear())}
-                        <Text category="h5">{t("screens.weekplan.week")} {getCurrentWeekNumber(now) + 3}</Text>
-                        {renderWeek(getCurrentWeekNumber(now) + 3, now.getFullYear())}
+                    <Text category="h5">{t("screens.weekplan.currentWeek")}</Text>
+                    {renderWeek(getCurrentWeekNumber(now), now.getFullYear())}
+                    <Text category="h5">{t("screens.weekplan.nextWeek")}</Text>
+                    {renderWeek(getCurrentWeekNumber(now) + 1, now.getFullYear())}
+                    <Text category="h5">{t("screens.weekplan.week")} {getCurrentWeekNumber(now) + 2}</Text>
+                    {renderWeek(getCurrentWeekNumber(now) + 2, now.getFullYear())}
+                    <Text category="h5">{t("screens.weekplan.week")} {getCurrentWeekNumber(now) + 3}</Text>
+                    {renderWeek(getCurrentWeekNumber(now) + 3, now.getFullYear())}
                 </ScrollView>
             </Layout>
         </>
