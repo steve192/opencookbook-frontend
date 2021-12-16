@@ -33,7 +33,6 @@ export const WeeklyRecipeListScreen = () => {
 
     const renderWeek = (weekNumber: number, year: number) => {
         let startWeekDate = getDateOfISOWeek(weekNumber, year);
-
         return [
             t("weekdays.monday"),
             t("weekdays.tuesday"),
@@ -47,8 +46,8 @@ export const WeeklyRecipeListScreen = () => {
                 weekdayDate.setDate(weekdayDate.getDate() + weekdayIndex);
                 return (
                     <CustomCard style={{ marginVertical: 5 }}>
-                        <Text style={styles.weekTitle}>{weekday} {weekdayDate.toString("dd.MM")}</Text>
-                        {weekplanDays.filter(weekplanDay => weekplanDay.day === weekdayDate.toISOString().split("T")[0]).map(weekplanDay => (
+                        <Text style={styles.weekTitle}>{weekday} {weekdayDate.toLocaleDateString()}</Text>
+                        {weekplanDays.filter(weekplanDay => weekplanDay.day === weekdayDate.toString("yyyy-MM-dd")).map(weekplanDay => (
                             weekplanDay.recipes.map(recipe => (
                                 <Text>{recipe.title}</Text>
                             ))
