@@ -166,6 +166,7 @@ const MainNavigation = () => {
     return (
         <NavigationContainer
             linking={{
+                
                 prefixes: [createURL('/')],
             }}
             >
