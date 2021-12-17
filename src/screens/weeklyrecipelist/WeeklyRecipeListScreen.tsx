@@ -34,8 +34,9 @@ export const WeeklyRecipeListScreen = () => {
     useEffect(loadData, []);
 
     const addRecipeToWeekplanDay = (recipe: Recipe, weekplanDay: WeekplanDay) => {
+        let newWeekplanDay = { ...weekplanDay };
         //@ts-ignore id is always set
-        weekplanDay.recipes.push({ id: recipe.id, title: recipe.title });
+        newWeekplanDay.recipes.push({ id: recipe.id, title: recipe.title });
         dispatch(updateSingleWeekplanDay(weekplanDay));
         setRecipeSelectionVisible(false);
     }
