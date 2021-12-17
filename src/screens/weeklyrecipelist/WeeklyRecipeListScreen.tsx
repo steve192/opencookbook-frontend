@@ -1,3 +1,6 @@
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { CompositeScreenProps } from '@react-navigation/native';
+import { StackScreenProps } from '@react-navigation/stack';
 import { Button, Layout, Text } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,13 +11,21 @@ import XDate from 'xdate';
 import { PlusIcon } from '../../assets/Icons';
 import { CustomCard } from '../../components/CustomCard';
 import { Recipe, WeekplanDay } from '../../dao/RestAPI';
+import { MainNavigationProps, OverviewNavigationProps } from '../../navigation/NavigationRoutes';
 import { fetchWeekplanDays, updateSingleWeekplanDay } from '../../redux/features/weeklyRecipesSlice';
 import { useAppSelector } from '../../redux/hooks';
 import CentralStyles from '../../styles/CentralStyles';
 import { RecipeSelectionPopup } from './RecipeSelectionPopup';
 import { WeeklyRecipeCard } from './WeeklyRecipeCard';
 
-export const WeeklyRecipeListScreen = () => {
+
+type Props =
+    CompositeScreenProps<
+        StackScreenProps<MainNavigationProps, "OverviewScreen">,
+        BottomTabScreenProps<OverviewNavigationProps, "RecipesListScreen">
+    >;
+
+export const WeeklyRecipeListScreen = (props: Props) => {
 
     const now = new XDate();
     const { t } = useTranslation("translation");
@@ -39,6 +50,10 @@ export const WeeklyRecipeListScreen = () => {
         newWeekplanDay.recipes.push({ id: recipe.id, title: recipe.title });
         dispatch(updateSingleWeekplanDay(newWeekplanDay));
         setRecipeSelectionVisible(false);
+    }
+
+    const openRecipe = (recipeId: number) => {
+        props.navigation.navigate("RecipeScreen", { recipeId })
     }
 
     const renderWeek = (weekNumber: number, year: number) => {
@@ -74,7 +89,9 @@ export const WeeklyRecipeListScreen = () => {
                             {weekplanDays.filter(weekplanDay => weekplanDay.day === weekdayDate.toString("yyyy-MM-dd")).map(weekplanDay => (
                                 weekplanDay.recipes.map(recipe => (
                                     <WeeklyRecipeCard
-                                        title={recipe.title} />
+                                        onPress={() => openRecipe(recipe.id)}
+                                        title={recipe.title}
+                                        imageUuid={recipe.titleImageUuid} />
                                 ))
                             ))}
                         </ScrollView>

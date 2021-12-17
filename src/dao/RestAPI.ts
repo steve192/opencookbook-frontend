@@ -39,6 +39,7 @@ export interface RecipeGroup {
 export interface WeekplanDayRecipeInfo {
     id: number;
     title: string;
+    titleImageUuid: string;
 }
 export interface WeekplanDay {
     day: string,
