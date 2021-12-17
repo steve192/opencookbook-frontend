@@ -10,6 +10,7 @@ import { useDispatch } from 'react-redux';
 import XDate from 'xdate';
 import { PlusIcon } from '../../assets/Icons';
 import { CustomCard } from '../../components/CustomCard';
+import { SideScroller } from '../../components/SideScroller';
 import { Recipe, WeekplanDay } from '../../dao/RestAPI';
 import { MainNavigationProps, OverviewNavigationProps } from '../../navigation/NavigationRoutes';
 import { fetchWeekplanDays, updateSingleWeekplanDay } from '../../redux/features/weeklyRecipesSlice';
@@ -84,8 +85,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
                                 }
                                 } />
                         </View>
-                        <ScrollView
-                            horizontal={true}>
+                        <SideScroller>
                             {weekplanDays.filter(weekplanDay => weekplanDay.day === weekdayDate.toString("yyyy-MM-dd")).map(weekplanDay => (
                                 weekplanDay.recipes.map(recipe => (
                                     <WeeklyRecipeCard
@@ -94,7 +94,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
                                         imageUuid={recipe.titleImageUuid} />
                                 ))
                             ))}
-                        </ScrollView>
+                        </SideScroller>
                     </CustomCard>
                 )
             });
