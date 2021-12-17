@@ -1,8 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Card, Layout, List, Text, useTheme } from "@ui-kitten/components";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ListRenderItemInfo, Pressable, StyleSheet, useWindowDimensions, View, ViewProps } from "react-native";
+import { ListRenderItemInfo, Pressable, StyleSheet, View, ViewProps } from "react-native";
 import { FolderIcon } from "../assets/Icons";
 import { Recipe, RecipeGroup } from "../dao/RestAPI";
 import { fetchMyRecipeGroups, fetchMyRecipes } from "../redux/features/recipesSlice";
@@ -19,14 +19,15 @@ export const RecipeList = (props: Props) => {
     const myRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
     const listRefreshing = useAppSelector((state) => state.recipes.loading);
 
+    const [componentWidth, setComponentWith] = useState<number>(1);
+
     const { t } = useTranslation("translation");
     const theme = useTheme();
 
     const dispatch = useAppDispatch();
 
 
-    const windowDimensions = useWindowDimensions();
-    const numberOfColumns = Math.ceil(windowDimensions.width / 300);
+    const numberOfColumns = Math.ceil(componentWidth / 300);
 
     useEffect(refreshData, []);
 
@@ -110,6 +111,7 @@ export const RecipeList = (props: Props) => {
     return (
         getShownItems().length > 0 ?
             <List
+                onLayout={(event) => setComponentWith(event.nativeEvent.layout.width)}
                 key={numberOfColumns} //To force re render when number of columns changes
                 style={styles.container}
                 contentContainerStyle={styles.contentContainer}
