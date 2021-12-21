@@ -10,6 +10,8 @@ import { RecipeImageViewPager } from "../components/RecipeImageViewPager";
 import { TextBullet } from "../components/TextBullet";
 import RestAPI, { Recipe } from "../dao/RestAPI";
 import { MainNavigationProps } from "../navigation/NavigationRoutes";
+import { fetchSingleRecipe } from "../redux/features/recipesSlice";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import CentralStyles from "../styles/CentralStyles";
 
 
@@ -17,11 +19,18 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
 export const RecipeScreen = (props: Props) => {
 
     const [servings, setServings] = useState<number>(0);
-    const [recipe, setRecipe] = useState<Recipe>();
+    var recipes = useAppSelector(state => state.recipes.recipes);
+    var displayedRecipe: Recipe | undefined = undefined;
+    console.log(recipes);
+    if (recipes.find(recipe => recipe.id === props.route.params.recipeId)) {
+        displayedRecipe = recipes
+            .filter(recipe => recipe.id === props.route.params.recipeId)[0]
 
+    }
     const { t } = useTranslation("translation");
+    const dispatch = useAppDispatch();
 
-    props.navigation.setOptions({ title: recipe ? recipe.title : "Loading" });
+    props.navigation.setOptions({ title: displayedRecipe ? displayedRecipe.title : "Loading" });
     // useLayoutEffect(() => {
 
     props.navigation.setOptions({
@@ -29,8 +38,7 @@ export const RecipeScreen = (props: Props) => {
             <Button
                 onPress={() => props.navigation.navigate("RecipeWizardScreen", {
                     editing: true,
-                    recipe: recipe,
-                    onRecipeChanged: setRecipe,
+                    recipe: displayedRecipe,
                     onRecipeDeleted: () => {
                         props.navigation.goBack();
                         if (props.route.params.onRecipeChanged) {
@@ -42,20 +50,16 @@ export const RecipeScreen = (props: Props) => {
     });
     // }, [props.navigation]);
     useEffect(() => {
-        RestAPI.getRecipeById(props.route.params.recipeId)
-            .then((loadedRecipe) => {
-                setRecipe(loadedRecipe);
-                setServings(loadedRecipe.servings);
-            });
+        dispatch(fetchSingleRecipe(props.route.params.recipeId));
     }, [props.route.params.recipeId]);
 
     const theme = useTheme();
 
     const getServingMultiplier = () => {
-        if (!recipe) {
+        if (!displayedRecipe) {
             return 1;
         }
-        return servings / recipe?.servings;
+        return servings / displayedRecipe?.servings;
     }
 
     const scaleIngredient = (originalAmount: number) => {
@@ -67,7 +71,7 @@ export const RecipeScreen = (props: Props) => {
             <Text category="label">{t("screens.recipe.ingredients")}</Text>
             {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                {recipe?.neededIngredients.map(ingredient =>
+                {displayedRecipe?.neededIngredients.map(ingredient =>
                     <>
                         <Divider />
                         <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row' }}>
@@ -105,7 +109,7 @@ export const RecipeScreen = (props: Props) => {
         <>
             <Text category="label">{t("screens.recipe.preparationSteps")}</Text>
             <Spacer height={20} />
-            {recipe && recipe.preparationSteps.map((preparationStep, index) => (
+            {displayedRecipe && displayedRecipe.preparationSteps.map((preparationStep, index) => (
                 <>
                     <Divider />
                     <View style={{ flexDirection: "row", alignItems: "center", paddingVertical: 10 }}>
@@ -126,16 +130,16 @@ export const RecipeScreen = (props: Props) => {
                 <ScrollView>
                     <RecipeImageViewPager
                         style={{ height: 320 }}
-                        images={recipe ? recipe?.images : []}
+                        images={displayedRecipe ? displayedRecipe?.images : []}
                     />
                     <View style={[CentralStyles.contentContainer, { flex: 1 }]} >
-                        {recipe && renderIngredientsSection()}
+                        {displayedRecipe && renderIngredientsSection()}
 
                         <Spacer height={20} />
-                        <Button onPress={() => recipe && props.navigation.navigate("GuidedCookingScreen", { recipe: recipe })}>{t("screens.recipe.startCookingButton")}</Button>
+                        <Button onPress={() => displayedRecipe && props.navigation.navigate("GuidedCookingScreen", { recipe: displayedRecipe })}>{t("screens.recipe.startCookingButton")}</Button>
                         <Spacer height={20} />
 
-                        {recipe && renderStepsSection()}
+                        {displayedRecipe && renderStepsSection()}
 
                     </View>
                 </ScrollView>

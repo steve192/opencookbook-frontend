@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import RestAPI, { Recipe, RecipeGroup } from '../../dao/RestAPI';
+import { RootState } from '../store';
 
 
 export interface RecipesState {
@@ -19,6 +20,16 @@ export const fetchMyRecipes = createAsyncThunk(
     'fetchMyRecipes',
     async (): Promise<Recipe[]> => {
         return RestAPI.getRecipes();
+    }
+);
+export const fetchSingleRecipe = createAsyncThunk<Recipe, number, { state: RootState }>(
+    'fetchSingleRecipe',
+    async (recipeId: number, { getState }): Promise<Recipe> => {
+        if (getState().recipes.recipes.find(recipe => recipe.id === recipeId)) {
+            //Already exists
+            return getState().recipes.recipes.filter(recipe => recipe.id === recipeId)[0];
+        }
+        return RestAPI.getRecipeById(recipeId);
     }
 );
 export const fetchMyRecipeGroups = createAsyncThunk(
@@ -42,6 +53,18 @@ export const recipesSlice = createSlice({
         })
         builder.addCase(fetchMyRecipeGroups.fulfilled, (state, action) => {
             state.recipeGroups = action.payload;
+        })
+        builder.addCase(fetchSingleRecipe.fulfilled, (state, action) => {
+            if (!state.recipes.find(recipe => recipe.id === action.meta.arg)) {
+                // Newly added
+                state.recipes.push(action.payload);
+                return;
+            }
+            state.recipes.forEach((recipe, index) => {
+                if (recipe.id === action.meta.arg) {
+                    state.recipes[index] = action.payload;
+                }
+            });
         })
     }
 })
