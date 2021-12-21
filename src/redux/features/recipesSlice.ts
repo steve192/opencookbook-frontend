@@ -39,6 +39,20 @@ export const fetchMyRecipeGroups = createAsyncThunk(
     }
 );
 
+export const updateRecipe = createAsyncThunk<Recipe, Recipe, { state: RootState }>(
+    'updateRecipe',
+    async (recipe: Recipe, { getState }): Promise<Recipe> => {
+        return RestAPI.updateRecipe(recipe);
+    }
+);
+
+export const createRecipe = createAsyncThunk<Recipe, Recipe, { state: RootState }>(
+    'createRecipe',
+    async (recipe: Recipe, { getState }): Promise<Recipe> => {
+        return RestAPI.createNewRecipe(recipe);
+    }
+);
+
 export const recipesSlice = createSlice({
     name: 'recipes',
     initialState,
@@ -62,6 +76,17 @@ export const recipesSlice = createSlice({
             }
             state.recipes.forEach((recipe, index) => {
                 if (recipe.id === action.meta.arg) {
+                    state.recipes[index] = action.payload;
+                }
+            });
+        })
+        builder.addCase(createRecipe.fulfilled, (state, action) => {
+            state.recipes.push(action.payload);
+        })
+
+        builder.addCase(updateRecipe.fulfilled, (state, action) => {
+            state.recipes.forEach((recipe, index) => {
+                if (recipe.id === action.meta.arg.id) {
                     state.recipes[index] = action.payload;
                 }
             });

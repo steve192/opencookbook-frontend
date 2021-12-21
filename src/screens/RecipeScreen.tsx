@@ -31,13 +31,7 @@ export const RecipeScreen = (props: Props) => {
             <Button
                 onPress={() => props.navigation.navigate("RecipeWizardScreen", {
                     editing: true,
-                    recipe: displayedRecipe,
-                    onRecipeDeleted: () => {
-                        props.navigation.goBack();
-                        if (props.route.params.onRecipeChanged) {
-                            props.route.params.onRecipeChanged();
-                        }
-                    }
+                    recipeId: displayedRecipe.id,
                 })} accessoryLeft={<EditIcon />} />
         ),
     });

@@ -9,6 +9,8 @@ import { CustomCard } from '../../components/CustomCard';
 import { RecipeImageViewPager } from '../../components/RecipeImageViewPager';
 import RestAPI, { IngredientUse, Recipe, RecipeGroup } from '../../dao/RestAPI';
 import { MainNavigationProps } from '../../navigation/NavigationRoutes';
+import { createRecipe, updateRecipe } from '../../redux/features/recipesSlice';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import CentralStyles from '../../styles/CentralStyles';
 import { IngredientFormField } from './IngridientFromField';
 import { RecipeFormField } from './PreparationStepFormField';
@@ -23,10 +25,18 @@ const RecipeWizardScreen = (props: Props) => {
     const theme = useTheme()
 
     const { t } = useTranslation("translation");
+    const dispatch = useAppDispatch();
 
-    const [newRecipeData, setNewRecipeData] = useState<Recipe>(
-        props.route.params.recipe ?
-            props.route.params.recipe
+    let existingRecipe: Recipe | undefined;
+    if (props.route.params.recipeId) {
+        //@ts-ignore never undefined
+        existingRecipe = useAppSelector(state => state.recipes.recipes.filter(recipe => recipe.id === props.route.params.recipeId)[0]);
+    } else {
+        existingRecipe = undefined;
+    }
+    const [recipeData, setRecipeData] = useState<Recipe>(
+        existingRecipe ?
+            existingRecipe
             :
             {
                 title: "",
@@ -37,6 +47,8 @@ const RecipeWizardScreen = (props: Props) => {
                 recipeGroups: [{ title: "", type: "RecipeGroup" }],
                 type: "Recipe"
             });
+
+
 
     props.navigation.setOptions({ title: props.route.params.editing ? t("screens.editRecipe.screenTitleEdit") : t("screens.editRecipe.screenTitleCreate") });
 
@@ -50,82 +62,81 @@ const RecipeWizardScreen = (props: Props) => {
                 </>
             ),
         });
-    }, [props.navigation, newRecipeData]);
+    }, [props.navigation, recipeData]);
 
 
     const changePreparationStep = (newText: string, index: number) => {
-        let preparationStepsCopy = newRecipeData.preparationSteps;
+        let preparationStepsCopy = recipeData.preparationSteps;
         preparationStepsCopy[index] = newText;
-        setNewRecipeData({ ...newRecipeData, preparationSteps: preparationStepsCopy })
+        setRecipeData({ ...recipeData, preparationSteps: preparationStepsCopy })
     }
 
     const addPreparationStep = () => {
-        let preparationStepsCopy = newRecipeData.preparationSteps;
+        let preparationStepsCopy = recipeData.preparationSteps;
         preparationStepsCopy.push("");
-        setNewRecipeData({ ...newRecipeData, preparationSteps: preparationStepsCopy })
+        setRecipeData({ ...recipeData, preparationSteps: preparationStepsCopy })
     }
 
     const removePreparationStep = (index: number) => {
-        let preparationStepsCopy = newRecipeData.preparationSteps;
+        let preparationStepsCopy = recipeData.preparationSteps;
         preparationStepsCopy.splice(index, 1);
-        setNewRecipeData({ ...newRecipeData, preparationSteps: preparationStepsCopy })
+        setRecipeData({ ...recipeData, preparationSteps: preparationStepsCopy })
     }
 
 
     const removeIngredient = (index: number) => {
-        let ingredientsCopy = newRecipeData.neededIngredients;
+        let ingredientsCopy = recipeData.neededIngredients;
         ingredientsCopy.splice(index, 1);
-        setNewRecipeData({ ...newRecipeData, neededIngredients: ingredientsCopy })
+        setRecipeData({ ...recipeData, neededIngredients: ingredientsCopy })
     }
 
     const addRecipeImage = (uuid: string) => {
-        let images = newRecipeData.images;
+        let images = recipeData.images;
         images.push({ uuid })
-        setNewRecipeData({ ...newRecipeData, images: images })
+        setRecipeData({ ...recipeData, images: images })
     }
 
     const addIngredient = () => {
-        let ingredientsCopy = newRecipeData.neededIngredients;
+        let ingredientsCopy = recipeData.neededIngredients;
         ingredientsCopy.push({
             ingredient: { id: undefined, name: "" },
             unit: "",
             amount: 1
         });
-        setNewRecipeData({ ...newRecipeData, neededIngredients: ingredientsCopy })
+        setRecipeData({ ...recipeData, neededIngredients: ingredientsCopy })
     }
 
     const changeIngredient = (index: number, ingredient: IngredientUse) => {
-        let ingredientsCopy = newRecipeData.neededIngredients;
+        let ingredientsCopy = recipeData.neededIngredients;
         ingredientsCopy[index] = ingredient
-        setNewRecipeData({ ...newRecipeData, neededIngredients: ingredientsCopy })
+        setRecipeData({ ...recipeData, neededIngredients: ingredientsCopy })
     }
 
     const setRecipeGroup = (recipeGroup: RecipeGroup | undefined) => {
         if (!recipeGroup) {
-            setNewRecipeData({ ...newRecipeData, recipeGroups: [] });
+            setRecipeData({ ...recipeData, recipeGroups: [] });
         } else {
-            setNewRecipeData({ ...newRecipeData, recipeGroups: [recipeGroup] });
+            setRecipeData({ ...recipeData, recipeGroups: [recipeGroup] });
         }
     }
 
 
 
     const saveRecipe = () => {
-        if (!newRecipeData.recipeGroups[0] || newRecipeData.recipeGroups[0].title === "") {
+        const recipeDataCopy = { ...recipeData };
+        if (!recipeDataCopy.recipeGroups[0] || recipeDataCopy.recipeGroups[0].title === "") {
             // As long as there are no multiple groups
-            newRecipeData.recipeGroups = [];
+            recipeDataCopy.recipeGroups = [];
         }
         if (props.route.params.editing) {
-            //TODO: Error handling
-            RestAPI.updateRecipe(newRecipeData).then((recipe) => {
+            dispatch(updateRecipe(recipeDataCopy)).then(() => {
+                //TODO: Error handling
                 props.navigation.goBack();
-                props.route.params.onRecipeChanged?.(recipe);
             });
         } else {
-            //TODO: Error handling
-            RestAPI.createNewRecipe(newRecipeData).then((recipe) => {
+            dispatch(createRecipe(recipeDataCopy)).then(() => {
+                //TODO: Error handling
                 props.navigation.goBack();
-                props.route.params.onRecipeChanged?.(recipe);
             });
         }
     };
@@ -133,7 +144,7 @@ const RecipeWizardScreen = (props: Props) => {
     const deleteRecipe = () => {
         if (props.route.params.editing) {
             //TODO: Error handling
-            RestAPI.deleteRecipe(newRecipeData).then(() => {
+            RestAPI.deleteRecipe(recipeData).then(() => {
                 props.navigation.goBack();
                 props.route.params.onRecipeDeleted?.();
             });
@@ -145,7 +156,7 @@ const RecipeWizardScreen = (props: Props) => {
     const renderIngredientsSection = () =>
         <CustomCard>
             <Text category="label">{t("screens.editRecipe.ingredients")}</Text>
-            {newRecipeData.neededIngredients.map((neededIngredient, ingredientIndex) =>
+            {recipeData.neededIngredients.map((neededIngredient, ingredientIndex) =>
                 <>
                     <IngredientFormField
                         key={ingredientIndex + "ingredient"}
@@ -168,14 +179,14 @@ const RecipeWizardScreen = (props: Props) => {
     const renderPreparationStepsSection = () =>
         <CustomCard>
             <Text category="label">{t("screens.editRecipe.preparationSteps")}</Text>
-            {newRecipeData.preparationSteps.map((preparationStep, preparationStepIndex) =>
+            {recipeData.preparationSteps.map((preparationStep, preparationStepIndex) =>
                 <>
                     <RecipeFormField
                         onRemovePress={() => removePreparationStep(preparationStepIndex)}
                         key={preparationStepIndex + "prepstep"}
                         multiline={true}
                         numberOfLines={5}
-                        value={newRecipeData.preparationSteps[preparationStepIndex]}
+                        value={recipeData.preparationSteps[preparationStepIndex]}
                         onChangeText={newText => changePreparationStep(newText, preparationStepIndex)}
                         placeholder={t("screens.editRecipe.preparationStepPlaceholder")} />
                     <Spacer height={5} />
@@ -189,7 +200,7 @@ const RecipeWizardScreen = (props: Props) => {
         <CustomCard>
             <Text category="label">{t("screens.editRecipe.recipeGroups")}</Text>
             <RecipeGroupFormField
-                recipeGroup={newRecipeData.recipeGroups?.[0]}
+                recipeGroup={recipeData.recipeGroups?.[0]}
                 onRecipeGroupChange={setRecipeGroup} />
         </CustomCard>
     )
@@ -202,15 +213,15 @@ const RecipeWizardScreen = (props: Props) => {
                     <RecipeImageViewPager
                         style={{ height: 320 }}
                         onImageAdded={addRecipeImage}
-                        images={newRecipeData.images}
+                        images={recipeData.images}
                         allowEdit={true}
                     />
                     <View style={[CentralStyles.contentContainer, CentralStyles.elementSpacing]}>
                         <CustomCard>
                             <Text category="label">{t("screens.editRecipe.title")}</Text>
                             <Input
-                                value={newRecipeData.title}
-                                onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, title: newText })}
+                                value={recipeData.title}
+                                onChangeText={(newText) => setRecipeData({ ...recipeData, title: newText })}
                                 placeholder="Name" />
                         </CustomCard>
                         <Spacer height={15} />
@@ -222,9 +233,9 @@ const RecipeWizardScreen = (props: Props) => {
                             <Input
                                 placeholder="Serving size"
                                 keyboardType='numeric'
-                                value={newRecipeData.servings?.toString()}
+                                value={recipeData.servings?.toString()}
                                 //@ts-ignore
-                                onChangeText={(newText) => setNewRecipeData({ ...newRecipeData, servings: parseInt(newText) ? parseInt(newText) : undefined })} />
+                                onChangeText={(newText) => setRecipeData({ ...recipeData, servings: parseInt(newText) ? parseInt(newText) : undefined })} />
                         </CustomCard>
                         <Divider style={{ marginVertical: 10 }} />
                         <Spacer height={15} />
