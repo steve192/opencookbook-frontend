@@ -18,8 +18,8 @@ import CentralStyles from "../styles/CentralStyles";
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
 export const RecipeScreen = (props: Props) => {
 
-    const [servings, setServings] = useState<number>(0);
     var displayedRecipe = useAppSelector(state => state.recipes.recipes.filter(recipe => recipe.id === props.route.params.recipeId)[0]);
+    const [servings, setServings] = useState<number>(displayedRecipe.servings);
     const { t } = useTranslation("translation");
     const dispatch = useAppDispatch();
 
