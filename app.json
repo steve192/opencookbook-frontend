@@ -2,7 +2,7 @@
   "expo": {
     "name": "opencookbook",
     "slug": "opencookbook",
-    "scheme":"opencookbook",
+    "scheme": "opencookbook",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -30,7 +30,7 @@
       "permissions": [
         "CAMERA"
       ],
-      "versionCode": 4
+      "versionCode": 5
     },
     "web": {
       "favicon": "./assets/favicon.png"
