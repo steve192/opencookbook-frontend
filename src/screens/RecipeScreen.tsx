@@ -19,14 +19,7 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
 export const RecipeScreen = (props: Props) => {
 
     const [servings, setServings] = useState<number>(0);
-    var recipes = useAppSelector(state => state.recipes.recipes);
-    var displayedRecipe: Recipe | undefined = undefined;
-    console.log(recipes);
-    if (recipes.find(recipe => recipe.id === props.route.params.recipeId)) {
-        displayedRecipe = recipes
-            .filter(recipe => recipe.id === props.route.params.recipeId)[0]
-
-    }
+    var displayedRecipe = useAppSelector(state => state.recipes.recipes.filter(recipe => recipe.id === props.route.params.recipeId)[0]);
     const { t } = useTranslation("translation");
     const dispatch = useAppDispatch();
 
