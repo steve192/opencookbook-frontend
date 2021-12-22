@@ -1,5 +1,6 @@
 import { Spinner, Text } from '@ui-kitten/components';
-import React, { useEffect } from 'react';
+import * as Updates from 'expo-updates';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import Configuration from '../../Configuration';
@@ -8,15 +9,33 @@ import { login, logout } from '../../redux/features/authSlice';
 import { LoginBackdrop } from './LoginBackdrop';
 
 
-
 export const SplashScreen = () => {
 
+    const [statusText, setStatusText] = useState("");
     const dispatch = useDispatch();
 
     useEffect(() => {
         // Load application data
         (async () => {
+            // Check for new app versions
             try {
+
+                setStatusText("Checking for updates...");
+                console.log("Update check");
+                const update = await Updates.checkForUpdateAsync();
+                if (update.isAvailable) {
+                    console.log("Dowload update");
+                    setStatusText("Downloading new app version...");
+                    await Updates.fetchUpdateAsync();
+                    // TODO: ... notify user of update ...
+                    Updates.reloadAsync();
+                }
+            } catch (e) {
+                // handle or log error
+            }
+
+            try {
+                setStatusText("Logging in...");
                 const authToken = await Configuration.getAuthToken();
                 if (!authToken) {
                     dispatch(logout());
@@ -40,6 +59,7 @@ export const SplashScreen = () => {
                         alignItems: "center"
                     }}>
                         <Spinner />
+                        <Text>{statusText}</Text>
                     </View>
                 </View>
             </View>

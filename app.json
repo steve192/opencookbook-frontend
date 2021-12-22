@@ -12,7 +12,11 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "updateUrl": "https://expo.dev/@steve192/opencookbook",
+      "sdkVersion": 43,
+      "releaseChannel": "default",
+      "checkOnLaunch": "NEVER"
     },
     "assetBundlePatterns": [
       "**/*"
