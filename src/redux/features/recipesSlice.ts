@@ -52,6 +52,13 @@ export const createRecipe = createAsyncThunk<Recipe, Recipe, { state: RootState 
         return RestAPI.createNewRecipe(recipe);
     }
 );
+export const deleteRecipe = createAsyncThunk<void, Recipe, { state: RootState }>(
+    'deleteRecipe',
+    async (recipe: Recipe, { getState }): Promise<void> => {
+        return RestAPI.deleteRecipe(recipe);
+    }
+);
+
 
 export const recipesSlice = createSlice({
     name: 'recipes',
@@ -82,6 +89,13 @@ export const recipesSlice = createSlice({
         })
         builder.addCase(createRecipe.fulfilled, (state, action) => {
             state.recipes.push(action.payload);
+        })
+        builder.addCase(deleteRecipe.fulfilled, (state, action) => {
+            state.recipes.forEach((recipe, index) => {
+                if (recipe.id === action.meta.arg.id) {
+                    state.recipes.splice(index, 1);
+                }
+            });
         })
 
         builder.addCase(updateRecipe.fulfilled, (state, action) => {
