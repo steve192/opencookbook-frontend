@@ -93,11 +93,6 @@ const RecipeListScreen = (props: Props) => {
     }
   }
 
-
-
-
-
-
   const openRecipe = (recipe: Recipe) => {
     if (recipe.id) {
       props.navigation.push("RecipeScreen", {

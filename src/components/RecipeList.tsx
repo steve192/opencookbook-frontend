@@ -37,7 +37,7 @@ export const RecipeList = (props: Props) => {
             <Pressable
                 style={[styles.recipeCard, { flex: 1 / numberOfColumns }]}
                 onPress={() => props.onRecipeClick(recipe)}>
-                <Layout style={{ height: 180 }}>
+                <Layout style={{ height: 180, borderRadius: 16, overflow: "hidden" }}>
                     <RecipeImageComponent
                         forceFitScaling={true}
                         uuid={recipe.images.length > 0 ? recipe.images[0].uuid : undefined} />
@@ -48,7 +48,7 @@ export const RecipeList = (props: Props) => {
     }
     const createRecipeGroupListItem = (recipeGroup: RecipeGroup) => {
         return (
-            < Card
+            <Card
                 style={[styles.recipeGroupCard, { flex: 1 / numberOfColumns }]}
                 status='basic'
                 onPress={() => props.onRecipeGroupClick(recipeGroup)}
@@ -128,7 +128,6 @@ export const RecipeList = (props: Props) => {
 
 const styles = StyleSheet.create({
     container: {
-        // maxHeight: 320,
         width: "100%"
     },
     contentContainer: {
@@ -136,15 +135,12 @@ const styles = StyleSheet.create({
         // paddingVertical: 4,
     },
     recipeCard: {
-        // marginVertical: 4,
         margin: 3,
+        borderColor: "rgba(0,0,0,0.09)",
         borderRadius: 16,
-        overflow: "hidden",
-        backgroundColor: "rgba(127,127,127, 0.05)" //TODO: Theme color
-
+        borderWidth: 1
     },
     recipeGroupCard: {
-        // marginVertical: 4,
         margin: 1,
         flex: 1
     },
