@@ -1,7 +1,7 @@
 import { HeaderHeightContext } from '@react-navigation/elements';
 import { Divider, Input, Layout, List, ListItem, Text } from '@ui-kitten/components';
 import React, { useRef, useState } from 'react';
-import { ListRenderItemInfo, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { ListRenderItemInfo, Modal, Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import Spacer from 'react-spacer';
 
 
@@ -15,7 +15,8 @@ interface Props {
     options: Option[],
     onValueChanged?: (newValue: Option) => void,
     placeholder?: string,
-    allowAdditionalValues?: boolean
+    allowAdditionalValues?: boolean,
+    style: StyleProp<ViewStyle>
 }
 
 interface ListItemData {
@@ -74,7 +75,9 @@ export const SelectionPopup = (props: Props) => {
 
     return (
         <>
-            <Pressable onPress={() => openModal()}>
+            <Pressable
+                style={props.style}
+                onPress={() => openModal()}>
                 <View pointerEvents="none">
                     <Input
                         placeholder={props.placeholder}

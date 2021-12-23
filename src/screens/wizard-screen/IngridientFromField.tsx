@@ -83,6 +83,7 @@ export const IngredientFormField = (props: Props) => {
                                 onChangeText={onAmountChange} />
                             <Spacer width={5} />
                             <SelectionPopup
+                                style={{ flex: 1 }}
                                 value={unit}
                                 options={availableUnits.map((availableUnit, index) => ({ key: index.toString(), value: availableUnit }))}
                                 onValueChanged={selectedOption => setUnit(selectedOption.value)}
