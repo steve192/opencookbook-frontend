@@ -26,6 +26,7 @@ type Props =
         BottomTabScreenProps<OverviewNavigationProps, 'RecipesListScreen'>
     >;
 
+const dateFormat = 'yyyy-MM-dd';
 export const WeeklyRecipeListScreen = (props: Props) => {
   const now = new XDate();
   const {t} = useTranslation('translation');
@@ -69,7 +70,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
         .map((weekday, weekdayIndex) => {
           const weekdayDate = new XDate(startWeekDate);
           weekdayDate.setDate(weekdayDate.getDate() + weekdayIndex);
-          const existingWeekplanDay = weekplanDays.filter((weekplanDay) => weekplanDay.day === weekdayDate.toString('yyyy-MM-dd'))[0];
+          const existingWeekplanDay = weekplanDays.filter((weekplanDay) => weekplanDay.day === weekdayDate.toString(dateFormat))[0];
           return (
             <CustomCard key={weekdayIndex} style={{marginVertical: 5}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -80,12 +81,12 @@ export const WeeklyRecipeListScreen = (props: Props) => {
                   appearance="outline"
                   onPress={() => {
                     setRecipeSelectionVisible(true);
-                    setSelectedWeekplanDay(existingWeekplanDay ? existingWeekplanDay : {day: weekdayDate.toString('yyyy-MM-dd'), recipes: []});
+                    setSelectedWeekplanDay(existingWeekplanDay ? existingWeekplanDay : {day: weekdayDate.toString(dateFormat), recipes: []});
                   }
                   } />
               </View>
               <SideScroller>
-                {weekplanDays.filter((weekplanDay) => weekplanDay.day === weekdayDate.toString('yyyy-MM-dd')).map((weekplanDay) => (
+                {weekplanDays.filter((weekplanDay) => weekplanDay.day === weekdayDate.toString(dateFormat)).map((weekplanDay) => (
                   weekplanDay.recipes.map((recipe, index) => (
                     <WeeklyRecipeCard
                       key={weekplanDay.day + index}

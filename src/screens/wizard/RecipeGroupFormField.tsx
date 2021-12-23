@@ -19,7 +19,7 @@ export const RecipeGroupFormField = (props: Props) => {
       // Newly created
       props.onRecipeGroupChange({title: option.value, type: 'RecipeGroup'});
     } else {
-      const existingGroup = availableGroups.find((group) => group.id?.toString() == option.key);
+      const existingGroup = availableGroups.find((group) => group.id?.toString() === option.key);
       if (existingGroup) {
         props.onRecipeGroupChange(existingGroup);
       } else {
