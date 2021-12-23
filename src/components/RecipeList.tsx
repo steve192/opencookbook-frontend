@@ -17,7 +17,7 @@ interface Props {
 export const RecipeList = (props: Props) => {
     const myRecipes = useAppSelector((state) => state.recipes.recipes);
     const myRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
-    const listRefreshing = useAppSelector((state) => state.recipes.loading);
+    const listRefreshing = useAppSelector((state) => state.recipes.pendingRequests > 0);
 
     const [componentWidth, setComponentWith] = useState<number>(1);
 

@@ -8,7 +8,7 @@ import { DeleteIcon, PlusIcon, SaveIcon } from '../../assets/Icons';
 import { RecipeImageViewPager } from '../../components/RecipeImageViewPager';
 import RestAPI, { IngredientUse, Recipe, RecipeGroup } from '../../dao/RestAPI';
 import { MainNavigationProps } from '../../navigation/NavigationRoutes';
-import { createRecipe, updateRecipe } from '../../redux/features/recipesSlice';
+import { createRecipe, deleteRecipe, updateRecipe } from '../../redux/features/recipesSlice';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import CentralStyles from '../../styles/CentralStyles';
 import { IngredientFormField } from './IngridientFromField';
@@ -56,7 +56,7 @@ const RecipeWizardScreen = (props: Props) => {
         props.navigation.setOptions({
             headerRight: () => (
                 <>
-                    <Button onPress={() => deleteRecipe()} accessoryLeft={<DeleteIcon fill={theme["color-danger-default"]} />} />
+                    <Button onPress={() => onDeleteRecipe()} accessoryLeft={<DeleteIcon fill={theme["color-danger-default"]} />} />
                     <Button onPress={() => saveRecipe()} accessoryLeft={<SaveIcon />} />
                 </>
             ),
@@ -140,12 +140,10 @@ const RecipeWizardScreen = (props: Props) => {
         }
     };
 
-    const deleteRecipe = () => {
+    const onDeleteRecipe = () => {
         if (props.route.params.editing) {
-            //TODO: Error handling
-            RestAPI.deleteRecipe(recipeData).then(() => {
+            dispatch(deleteRecipe(recipeData)).then(() => {
                 props.navigation.goBack();
-                props.route.params.onRecipeDeleted?.();
             });
         } else {
             props.navigation.goBack()

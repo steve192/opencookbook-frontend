@@ -6,14 +6,14 @@ import { RootState } from '../store';
 export interface RecipesState {
     recipes: Recipe[];
     recipeGroups: RecipeGroup[];
-    loading: boolean;
+    pendingRequests: number;
 
 }
 
 const initialState: RecipesState = {
     recipes: [],
     recipeGroups: [],
-    loading: false
+    pendingRequests: 0
 }
 
 export const fetchMyRecipes = createAsyncThunk(
@@ -29,6 +29,7 @@ export const fetchSingleRecipe = createAsyncThunk<Recipe, number, { state: RootS
             //Already exists
             return getState().recipes.recipes.filter(recipe => recipe.id === recipeId)[0];
         }
+
         return RestAPI.getRecipeById(recipeId);
     }
 );
@@ -69,42 +70,89 @@ export const recipesSlice = createSlice({
         // }
     },
     extraReducers: (builder) => {
-        builder.addCase(fetchMyRecipes.fulfilled, (state, action) => {
-            state.recipes = action.payload;
-        })
-        builder.addCase(fetchMyRecipeGroups.fulfilled, (state, action) => {
-            state.recipeGroups = action.payload;
-        })
-        builder.addCase(fetchSingleRecipe.fulfilled, (state, action) => {
-            if (!state.recipes.find(recipe => recipe.id === action.meta.arg)) {
-                // Newly added
-                state.recipes.push(action.payload);
-                return;
-            }
-            state.recipes.forEach((recipe, index) => {
-                if (recipe.id === action.meta.arg) {
-                    state.recipes[index] = action.payload;
-                }
-            });
-        })
-        builder.addCase(createRecipe.fulfilled, (state, action) => {
-            state.recipes.push(action.payload);
-        })
-        builder.addCase(deleteRecipe.fulfilled, (state, action) => {
-            state.recipes.forEach((recipe, index) => {
-                if (recipe.id === action.meta.arg.id) {
-                    state.recipes.splice(index, 1);
-                }
-            });
-        })
+        builder
+            .addCase(fetchMyRecipes.pending, (state) => {
+                state.pendingRequests++;
+            })
+            .addCase(fetchMyRecipes.fulfilled, (state, action) => {
+                state.recipes = action.payload;
+                state.pendingRequests--;
+            })
+            .addCase(fetchMyRecipes.rejected, (state) => {
+                state.pendingRequests--;
+            })
 
-        builder.addCase(updateRecipe.fulfilled, (state, action) => {
-            state.recipes.forEach((recipe, index) => {
-                if (recipe.id === action.meta.arg.id) {
-                    state.recipes[index] = action.payload;
-                }
+        builder
+            .addCase(fetchMyRecipeGroups.pending, (state, action) => {
+                state.pendingRequests++;
+            })
+            .addCase(fetchMyRecipeGroups.fulfilled, (state, action) => {
+                state.recipeGroups = action.payload;
+            })
+            .addCase(fetchMyRecipeGroups.rejected, (state, action) => {
+                state.pendingRequests--;
             });
-        })
+
+        builder
+            .addCase(fetchSingleRecipe.pending, (state, action) => {
+                state.pendingRequests++;
+            })
+            .addCase(fetchSingleRecipe.fulfilled, (state, action) => {
+                if (!state.recipes.find(recipe => recipe.id === action.meta.arg)) {
+                    // Newly added
+                    state.recipes.push(action.payload);
+                    return;
+                }
+                state.recipes.forEach((recipe, index) => {
+                    if (recipe.id === action.meta.arg) {
+                        state.recipes[index] = action.payload;
+                    }
+                });
+            })
+            .addCase(fetchSingleRecipe.rejected, (state, action) => {
+                state.pendingRequests--;
+            });
+
+        builder
+            .addCase(createRecipe.pending, (state, action) => {
+                state.pendingRequests++;
+            })
+            .addCase(createRecipe.fulfilled, (state, action) => {
+                state.recipes.push(action.payload);
+            })
+            .addCase(createRecipe.rejected, (state, action) => {
+                state.pendingRequests--;
+            });
+
+        builder
+            .addCase(deleteRecipe.pending, (state, action) => {
+                state.pendingRequests++;
+            })
+            .addCase(deleteRecipe.fulfilled, (state, action) => {
+                state.recipes.forEach((recipe, index) => {
+                    if (recipe.id === action.meta.arg.id) {
+                        state.recipes.splice(index, 1);
+                    }
+                });
+            })
+            .addCase(deleteRecipe.rejected, (state, action) => {
+                state.pendingRequests--;
+            });
+
+        builder
+            .addCase(updateRecipe.pending, (state, action) => {
+                state.pendingRequests++;
+            })
+            .addCase(updateRecipe.fulfilled, (state, action) => {
+                state.recipes.forEach((recipe, index) => {
+                    if (recipe.id === action.meta.arg.id) {
+                        state.recipes[index] = action.payload;
+                    }
+                });
+            })
+            .addCase(updateRecipe.rejected, (state, action) => {
+                state.pendingRequests--;
+            });
     }
 })
 

@@ -1,3 +1,4 @@
+import { useIsFocused } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Button, Divider, Layout, Text, useTheme } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
@@ -8,7 +9,6 @@ import Spacer from "react-spacer";
 import { EditIcon, MinusIcon, PlusIcon } from "../assets/Icons";
 import { RecipeImageViewPager } from "../components/RecipeImageViewPager";
 import { TextBullet } from "../components/TextBullet";
-import RestAPI, { Recipe } from "../dao/RestAPI";
 import { MainNavigationProps } from "../navigation/NavigationRoutes";
 import { fetchSingleRecipe } from "../redux/features/recipesSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
@@ -18,13 +18,26 @@ import CentralStyles from "../styles/CentralStyles";
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
 export const RecipeScreen = (props: Props) => {
 
-    var displayedRecipe = useAppSelector(state => state.recipes.recipes.filter(recipe => recipe.id === props.route.params.recipeId)[0]);
-    const [servings, setServings] = useState<number>(displayedRecipe.servings);
-    const { t } = useTranslation("translation");
     const dispatch = useAppDispatch();
+    const focussed = useIsFocused();
+
+    var displayedRecipe = useAppSelector(state => state.recipes.recipes.filter(recipe => recipe.id == props.route.params.recipeId)[0]);
+    const [servings, setServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 0);
+    const { t } = useTranslation("translation");
+
+    useEffect(() => {
+        // Load recipe if recipe id of screen has changed or screen is navigated to
+        dispatch(fetchSingleRecipe(props.route.params.recipeId))
+            .then((result) => {
+                if (result.meta.requestStatus === "rejected") {
+                    // Recipe does not exist, try to go back
+                    props.navigation.goBack();
+                }
+            });
+    }, [props.route.params.recipeId, focussed]);
+
 
     props.navigation.setOptions({ title: displayedRecipe ? displayedRecipe.title : "Loading" });
-    // useLayoutEffect(() => {
 
     props.navigation.setOptions({
         headerRight: () => (
@@ -35,10 +48,7 @@ export const RecipeScreen = (props: Props) => {
                 })} accessoryLeft={<EditIcon />} />
         ),
     });
-    // }, [props.navigation]);
-    useEffect(() => {
-        dispatch(fetchSingleRecipe(props.route.params.recipeId));
-    }, [props.route.params.recipeId]);
+
 
     const theme = useTheme();
 
