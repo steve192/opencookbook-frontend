@@ -28,7 +28,7 @@ const RecipeWizardScreen = (props: Props) => {
     const dispatch = useAppDispatch();
 
     let existingRecipe: Recipe | undefined;
-    if (props.route.params.recipeId) {
+    if (props.route.params?.recipeId) {
         //@ts-ignore never undefined
         existingRecipe = useAppSelector(state => state.recipes.recipes.filter(recipe => recipe.id === props.route.params.recipeId)[0]);
     } else {
@@ -50,7 +50,7 @@ const RecipeWizardScreen = (props: Props) => {
 
 
 
-    props.navigation.setOptions({ title: props.route.params.editing ? t("screens.editRecipe.screenTitleEdit") : t("screens.editRecipe.screenTitleCreate") });
+    props.navigation.setOptions({ title: props.route.params?.editing ? t("screens.editRecipe.screenTitleEdit") : t("screens.editRecipe.screenTitleCreate") });
 
     useLayoutEffect(() => {
 
@@ -242,7 +242,7 @@ const RecipeWizardScreen = (props: Props) => {
                     </View>
                     <Button
                         size="giant"
-                        onPress={() => saveRecipe()}>{props.route.params.editing ? "Save" : "Create"}</Button>
+                        onPress={() => saveRecipe()}>{props.route.params?.editing ? "Save" : "Create"}</Button>
                 </ScrollView>
             </Layout>
         </>
