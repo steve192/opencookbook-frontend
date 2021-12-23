@@ -6,7 +6,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
 import { DeleteIcon, PlusIcon, SaveIcon } from '../../assets/Icons';
 import { RecipeImageViewPager } from '../../components/RecipeImageViewPager';
-import RestAPI, { IngredientUse, Recipe, RecipeGroup } from '../../dao/RestAPI';
+import { IngredientUse, Recipe, RecipeGroup } from '../../dao/RestAPI';
 import { MainNavigationProps } from '../../navigation/NavigationRoutes';
 import { createRecipe, deleteRecipe, updateRecipe } from '../../redux/features/recipesSlice';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';

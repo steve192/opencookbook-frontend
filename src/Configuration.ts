@@ -4,11 +4,10 @@ import { Platform } from 'react-native';
 
 export default class Configuration {
     private static backendURL = "https://opencookbook.sterul.com";
-    private static authToken = "";
 
 
     static async setAuthToken(token: string) {
-        if (Platform.OS == 'web') {
+        if (Platform.OS === 'web') {
             await AsyncStorage.setItem("authToken", token);
             return;
         }
@@ -16,7 +15,7 @@ export default class Configuration {
     }
 
     static async getAuthToken(): Promise<string | null> {
-        if (Platform.OS == 'web') {
+        if (Platform.OS === 'web') {
             return AsyncStorage.getItem("authToken");
         }
         return SecureStore.getItemAsync("authToken");

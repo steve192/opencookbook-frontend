@@ -19,7 +19,7 @@ export const RecipeImageViewPager = (props: Props) => {
     const [shownImageIndex, setShownImageIndex] = useState<number>(0);
 
     const selectImage = async () => {
-        // Ask the user for the permission to access the media library 
+        // Ask the user for the permission to access the media library
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
         if (!permissionResult.granted) {
