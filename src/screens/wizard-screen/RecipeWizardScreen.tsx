@@ -157,20 +157,18 @@ const RecipeWizardScreen = (props: Props) => {
         <CustomCard>
             <Text category="label">{t("screens.editRecipe.ingredients")}</Text>
             {recipeData.neededIngredients.map((neededIngredient, ingredientIndex) =>
-                <>
+                <React.Fragment key={ingredientIndex}>
                     <IngredientFormField
-                        key={ingredientIndex + "ingredient"}
                         ingredient={neededIngredient}
                         onIngredientChange={(ingredient) => changeIngredient(ingredientIndex, ingredient)}
                         onRemovePress={() => removeIngredient(ingredientIndex)} />
                     <Spacer height={10} />
-                </>
+                </React.Fragment>
             )}
             <Spacer height={10} />
             <Button
                 style={{ marginHorizontal: 16 }}
                 size="small"
-                key="addIngredient"
                 accessoryLeft={PlusIcon}
                 onPress={addIngredient} />
         </CustomCard>
@@ -180,20 +178,19 @@ const RecipeWizardScreen = (props: Props) => {
         <CustomCard>
             <Text category="label">{t("screens.editRecipe.preparationSteps")}</Text>
             {recipeData.preparationSteps.map((preparationStep, preparationStepIndex) =>
-                <>
+                <React.Fragment key={preparationStepIndex}>
                     <RecipeFormField
                         onRemovePress={() => removePreparationStep(preparationStepIndex)}
-                        key={preparationStepIndex + "prepstep"}
                         multiline={true}
                         numberOfLines={5}
                         value={recipeData.preparationSteps[preparationStepIndex]}
                         onChangeText={newText => changePreparationStep(newText, preparationStepIndex)}
                         placeholder={t("screens.editRecipe.preparationStepPlaceholder")} />
                     <Spacer height={5} />
-                </>
+                </React.Fragment>
             )}
             <Spacer height={10} />
-            <Button size="small" key="addStep" accessoryLeft={PlusIcon} onPress={addPreparationStep} />
+            <Button size="small" accessoryLeft={PlusIcon} onPress={addPreparationStep} />
         </CustomCard>
 
     const renderGroupSelectionSection = () => (

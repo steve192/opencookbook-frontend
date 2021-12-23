@@ -37,6 +37,7 @@ export const SelectionPopup = (props: Props) => {
 
     const renderListItem = (info: ListRenderItemInfo<ListItemData>) =>
         <ListItem
+            key={info.index}
             title={
                 <Text
                     style={{ fontWeight: info.item.option.newlyCreated ? "bold" : "normal" }}>

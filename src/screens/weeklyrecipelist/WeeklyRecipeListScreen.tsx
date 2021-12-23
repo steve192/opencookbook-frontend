@@ -72,7 +72,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
                 weekdayDate.setDate(weekdayDate.getDate() + weekdayIndex);
                 const existingWeekplanDay = weekplanDays.filter(weekplanDay => weekplanDay.day === weekdayDate.toString("yyyy-MM-dd"))[0];
                 return (
-                    <CustomCard style={{ marginVertical: 5 }}>
+                    <CustomCard key={weekdayIndex} style={{ marginVertical: 5 }}>
                         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                             <Text style={styles.weekTitle}>{weekday} {weekdayDate.toLocaleDateString()}</Text>
                             <Button
@@ -87,8 +87,9 @@ export const WeeklyRecipeListScreen = (props: Props) => {
                         </View>
                         <SideScroller>
                             {weekplanDays.filter(weekplanDay => weekplanDay.day === weekdayDate.toString("yyyy-MM-dd")).map(weekplanDay => (
-                                weekplanDay.recipes.map(recipe => (
+                                weekplanDay.recipes.map((recipe, index) => (
                                     <WeeklyRecipeCard
+                                        key={weekplanDay.day + index}
                                         onPress={() => openRecipe(recipe.id)}
                                         title={recipe.title}
                                         imageUuid={recipe.titleImageUuid} />

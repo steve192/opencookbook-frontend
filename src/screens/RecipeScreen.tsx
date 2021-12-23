@@ -58,8 +58,8 @@ export const RecipeScreen = (props: Props) => {
             <Text category="label">{t("screens.recipe.ingredients")}</Text>
             {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                {displayedRecipe?.neededIngredients.map(ingredient =>
-                    <>
+                {displayedRecipe?.neededIngredients.map((ingredient, index) =>
+                    <React.Fragment key={index}>
                         <Divider />
                         <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row' }}>
                             <Text
@@ -73,7 +73,7 @@ export const RecipeScreen = (props: Props) => {
 
                             <Text style={{ flex: 4, alignSelf: 'stretch' }} >{ingredient.ingredient.name}</Text>
                         </View>
-                    </>
+                    </React.Fragment>
                 )}
             </View>
             <Spacer height={20} />
@@ -105,14 +105,14 @@ export const RecipeScreen = (props: Props) => {
             <Text category="label">{t("screens.recipe.preparationSteps")}</Text>
             <Spacer height={20} />
             {displayedRecipe && displayedRecipe.preparationSteps.map((preparationStep, index) => (
-                <>
+                <React.Fragment key={index}>
                     <Divider />
                     <View style={{ flexDirection: "row", alignItems: "center", paddingVertical: 10 }}>
                         <TextBullet
                             value={(index + 1).toString()} />
                         <Text style={{ flex: 1 }}>{preparationStep}</Text>
                     </View>
-                </>
+                </React.Fragment>
             ))}
         </>
     );
