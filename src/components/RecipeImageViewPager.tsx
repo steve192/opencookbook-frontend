@@ -35,6 +35,7 @@ export const RecipeImageViewPager = (props: Props) => {
             props.onImageAdded?.(uuid);
         }).catch((error) => {
             //TODO: Error handling
+            console.error(error);
             alert("Error uploading picture");
         });
     };

@@ -91,7 +91,7 @@ const RecipeWizardScreen = (props: Props) => {
     }
 
     const addRecipeImage = (uuid: string) => {
-        let images = recipeData.images;
+        let images = [...recipeData.images];
         images.push({ uuid })
         setRecipeData({ ...recipeData, images: images })
     }
