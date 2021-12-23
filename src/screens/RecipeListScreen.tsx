@@ -81,12 +81,7 @@ const RecipeListScreen = (props: Props) => {
         props.navigation.navigate("ImportScreen", {});
         break;
       case 'addRecipe':
-        props.navigation.navigate("RecipeWizardScreen", {
-          onRecipeChanged: () => {
-            dispatch(fetchMyRecipes());
-            dispatch(fetchMyRecipeGroups());
-          }
-        });
+        props.navigation.navigate("RecipeWizardScreen", {});
         break;
       case 'addRecipeGroup':
         props.navigation.navigate("RecipeGroupEditScreen", {
@@ -106,10 +101,7 @@ const RecipeListScreen = (props: Props) => {
   const openRecipe = (recipe: Recipe) => {
     if (recipe.id) {
       props.navigation.push("RecipeScreen", {
-        recipeId: recipe.id,
-        onRecipeChanged: () => {
-          dispatch(fetchMyRecipes());
-        }
+        recipeId: recipe.id
       });
     }
   }
