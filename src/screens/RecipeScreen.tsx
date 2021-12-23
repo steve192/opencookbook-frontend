@@ -62,7 +62,15 @@ export const RecipeScreen = (props: Props) => {
                     <>
                         <Divider />
                         <View style={{ flex: 1, alignSelf: 'stretch', flexDirection: 'row' }}>
-                            <Text style={{ flex: 2, alignSelf: 'stretch', color: theme["color-primary-default"], fontWeight: "bold" }}>{`${scaleIngredient(ingredient.amount)} ${ingredient.unit}`}</Text>
+                            <Text
+                                style={{
+                                    flex: 2,
+                                    alignSelf: 'stretch',
+                                    color: theme["color-primary-default"],
+                                    fontWeight: "bold"
+                                }}>{ingredient.amount > 0 ? `${scaleIngredient(ingredient.amount)} ${ingredient.unit}` : ""}
+                            </Text>
+
                             <Text style={{ flex: 4, alignSelf: 'stretch' }} >{ingredient.ingredient.name}</Text>
                         </View>
                     </>
