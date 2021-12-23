@@ -1,6 +1,6 @@
 import { HeaderHeightContext } from '@react-navigation/elements';
 import { Layout } from "@ui-kitten/components";
-import React from "react";
+import React, { useState } from "react";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
 import { RecipeList } from "../../components/RecipeList";
 import { Recipe, RecipeGroup } from '../../dao/RestAPI';
@@ -12,8 +12,10 @@ interface Props {
 }
 
 export const RecipeSelectionPopup = (props: Props) => {
+
+    const [shownRecipeGroup, setShownRecipeGroup] = useState<RecipeGroup>();
     const onRecipeGroupSelected = (recipeGroup: RecipeGroup) => {
-        //TODO: Implement
+        setShownRecipeGroup(recipeGroup);
     }
 
     return (
@@ -35,7 +37,7 @@ export const RecipeSelectionPopup = (props: Props) => {
                                     {/*headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
                                     <Layout style={[{ flex: 1, marginTop: (headerHeight / 2), width: "100%" }, styles.modalView]}>
                                         <RecipeList
-                                            shownRecipeGroup={undefined}
+                                            shownRecipeGroup={shownRecipeGroup}
                                             onRecipeClick={props.onRecipeSelected}
                                             onRecipeGroupClick={onRecipeGroupSelected} />
                                     </Layout>
