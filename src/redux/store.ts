@@ -1,9 +1,9 @@
-import { configureStore } from '@reduxjs/toolkit'
-import authSlice from './features/authSlice'
-import imagesSlice from './features/imagesSlice'
-import recipesSlice from './features/recipesSlice'
-import settingsSlice from './features/settingsSlice'
-import weeklyRecipesSlice from './features/weeklyRecipesSlice'
+import {configureStore} from '@reduxjs/toolkit';
+import authSlice from './features/authSlice';
+import imagesSlice from './features/imagesSlice';
+import recipesSlice from './features/recipesSlice';
+import settingsSlice from './features/settingsSlice';
+import weeklyRecipesSlice from './features/weeklyRecipesSlice';
 
 export const store = configureStore({
   reducer: {
@@ -11,9 +11,9 @@ export const store = configureStore({
     settings: settingsSlice,
     weeklyRecipes: weeklyRecipesSlice,
     recipes: recipesSlice,
-    images: imagesSlice
+    images: imagesSlice,
   },
-})
+});
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>

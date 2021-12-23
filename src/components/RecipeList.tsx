@@ -28,6 +28,10 @@ export const RecipeList = (props: Props) => {
 
   const numberOfColumns = Math.ceil(componentWidth / 300);
 
+  const refreshData = () => {
+    dispatch(fetchMyRecipes());
+    dispatch(fetchMyRecipeGroups());
+  };
   useEffect(refreshData, []);
 
 
@@ -113,10 +117,7 @@ export const RecipeList = (props: Props) => {
       return myRecipes.filter((recipe) => recipe.recipeGroups.filter((group) => group.id === props.shownRecipeGroup?.id).length > 0);
     }
   };
-  function refreshData() {
-    dispatch(fetchMyRecipes());
-    dispatch(fetchMyRecipeGroups());
-  }
+
 
   return (
         getShownItems().length > 0 ?

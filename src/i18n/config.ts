@@ -1,6 +1,6 @@
 import * as Localization from 'expo-localization';
 import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import {initReactI18next} from 'react-i18next';
 import de from './de.json';
 import en from './en.json';
 
@@ -9,13 +9,13 @@ export const resources = {
     translation: en,
   },
   de: {
-    translation: de
-  }
+    translation: de,
+  },
 } as const;
 
-const locale = Localization.locale.split("-")[0];
+const locale = Localization.locale.split('-')[0];
 
-console.debug("Detected locale", locale);
+console.debug('Detected locale', locale);
 i18n.use(initReactI18next).init({
   lng: locale,
   interpolation: {

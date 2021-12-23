@@ -1,4 +1,4 @@
-import { Icon, IconElement, IconProps } from '@ui-kitten/components';
+import {Icon, IconElement, IconProps} from '@ui-kitten/components';
 import React from 'react';
 
 export const CloseIcon = (style: IconProps): IconElement => (

@@ -1,4 +1,4 @@
-import { Recipe, RecipeGroup } from "../dao/RestAPI";
+import {Recipe, RecipeGroup} from '../dao/RestAPI';
 
 
 export type LoginNavigationProps = {
