@@ -1,12 +1,13 @@
 import { Spinner } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
-import { Image, Platform, StyleSheet, View } from 'react-native';
+import { Image, Platform, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { fetchSingleImage } from '../redux/features/imagesSlice';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
 
 interface Props {
     uuid?: string
     forceFitScaling?: boolean
+    blurredMode?: boolean
 }
 export const RecipeImageComponent = (props: Props) => {
 
@@ -31,16 +32,20 @@ export const RecipeImageComponent = (props: Props) => {
 
     const resizeMode = Platform.OS === "web" && !props.forceFitScaling ? 'center' : 'cover';
 
+
     return (
-        <>
+        <View style={[styles.recipeImage]}>
             <Image
+                blurRadius={props.blurredMode ? 2 : undefined}
                 source={imageData ? { uri: imageData } : require('../../assets/placeholder.png')}
-                style={[styles.recipeImage, { resizeMode: resizeMode }]} />
+                style={[styles.recipeImage, { resizeMode: resizeMode }]} >
+            </Image>
             {requestPending &&
                 <View style={styles.loadingSpinner}>
                     <Spinner size="giant" />
                 </View>}
-        </>
+
+        </View>
     )
 }
 
@@ -60,6 +65,7 @@ const styles = StyleSheet.create({
     recipeImage: {
         width: "100%",
         height: "100%",
+        flex: 1
 
     },
 });

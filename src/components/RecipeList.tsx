@@ -1,9 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Card, Layout, List, Text, useTheme } from "@ui-kitten/components";
+import { Layout, List, Text, useTheme } from "@ui-kitten/components";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ListRenderItemInfo, Pressable, StyleSheet, View, ViewProps } from "react-native";
-import { FolderIcon } from "../assets/Icons";
 import { Recipe, RecipeGroup } from "../dao/RestAPI";
 import { fetchMyRecipeGroups, fetchMyRecipes } from "../redux/features/recipesSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
@@ -47,23 +46,41 @@ export const RecipeList = (props: Props) => {
         );
     }
     const createRecipeGroupListItem = (recipeGroup: RecipeGroup) => {
+        const firstFewGroupRecipes = myRecipes.filter(recipe => recipe.recipeGroups.find(group => group.id === recipeGroup.id)).splice(0, 4);
         return (
-            <Card
-                style={[styles.recipeGroupCard, { flex: 1 / numberOfColumns }]}
-                status='basic'
-                onPress={() => props.onRecipeGroupClick(recipeGroup)}
-                footer={headerProps => renderRecipeGroupTitle(headerProps, recipeGroup.title)}
-                header={
-                    <View>
-                        <View style={{ flexDirection: "row", justifyContent: "center" }}>
-                            <FolderIcon width={32} height={32} />
-                        </View>
-                    </View>}
-            >
-                <Layout style={{ height: 180 }}>
-
+            <Pressable
+                style={[
+                    styles.recipeCard,
+                    {
+                        flex: 1 / numberOfColumns,
+                        borderRadius: 16,
+                        minHeight: 240,
+                        overflow: "hidden"
+                    }]}
+                onPress={() => props.onRecipeGroupClick(recipeGroup)}>
+                <Layout style={{ flex: 1, height: "100%", flexWrap: "wrap" }}>
+                    {firstFewGroupRecipes.map((recipe) =>
+                        <RecipeImageComponent
+                            blurredMode={true}
+                            key={recipe.id}
+                            forceFitScaling={true}
+                            uuid={recipe.images.length > 0 ? recipe.images[0].uuid : undefined} />
+                    )}
                 </Layout>
-            </Card >)
+                <View style={{ padding: 16, backgroundColor: "rgba(0,0,0,0.3)", position: "absolute", width: "100%", height: "100%" }} >
+                    <Text
+                        category={"h4"}
+                        style={{
+                            fontWeight: "bold",
+                            position: "absolute",
+                            color: theme["text-alternate-color"]
+                        }}>
+                        {recipeGroup.title}
+                    </Text>
+                </View>
+            </Pressable>
+
+        )
     }
 
     const renderItem = (info: ListRenderItemInfo<Recipe | RecipeGroup>): JSX.Element => {
@@ -79,13 +96,6 @@ export const RecipeList = (props: Props) => {
         <Text numberOfLines={2} style={{ height: 60, padding: 10, fontWeight: "bold" }} >
             {title}
         </Text>
-    );
-    const renderRecipeGroupTitle = (headerProps: ViewProps | undefined, title: string) => (
-        <View style={{ padding: 10, flexDirection: "row", alignItems: "center" }}>
-            <Text numberOfLines={1} style={{ fontWeight: "bold" }} >
-                {title}
-            </Text>
-        </View>
     );
 
     const renderNoItemsNotice = () => (
