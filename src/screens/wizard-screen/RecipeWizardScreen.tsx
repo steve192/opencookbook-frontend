@@ -154,7 +154,7 @@ const RecipeWizardScreen = (props: Props) => {
     }
 
     const renderIngredientsSection = () =>
-        <CustomCard>
+        <>
             <Text category="label">{t("screens.editRecipe.ingredients")}</Text>
             {recipeData.neededIngredients.map((neededIngredient, ingredientIndex) =>
                 <React.Fragment key={ingredientIndex}>
@@ -171,11 +171,11 @@ const RecipeWizardScreen = (props: Props) => {
                 size="small"
                 accessoryLeft={PlusIcon}
                 onPress={addIngredient} />
-        </CustomCard>
+        </>
 
 
     const renderPreparationStepsSection = () =>
-        <CustomCard>
+        <>
             <Text category="label">{t("screens.editRecipe.preparationSteps")}</Text>
             {recipeData.preparationSteps.map((preparationStep, preparationStepIndex) =>
                 <React.Fragment key={preparationStepIndex}>
@@ -191,15 +191,15 @@ const RecipeWizardScreen = (props: Props) => {
             )}
             <Spacer height={10} />
             <Button size="small" accessoryLeft={PlusIcon} onPress={addPreparationStep} />
-        </CustomCard>
+        </>
 
     const renderGroupSelectionSection = () => (
-        <CustomCard>
+        <>
             <Text category="label">{t("screens.editRecipe.recipeGroups")}</Text>
             <RecipeGroupFormField
                 recipeGroup={recipeData.recipeGroups?.[0]}
                 onRecipeGroupChange={setRecipeGroup} />
-        </CustomCard>
+        </>
     )
 
     return (
@@ -214,30 +214,25 @@ const RecipeWizardScreen = (props: Props) => {
                         allowEdit={true}
                     />
                     <View style={[CentralStyles.contentContainer, CentralStyles.elementSpacing]}>
-                        <CustomCard>
-                            <Text category="label">{t("screens.editRecipe.title")}</Text>
-                            <Input
-                                value={recipeData.title}
-                                onChangeText={(newText) => setRecipeData({ ...recipeData, title: newText })}
-                                placeholder="Name" />
-                        </CustomCard>
-                        <Spacer height={15} />
+                        <Text category="label">{t("screens.editRecipe.title")}</Text>
+                        <Input
+                            value={recipeData.title}
+                            onChangeText={(newText) => setRecipeData({ ...recipeData, title: newText })}
+                            placeholder="Name" />
+                        <Divider style={{ marginVertical: 10 }} />
                         {renderIngredientsSection()}
                         <Divider style={{ marginVertical: 10 }} />
                         <Spacer height={15} />
-                        <CustomCard>
-                            <Text category="label">{t("screens.editRecipe.servings")}</Text>
-                            <Input
-                                placeholder="Serving size"
-                                keyboardType='numeric'
-                                value={recipeData.servings?.toString()}
-                                //@ts-ignore
-                                onChangeText={(newText) => setRecipeData({ ...recipeData, servings: parseInt(newText) ? parseInt(newText) : undefined })} />
-                        </CustomCard>
+                        <Text category="label">{t("screens.editRecipe.servings")}</Text>
+                        <Input
+                            placeholder="Serving size"
+                            keyboardType='numeric'
+                            value={recipeData.servings?.toString()}
+                            //@ts-ignore
+                            onChangeText={(newText) => setRecipeData({ ...recipeData, servings: parseInt(newText) ? parseInt(newText) : undefined })} />
                         <Divider style={{ marginVertical: 10 }} />
-                        <Spacer height={15} />
                         {renderPreparationStepsSection()}
-                        <Spacer height={15} />
+                        <Divider style={{ marginVertical: 10 }} />
                         {renderGroupSelectionSection()}
                     </View>
                     <Button
