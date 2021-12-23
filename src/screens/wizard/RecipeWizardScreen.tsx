@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Spacer from 'react-spacer';
 import { DeleteIcon, PlusIcon, SaveIcon } from '../../assets/Icons';
-import { CustomCard } from '../../components/CustomCard';
 import { RecipeImageViewPager } from '../../components/RecipeImageViewPager';
 import RestAPI, { IngredientUse, Recipe, RecipeGroup } from '../../dao/RestAPI';
 import { MainNavigationProps } from '../../navigation/NavigationRoutes';

@@ -18,7 +18,7 @@ import RecipeListScreen from '../screens/RecipeListScreen';
 import { RecipeScreen } from '../screens/RecipeScreen';
 import { SettingsScreen } from '../screens/SettingsScreen';
 import { WeeklyRecipeListScreen } from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
-import RecipeWizardScreen from '../screens/wizard-screen/RecipeWizardScreen';
+import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 
 
 
