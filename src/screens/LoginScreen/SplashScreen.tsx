@@ -15,7 +15,6 @@ export const SplashScreen = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        // Load application data
         (async () => {
             // Check for new app versions
             try {
@@ -27,11 +26,10 @@ export const SplashScreen = () => {
                     console.log("Dowload update");
                     setStatusText("Downloading new app version...");
                     await Updates.fetchUpdateAsync();
-                    // TODO: ... notify user of update ...
                     Updates.reloadAsync();
                 }
             } catch (e) {
-                // handle or log error
+                // TODO: handle or log error
             }
 
             try {
