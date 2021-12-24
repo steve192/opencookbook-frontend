@@ -19,6 +19,7 @@ export const RecipeList = (props: Props) => {
   const listRefreshing = useAppSelector((state) => state.recipes.pendingRequests > 0);
 
   const [componentWidth, setComponentWith] = useState<number>(1);
+  const [columndDetermined, setColumnsDetermined] = useState(false);
 
   const {t} = useTranslation('translation');
   const theme = useTheme();
@@ -112,6 +113,10 @@ export const RecipeList = (props: Props) => {
     </View>
   );
   const getShownItems = (): (RecipeGroup | Recipe)[] => {
+    if (!columndDetermined) {
+      // Avoid flickering: don't render items until the amount of columns is determined
+      return [];
+    }
     if (!props.shownRecipeGroup) {
       return [...myRecipeGroups, ...myRecipes.filter((recipe) => recipe.recipeGroups.length === 0)];
     } else {
@@ -121,19 +126,26 @@ export const RecipeList = (props: Props) => {
 
 
   return (
-        getShownItems().length > 0 ?
-            <List
-              onLayout={(event) => setComponentWith(event.nativeEvent.layout.width)}
-              key={numberOfColumns} // To force re render when number of columns changes
-              style={styles.container}
-              contentContainerStyle={styles.contentContainer}
-              data={getShownItems()}
-              numColumns={numberOfColumns}
-              renderItem={renderItem}
-              refreshing={listRefreshing}
-              onRefresh={refreshData}
-            /> :
-            renderNoItemsNotice()
+    <View
+      style={styles.container}
+      onLayout={(event) => {
+        setComponentWith(event.nativeEvent.layout.width);
+        setColumnsDetermined(true);
+      }}>
+
+      {getShownItems().length > 0 ?
+          <List
+            key={numberOfColumns} // To force re render when number of columns changes
+            style={styles.container}
+            contentContainerStyle={styles.contentContainer}
+            data={getShownItems()}
+            numColumns={numberOfColumns}
+            renderItem={renderItem}
+            refreshing={listRefreshing}
+            onRefresh={refreshData}
+          /> :
+            renderNoItemsNotice()}
+    </View>
   );
 };
 
