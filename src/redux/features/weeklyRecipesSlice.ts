@@ -38,6 +38,8 @@ export const weeklyRecipesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchWeekplanDays.fulfilled, (state, action) => {
+      // Remove if already existing
+      state.weekplanDays = state.weekplanDays.filter((weekplanDay) => !action.payload.find((newWeekplanDay) => newWeekplanDay.day === weekplanDay.day));
       state.weekplanDays = state.weekplanDays.concat(action.payload);
     });
     builder.addCase(updateSingleWeekplanDay.fulfilled, (state, action) => {

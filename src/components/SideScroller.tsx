@@ -100,11 +100,11 @@ export const SideScroller = (props: ScrollViewProps) => {
                   style={{
                     position: 'absolute',
                     right: 0,
-                    width: 80,
+                    width: 40,
                     height: '100%',
                   }} >
                   <LinearGradient
-                    colors={['rgba(0,0,0,0.4)', 'transparent']}
+                    colors={['rgba(0,0,0,0.3)', 'transparent']}
                     start={[1, 0]}
                     end={[0, 0]}
                     style={{'width': '100%', 'height': '100%'}}
@@ -117,11 +117,11 @@ export const SideScroller = (props: ScrollViewProps) => {
                   style={{
                     position: 'absolute',
                     left: 0,
-                    width: 80,
+                    width: 40,
                     height: '100%',
                   }} >
                   <LinearGradient
-                    colors={['transparent', 'rgba(0,0,0,0.4)']}
+                    colors={['transparent', 'rgba(0,0,0,0.3)']}
                     start={[1, 0]}
                     end={[0, 0]}
                     style={{'width': '100%', 'height': '100%'}}

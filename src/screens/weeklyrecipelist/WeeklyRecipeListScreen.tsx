@@ -52,6 +52,12 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     dispatch(updateSingleWeekplanDay(newWeekplanDay));
     setRecipeSelectionVisible(false);
   };
+  const removeRecipeFromWeekplanDay = (recipeId: number, weekplanDay: WeekplanDay) => {
+    const newWeekplanDay = {...weekplanDay, recipes: [...weekplanDay.recipes]};
+    newWeekplanDay.recipes = newWeekplanDay.recipes.filter((existingRecipe) => existingRecipe.id !== recipeId);
+    dispatch(updateSingleWeekplanDay(newWeekplanDay));
+    setRecipeSelectionVisible(false);
+  };
 
   const openRecipe = (recipeId: number) => {
     props.navigation.navigate('RecipeScreen', {recipeId});
@@ -91,6 +97,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
                     <WeeklyRecipeCard
                       key={weekplanDay.day + index}
                       onPress={() => openRecipe(recipe.id)}
+                      onRemovePress={() => removeRecipeFromWeekplanDay(recipe.id, weekplanDay)}
                       title={recipe.title}
                       imageUuid={recipe.titleImageUuid} />
                   ))
