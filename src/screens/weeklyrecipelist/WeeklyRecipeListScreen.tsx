@@ -1,12 +1,13 @@
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
-import {Button, Layout, Text} from '@ui-kitten/components';
+import {Button, Divider, Layout, Text} from '@ui-kitten/components';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useDispatch} from 'react-redux';
+import Spacer from 'react-spacer';
 import XDate from 'xdate';
 import {PlusIcon} from '../../assets/Icons';
 import {CustomCard} from '../../components/CustomCard';
@@ -112,12 +113,16 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     <>
       <Layout style={CentralStyles.fullscreen}>
         <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
+          <Divider style={{marginVertical: 25}}/>
           <Text category="h5">{t('screens.weekplan.currentWeek')}</Text>
           {renderWeek(getCurrentWeekNumber(now), now.getFullYear())}
+          <Divider style={{marginVertical: 25}}/>
           <Text category="h5">{t('screens.weekplan.nextWeek')}</Text>
           {renderWeek(getCurrentWeekNumber(now) + 1, now.getFullYear())}
+          <Divider style={{marginVertical: 25}}/>
           <Text category="h5">{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 2}</Text>
           {renderWeek(getCurrentWeekNumber(now) + 2, now.getFullYear())}
+          <Divider style={{marginVertical: 25}}/>
           <Text category="h5">{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 3}</Text>
           {renderWeek(getCurrentWeekNumber(now) + 3, now.getFullYear())}
         </ScrollView>
