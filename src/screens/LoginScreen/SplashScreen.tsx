@@ -1,4 +1,4 @@
-import {Spinner, Text} from '@ui-kitten/components';
+import {Spinner, Text, useTheme} from '@ui-kitten/components';
 import * as Updates from 'expo-updates';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
@@ -12,6 +12,7 @@ import {LoginBackdrop} from './LoginBackdrop';
 export const SplashScreen = () => {
   const [statusText, setStatusText] = useState('');
   const dispatch = useDispatch();
+  const theme= useTheme();
 
   useEffect(() => {
     (async () => {
@@ -55,7 +56,7 @@ export const SplashScreen = () => {
             alignItems: 'center',
           }}>
             <Spinner />
-            <Text>{statusText}</Text>
+            <Text style={{color: theme['text-alternate-color']}}>{statusText}</Text>
           </View>
         </View>
       </View>
