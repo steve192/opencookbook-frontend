@@ -21,12 +21,13 @@ import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeLi
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 
 
+const Stack = createNativeStackNavigator();
+const BottomTab = createBottomTabNavigator();
 const MainNavigation = () => {
   const theme = useTheme();
   const loggedIn = useAppSelector((state) => state.auth.loggedIn);
   const isLoading = useAppSelector((state) => state.auth.isLoading);
 
-  const Stack = createNativeStackNavigator();
 
   const {t} = useTranslation('translation');
 
@@ -107,7 +108,6 @@ const MainNavigation = () => {
     );
   };
 
-  const BottomTab = createBottomTabNavigator();
 
   const BottomTabBar = (props: BottomTabBarProps) => (
     <>
@@ -163,6 +163,7 @@ const MainNavigation = () => {
 
   return (
     <NavigationContainer
+
       linking={{
 
         prefixes: [createURL('/')],
