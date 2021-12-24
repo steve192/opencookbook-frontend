@@ -16,7 +16,7 @@ interface Props {
     onValueChanged?: (newValue: Option) => void,
     placeholder?: string,
     allowAdditionalValues?: boolean,
-    style: StyleProp<ViewStyle>
+    style?: StyleProp<ViewStyle>
 }
 
 interface ListItemData {
