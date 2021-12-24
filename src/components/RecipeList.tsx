@@ -71,10 +71,11 @@ export const RecipeList = (props: Props) => {
               uuid={recipe.images.length > 0 ? recipe.images[0].uuid : undefined} />,
           )}
         </Layout>
-        <View style={{padding: 16, backgroundColor: 'rgba(0,0,0,0.3)', position: 'absolute', width: '100%', height: '100%'}} >
+        <View style={{backgroundColor: 'rgba(0,0,0,0.3)', position: 'absolute', width: '100%', height: '100%'}} >
           <Text
             category={'h4'}
             style={{
+              padding: 16,
               fontWeight: 'bold',
               position: 'absolute',
               color: theme['text-alternate-color'],

@@ -31,11 +31,13 @@ export const RecipeImageComponent = (props: Props) => {
 
   const resizeMode = Platform.OS === 'web' && !props.forceFitScaling ? 'center' : 'cover';
 
+  // Blurring is stronger on web, compensate
+  const blurAmount = Platform.OS === 'web' ? 2 : 10;
 
   return (
     <View style={[styles.recipeImage]}>
       <Image
-        blurRadius={props.blurredMode ? 2 : undefined}
+        blurRadius={props.blurredMode ? blurAmount : undefined}
         source={imageData ? {uri: imageData} : require('../../assets/placeholder.png')}
         style={[styles.recipeImage, {resizeMode: resizeMode}]} >
       </Image>
