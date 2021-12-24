@@ -75,8 +75,8 @@ export const recipesSlice = createSlice({
           state.pendingRequests++;
         })
         .addCase(fetchMyRecipes.fulfilled, (state, action) => {
-          state.recipes = action.payload;
           state.pendingRequests--;
+          state.recipes = action.payload;
         })
         .addCase(fetchMyRecipes.rejected, (state) => {
           state.pendingRequests--;
@@ -87,6 +87,7 @@ export const recipesSlice = createSlice({
           state.pendingRequests++;
         })
         .addCase(fetchMyRecipeGroups.fulfilled, (state, action) => {
+          state.pendingRequests--;
           state.recipeGroups = action.payload;
         })
         .addCase(fetchMyRecipeGroups.rejected, (state, action) => {
@@ -98,6 +99,7 @@ export const recipesSlice = createSlice({
           state.pendingRequests++;
         })
         .addCase(fetchSingleRecipe.fulfilled, (state, action) => {
+          state.pendingRequests--;
           if (!state.recipes.find((recipe) => recipe.id === action.meta.arg)) {
             // Newly added
             state.recipes.push(action.payload);
@@ -118,6 +120,7 @@ export const recipesSlice = createSlice({
           state.pendingRequests++;
         })
         .addCase(createRecipe.fulfilled, (state, action) => {
+          state.pendingRequests--;
           state.recipes.push(action.payload);
         })
         .addCase(createRecipe.rejected, (state, action) => {
@@ -129,6 +132,7 @@ export const recipesSlice = createSlice({
           state.pendingRequests++;
         })
         .addCase(deleteRecipe.fulfilled, (state, action) => {
+          state.pendingRequests--;
           state.recipes.forEach((recipe, index) => {
             if (recipe.id === action.meta.arg.id) {
               state.recipes.splice(index, 1);
@@ -144,6 +148,7 @@ export const recipesSlice = createSlice({
           state.pendingRequests++;
         })
         .addCase(updateRecipe.fulfilled, (state, action) => {
+          state.pendingRequests--;
           state.recipes.forEach((recipe, index) => {
             if (recipe.id === action.meta.arg.id) {
               state.recipes[index] = action.payload;
