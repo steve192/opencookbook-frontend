@@ -7,6 +7,7 @@ import {StyleSheet, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import Spacer from 'react-spacer';
 import {EditIcon, MinusIcon, PlusIcon} from '../assets/Icons';
+import {ChunkView} from '../ChunkView';
 import {RecipeImageViewPager} from '../components/RecipeImageViewPager';
 import {TextBullet} from '../components/TextBullet';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
@@ -24,6 +25,7 @@ export const RecipeScreen = (props: Props) => {
   const [servings, setServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 0);
   const {t} = useTranslation('translation');
 
+
   useEffect(() => {
     // Load recipe if recipe id of screen has changed or screen is navigated to
     dispatch(fetchSingleRecipe(props.route.params.recipeId))
@@ -33,21 +35,20 @@ export const RecipeScreen = (props: Props) => {
             props.navigation.goBack();
           }
         });
+
+
+    props.navigation.setOptions({title: displayedRecipe ? displayedRecipe.title : 'Loading'});
+
+    props.navigation.setOptions({
+      headerRight: () => (
+        <Button
+          onPress={() => props.navigation.navigate('RecipeWizardScreen', {
+            editing: true,
+            recipeId: displayedRecipe.id,
+          })} accessoryLeft={<EditIcon />} />
+      ),
+    });
   }, [props.route.params.recipeId, focussed]);
-
-
-  props.navigation.setOptions({title: displayedRecipe ? displayedRecipe.title : 'Loading'});
-
-  props.navigation.setOptions({
-    headerRight: () => (
-      <Button
-        onPress={() => props.navigation.navigate('RecipeWizardScreen', {
-          editing: true,
-          recipeId: displayedRecipe.id,
-        })} accessoryLeft={<EditIcon />} />
-    ),
-  });
-
 
   const theme = useTheme();
 
@@ -62,7 +63,7 @@ export const RecipeScreen = (props: Props) => {
     return Math.round(originalAmount * getServingMultiplier() * 10) / 10;
   };
 
-  const renderIngredientsSection = () => (
+  const renderIngredientsSection = () =>
     <>
       <Text category="label">{t('screens.recipe.ingredients')}</Text>
       {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
@@ -105,9 +106,9 @@ export const RecipeScreen = (props: Props) => {
           onPress={() => setServings(servings + 1)}
           accessoryLeft={<PlusIcon />} />
       </View>
-      {/* </View> */}
-    </>
-  );
+    </>;
+  ;
+
 
   const renderStepsSection = () => (
     <>
@@ -128,8 +129,8 @@ export const RecipeScreen = (props: Props) => {
 
 
   return (
-    <>
-      {/* <StatusBar /> */}
+
+    <ChunkView>
       <Layout style={CentralStyles.fullscreen}>
         <ScrollView>
           <RecipeImageViewPager
@@ -148,7 +149,8 @@ export const RecipeScreen = (props: Props) => {
           </View>
         </ScrollView>
       </Layout>
-    </>
+      <Text/>
+    </ChunkView>
   );
 };
 

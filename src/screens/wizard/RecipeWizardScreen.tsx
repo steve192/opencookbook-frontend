@@ -14,6 +14,7 @@ import CentralStyles from '../../styles/CentralStyles';
 import {IngredientFormField} from './IngridientFromField';
 import {RecipeFormField} from './PreparationStepFormField';
 import {RecipeGroupFormField} from './RecipeGroupFormField';
+import {ChunkView} from '../../ChunkView';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeWizardScreen'>;
@@ -44,10 +45,9 @@ const RecipeWizardScreen = (props: Props) => {
             });
 
 
-  props.navigation.setOptions({title: props.route.params?.editing ? t('screens.editRecipe.screenTitleEdit') : t('screens.editRecipe.screenTitleCreate')});
-
   useLayoutEffect(() => {
     props.navigation.setOptions({
+      title: props.route.params?.editing ? t('screens.editRecipe.screenTitleEdit') : t('screens.editRecipe.screenTitleCreate'),
       headerRight: () => (
         <>
           <Button onPress={() => onDeleteRecipe()} accessoryLeft={<DeleteIcon fill={theme['color-danger-default']} />} />
@@ -193,8 +193,8 @@ const RecipeWizardScreen = (props: Props) => {
   );
 
   return (
-    <>
-      <Layout style={styles.contentContainer}>
+    <Layout style={styles.contentContainer}>
+      <ChunkView>
         <ScrollView
           keyboardShouldPersistTaps='handled'>
           <RecipeImageViewPager
@@ -204,6 +204,7 @@ const RecipeWizardScreen = (props: Props) => {
             allowEdit={true}
           />
           <View style={[CentralStyles.contentContainer, CentralStyles.elementSpacing]}>
+
             <Text category="label">{t('screens.editRecipe.title')}</Text>
             <Input
               value={recipeData.title}
@@ -229,8 +230,8 @@ const RecipeWizardScreen = (props: Props) => {
             size="giant"
             onPress={() => saveRecipe()}>{props.route.params?.editing ? 'Save' : 'Create'}</Button>
         </ScrollView>
-      </Layout>
-    </>
+      </ChunkView>
+    </Layout>
   );
 };
 
