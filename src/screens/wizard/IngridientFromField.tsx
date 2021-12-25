@@ -77,6 +77,7 @@ export const IngredientFormField = (props: Props) => {
             <View style={{flex: 1, flexDirection: 'row'}}>
               <Input
                 style={{width: 100}}
+                keyboardType="numeric"
                 value={(amount ? amount.toString() : '')}
                 placeholder={t('screens.editRecipe.amount')}
                 onChangeText={onAmountChange} />

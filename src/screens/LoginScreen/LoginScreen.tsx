@@ -59,7 +59,7 @@ const LoginScreen = ({route, navigation}: Props) => {
       <View style={styles.loginContainer}>
         <View style={styles.innerLoginContainer}>
           <Text style={styles.title}>OpenCookbook</Text>
-          <Input value={email} onChangeText={(text) => setEmail(text)} placeholder="E-Mail"></Input>
+          <Input value={email} keyboardType='email-address' onChangeText={(text) => setEmail(text)} placeholder="E-Mail"></Input>
           <Spacer height={10} />
           <Input value={password} onChangeText={(text) => setPassword(text)} placeholder="Password" secureTextEntry={true} />
           <View style={styles.forgotPasswordContainer}>
