@@ -152,6 +152,7 @@ export const RecipeList = (props: Props) => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+    height: '100%',
   },
   contentContainer: {
     // paddingHorizontal: 8,
