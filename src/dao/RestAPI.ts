@@ -45,6 +45,9 @@ export interface WeekplanDay {
     day: string,
     recipes: WeekplanDayRecipeInfo[]
 }
+/**
+ * RESTApi for communication with opencookbook backend
+ */
 class RestAPI {
   static async setWeekplanRecipes(date: string, recipeIds: number[]): Promise<WeekplanDay> {
     const response = await axios.put(this.url(`/weekplan/${date}`), {recipeIds}, await this.axiosConfig());

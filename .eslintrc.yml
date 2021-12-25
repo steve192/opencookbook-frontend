@@ -16,3 +16,4 @@ plugins:
 rules:
   max-len: off
   react/prop-types: off
+  require-jsdoc: off
