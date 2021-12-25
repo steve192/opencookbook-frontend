@@ -3,7 +3,6 @@ import * as Updates from 'expo-updates';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {useDispatch} from 'react-redux';
-import Configuration from '../../Configuration';
 import RestAPI from '../../dao/RestAPI';
 import {login, logout} from '../../redux/features/authSlice';
 import {LoginBackdrop} from './LoginBackdrop';
@@ -33,14 +32,10 @@ export const SplashScreen = () => {
 
       try {
         setStatusText('Logging in...');
-        const authToken = await Configuration.getAuthToken();
-        if (!authToken) {
-          dispatch(logout());
-          return;
-        }
-        await RestAPI.renewToken(authToken);
+        await RestAPI.getUserInfo();
         dispatch(login());
       } catch (e) {
+        console.error('Login failed');
         dispatch(logout());
       }
     })();

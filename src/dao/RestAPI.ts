@@ -1,4 +1,4 @@
-import axios, {AxiosRequestConfig, AxiosRequestHeaders} from 'axios';
+import axios, {AxiosError, AxiosRequestConfig, AxiosRequestHeaders} from 'axios';
 import {Buffer} from 'buffer';
 import {Platform} from 'react-native';
 import XDate from 'xdate';
@@ -45,19 +45,26 @@ export interface WeekplanDay {
     day: string,
     recipes: WeekplanDayRecipeInfo[]
 }
+export interface UserInfo {
+
+}
 /**
  * RESTApi for communication with opencookbook backend
  */
 class RestAPI {
+  static async getUserInfo(): Promise<UserInfo> {
+    const response = await this.get('/users/self');
+    return response?.data;
+  }
   static async setWeekplanRecipes(date: string, recipeIds: number[]): Promise<WeekplanDay> {
-    const response = await axios.put(this.url(`/weekplan/${date}`), {recipeIds}, await this.axiosConfig());
-    return response.data;
+    const response = await this.put(`/weekplan/${date}`, {recipeIds});
+    return response?.data;
   }
   static async getWeekplanDays(from: XDate, to: XDate): Promise<WeekplanDay[]> {
-    const response = await axios.get(this.url(`/weekplan/${from.toString('yyyy-MM-dd')}/to/${to.toString('yyyy-MM-dd')}`), await this.axiosConfig());
+    const response = await this.get(`/weekplan/${from.toString('yyyy-MM-dd')}/to/${to.toString('yyyy-MM-dd')}`);
 
     // Add type recipe to recipe objects
-    return response.data.map((weekplanDay: WeekplanDay) => {
+    return response?.data.map((weekplanDay: WeekplanDay) => {
       return ({
         ...weekplanDay,
         recipes: weekplanDay.recipes.map((recipe) => {
@@ -67,19 +74,19 @@ class RestAPI {
     });
   }
   static async deleteRecipeGroup(group: RecipeGroup) {
-    await axios.delete(this.url('/recipe-groups/' + group.id), await this.axiosConfig());
+    await this.delete('/recipe-groups/' + group.id);
   }
-  static async renewToken(oldToken: string) {
-    const response = await axios.get(this.url('/users/renewToken'), await this.axiosConfig());
-    // TODO: Implement this correcly. Currently this is only used to check if the token is still valid
+  static async refreshToken() {
+    const response = await axios.post(this.url('/users/refreshToken'), {refreshToken: await Configuration.getRefreshToken()});
+    await Configuration.setAuthToken(response.data.token);
   }
   static async createNewRecipeGroup(recipeGroup: RecipeGroup): Promise<RecipeGroup> {
-    const response = await axios.post(this.url('/recipe-groups'), recipeGroup, await this.axiosConfig());
-    return {...response.data, type: 'RecipeGroup'};
+    const response = await this.post('/recipe-groups', recipeGroup);
+    return {...response?.data, type: 'RecipeGroup'};
   }
   static async getRecipeGroups(): Promise<RecipeGroup[]> {
-    const response = await axios.get(this.url('/recipe-groups'), await this.axiosConfig());
-    return response.data.map((item: RecipeGroup) => {
+    const response = await this.get('/recipe-groups');
+    return response?.data.map((item: RecipeGroup) => {
       return {...item, type: 'RecipeGroup'};
     });
   }
@@ -211,15 +218,15 @@ class RestAPI {
     ];
   }
   static async deleteRecipe(recipe: Recipe): Promise<void> {
-    await axios.delete(this.url('/recipes/' + recipe.id), await this.axiosConfig());
+    await this.delete('/recipes/' + recipe.id);
   }
   static async updateRecipe(newRecipeData: Recipe): Promise<Recipe> {
-    const response = await axios.put(this.url('/recipes/' + newRecipeData.id), newRecipeData, await this.axiosConfig());
-    return {...response.data, type: 'Recipe'};
+    const response = await this.put('/recipes/' + newRecipeData.id, newRecipeData);
+    return {...response?.data, type: 'Recipe'};
   }
   static async importRecipe(importURL: string): Promise<Recipe> {
-    const response = await axios.get(this.url('/recipes/import?importUrl=' + encodeURI(importURL)), await this.axiosConfig());
-    return {...response.data, type: 'Recipe'};
+    const response = await this.get('/recipes/import?importUrl=' + encodeURI(importURL));
+    return {...response?.data, type: 'Recipe'};
   }
 
   private static dataURItoBlob(dataURI: string) {
@@ -245,14 +252,19 @@ class RestAPI {
 
 
   static async getImageAsDataURI(uuid: string) {
-    const response = await axios.get(this.url('/recipes-images/' + uuid), {
-      headers: {
-        'Authorization': 'Bearer ' + await Configuration.getAuthToken(),
-      },
-      responseType: 'arraybuffer',
-    });
-    const base64String = Buffer.from(response.data).toString('base64');
-    return 'data:image/jpg;base64,' + base64String;
+    try {
+      const response = await axios.get(this.url('/recipes-images/' + uuid), {
+        headers: {
+          'Authorization': 'Bearer ' + await Configuration.getAuthToken(),
+        },
+        responseType: 'arraybuffer',
+      });
+
+      const base64String = Buffer.from(response.data).toString('base64');
+      return 'data:image/jpg;base64,' + base64String;
+    } catch (e) {
+      await this.handleAxiosError(e);
+    }
   }
   static async uploadImage(uri: string): Promise<string> {
     const formData = new FormData();
@@ -274,27 +286,18 @@ class RestAPI {
     }
 
 
-    const response = await axios.post(this.url('/recipes-images'), formData, await this.axiosConfig());
-    if (response.status > 299) {
-      throw new Error('Server responded with http ' + response.status);
-    }
-    return response.data.uuid;
+    const response = await this.post('/recipes-images', formData);
+    return response?.data.uuid;
   }
   static async getRecipeById(recipeId: number): Promise<Recipe> {
-    const response = await axios.get(this.url(`/recipes/${recipeId}`), await this.axiosConfig());
-    if (response.status > 299) {
-      throw new Error();
-    }
-    return {...response.data, type: 'Recipe'};
+    const response = await this.get(`/recipes/${recipeId}`);
+    return {...response?.data, type: 'Recipe'};
   }
 
   static async getRecipes(): Promise<Recipe[]> {
-    const response = await axios.get(this.url('/recipes'), await this.axiosConfig());
-    if (response.status > 299) {
-      throw new Error();
-    }
+    const response = await this.get('/recipes');
 
-    return response.data.map((item: Recipe) => {
+    return response?.data.map((item: Recipe) => {
       return {...item, type: 'Recipe'};
     });
   }
@@ -310,12 +313,8 @@ class RestAPI {
     return {'Authorization': 'Bearer ' + token};
   }
   static async getIngredients(filter: string = ''): Promise<Ingredient[]> {
-    const response = await axios.get(this.url('/ingredients'), await this.axiosConfig());
-    if (response.status > 299) {
-      // TODO: Error handling
-      throw Error('Server error');
-    }
-    return response.data;
+    const response = await this.get('/ingredients');
+    return response?.data;
   }
   static async createNewRecipe(newRecipeData: Recipe): Promise<Recipe> {
     const response = await axios.post(this.url('/recipes'), newRecipeData, await this.axiosConfig());
@@ -334,6 +333,7 @@ class RestAPI {
     }
 
     Configuration.setAuthToken(response.data.token);
+    Configuration.setRefreshToken(response.data.refreshToken);
   }
 
   static async registerUser(emailAddress: string, password: string) {
@@ -349,6 +349,65 @@ class RestAPI {
 
   private static url(path: string): string {
     return Configuration.getBackendURL() + Configuration.getApiRoute() + path;
+  }
+
+  private static async post(apiPath: string, data: any) {
+    try {
+      return await axios.post(this.url(apiPath), data, await this.axiosConfig());
+    } catch (e) {
+      await RestAPI.handleAxiosError(e);
+      // Retry after error handling
+      return axios.post(this.url(apiPath), data, await this.axiosConfig());
+    }
+  }
+  private static async delete(apiPath: string) {
+    try {
+      return await axios.delete(this.url(apiPath), await this.axiosConfig());
+    } catch (e) {
+      await RestAPI.handleAxiosError(e);
+      // Retry after error handling
+      return axios.delete(this.url(apiPath), await this.axiosConfig());
+    }
+  }
+  private static async put(apiPath: string, data: any) {
+    try {
+      return await axios.put(this.url(apiPath), data, await this.axiosConfig());
+    } catch (e) {
+      await RestAPI.handleAxiosError(e);
+      // Retry after error handling
+      return axios.put(this.url(apiPath), data, await this.axiosConfig());
+    }
+  }
+  private static async get(apiPath: string) {
+    try {
+      return await axios.get(this.url(apiPath), await this.axiosConfig());
+    } catch (e) {
+      await RestAPI.handleAxiosError(e);
+      // Retry after error handling
+      return axios.get(this.url(apiPath), await this.axiosConfig());
+    }
+  }
+
+  private static async handleAxiosError(axiosError: unknown) {
+    const errResponse = (axiosError as AxiosError).response;
+    if (!errResponse) {
+      console.error('Axios error: No response from server');
+      throw axiosError;
+    }
+
+    if (errResponse.status === 401 || errResponse.status === 403) {
+      // Maybe token expired?
+      console.warn('Axios warning: Auth fail, trying to refresh token');
+      try {
+        await this.refreshToken();
+      } catch (refreshError) {
+        console.error('Failed to refesh token');
+        throw refreshError;
+      }
+    } else {
+      console.error('Axios error: Server responded with http '+ errResponse.status);
+      throw axiosError;
+    }
   }
 }
 

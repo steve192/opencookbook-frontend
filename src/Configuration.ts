@@ -22,6 +22,22 @@ export default class Configuration {
   }
 
 
+  static async setRefreshToken(token: string) {
+    if (Platform.OS === 'web') {
+      await AsyncStorage.setItem('refreshToken', token);
+      return;
+    }
+    await SecureStore.setItemAsync('refreshToken', token);
+  }
+
+  static async getRefreshToken(): Promise<string | null> {
+    if (Platform.OS === 'web') {
+      return AsyncStorage.getItem('refreshToken');
+    }
+    return SecureStore.getItemAsync('refreshToken');
+  }
+
+
   static getBackendURL(): string {
     return this.backendURL;
   }
