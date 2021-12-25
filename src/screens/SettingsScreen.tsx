@@ -7,6 +7,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
 import {CustomCard} from '../components/CustomCard';
+import {logout} from '../redux/features/authSlice';
 import {changeTheme} from '../redux/features/settingsSlice';
 import {RootState} from '../redux/store';
 import CentralStyles from '../styles/CentralStyles';
@@ -20,6 +21,10 @@ export const SettingsScreen = () => {
       <Layout style={[CentralStyles.fullscreen]}>
         <View style={CentralStyles.contentContainer}>
           <ScrollView>
+            <CustomCard>
+              <Button onPress={() => dispatch(logout())}>Logout</Button>
+            </CustomCard>
+            <Spacer height={20} />
             <CustomCard>
               <Text category="label">{t('screens.settings.theme')}</Text>
               <Picker
