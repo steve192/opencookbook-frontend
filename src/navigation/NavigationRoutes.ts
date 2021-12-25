@@ -20,5 +20,5 @@ export type OverviewNavigationProps = {
 }
 
 export type RecipeScreenNavigation = {
-    RecipeListDetailScreen: { shownRecipeGroup?: RecipeGroup }
+    RecipeListDetailScreen: { shownRecipeGroupId?: number }
 }

@@ -9,7 +9,7 @@ import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {RecipeImageComponent} from './RecipeImageComponent';
 
 interface Props {
-    shownRecipeGroup: RecipeGroup | undefined
+    shownRecipeGroupId: number | undefined
     onRecipeClick: (recipe: Recipe) => void
     onRecipeGroupClick: (recipeGroup: RecipeGroup) => void
 }
@@ -117,10 +117,10 @@ export const RecipeList = (props: Props) => {
       // Avoid flickering: don't render items until the amount of columns is determined
       return [];
     }
-    if (!props.shownRecipeGroup) {
+    if (!props.shownRecipeGroupId) {
       return [...myRecipeGroups, ...myRecipes.filter((recipe) => recipe.recipeGroups.length === 0)];
     } else {
-      return myRecipes.filter((recipe) => recipe.recipeGroups.filter((group) => group.id === props.shownRecipeGroup?.id).length > 0);
+      return myRecipes.filter((recipe) => recipe.recipeGroups.filter((group) => group.id === props.shownRecipeGroupId).length > 0);
     }
   };
 

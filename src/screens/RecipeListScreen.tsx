@@ -7,10 +7,9 @@ import {useTranslation} from 'react-i18next';
 import {FloatingAction, IActionProps} from 'react-native-floating-action';
 import {DeleteIcon} from '../assets/Icons';
 import {RecipeList} from '../components/RecipeList';
-import RestAPI, {Recipe, RecipeGroup} from '../dao/RestAPI';
+import RestAPI, {Recipe} from '../dao/RestAPI';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
-import {fetchMyRecipeGroups} from '../redux/features/recipesSlice';
-import {useAppDispatch} from '../redux/hooks';
+import {useAppSelector} from '../redux/hooks';
 
 
 type Props = CompositeScreenProps<
@@ -25,15 +24,16 @@ type Props = CompositeScreenProps<
 const RecipeListScreen = (props: Props) => {
   const theme = useTheme();
   const {t} = useTranslation('translation');
-  const dispatch = useAppDispatch();
 
-  if (props.route.params?.shownRecipeGroup?.id) {
+  const shownRecipeGroup = useAppSelector((state) => state.recipes.recipeGroups.filter((recipeGroup) => recipeGroup.id == props.route.params?.shownRecipeGroupId)[0]);
+
+  if (props.route.params?.shownRecipeGroupId) {
     props.navigation.setOptions({
-      title: props.route.params?.shownRecipeGroup?.title,
+      title: shownRecipeGroup?.title,
       headerRight: () => (
         <>
           <Button
-            onPress={() => deleteRecipeGroup(props.route.params.shownRecipeGroup)}
+            onPress={() => shownRecipeGroup.id && deleteRecipeGroup(shownRecipeGroup.id)}
             accessoryLeft={<DeleteIcon fill={theme['color-danger-default']} />} />
         </>
       ),
@@ -42,9 +42,8 @@ const RecipeListScreen = (props: Props) => {
     props.navigation.setOptions({title: t('screens.overview.myRecipes')});
   }
 
-  const deleteRecipeGroup = (group: RecipeGroup | undefined) => {
-    if (!group) return;
-    RestAPI.deleteRecipeGroup(group)
+  const deleteRecipeGroup = (groupId: number) => {
+    RestAPI.deleteRecipeGroup(groupId)
         .then(() => props.navigation.goBack())
         .catch(() => {
         // TODO: Error handling
@@ -83,11 +82,7 @@ const RecipeListScreen = (props: Props) => {
         props.navigation.navigate('RecipeWizardScreen', {});
         break;
       case 'addRecipeGroup':
-        props.navigation.navigate('RecipeGroupEditScreen', {
-          onRecipeGroupChanges: () => {
-            dispatch(fetchMyRecipeGroups());
-          },
-        });
+        props.navigation.navigate('RecipeGroupEditScreen', {});
         break;
     }
   };
@@ -104,9 +99,9 @@ const RecipeListScreen = (props: Props) => {
     <>
       <Layout style={{flex: 1, justifyContent: 'flex-start', alignItems: 'baseline'}}>
         <RecipeList
-          shownRecipeGroup={props.route.params?.shownRecipeGroup}
+          shownRecipeGroupId={props.route.params?.shownRecipeGroupId}
           onRecipeClick={openRecipe}
-          onRecipeGroupClick={(recipeGroup) => props.navigation.push('RecipeListDetailScreen', {shownRecipeGroup: recipeGroup})} />
+          onRecipeGroupClick={(recipeGroup) => props.navigation.push('RecipeListDetailScreen', {shownRecipeGroupId: recipeGroup.id})} />
         <FloatingAction
           actions={addActions}
           onPressItem={onActionButtonPress}

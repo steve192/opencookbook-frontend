@@ -3,13 +3,16 @@ import {Button, Input, Layout, Text} from '@ui-kitten/components';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import Spacer from 'react-spacer';
-import RestAPI, {RecipeGroup} from '../dao/RestAPI';
+import {RecipeGroup} from '../dao/RestAPI';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
+import {createRecipeGroup} from '../redux/features/recipesSlice';
+import {useAppDispatch} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeGroupEditScreen'>;
 export const RecipeGroupEditScreen = (props: Props) => {
   const {t} = useTranslation('translation');
+  const dispatch = useAppDispatch();
 
   const [recipeGroup, setRecipeGroup] = useState<RecipeGroup>(
         props.route.params.recipeGroup ?
@@ -21,10 +24,8 @@ export const RecipeGroupEditScreen = (props: Props) => {
   );
 
   const saveRecipeGroup = () => {
-    RestAPI.createNewRecipeGroup(recipeGroup).then((savedRecipeGroup) => {
-      props.navigation.goBack();
-      props.route.params.onRecipeGroupChanges?.(savedRecipeGroup);
-    });
+    dispatch(createRecipeGroup(recipeGroup));
+    props.navigation.goBack();
   };
   return (
     <Layout style={CentralStyles.contentContainer}>

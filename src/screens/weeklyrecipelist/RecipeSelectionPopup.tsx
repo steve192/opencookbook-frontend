@@ -36,7 +36,7 @@ export const RecipeSelectionPopup = (props: Props) => {
                                 {/* headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
                                 <Layout style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, styles.modalView]}>
                                   <RecipeList
-                                    shownRecipeGroup={shownRecipeGroup}
+                                    shownRecipeGroupId={shownRecipeGroup}
                                     onRecipeClick={props.onRecipeSelected}
                                     onRecipeGroupClick={onRecipeGroupSelected} />
                                 </Layout>

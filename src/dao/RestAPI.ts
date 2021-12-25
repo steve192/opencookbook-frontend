@@ -73,8 +73,8 @@ class RestAPI {
       });
     });
   }
-  static async deleteRecipeGroup(group: RecipeGroup) {
-    await this.delete('/recipe-groups/' + group.id);
+  static async deleteRecipeGroup(groupId: number) {
+    await this.delete('/recipe-groups/' + groupId);
   }
   static async refreshToken() {
     const response = await axios.post(this.url('/users/refreshToken'), {refreshToken: await Configuration.getRefreshToken()});
