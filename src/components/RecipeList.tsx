@@ -19,7 +19,7 @@ export const RecipeList = (props: Props) => {
   const listRefreshing = useAppSelector((state) => state.recipes.pendingRequests > 0);
 
   const [componentWidth, setComponentWith] = useState<number>(1);
-  const [columndDetermined, setColumnsDetermined] = useState(false);
+  const [columnsDetermined, setColumnsDetermined] = useState(false);
 
   const {t} = useTranslation('translation');
   const theme = useTheme();
@@ -113,7 +113,7 @@ export const RecipeList = (props: Props) => {
     </View>
   );
   const getShownItems = (): (RecipeGroup | Recipe)[] => {
-    if (!columndDetermined) {
+    if (!columnsDetermined) {
       // Avoid flickering: don't render items until the amount of columns is determined
       return [];
     }

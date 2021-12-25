@@ -99,7 +99,8 @@ const RecipeListScreen = (props: Props) => {
     <>
       <Layout style={{flex: 1, justifyContent: 'flex-start', alignItems: 'baseline'}}>
         <RecipeList
-          shownRecipeGroupId={props.route.params?.shownRecipeGroupId}
+          // @ts-ignore Route params are sometimes string
+          shownRecipeGroupId={props.route.params?.shownRecipeGroupId && parseInt(props.route.params.shownRecipeGroupId)}
           onRecipeClick={openRecipe}
           onRecipeGroupClick={(recipeGroup) => props.navigation.push('RecipeListDetailScreen', {shownRecipeGroupId: recipeGroup.id})} />
         <FloatingAction
