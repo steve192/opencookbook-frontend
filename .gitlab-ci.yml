@@ -67,6 +67,18 @@ publish-expo:
     - npm ci
     - npm run publish-expo -- --release-channel beta
 
+build-android:
+  stage: publish
+  image: steve192/expo-turtle-builder
+  variables:
+    EXPO_TOKEN: $EXPO_TOKEN
+  script:
+    - npm ci
+    - expo-turtle-builder --target android --format app-bundle
+  artifacts:
+    paths:
+      - output/android*
+
 publish-cluster:
   stage: publish
   needs: ["package-docker-qa"]
