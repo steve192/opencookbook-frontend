@@ -10,6 +10,7 @@ import {useDispatch} from 'react-redux';
 import Spacer from 'react-spacer';
 import XDate from 'xdate';
 import {PlusIcon} from '../../assets/Icons';
+import {ChunkView} from '../../ChunkView';
 import {CustomCard} from '../../components/CustomCard';
 import {SideScroller} from '../../components/SideScroller';
 import {Recipe, WeekplanDay} from '../../dao/RestAPI';
@@ -111,22 +112,24 @@ export const WeeklyRecipeListScreen = (props: Props) => {
 
   return (
     <>
-      <Layout style={CentralStyles.fullscreen}>
-        <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
-          <Divider style={{marginVertical: 25}}/>
-          <Text category="h5">{t('screens.weekplan.currentWeek')}</Text>
-          {renderWeek(getCurrentWeekNumber(now), now.getFullYear())}
-          <Divider style={{marginVertical: 25}}/>
-          <Text category="h5">{t('screens.weekplan.nextWeek')}</Text>
-          {renderWeek(getCurrentWeekNumber(now) + 1, now.getFullYear())}
-          <Divider style={{marginVertical: 25}}/>
-          <Text category="h5">{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 2}</Text>
-          {renderWeek(getCurrentWeekNumber(now) + 2, now.getFullYear())}
-          <Divider style={{marginVertical: 25}}/>
-          <Text category="h5">{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 3}</Text>
-          {renderWeek(getCurrentWeekNumber(now) + 3, now.getFullYear())}
-        </ScrollView>
-      </Layout>
+      <ChunkView>
+        <Layout style={CentralStyles.fullscreen}>
+          <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
+            <Divider style={{marginVertical: 25}}/>
+            <Text category="h5">{t('screens.weekplan.currentWeek')}</Text>
+            {renderWeek(getCurrentWeekNumber(now), now.getFullYear())}
+            <Divider style={{marginVertical: 25}}/>
+            <Text category="h5">{t('screens.weekplan.nextWeek')}</Text>
+            {renderWeek(getCurrentWeekNumber(now) + 1, now.getFullYear())}
+            <Divider style={{marginVertical: 25}}/>
+            <Text category="h5">{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 2}</Text>
+            {renderWeek(getCurrentWeekNumber(now) + 2, now.getFullYear())}
+            <Divider style={{marginVertical: 25}}/>
+            <Text category="h5">{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 3}</Text>
+            {renderWeek(getCurrentWeekNumber(now) + 3, now.getFullYear())}
+          </ScrollView>
+        </Layout>
+      </ChunkView>
 
       <RecipeSelectionPopup
         visible={recipeSelectionVisible}
