@@ -4,11 +4,10 @@ stages:
   - package
   - publish
 
-
 build-web:
   stage: build
   image: node:16.13
-  script: 
+  script:
     - npm ci
     - npm run build-web
   artifacts:
@@ -18,7 +17,7 @@ build-web:
 sonarqube:
   stage: test
   only:
-  - master
+    - master
   image: sonarsource/sonar-scanner-cli:latest
   allow_failure: true
   variables:
@@ -29,16 +28,15 @@ sonarqube:
   script:
     - npm ci
     - npm run build-web
-    - sonar-scanner 
-      -Dsonar.qualitygate.wait=true 
-      -Dsonar.sources=src 
-      -Dsonar.login="$SONAR_TOKEN" 
-      -Dsonar.projectKey="$CI_PROJECT_NAME" 
-      -Dsonar.links.scm="$CI_PROJECT_URL" 
-      -Dsonar.scm.revision="$CI_COMMIT_SHA" 
-      -Dsonar.scm.disabled=False 
+    - sonar-scanner
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.sources=src
+      -Dsonar.login="$SONAR_TOKEN"
+      -Dsonar.projectKey="$CI_PROJECT_NAME"
+      -Dsonar.links.scm="$CI_PROJECT_URL"
+      -Dsonar.scm.revision="$CI_COMMIT_SHA"
+      -Dsonar.scm.disabled=False
       -Dsonar.projectVersion="$CI_PIPELINE_IID"
-
 
 package-docker-qa:
   stage: package
@@ -55,7 +53,7 @@ package-docker-qa:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$REGISTRY_TAG --cache=true --cache-ttl=100h
   rules:
-    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+    - if: "$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH"
 
 publish-expo:
   stage: publish
@@ -71,7 +69,9 @@ build-android:
   stage: publish
   image: steve192/expo-turtle-builder
   variables:
-    EXPO_TOKEN: $EXPO_TOKEN
+    # Token not supported by turtle
+    EXPO_USERNAME: $EXPO_USERNAME
+    EXPO_PASSWORD: $EXPO_PASSWORD
   script:
     - npm ci
     - expo-turtle-builder --target android --format app-bundle
