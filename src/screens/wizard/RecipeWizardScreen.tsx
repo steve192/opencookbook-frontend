@@ -59,26 +59,26 @@ const RecipeWizardScreen = (props: Props) => {
 
 
   const changePreparationStep = (newText: string, index: number) => {
-    const preparationStepsCopy = recipeData.preparationSteps;
+    const preparationStepsCopy = [...recipeData.preparationSteps];
     preparationStepsCopy[index] = newText;
     setRecipeData({...recipeData, preparationSteps: preparationStepsCopy});
   };
 
   const addPreparationStep = () => {
-    const preparationStepsCopy = recipeData.preparationSteps;
+    const preparationStepsCopy = [...recipeData.preparationSteps];
     preparationStepsCopy.push('');
     setRecipeData({...recipeData, preparationSteps: preparationStepsCopy});
   };
 
   const removePreparationStep = (index: number) => {
-    const preparationStepsCopy = recipeData.preparationSteps;
+    const preparationStepsCopy = [...recipeData.preparationSteps];
     preparationStepsCopy.splice(index, 1);
     setRecipeData({...recipeData, preparationSteps: preparationStepsCopy});
   };
 
 
   const removeIngredient = (index: number) => {
-    const ingredientsCopy = recipeData.neededIngredients;
+    const ingredientsCopy = [...recipeData.neededIngredients];
     ingredientsCopy.splice(index, 1);
     setRecipeData({...recipeData, neededIngredients: ingredientsCopy});
   };
@@ -90,7 +90,7 @@ const RecipeWizardScreen = (props: Props) => {
   };
 
   const addIngredient = () => {
-    const ingredientsCopy = recipeData.neededIngredients;
+    const ingredientsCopy = [...recipeData.neededIngredients];
     ingredientsCopy.push({
       ingredient: {id: undefined, name: ''},
       unit: '',
@@ -100,7 +100,7 @@ const RecipeWizardScreen = (props: Props) => {
   };
 
   const changeIngredient = (index: number, ingredient: IngredientUse) => {
-    const ingredientsCopy = recipeData.neededIngredients;
+    const ingredientsCopy = [...recipeData.neededIngredients];
     ingredientsCopy[index] = ingredient;
     setRecipeData({...recipeData, neededIngredients: ingredientsCopy});
   };
