@@ -10,6 +10,7 @@ import {RecipeList} from '../components/RecipeList';
 import RestAPI, {Recipe} from '../dao/RestAPI';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
 import {useAppSelector} from '../redux/hooks';
+import CentralStyles from '../styles/CentralStyles';
 
 
 type Props = CompositeScreenProps<
@@ -97,7 +98,7 @@ const RecipeListScreen = (props: Props) => {
 
   return (
     <>
-      <Layout style={{flex: 1, justifyContent: 'flex-start', alignItems: 'baseline'}}>
+      <Layout style={CentralStyles.fullscreen}>
         <RecipeList
           // @ts-ignore Route params are sometimes string
           shownRecipeGroupId={props.route.params?.shownRecipeGroupId && parseInt(props.route.params.shownRecipeGroupId)}

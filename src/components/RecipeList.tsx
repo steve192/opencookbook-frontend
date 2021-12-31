@@ -1,8 +1,9 @@
 import {MaterialIcons} from '@expo/vector-icons';
-import {Layout, List, Text, useTheme} from '@ui-kitten/components';
-import React, {useEffect, useState} from 'react';
+import {Layout, Text, useTheme} from '@ui-kitten/components';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ListRenderItemInfo, Pressable, StyleSheet, View, ViewProps} from 'react-native';
+import {Pressable, StyleSheet, View, ViewProps} from 'react-native';
+import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {fetchMyRecipeGroups, fetchMyRecipes} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
@@ -19,15 +20,11 @@ export const RecipeList = (props: Props) => {
   const listRefreshing = useAppSelector((state) => state.recipes.pendingRequests > 0);
 
   const [componentWidth, setComponentWith] = useState<number>(1);
-  const [columnsDetermined, setColumnsDetermined] = useState(false);
 
   const {t} = useTranslation('translation');
   const theme = useTheme();
 
   const dispatch = useAppDispatch();
-
-
-  const numberOfColumns = Math.ceil(componentWidth / 300);
 
   const refreshData = () => {
     dispatch(fetchMyRecipes());
@@ -35,11 +32,25 @@ export const RecipeList = (props: Props) => {
   };
   useEffect(refreshData, []);
 
+  const getShownItems = (): (RecipeGroup | Recipe)[] => {
+    if (!props.shownRecipeGroupId) {
+      return [...myRecipeGroups, ...myRecipes.filter((recipe) => recipe.recipeGroups.length === 0)];
+    } else {
+      return myRecipes.filter((recipe) => recipe.recipeGroups.filter((group) => group.id === props.shownRecipeGroupId).length > 0);
+    }
+  };
+
+  const dataProvider = useMemo(() => {
+    return new DataProvider((item1, item2) => {
+      return item1.id !== item2.id;
+    }).cloneWithRows(getShownItems());
+  }, [myRecipes, myRecipeGroups]);
 
   const createRecipeListItem = (recipe: Recipe) => {
     return (
       <Pressable
-        style={[styles.recipeCard, {flex: 1 / numberOfColumns}]}
+        key={recipe.id}
+        style={[styles.recipeCard]}
         onPress={() => props.onRecipeClick(recipe)}>
         <Layout style={{height: 180, borderRadius: 16, overflow: 'hidden'}}>
           <RecipeImageComponent
@@ -54,6 +65,7 @@ export const RecipeList = (props: Props) => {
     const firstFewGroupRecipes = myRecipes.filter((recipe) => recipe.recipeGroups.find((group) => group.id === recipeGroup.id)).splice(0, 4);
     return (
       <Pressable
+        key={'rg'+recipeGroup.id}
         style={[
           styles.recipeCard,
           {
@@ -89,11 +101,11 @@ export const RecipeList = (props: Props) => {
     );
   };
 
-  const renderItem = (info: ListRenderItemInfo<Recipe | RecipeGroup>): JSX.Element => {
-    if (info.item.type === 'Recipe') {
-      return createRecipeListItem(info.item as Recipe);
-    } else if (info.item.type === 'RecipeGroup') {
-      return createRecipeGroupListItem(info.item as RecipeGroup);
+  const renderItem = (type: string | number, data: Recipe | RecipeGroup): JSX.Element => {
+    if (data.type === 'Recipe') {
+      return createRecipeListItem(data as Recipe);
+    } else if (data.type === 'RecipeGroup') {
+      return createRecipeGroupListItem(data as RecipeGroup);
     }
     return <View></View>;
   };
@@ -112,17 +124,9 @@ export const RecipeList = (props: Props) => {
       </Text>
     </View>
   );
-  const getShownItems = (): (RecipeGroup | Recipe)[] => {
-    if (!columnsDetermined) {
-      // Avoid flickering: don't render items until the amount of columns is determined
-      return [];
-    }
-    if (!props.shownRecipeGroupId) {
-      return [...myRecipeGroups, ...myRecipes.filter((recipe) => recipe.recipeGroups.length === 0)];
-    } else {
-      return myRecipes.filter((recipe) => recipe.recipeGroups.filter((group) => group.id === props.shownRecipeGroupId).length > 0);
-    }
-  };
+
+  const numberOfColumns = Math.ceil(componentWidth / 300);
+  const _layoutProvider = LayoutUtil.getLayoutProvider(componentWidth, numberOfColumns);
 
 
   return (
@@ -130,29 +134,28 @@ export const RecipeList = (props: Props) => {
       style={styles.container}
       onLayout={(event) => {
         setComponentWith(event.nativeEvent.layout.width);
-        setColumnsDetermined(true);
       }}>
 
-      {getShownItems().length > 0 ?
-          <List
-            key={numberOfColumns} // To force re render when number of columns changes
-            style={styles.container}
-            contentContainerStyle={styles.contentContainer}
-            data={getShownItems()}
-            numColumns={numberOfColumns}
-            renderItem={renderItem}
-            refreshing={listRefreshing}
-            onRefresh={refreshData}
-          /> :
-            renderNoItemsNotice()}
+      { getShownItems().length > 0 ?
+      <RecyclerListView
+        style={styles.container}
+        layoutProvider={_layoutProvider}
+        dataProvider={dataProvider}
+        renderAheadOffset={1000}
+        canChangeSize={true}
+        // forceNonDeterministicRendering={true}
+        rowRenderer={renderItem} /> :
+      renderNoItemsNotice() }
+
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    height: '100%',
+    // width: '100%',
+    // height: '100%',
+    flex: 1,
   },
   contentContainer: {
     // paddingHorizontal: 8,
@@ -163,6 +166,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(0,0,0,0.09)',
     borderRadius: 16,
     borderWidth: 1,
+    flex: 1,
   },
   recipeGroupCard: {
     margin: 1,
@@ -177,5 +181,22 @@ const styles = StyleSheet.create({
     width: undefined,
     height: 100,
   },
+
+
 });
+
+
+class LayoutUtil {
+  static getLayoutProvider(componentWidth: number, numberOfColumns: number) {
+    return new LayoutProvider(
+        () => {
+          return 'VSEL'; // Since we have just one view type
+        },
+        (type, dim, index) => {
+          dim.width = componentWidth / numberOfColumns;// 200;
+          dim.height = 246;
+        },
+    );
+  }
+}
 

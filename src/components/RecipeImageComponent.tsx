@@ -43,7 +43,7 @@ export const RecipeImageComponent = (props: Props) => {
       </Image>
       {requestPending &&
                 <View style={styles.loadingSpinner}>
-                  <Spinner size="giant" />
+                  {/* <Spinner size="giant" /> */}
                 </View>}
 
     </View>
