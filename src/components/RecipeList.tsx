@@ -3,7 +3,6 @@ import {Input, Layout, Text, useTheme} from '@ui-kitten/components';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, RefreshControl, StyleSheet, View, ViewProps} from 'react-native';
-import Spacer from 'react-spacer';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {CrossIcon, SearchIcon} from '../assets/Icons';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
@@ -11,6 +10,7 @@ import {fetchMyRecipeGroups, fetchMyRecipes} from '../redux/features/recipesSlic
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 import {RecipeImageComponent} from './RecipeImageComponent';
+import fuzzy from 'fuzzy';
 
 interface Props {
     shownRecipeGroupId: number | undefined
@@ -21,6 +21,7 @@ export const RecipeList = (props: Props) => {
   const myRecipes = useAppSelector((state) => state.recipes.recipes);
   const myRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
   const listRefreshing = useAppSelector((state) => state.recipes.pendingRequests > 0);
+  const [searchStringPendingInput, setSearchStringPendingInput] = useState('');
   const [searchString, setSearchString] = useState('');
 
   const [componentWidth, setComponentWith] = useState<number>(1);
@@ -49,14 +50,21 @@ export const RecipeList = (props: Props) => {
   };
 
   const dataProvider = useMemo(() => {
+    let shownItems = getShownItems();
+    if (searchString !== '') {
+      shownItems = fuzzy
+          .filter(searchString, shownItems, {extract: (e) => e.title})
+          .map((e) => e.original);
+    }
+
     return new DataProvider((item1, item2) => {
       return item1.id !== item2.id;
 
       // Empty object as first item.
       // This is used for an initial offset due to the search input field
       // @ts-ignore
-    }).cloneWithRows([{}].concat(getShownItems()));
-  }, [myRecipes, myRecipeGroups]);
+    }).cloneWithRows([{}].concat(shownItems));
+  }, [myRecipes, myRecipeGroups, searchString]);
 
   const createRecipeListItem = (recipe: Recipe) => {
     return (
@@ -139,11 +147,11 @@ export const RecipeList = (props: Props) => {
 
 
   const updateSearchString = (newValue: string) => {
-    setSearchString(newValue);
+    setSearchStringPendingInput(newValue);
     searchDebounceTimer.current && clearTimeout(searchDebounceTimer.current);
     searchDebounceTimer.current = setTimeout(()=>{
       // User has not entered anything for 1 seoncd, start searching
-      console.log('Searching');
+      setSearchString(newValue);
     }, 1000);
   };
 
@@ -184,7 +192,7 @@ export const RecipeList = (props: Props) => {
 
       <View style={[CentralStyles.contentContainer, styles.searchContainer]}>
         <Input
-          value={searchString}
+          value={searchStringPendingInput}
           onChangeText={updateSearchString}
           style={{flex: 1, width: '100%', maxWidth: 500, alignSelf: 'center'}}
           placeholder={t('screens.overview.searchPlaceholder')}
