@@ -137,7 +137,7 @@ export const RecipeList = (props: Props) => {
         setComponentWith(event.nativeEvent.layout.width);
       }}>
 
-      { getShownItems().length > 0 ?
+      { getShownItems().length > 0 && numberOfColumns !== 0 && componentWidth > 10?
       <RecyclerListView
         style={styles.container}
         layoutProvider={_layoutProvider}
