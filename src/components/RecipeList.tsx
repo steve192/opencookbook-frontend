@@ -150,9 +150,9 @@ export const RecipeList = (props: Props) => {
     setSearchStringPendingInput(newValue);
     searchDebounceTimer.current && clearTimeout(searchDebounceTimer.current);
     searchDebounceTimer.current = setTimeout(()=>{
-      // User has not entered anything for 1 seoncd, start searching
+      // User has not entered anything for some time, start searching
       setSearchString(newValue);
-    }, 1000);
+    }, 500);
   };
 
   let numberOfColumns = Math.ceil(componentWidth / 300);
