@@ -2,7 +2,7 @@ import {MaterialIcons} from '@expo/vector-icons';
 import {Layout, Text, useTheme} from '@ui-kitten/components';
 import React, {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Pressable, StyleSheet, View, ViewProps} from 'react-native';
+import {Pressable, RefreshControl, StyleSheet, View, ViewProps} from 'react-native';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {fetchMyRecipeGroups, fetchMyRecipes} from '../redux/features/recipesSlice';
@@ -125,7 +125,8 @@ export const RecipeList = (props: Props) => {
     </View>
   );
 
-  const numberOfColumns = Math.ceil(componentWidth / 300);
+  let numberOfColumns = Math.ceil(componentWidth / 300);
+  numberOfColumns = numberOfColumns > 4 ? 4 : numberOfColumns;
   const _layoutProvider = LayoutUtil.getLayoutProvider(componentWidth, numberOfColumns);
 
 
@@ -143,6 +144,14 @@ export const RecipeList = (props: Props) => {
         dataProvider={dataProvider}
         renderAheadOffset={1000}
         canChangeSize={true}
+        scrollViewProps={{
+          refreshControl: (
+            <RefreshControl
+              refreshing={listRefreshing}
+              onRefresh={() => refreshData()}
+            />
+          ),
+        }}
         // forceNonDeterministicRendering={true}
         rowRenderer={renderItem} /> :
       renderNoItemsNotice() }
