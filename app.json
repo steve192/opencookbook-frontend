@@ -7,9 +7,9 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/login-screen.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#295700"
     },
     "updates": {
       "fallbackToCacheTimeout": 0,
@@ -25,8 +25,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#295700"
       },
       "package": "com.sterul.opencookbook",
       "permissions": [
@@ -35,7 +35,7 @@
       "versionCode": 5
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/icon.png"
     }
   }
 }
