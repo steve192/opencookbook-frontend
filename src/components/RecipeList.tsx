@@ -1,12 +1,15 @@
 import {MaterialIcons} from '@expo/vector-icons';
-import {Layout, Text, useTheme} from '@ui-kitten/components';
-import React, {useEffect, useMemo, useState} from 'react';
+import {Input, Layout, Text, useTheme} from '@ui-kitten/components';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, RefreshControl, StyleSheet, View, ViewProps} from 'react-native';
+import Spacer from 'react-spacer';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
+import {CrossIcon, SearchIcon} from '../assets/Icons';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {fetchMyRecipeGroups, fetchMyRecipes} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import CentralStyles from '../styles/CentralStyles';
 import {RecipeImageComponent} from './RecipeImageComponent';
 
 interface Props {
@@ -18,6 +21,7 @@ export const RecipeList = (props: Props) => {
   const myRecipes = useAppSelector((state) => state.recipes.recipes);
   const myRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
   const listRefreshing = useAppSelector((state) => state.recipes.pendingRequests > 0);
+  const [searchString, setSearchString] = useState('');
 
   const [componentWidth, setComponentWith] = useState<number>(1);
 
@@ -25,10 +29,14 @@ export const RecipeList = (props: Props) => {
   const theme = useTheme();
 
   const dispatch = useAppDispatch();
+  const searchDebounceTimer = useRef<NodeJS.Timeout>();
 
   const refreshData = () => {
     dispatch(fetchMyRecipes());
     dispatch(fetchMyRecipeGroups());
+
+    // Clear the search debounce timer, to avoid state changes on unmounted component
+    return () => searchDebounceTimer.current && clearTimeout(searchDebounceTimer.current);
   };
   useEffect(refreshData, []);
 
@@ -43,7 +51,11 @@ export const RecipeList = (props: Props) => {
   const dataProvider = useMemo(() => {
     return new DataProvider((item1, item2) => {
       return item1.id !== item2.id;
-    }).cloneWithRows(getShownItems());
+
+      // Empty object as first item.
+      // This is used for an initial offset due to the search input field
+      // @ts-ignore
+    }).cloneWithRows([{}].concat(getShownItems()));
   }, [myRecipes, myRecipeGroups]);
 
   const createRecipeListItem = (recipe: Recipe) => {
@@ -125,6 +137,16 @@ export const RecipeList = (props: Props) => {
     </View>
   );
 
+
+  const updateSearchString = (newValue: string) => {
+    setSearchString(newValue);
+    searchDebounceTimer.current && clearTimeout(searchDebounceTimer.current);
+    searchDebounceTimer.current = setTimeout(()=>{
+      // User has not entered anything for 1 seoncd, start searching
+      console.log('Searching');
+    }, 1000);
+  };
+
   let numberOfColumns = Math.ceil(componentWidth / 300);
   numberOfColumns = numberOfColumns > 4 ? 4 : numberOfColumns;
   const _layoutProvider = LayoutUtil.getLayoutProvider(componentWidth, numberOfColumns);
@@ -137,13 +159,17 @@ export const RecipeList = (props: Props) => {
         setComponentWith(event.nativeEvent.layout.width);
       }}>
 
+
       { getShownItems().length > 0 && numberOfColumns !== 0 && componentWidth > 10?
       <RecyclerListView
-        style={styles.container}
+        style={{flex: 1}}
         layoutProvider={_layoutProvider}
         dataProvider={dataProvider}
         renderAheadOffset={1000}
         canChangeSize={true}
+        // applyWindowCorrection={(offsetX, offsetY, windowCorrection) => ({
+        //   windowShift: 800,
+        // })}
         scrollViewProps={{
           refreshControl: (
             <RefreshControl
@@ -156,19 +182,32 @@ export const RecipeList = (props: Props) => {
         rowRenderer={renderItem} /> :
       renderNoItemsNotice() }
 
+      <View style={[CentralStyles.contentContainer, styles.searchContainer]}>
+        <Input
+          value={searchString}
+          onChangeText={updateSearchString}
+          style={{flex: 1, width: '100%', maxWidth: 500, alignSelf: 'center'}}
+          placeholder={t('screens.overview.searchPlaceholder')}
+          accessoryLeft={SearchIcon}
+          accessoryRight={<CrossIcon onPress={() => updateSearchString('')}/>}/>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    // width: '100%',
-    // height: '100%',
+    alignContent: 'flex-start',
+    flexDirection: 'column',
     flex: 1,
   },
-  contentContainer: {
-    // paddingHorizontal: 8,
-    // paddingVertical: 4,
+  list: {
+    flex: 1,
+  },
+  searchContainer: {
+    position: 'absolute',
+    top: 0,
+    height: 100,
   },
   recipeCard: {
     margin: 3,
@@ -198,11 +237,16 @@ const styles = StyleSheet.create({
 class LayoutUtil {
   static getLayoutProvider(componentWidth: number, numberOfColumns: number) {
     return new LayoutProvider(
-        () => {
-          return 'VSEL'; // Since we have just one view type
+        (index) => {
+          return index === 0 ? 'first': 'normal'; // Since we have just one view type
         },
         (type, dim, index) => {
-          dim.width = componentWidth / numberOfColumns;// 200;
+          if (type === 'first') {
+            dim.width = componentWidth;
+            dim.height = 100; // Height of search bar
+            return;
+          }
+          dim.width = componentWidth / numberOfColumns;
           dim.height = 246;
         },
     );

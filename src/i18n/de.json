@@ -1,8 +1,8 @@
 {
   "weekdays": {
-    "monday":"Montag",
+    "monday": "Montag",
     "tuesday": "Dienstag",
-    "wednesday":"Mittwoch",
+    "wednesday": "Mittwoch",
     "thursday": "Donnerstag",
     "friday": "Freitag",
     "saturday": "Samstag",
@@ -40,7 +40,8 @@
       "addRecipe": "Neues Rezept",
       "importRecipe": "Rezept importieren",
       "addRecipeGroup": "Neue Rezeptgruppe",
-      "noRecipesMessage": "Sieht so aus als hättest du noch keine Rezepte"
+      "noRecipesMessage": "Sieht so aus als hättest du noch keine Rezepte",
+      "searchPlaceholder": "Suchbegriff eingeben"
     },
     "settings": {
       "screenTitle": "Einstellungen",

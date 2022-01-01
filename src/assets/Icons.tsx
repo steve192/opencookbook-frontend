@@ -47,3 +47,9 @@ export const CheckmarkIcon = (style: IconProps): IconElement => (
 export const WarningIcon = (style: IconProps): IconElement => (
   <Icon {...style} name='alert-triangle-outline' />
 );
+export const SearchIcon = (style: IconProps): IconElement => (
+  <Icon {...style} name='search-outline' />
+);
+export const CrossIcon = (style: IconProps): IconElement => (
+  <Icon {...style} name='close-outline' />
+);
