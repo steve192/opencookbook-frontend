@@ -205,7 +205,7 @@ export const RecipeList = (props: Props) => {
           style={{flex: 1, width: '100%', maxWidth: 500, alignSelf: 'center'}}
           placeholder={t('screens.overview.searchPlaceholder')}
           accessoryLeft={SearchIcon}
-          accessoryRight={<CrossIcon onPress={() => updateSearchString('')}/>}/>
+          accessoryRight={searchStringPendingInput ? <CrossIcon onPress={() => updateSearchString('')}/> : undefined}/>
       </View>
     </View>
   );
