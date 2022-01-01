@@ -41,20 +41,28 @@ export const RecipeList = (props: Props) => {
   };
   useEffect(refreshData, []);
 
-  const getShownItems = (): (RecipeGroup | Recipe)[] => {
-    if (!props.shownRecipeGroupId) {
-      return [...myRecipeGroups, ...myRecipes.filter((recipe) => recipe.recipeGroups.length === 0)];
-    } else {
+  const getShownItems = (includeGroupedRecipes=false): (RecipeGroup | Recipe)[] => {
+    if (props.shownRecipeGroupId) {
+      // Navigated in a group, return only group items
       return myRecipes.filter((recipe) => recipe.recipeGroups.filter((group) => group.id === props.shownRecipeGroupId).length > 0);
+    } else if (includeGroupedRecipes) {
+      // Return all recipes and groups (used in search mode)
+      return [...myRecipeGroups, ...myRecipes];
+    } else {
+      // Only return recipes, not in a group and groups
+      return [...myRecipeGroups, ...myRecipes.filter((recipe) => recipe.recipeGroups.length === 0)];
     }
   };
 
   const dataProvider = useMemo(() => {
-    let shownItems = getShownItems();
+    let shownItems: (Recipe|RecipeGroup)[] = [];
     if (searchString !== '') {
+      shownItems = getShownItems(true);
       shownItems = fuzzy
           .filter(searchString, shownItems, {extract: (e) => e.title})
           .map((e) => e.original);
+    } else {
+      shownItems = getShownItems();
     }
 
     return new DataProvider((item1, item2) => {
