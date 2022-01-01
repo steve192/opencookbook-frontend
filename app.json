@@ -32,7 +32,7 @@
       "permissions": [
         "CAMERA"
       ],
-      "versionCode": 5
+      "versionCode": 7
     },
     "web": {
       "favicon": "./assets/icon.png"
