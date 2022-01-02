@@ -2,6 +2,7 @@ import {Text, useTheme} from '@ui-kitten/components';
 import React from 'react';
 import {StyleProp, TextStyle, View} from 'react-native';
 import {IngredientUse} from '../dao/RestAPI';
+import fuzzy from 'fuzzy';
 
 interface Props {
     value: string;
@@ -17,8 +18,15 @@ export const PreparationStepText = (props: Props) => {
   };
 
   const isIngredient = (word: string) => {
-    const foundIngredient = props.ingredients.find((ingredient) => ingredient.ingredient.name.toLowerCase() === word.toLowerCase());
-    return foundIngredient !== undefined;
+    const results = fuzzy.filter(word, props.ingredients, {
+      extract: (indgredient) => indgredient.ingredient.name,
+    });
+    if (results.length > 0 && results[0].score > 50) {
+      console.log(word, 'matches to', results[0].original.ingredient.name, 'score', results[0].score);
+      return true;
+    } else {
+      return false;
+    }
   };
 
 

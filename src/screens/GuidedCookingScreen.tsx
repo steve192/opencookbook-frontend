@@ -11,6 +11,7 @@ import {PreparationStepText} from '../components/PreparationStepText';
 import {TextBullet} from '../components/TextBullet';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
+import fuzzy from 'fuzzy';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 export const GuidedCookingScreen = (props: Props) => {
@@ -56,7 +57,7 @@ export const GuidedCookingScreen = (props: Props) => {
               <Text category="label">{t('screens.guidedCooking.ingredients')}</Text>
               <IngredientList
                 ingredients={recipe.neededIngredients
-                    .filter((neededIngredient) => step.toLowerCase().includes(cleanupIngredientName(neededIngredient.ingredient.name)))}
+                    .filter((neededIngredient) => isIngredientContainedInText(neededIngredient.ingredient.name, step))}
                 scaledServings={props.route.params.scaledServings}
                 servings={recipe.servings}
               />
@@ -64,7 +65,7 @@ export const GuidedCookingScreen = (props: Props) => {
               <IngredientList
                 greyedOutStyle={true}
                 ingredients={recipe.neededIngredients
-                    .filter((neededIngredient) => !step.toLowerCase().includes(cleanupIngredientName(neededIngredient.ingredient.name)))}
+                    .filter((neededIngredient) => !isIngredientContainedInText(neededIngredient.ingredient.name, step))}
                 scaledServings={props.route.params.scaledServings}
                 servings={recipe.servings}
               />
@@ -94,6 +95,18 @@ export const GuidedCookingScreen = (props: Props) => {
       </View>
     </Layout>
   );
+};
+
+const isIngredientContainedInText = (ingredient:string, text:string) => {
+  const results = fuzzy.filter(ingredient, [text], {
+    extract: (text) => text,
+  });
+  if (results.length > 0 && results[0].score > 50) {
+    console.log(ingredient, 'matches to', results[0].original, 'score', results[0].score);
+    return true;
+  } else {
+    return false;
+  }
 };
 
 const cleanupIngredientName = (name: string) => {
