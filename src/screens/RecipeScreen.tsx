@@ -52,14 +52,16 @@ export const RecipeScreen = (props: Props) => {
   }, [props.route.params.recipeId, focussed]);
 
   const renderIngredientsSection = () =>
-    <IngredientList
-      ingredients={displayedRecipe.neededIngredients}
-      servings={displayedRecipe.servings}
-      scaledServings={scaledServings}
-      enableServingScaling={true}
-
-      onServingScaleChange={setScaledServings}
-    />
+    <>
+      <Text category="label">{t('screens.recipe.ingredients')}</Text>
+      <IngredientList
+        ingredients={displayedRecipe.neededIngredients}
+        servings={displayedRecipe.servings}
+        scaledServings={scaledServings}
+        enableServingScaling={true}
+        onServingScaleChange={setScaledServings}
+      />
+    </>
   ;
 
 

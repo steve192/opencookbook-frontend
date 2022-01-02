@@ -60,6 +60,14 @@ export const GuidedCookingScreen = (props: Props) => {
                 scaledServings={props.route.params.scaledServings}
                 servings={recipe.servings}
               />
+              <Divider/>
+              <IngredientList
+                greyedOutStyle={true}
+                ingredients={recipe.neededIngredients
+                    .filter((neededIngredient) => !step.toLowerCase().includes(neededIngredient.ingredient.name.toLowerCase()))}
+                scaledServings={props.route.params.scaledServings}
+                servings={recipe.servings}
+              />
             </View>,
           )}
 

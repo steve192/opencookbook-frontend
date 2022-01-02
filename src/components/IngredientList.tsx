@@ -14,6 +14,7 @@ interface Props {
    ingredients: IngredientUse[]
    enableServingScaling?: boolean
    onServingScaleChange?: (newServings: number) => void
+   greyedOutStyle?: boolean
 }
 
 
@@ -34,7 +35,6 @@ export const IngredientList = (props: Props) => {
   };
   return (
     <>
-      <Text category="label">{t('screens.recipe.ingredients')}</Text>
       {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
       <View style={{alignItems: 'center', justifyContent: 'center'}}>
         {props.ingredients.map((ingredient, index) =>
@@ -45,12 +45,12 @@ export const IngredientList = (props: Props) => {
                 style={{
                   flex: 2,
                   alignSelf: 'stretch',
-                  color: theme['color-primary-default'],
+                  color: props.greyedOutStyle ? theme['color-control-disabled']: theme['color-primary-default'],
                   fontWeight: 'bold',
                 }}>{ingredient.amount > 0 ? `${scaleIngredient(ingredient.amount)} ${ingredient.unit}` : ''}
               </Text>
 
-              <Text style={{flex: 4, alignSelf: 'stretch'}} >{ingredient.ingredient.name}</Text>
+              <Text style={{flex: 4, alignSelf: 'stretch', color: props.greyedOutStyle && theme['color-basic-transparent-600']}} >{ingredient.ingredient.name}</Text>
             </View>
           </React.Fragment>,
         )}
