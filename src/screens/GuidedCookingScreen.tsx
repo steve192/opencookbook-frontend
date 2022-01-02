@@ -98,15 +98,21 @@ export const GuidedCookingScreen = (props: Props) => {
 };
 
 const isIngredientContainedInText = (ingredient:string, text:string) => {
-  const results = fuzzy.filter(ingredient, [text], {
+  let cleanText = text.replace(',', ' ');
+  cleanText = cleanText.replace('(', ' ');
+  cleanText = cleanText.replace(')', ' ');
+
+  // Is any ingredient a word of the text?
+  const results = fuzzy.filter(ingredient, cleanText.split(' '), {
     extract: (text) => text,
   });
   if (results.length > 0 && results[0].score > 50) {
     console.log(ingredient, 'matches to', results[0].original, 'score', results[0].score);
     return true;
-  } else {
-    return false;
   }
+
+  // TODO: Vice versa check, is a word contained in the ingredients?
+  return false;
 };
 
 const cleanupIngredientName = (name: string) => {
