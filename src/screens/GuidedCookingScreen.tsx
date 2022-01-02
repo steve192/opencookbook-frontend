@@ -56,7 +56,7 @@ export const GuidedCookingScreen = (props: Props) => {
               <Text category="label">{t('screens.guidedCooking.ingredients')}</Text>
               <IngredientList
                 ingredients={recipe.neededIngredients
-                    .filter((neededIngredient) => step.toLowerCase().includes(neededIngredient.ingredient.name.toLowerCase()))}
+                    .filter((neededIngredient) => step.toLowerCase().includes(cleanupIngredientName(neededIngredient.ingredient.name)))}
                 scaledServings={props.route.params.scaledServings}
                 servings={recipe.servings}
               />
@@ -64,7 +64,7 @@ export const GuidedCookingScreen = (props: Props) => {
               <IngredientList
                 greyedOutStyle={true}
                 ingredients={recipe.neededIngredients
-                    .filter((neededIngredient) => !step.toLowerCase().includes(neededIngredient.ingredient.name.toLowerCase()))}
+                    .filter((neededIngredient) => !step.toLowerCase().includes(cleanupIngredientName(neededIngredient.ingredient.name)))}
                 scaledServings={props.route.params.scaledServings}
                 servings={recipe.servings}
               />
@@ -94,6 +94,13 @@ export const GuidedCookingScreen = (props: Props) => {
       </View>
     </Layout>
   );
+};
+
+const cleanupIngredientName = (name: string) => {
+  let newName = name.toLowerCase();
+  newName = newName.replace(/\(.*\)/, '');
+  newName = newName.replace(/,.*/, '');
+  return newName;
 };
 
 const styles = StyleSheet.create({
