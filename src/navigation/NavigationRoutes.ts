@@ -11,7 +11,7 @@ export type MainNavigationProps = {
     RecipeScreen: { recipeId: number }
     ImportScreen: { importUrl?: string },
     RecipeGroupEditScreen: { recipeGroup?: RecipeGroup, onRecipeGroupChanges?: (changedRecipeGroup: RecipeGroup) => void }
-    GuidedCookingScreen: { recipe: Recipe }
+    GuidedCookingScreen: { recipe: Recipe, scaledServings: number }
 };
 
 export type OverviewNavigationProps = {

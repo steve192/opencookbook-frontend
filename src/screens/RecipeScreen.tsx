@@ -1,13 +1,14 @@
 import {useIsFocused} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {Button, Divider, Layout, Text, useTheme} from '@ui-kitten/components';
+import {Button, Divider, Layout, Text} from '@ui-kitten/components';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, View} from 'react-native';
+import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import Spacer from 'react-spacer';
-import {EditIcon, MinusIcon, PlusIcon} from '../assets/Icons';
+import {EditIcon} from '../assets/Icons';
 import {ChunkView} from '../ChunkView';
+import {IngredientList} from '../components/IngredientList';
 import {RecipeImageViewPager} from '../components/RecipeImageViewPager';
 import {TextBullet} from '../components/TextBullet';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
@@ -22,7 +23,7 @@ export const RecipeScreen = (props: Props) => {
   const focussed = useIsFocused();
 
   const displayedRecipe = useAppSelector((state) => state.recipes.recipes.filter((recipe) => recipe.id == props.route.params.recipeId)[0]);
-  const [servings, setServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 0);
+  const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 0);
   const {t} = useTranslation('translation');
 
 
@@ -50,63 +51,15 @@ export const RecipeScreen = (props: Props) => {
     });
   }, [props.route.params.recipeId, focussed]);
 
-  const theme = useTheme();
-
-  const getServingMultiplier = () => {
-    if (!displayedRecipe) {
-      return 1;
-    }
-    return servings / displayedRecipe?.servings;
-  };
-
-  const scaleIngredient = (originalAmount: number) => {
-    return Math.round(originalAmount * getServingMultiplier() * 10) / 10;
-  };
-
   const renderIngredientsSection = () =>
-    <>
-      <Text category="label">{t('screens.recipe.ingredients')}</Text>
-      {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
-      <View style={{alignItems: 'center', justifyContent: 'center'}}>
-        {displayedRecipe?.neededIngredients.map((ingredient, index) =>
-          <React.Fragment key={index}>
-            <Divider />
-            <View style={{flex: 1, alignSelf: 'stretch', flexDirection: 'row'}}>
-              <Text
-                style={{
-                  flex: 2,
-                  alignSelf: 'stretch',
-                  color: theme['color-primary-default'],
-                  fontWeight: 'bold',
-                }}>{ingredient.amount > 0 ? `${scaleIngredient(ingredient.amount)} ${ingredient.unit}` : ''}
-              </Text>
+    <IngredientList
+      ingredients={displayedRecipe.neededIngredients}
+      servings={displayedRecipe.servings}
+      scaledServings={scaledServings}
+      enableServingScaling={true}
 
-              <Text style={{flex: 4, alignSelf: 'stretch'}} >{ingredient.ingredient.name}</Text>
-            </View>
-          </React.Fragment>,
-        )}
-      </View>
-      <Spacer height={20} />
-      <View style={styles.servingsContainer}>
-        <Button
-          style={CentralStyles.iconButton}
-          size='tiny'
-          onPress={() => {
-            if (servings === 1) {
-              return;
-            }
-            setServings(
-                servings - 1);
-          }}
-          accessoryLeft={<MinusIcon />} />
-        <Text style={{paddingHorizontal: 20}}> {servings} {t('screens.recipe.servings')}</Text>
-        <Button
-          style={CentralStyles.iconButton}
-          size='tiny'
-          onPress={() => setServings(servings + 1)}
-          accessoryLeft={<PlusIcon />} />
-      </View>
-    </>;
+      onServingScaleChange={setScaledServings}
+    />
   ;
 
 
@@ -141,7 +94,7 @@ export const RecipeScreen = (props: Props) => {
             {displayedRecipe && renderIngredientsSection()}
 
             <Spacer height={20} />
-            <Button onPress={() => displayedRecipe && props.navigation.navigate('GuidedCookingScreen', {recipe: displayedRecipe})}>{t('screens.recipe.startCookingButton')}</Button>
+            <Button onPress={() => displayedRecipe && props.navigation.navigate('GuidedCookingScreen', {recipe: displayedRecipe, scaledServings: scaledServings})}>{t('screens.recipe.startCookingButton')}</Button>
             <Spacer height={20} />
 
             {displayedRecipe && renderStepsSection()}
@@ -153,19 +106,4 @@ export const RecipeScreen = (props: Props) => {
     </ChunkView>
   );
 };
-
-const styles = StyleSheet.create({
-  recipeImage: {
-    width: '100%',
-    height: 320,
-    borderRadius: 0,
-  },
-  servingsContainer: {
-
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-
-  },
-});
 

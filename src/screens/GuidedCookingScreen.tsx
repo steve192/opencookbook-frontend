@@ -6,6 +6,7 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import Spacer from 'react-spacer';
+import {IngredientList} from '../components/IngredientList';
 import {PreparationStepText} from '../components/PreparationStepText';
 import {TextBullet} from '../components/TextBullet';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
@@ -53,11 +54,12 @@ export const GuidedCookingScreen = (props: Props) => {
               <Divider />
               <Spacer height={20} />
               <Text category="label">{t('screens.guidedCooking.ingredients')}</Text>
-              {recipe.neededIngredients
-                  .filter((neededIngredient) => step.toLowerCase().includes(neededIngredient.ingredient.name.toLowerCase()))
-                  .map((neededIngredient, index) => (
-                    <Text key={index}>{neededIngredient.ingredient.name}</Text>
-                  ))}
+              <IngredientList
+                ingredients={recipe.neededIngredients
+                    .filter((neededIngredient) => step.toLowerCase().includes(neededIngredient.ingredient.name.toLowerCase()))}
+                scaledServings={props.route.params.scaledServings}
+                servings={recipe.servings}
+              />
             </View>,
           )}
 
