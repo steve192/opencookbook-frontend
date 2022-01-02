@@ -50,7 +50,7 @@ export const IngredientList = (props: Props) => {
                 }}>{ingredient.amount > 0 ? `${scaleIngredient(ingredient.amount)} ${ingredient.unit}` : ''}
               </Text>
 
-              <Text style={{flex: 4, alignSelf: 'stretch', color: props.greyedOutStyle && theme['color-basic-transparent-600']}} >{ingredient.ingredient.name}</Text>
+              <Text style={{flex: 4, alignSelf: 'stretch', color: props.greyedOutStyle ? theme['color-basic-transparent-600'] : theme['text-basic-color']}} >{ingredient.ingredient.name}</Text>
             </View>
           </React.Fragment>,
         )}
