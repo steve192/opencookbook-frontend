@@ -1,9 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import {Platform} from 'react-native';
 
 export default class Configuration {
-  private static backendURL = 'https://opencookbook.sterul.com';
+  private static backendURL = Constants.manifest?.extra?.defaultApiUrl;
 
 
   static async setAuthToken(token: string) {

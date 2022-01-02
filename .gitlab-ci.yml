@@ -7,6 +7,8 @@ stages:
 build-web:
   stage: build
   image: node:16.13
+  variables:
+    DEFAULT_API_URL: $DEFAULT_API_URL
   script:
     - npm ci
     - npm run build-web
@@ -61,6 +63,7 @@ publish-expo:
   image: node:16.13
   variables:
     EXPO_TOKEN: $EXPO_TOKEN
+    DEFAULT_API_URL: $DEFAULT_API_URL
   script:
     - npm ci
     - npm run publish-expo -- --release-channel beta
@@ -72,6 +75,7 @@ build-android:
     # Token not supported by turtle
     EXPO_USERNAME: $EXPO_USERNAME
     EXPO_PASSWORD: $EXPO_PASSWORD
+    DEFAULT_API_URL: $DEFAULT_API_URL
   script:
     - npm ci
     - expo-turtle-builder --target android --format app-bundle
