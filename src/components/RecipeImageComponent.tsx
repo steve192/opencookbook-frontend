@@ -1,4 +1,3 @@
-import {Spinner} from '@ui-kitten/components';
 import React, {useEffect, useState} from 'react';
 import {Image, Platform, StyleSheet, View} from 'react-native';
 import {fetchSingleImage} from '../redux/features/imagesSlice';

@@ -1,5 +1,5 @@
 import {Spinner} from '@ui-kitten/components';
-import React, {useEffect, useState, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {InteractionManager, View} from 'react-native';
 
 const BATCH_SIZE = 100;
@@ -18,9 +18,17 @@ export const ChunkView = ({children}) => {
     </View>
   );
 
-  const childrenChunk = reachedEndRef.current ?
-      children :
-      Array.isArray(children) ? children.slice(0, BATCH_SIZE * batchIndex) : batchIndex > 0 ? children : undefined;
+  let childrenChunk = undefined;
+  if (reachedEndRef.current) {
+    // Render all
+    childrenChunk = children;
+  } else if (Array.isArray(children) ) {
+    // Render according to current batch
+    childrenChunk = children.slice(0, BATCH_SIZE * batchIndex);
+  } else if (batchIndex > 0) {
+    // Single child
+    childrenChunk = children;
+  }
 
   const setBatchIndex = (index) => {
     batchIndexRef.current = index;
