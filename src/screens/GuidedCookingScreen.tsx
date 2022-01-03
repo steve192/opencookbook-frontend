@@ -117,7 +117,7 @@ const isIngredientContainedInText = (ingredient:string, text:string) => {
 
 const cleanupIngredientName = (name: string) => {
   let newName = name.toLowerCase();
-  newName = newName.replace(/\(.*\)/, '');
+  newName = newName.replace(/\([^)]*\)/, '');
   newName = newName.replace(/,.*/, '');
   return newName;
 };
