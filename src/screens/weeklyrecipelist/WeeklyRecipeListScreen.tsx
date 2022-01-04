@@ -7,7 +7,6 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useDispatch} from 'react-redux';
-import Spacer from 'react-spacer';
 import XDate from 'xdate';
 import {PlusIcon} from '../../assets/Icons';
 import {ChunkView} from '../../ChunkView';
