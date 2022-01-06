@@ -72,7 +72,6 @@ jobs:
       - name: install dependencies
         run: |
           npm ci
-          npm run build-web
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
