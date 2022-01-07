@@ -77,7 +77,7 @@ class RestAPI {
     await this.delete('/recipe-groups/' + groupId);
   }
   static async refreshToken() {
-    const response = await axios.post(this.url('/users/refreshToken'), {refreshToken: await Configuration.getRefreshToken()});
+    const response = await axios.post(await this.url('/users/refreshToken'), {refreshToken: await Configuration.getRefreshToken()});
     await Configuration.setAuthToken(response.data.token);
   }
   static async createNewRecipeGroup(recipeGroup: RecipeGroup): Promise<RecipeGroup> {
@@ -253,7 +253,7 @@ class RestAPI {
 
   static async getImageAsDataURI(uuid: string) {
     try {
-      const response = await axios.get(this.url('/recipes-images/' + uuid), {
+      const response = await axios.get(await this.url('/recipes-images/' + uuid), {
         headers: {
           'Authorization': 'Bearer ' + await Configuration.getAuthToken(),
         },
@@ -317,13 +317,13 @@ class RestAPI {
     return response?.data;
   }
   static async createNewRecipe(newRecipeData: Recipe): Promise<Recipe> {
-    const response = await axios.post(this.url('/recipes'), newRecipeData, await this.axiosConfig());
+    const response = await axios.post(await this.url('/recipes'), newRecipeData, await this.axiosConfig());
     return {...response.data, type: 'Recipe'};
   }
 
 
   static async authenticate(emailAddress: string, password: string): Promise<void> {
-    const response = await axios.post(this.url('/users/login'), {
+    const response = await axios.post(await this.url('/users/login'), {
       emailAddress: emailAddress,
       password: password,
     });
@@ -337,7 +337,7 @@ class RestAPI {
   }
 
   static async registerUser(emailAddress: string, password: string) {
-    const response = await axios.post(this.url('/users/signup'), {
+    const response = await axios.post(await this.url('/users/signup'), {
       emailAddress: emailAddress,
       password: password,
     });
@@ -347,44 +347,44 @@ class RestAPI {
     }
   }
 
-  private static url(path: string): string {
-    return Configuration.getBackendURL() + Configuration.getApiRoute() + path;
+  private static async url(path: string) {
+    return await Configuration.getBackendURL() + Configuration.getApiRoute() + path;
   }
 
   private static async post(apiPath: string, data: any) {
     try {
-      return await axios.post(this.url(apiPath), data, await this.axiosConfig());
+      return await axios.post(await this.url(apiPath), data, await this.axiosConfig());
     } catch (e) {
       await RestAPI.handleAxiosError(e);
       // Retry after error handling
-      return axios.post(this.url(apiPath), data, await this.axiosConfig());
+      return axios.post(await this.url(apiPath), data, await this.axiosConfig());
     }
   }
   private static async delete(apiPath: string) {
     try {
-      return await axios.delete(this.url(apiPath), await this.axiosConfig());
+      return await axios.delete(await this.url(apiPath), await this.axiosConfig());
     } catch (e) {
       await RestAPI.handleAxiosError(e);
       // Retry after error handling
-      return axios.delete(this.url(apiPath), await this.axiosConfig());
+      return axios.delete(await this.url(apiPath), await this.axiosConfig());
     }
   }
   private static async put(apiPath: string, data: any) {
     try {
-      return await axios.put(this.url(apiPath), data, await this.axiosConfig());
+      return await axios.put(await this.url(apiPath), data, await this.axiosConfig());
     } catch (e) {
       await RestAPI.handleAxiosError(e);
       // Retry after error handling
-      return axios.put(this.url(apiPath), data, await this.axiosConfig());
+      return axios.put(await this.url(apiPath), data, await this.axiosConfig());
     }
   }
   private static async get(apiPath: string) {
     try {
-      return await axios.get(this.url(apiPath), await this.axiosConfig());
+      return await axios.get(await this.url(apiPath), await this.axiosConfig());
     } catch (e) {
       await RestAPI.handleAxiosError(e);
       // Retry after error handling
-      return axios.get(this.url(apiPath), await this.axiosConfig());
+      return axios.get(await this.url(apiPath), await this.axiosConfig());
     }
   }
 

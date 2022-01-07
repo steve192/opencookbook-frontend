@@ -4,9 +4,6 @@ import * as SecureStore from 'expo-secure-store';
 import {Platform} from 'react-native';
 
 export default class Configuration {
-  private static backendURL = Constants.manifest?.extra?.defaultApiUrl;
-
-
   static async setAuthToken(token: string) {
     if (Platform.OS === 'web') {
       await AsyncStorage.setItem('authToken', token);
@@ -39,12 +36,25 @@ export default class Configuration {
   }
 
 
-  static getBackendURL(): string {
-    return this.backendURL;
+  static async getBackendURL(): Promise<string> {
+    let backendUrl = undefined;
+    if (Platform.OS !== 'web') {
+      backendUrl = await SecureStore.getItemAsync('backendUrl');
+    }
+    backendUrl = await AsyncStorage.getItem('backendUrl');
+    if (!backendUrl) {
+      // Default backend url if not set
+      backendUrl = Constants.manifest?.extra?.defaultApiUrl ? Constants.manifest?.extra?.defaultApiUrl : '';
+    }
+    return backendUrl;
   }
 
-  static setBackendURL(url: string) {
-    this.backendURL = url;
+  static async setBackendURL(url: string) {
+    if (Platform.OS === 'web') {
+      await AsyncStorage.setItem('backendUrl', url);
+      return;
+    }
+    await SecureStore.setItemAsync('backendUrl', url);
   }
 
   static getApiRoute(): string {

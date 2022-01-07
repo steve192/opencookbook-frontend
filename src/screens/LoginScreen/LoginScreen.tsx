@@ -1,7 +1,7 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Button, Card, Icon, Input, Modal, Text} from '@ui-kitten/components';
 import Constants from 'expo-constants';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {useDispatch} from 'react-redux';
@@ -20,7 +20,7 @@ const LoginScreen = ({route, navigation}: Props) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [settingsModalVisible, setSettingsModalVisible] = useState<boolean>(false);
-  const [serverUrl, setServerUrl] = useState<string>(Configuration.getBackendURL());
+  const [serverUrl, setServerUrl] = useState<string>('');
   const [apiErrorMessage, setApiErrorMessage] = useState<string>();
 
   const dispatch = useDispatch();
@@ -34,6 +34,10 @@ const LoginScreen = ({route, navigation}: Props) => {
       setApiErrorMessage(error.toString());
     });
   };
+
+  useEffect(() => {
+    Configuration.getBackendURL().then(setServerUrl);
+  }, []);
 
   const settingsModal = (
     <Modal

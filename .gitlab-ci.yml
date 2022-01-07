@@ -19,7 +19,7 @@ build-web:
 sonarqube:
   stage: test
   only:
-    - master
+    - main
   image: sonarsource/sonar-scanner-cli:latest
   allow_failure: true
   variables:
