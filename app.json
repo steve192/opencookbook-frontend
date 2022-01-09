@@ -14,7 +14,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0,
       "checkAutomatically": "ON_ERROR_RECOVERY",
-      "url": "https://expo.dev/@steve192/opencookbook",
+      "url": "https://expo.dev/@steve192/opencookbook"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -31,12 +31,22 @@
       },
       "package": "com.sterul.opencookbook",
       "permissions": [
-        "CAMERA"
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
       ],
-      "versionCode": 7
+      "versionCode": 8
     },
     "web": {
       "favicon": "./assets/icon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you upload them to your recipes."
+        }
+      ]
+    ]
   }
 }
