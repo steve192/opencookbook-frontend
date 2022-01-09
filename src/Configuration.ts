@@ -40,8 +40,9 @@ export default class Configuration {
     let backendUrl = undefined;
     if (Platform.OS !== 'web') {
       backendUrl = await SecureStore.getItemAsync('backendUrl');
+    } else {
+      backendUrl = await AsyncStorage.getItem('backendUrl');
     }
-    backendUrl = await AsyncStorage.getItem('backendUrl');
     if (!backendUrl) {
       // Default backend url if not set
       backendUrl = Constants.manifest?.extra?.defaultApiUrl ? Constants.manifest?.extra?.defaultApiUrl : '';

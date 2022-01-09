@@ -48,8 +48,9 @@ const LoginScreen = ({route, navigation}: Props) => {
         <Text>Server URL</Text>
         <Input value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
         <Button onPress={() => {
-          setSettingsModalVisible(false);
-          Configuration.setBackendURL(serverUrl);
+          Configuration.setBackendURL(serverUrl).then(() => {
+            setSettingsModalVisible(false);
+          });
         }}>
                     Save
         </Button>
