@@ -5,6 +5,7 @@ import React from 'react';
 import {enableScreens} from 'react-native-screens';
 import {Provider, useSelector} from 'react-redux';
 import {default as customMapping} from './mapping.json';
+import {Prompt} from './src/helper/Prompt';
 import './src/i18n/config';
 import MainNavigation from './src/navigation/MainNavigation';
 import {RootState, store} from './src/redux/store';
@@ -19,6 +20,7 @@ export default () => {
       <Provider store={store}>
         <ReduxWrappedApp />
       </Provider>
+      <Prompt/>
     </>
   );
 };
