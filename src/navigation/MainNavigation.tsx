@@ -32,78 +32,70 @@ const MainNavigation = () => {
   const {t} = useTranslation('translation');
 
   const LoginStackNavigation = () => (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{flex: 1}}>
-      <Stack.Navigator
-        screenOptions={{
-          headerStyle: {backgroundColor: theme['color-primary-default']},
-          headerTintColor: theme['text-alternate-color'],
-        }}>
-        <Stack.Screen
-          name="LoginScreen"
-          component={LoginScreen}
-          options={{headerShown: false}} />
-        <Stack.Screen
-          name="SignupScreen"
-          component={SignupScreen}
-          options={{headerShown: false}} />
-      </Stack.Navigator>
-    </KeyboardAvoidingView>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {backgroundColor: theme['color-primary-default']},
+        headerTintColor: theme['text-alternate-color'],
+      }}>
+      <Stack.Screen
+        name="LoginScreen"
+        component={LoginScreen}
+        options={{headerShown: false}} />
+      <Stack.Screen
+        name="SignupScreen"
+        component={SignupScreen}
+        options={{headerShown: false}} />
+    </Stack.Navigator>
   );
 
   const MainStackNavigation = () => {
     return (
       <>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{flex: 1}}>
-          <Stack.Navigator
-            screenOptions={{
-              headerStyle: {backgroundColor: theme['color-primary-default']},
-              headerTintColor: theme['text-alternate-color'],
-            }}>
-            <Stack.Screen
-              name="OverviewScreen"
-              component={BottomTabNavigation}
-              options={
-                {headerShown: false}
-              }
-            />
-            <Stack.Screen
-              name="RecipeWizardScreen"
-              component={RecipeWizardScreen}
-            />
-            <Stack.Screen
-              name="ImportScreen"
-              component={ImportScreen}
-              options={{
-                title: t('navigation.screenTitleImport'),
-              }}
-            />
-            <Stack.Screen
-              name="RecipeGroupEditScreen"
-              component={RecipeGroupEditScreen}
-              options={{
-                title: t('navigation.screenTitleCreateRecipeGroup'),
-              }}
-            />
-            <Stack.Screen
-              name="GuidedCookingScreen"
-              component={GuidedCookingScreen}
-              options={{
-                title: t('navigation.screenTitleGuidedCooking'),
-              }}
-            />
-            <Stack.Screen
-              name="RecipeScreen"
-              component={RecipeScreen}
-              // options={
-              //     { headerTransparent: true, headerStyle: {} }
-              // }
-            />
-          </Stack.Navigator>
-        </KeyboardAvoidingView>
+        <Stack.Navigator
+          screenOptions={{
+            headerStyle: {backgroundColor: theme['color-primary-default']},
+            headerTintColor: theme['text-alternate-color'],
+          }}>
+          <Stack.Screen
+            name="OverviewScreen"
+            component={BottomTabNavigation}
+            options={
+              {headerShown: false}
+            }
+          />
+          <Stack.Screen
+            name="RecipeWizardScreen"
+            component={RecipeWizardScreen}
+          />
+          <Stack.Screen
+            name="ImportScreen"
+            component={ImportScreen}
+            options={{
+              title: t('navigation.screenTitleImport'),
+            }}
+          />
+          <Stack.Screen
+            name="RecipeGroupEditScreen"
+            component={RecipeGroupEditScreen}
+            options={{
+              title: t('navigation.screenTitleCreateRecipeGroup'),
+            }}
+          />
+          <Stack.Screen
+            name="GuidedCookingScreen"
+            component={GuidedCookingScreen}
+            options={{
+              title: t('navigation.screenTitleGuidedCooking'),
+            }}
+          />
+          <Stack.Screen
+            name="RecipeScreen"
+            component={RecipeScreen}
+            // options={
+            //     { headerTransparent: true, headerStyle: {} }
+            // }
+          />
+        </Stack.Navigator>
       </>
     );
   };
