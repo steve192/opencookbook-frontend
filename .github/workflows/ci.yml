@@ -158,7 +158,7 @@ jobs:
     name: Publish on expo
     needs: sonarcloud
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' && ( github.ref == 'main' )
+    if: github.event_name != 'pull_request' && ( github.ref_name == 'main' )
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
