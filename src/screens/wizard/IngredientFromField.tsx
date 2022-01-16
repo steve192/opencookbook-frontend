@@ -36,7 +36,7 @@ export const IngredientFormField = (props: Props) => {
     if (existingIngredient) {
       props.onIngredientChange({ingredient: existingIngredient, amount: parseFloat(newAmount), unit: newUnit});
     } else {
-      props.onIngredientChange({ingredient: {name: ingredientQuery}, amount: parseFloat(newAmount), unit: newUnit});
+      props.onIngredientChange({ingredient: {name: ingredientName}, amount: parseFloat(newAmount), unit: newUnit});
     }
   };
 
