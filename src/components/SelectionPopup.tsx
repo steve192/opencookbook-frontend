@@ -1,6 +1,7 @@
 import {HeaderHeightContext} from '@react-navigation/elements';
 import {Divider, Input, Layout, List, ListItem, Text} from '@ui-kitten/components';
 import React, {useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {ListRenderItemInfo, Modal, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import Spacer from 'react-spacer';
 
@@ -28,6 +29,8 @@ export const SelectionPopup = (props: Props) => {
   const [value, setValue] = useState<string>('');
 
   const modalInputRef = useRef<Input>(null);
+
+  const {t} = useTranslation('translation');
 
 
   const openModal = () => {
@@ -68,7 +71,7 @@ export const SelectionPopup = (props: Props) => {
       return listItems;
     }
 
-    return [{option: {key: '', value: 'Create ' + value, newlyCreated: true}}];
+    return [{option: {key: '', value: t('common.createImperative') + ' ' + value, newlyCreated: true}}];
   };
 
 
@@ -84,8 +87,6 @@ export const SelectionPopup = (props: Props) => {
         </View>
       </Pressable>
 
-      {/* <SafeAreaInsetsContext.Consumer>
-                {insets => insets && */}
       {modalVisible &&
                 <View style={styles.centeredView}>
                   <Modal
@@ -126,8 +127,6 @@ export const SelectionPopup = (props: Props) => {
                   </Modal>
                 </View>
       }
-      {/* } */}
-      {/* </SafeAreaInsetsContext.Consumer> */}
     </>
   );
 };

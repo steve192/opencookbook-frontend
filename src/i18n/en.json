@@ -11,7 +11,8 @@
   "common": {
     "create": "Create",
     "next": "Next",
-    "previous": "Previous"
+    "previous": "Previous",
+    "createImperative": "Create"
   },
   "navigation": {
     "tabMyRecipes": "MY RECIPES",

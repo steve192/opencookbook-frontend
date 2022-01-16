@@ -11,7 +11,7 @@ import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {createRecipe, deleteRecipe, updateRecipe} from '../../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles from '../../styles/CentralStyles';
-import {IngredientFormField} from './IngridientFromField';
+import {IngredientFormField} from './IngredientFromField';
 import {RecipeFormField} from './PreparationStepFormField';
 import {RecipeGroupFormField} from './RecipeGroupFormField';
 import {ChunkView} from '../../ChunkView';

@@ -11,7 +11,8 @@
   "common": {
     "create": "Erstellen",
     "next": "Weiter",
-    "previous": "Zurrück"
+    "previous": "Zurrück",
+    "createImperative": "Erstelle"
   },
   "navigation": {
     "tabMyRecipes": "MEINE REZEPTE",
