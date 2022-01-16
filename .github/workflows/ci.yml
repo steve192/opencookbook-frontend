@@ -181,11 +181,6 @@ jobs:
         with:
           node-version: 16.x
 
-      - name: Setup Expo
-        uses: expo/expo-github-action@v7
-        with:
-          token: ${{ secrets.EXPO_TOKEN }}
-
       - name: Install dependencies
         run: npm ci
 
@@ -193,3 +188,4 @@ jobs:
         run: npx expo publish
         env:
           DEFAULT_API_URL: https://cookpal.io
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
