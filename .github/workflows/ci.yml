@@ -156,7 +156,7 @@ jobs:
   # Publish everything on main branch to expo (TODO: as soon as semantic versions are introduced, only release to beta release channel)
   expo-publish:
     name: Publish on expo
-    needs: build-web
+    needs: sonarcloud
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' && ( github.ref == 'main' )
     steps:
