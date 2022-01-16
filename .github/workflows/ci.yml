@@ -152,3 +152,44 @@ jobs:
       #  # This step uses the identity token to provision an ephemeral certificate
       #  # against the sigstore community Fulcio instance.
       #  run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
+
+  # Publish everything on main branch to expo (TODO: as soon as semantic versions are introduced, only release to beta release channel)
+  expo-publish:
+    name: Publish on expo
+    needs: sonarcloud
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' && ( github.ref == 'main' )
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v7
+        with:
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: publish to expo beta
+        run: npx expo publish
+        env:
+          DEFAULT_API_URL: https://cookpal.io
