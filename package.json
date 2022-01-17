@@ -64,7 +64,7 @@
     "@types/react": "~17.0.21",
     "@types/react-native": "~0.66.11",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
-    "@typescript-eslint/parser": "^5.8.0",
+    "@typescript-eslint/parser": "^5.9.1",
     "eas-cli": "^0.43.0",
     "eas-cli-local-build-plugin": "^0.0.58",
     "eslint": "^8.5.0",
