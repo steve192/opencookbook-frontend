@@ -11,6 +11,7 @@ import MainNavigation from './src/navigation/MainNavigation';
 import {RootState, store} from './src/redux/store';
 import {myDarkTheme} from './src/styles/custom-theme-dark';
 import {myLightTheme} from './src/styles/custom-theme-light';
+import {Provider as PaperProvider} from 'react-native-paper';
 
 enableScreens();
 
@@ -18,9 +19,10 @@ export default () => {
   return (
     <>
       <Provider store={store}>
-        <ReduxWrappedApp />
+        <PaperProvider>
+          <ReduxWrappedApp />
+        </PaperProvider>
       </Provider>
-      <Prompt/>
     </>
   );
 };
@@ -37,6 +39,7 @@ const ReduxWrappedApp = () => {
         theme={selectedTheme === 'light' ? myLightTheme : myDarkTheme}>
 
         <MainNavigation />
+        <Prompt/>
       </ApplicationProvider>
     </>
   );

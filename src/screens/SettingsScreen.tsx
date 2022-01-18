@@ -7,7 +7,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
 import {CustomCard} from '../components/CustomCard';
-import {Prompt} from '../helper/Prompt';
+import {Prompt, PromptUtil} from '../helper/Prompt';
 import {logout} from '../redux/features/authSlice';
 import {changeTheme} from '../redux/features/settingsSlice';
 import {RootState} from '../redux/store';
@@ -19,7 +19,12 @@ export const SettingsScreen = () => {
   const {t} = useTranslation('translation');
 
   const deleteAccount = () => {
-    Prompt.show();
+    PromptUtil.show({
+      title: t('screens.settings.deleteAccount'),
+      message: t('screens.settings.deleteAccountConfirmationQuestion'),
+      button1: t('common.delete'),
+      button2: t('common.cancel'),
+    });
     // Alert.alert(
     //     t('screens.settings.deleteAccount'),
     //     t('screens.settings.deleteAccountConfirmationQuestion'), [
