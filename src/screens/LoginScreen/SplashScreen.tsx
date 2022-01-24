@@ -29,7 +29,7 @@ export const SplashScreen = () => {
           Updates.reloadAsync();
         }
       } catch (e) {
-        // TODO: handle or log error
+        // Ignore error, just start with unupdated version
       }
 
       // TODO: Proper management of backend url via redux

@@ -1,7 +1,5 @@
 import React from 'react';
-import {View} from 'react-native';
-import {Button, Paragraph, Dialog, Portal, Provider, withTheme} from 'react-native-paper';
-import {Text, ThemedComponentProps, ThemeType, withStyles} from '@ui-kitten/components';
+import {Button, Dialog, Paragraph, withTheme} from 'react-native-paper';
 
 interface Options {
   title: string;
