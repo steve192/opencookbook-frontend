@@ -1,8 +1,9 @@
-import {Button, Divider, Input, Layout, Spinner, Text, useTheme} from '@ui-kitten/components';
+import {Layout, Text, useTheme} from '@ui-kitten/components';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
+import {Button, Divider, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {CheckmarkIcon, WarningIcon} from '../assets/Icons';
 import RestAPI from '../dao/RestAPI';
@@ -35,15 +36,14 @@ export const ImportScreen = (props: Props) => {
   return (
     <Layout style={CentralStyles.fullscreen}>
       <View style={CentralStyles.contentContainer}>
-        <Text>URL to import</Text>
-        <Input value={importURL} onChangeText={setImportURL} />
+        <TextInput label={t('screens.import.URLToImport')} value={importURL} onChangeText={setImportURL} />
         <Spacer height={10} />
-        <Button onPress={startImport}>Import</Button>
+        <Button icon={importSuccess ? 'check' : undefined} mode="contained" loading={importPending} onPress={startImport}>
+          {importSuccess ? <CheckmarkIcon fill={theme['text-success-color']}/> : undefined}
+          Import
+        </Button>
         <Spacer height={80} />
         <View style={{flexDirection: 'row', justifyContent: 'center', alignContent: 'center'}}>
-          {importPending &&
-                        <Spinner size="giant" />
-          }
 
           {importError.length > 0 &&
                         <>

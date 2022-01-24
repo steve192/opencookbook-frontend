@@ -1,5 +1,5 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {Button, Divider, Input, Layout, Text, useTheme} from '@ui-kitten/components';
+import {Layout, Text, useTheme} from '@ui-kitten/components';
 import React, {useLayoutEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
@@ -15,6 +15,7 @@ import {IngredientFormField} from './IngredientFromField';
 import {RecipeFormField} from './PreparationStepFormField';
 import {RecipeGroupFormField} from './RecipeGroupFormField';
 import {ChunkView} from '../../ChunkView';
+import {Button, Divider, TextInput} from 'react-native-paper';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeWizardScreen'>;
@@ -50,8 +51,8 @@ const RecipeWizardScreen = (props: Props) => {
       title: props.route.params?.editing ? t('screens.editRecipe.screenTitleEdit') : t('screens.editRecipe.screenTitleCreate'),
       headerRight: () => (
         <>
-          <Button onPress={() => onDeleteRecipe()} accessoryLeft={<DeleteIcon fill={theme['color-danger-default']} />} />
-          <Button onPress={() => saveRecipe()} accessoryLeft={<SaveIcon />} />
+          <Button onPress={() => onDeleteRecipe()} ><DeleteIcon fill={theme['color-danger-default']} /> </Button>
+          <Button onPress={() => saveRecipe()} ><SaveIcon /> </Button>
         </>
       ),
     });
@@ -158,9 +159,8 @@ const RecipeWizardScreen = (props: Props) => {
       <Spacer height={10} />
       <Button
         style={{marginHorizontal: 16}}
-        size="small"
-        accessoryLeft={PlusIcon}
-        onPress={addIngredient} />
+        mode="contained"
+        onPress={addIngredient} >{t('common.more')}</Button>
     </>;
 
 
@@ -180,7 +180,10 @@ const RecipeWizardScreen = (props: Props) => {
         </React.Fragment>,
       )}
       <Spacer height={10} />
-      <Button size="small" accessoryLeft={PlusIcon} onPress={addPreparationStep} />
+      <Button
+        mode="contained"
+        icon="plus"
+        onPress={addPreparationStep} >{t('common.more')}</Button>
     </>;
 
   const renderGroupSelectionSection = () => (
@@ -205,8 +208,8 @@ const RecipeWizardScreen = (props: Props) => {
           />
           <View style={[CentralStyles.contentContainer, CentralStyles.elementSpacing]}>
 
-            <Text category="label">{t('screens.editRecipe.title')}</Text>
-            <Input
+            <TextInput
+              label={t('screens.editRecipe.title')}
               value={recipeData.title}
               onChangeText={(newText) => setRecipeData({...recipeData, title: newText})}
               placeholder="Name" />
@@ -214,9 +217,8 @@ const RecipeWizardScreen = (props: Props) => {
             {renderIngredientsSection()}
             <Divider style={{marginVertical: 10}} />
             <Spacer height={15} />
-            <Text category="label">{t('screens.editRecipe.servings')}</Text>
-            <Input
-              placeholder="Serving size"
+            <TextInput
+              label={t('screens.editRecipe.servings')}
               keyboardType='numeric'
               value={recipeData.servings?.toString()}
               // @ts-ignore
@@ -227,7 +229,7 @@ const RecipeWizardScreen = (props: Props) => {
             {renderGroupSelectionSection()}
           </View>
           <Button
-            size="giant"
+            mode="contained"
             onPress={() => saveRecipe()}>{props.route.params?.editing ? 'Save' : 'Create'}</Button>
         </ScrollView>
       </ChunkView>

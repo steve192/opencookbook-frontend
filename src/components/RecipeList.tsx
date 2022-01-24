@@ -11,6 +11,7 @@ import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 import {RecipeImageComponent} from './RecipeImageComponent';
 import fuzzy from 'fuzzy';
+import {Searchbar} from 'react-native-paper';
 
 interface Props {
     shownRecipeGroupId: number | undefined
@@ -199,13 +200,11 @@ export const RecipeList = (props: Props) => {
       renderNoItemsNotice() }
 
       <View style={[CentralStyles.contentContainer, styles.searchContainer]}>
-        <Input
+        <Searchbar
           value={searchStringPendingInput}
           onChangeText={updateSearchString}
           style={{flex: 1, width: '100%', maxWidth: 500, alignSelf: 'center'}}
-          placeholder={t('screens.overview.searchPlaceholder')}
-          accessoryLeft={SearchIcon}
-          accessoryRight={searchStringPendingInput ? <CrossIcon onPress={() => updateSearchString('')}/> : undefined}/>
+          placeholder={t('screens.overview.searchPlaceholder')}/>
       </View>
     </View>
   );
