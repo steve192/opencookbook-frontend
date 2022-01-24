@@ -53,3 +53,6 @@ export const SearchIcon = (style: IconProps): IconElement => (
 export const CrossIcon = (style: IconProps): IconElement => (
   <Icon {...style} name='close-outline' />
 );
+export const HardDriveIcon = (style: IconProps): IconElement => (
+  <Icon {...style} name='hard-drive-outline' />
+);

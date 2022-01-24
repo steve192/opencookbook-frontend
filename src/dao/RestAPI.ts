@@ -73,6 +73,9 @@ class RestAPI {
       });
     });
   }
+  static async deleteAccount() {
+    await this.delete('/users/self');
+  }
   static async deleteRecipeGroup(groupId: number) {
     await this.delete('/recipe-groups/' + groupId);
   }
