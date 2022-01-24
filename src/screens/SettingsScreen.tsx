@@ -1,12 +1,15 @@
 import {Picker} from '@react-native-picker/picker';
-import {Button, Layout, Text} from '@ui-kitten/components';
+import {Button, Divider, Layout, Text} from '@ui-kitten/components';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {Alert, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
+import {HardDriveIcon} from '../assets/Icons';
 import {CustomCard} from '../components/CustomCard';
+import Configuration from '../Configuration';
+import RestAPI from '../dao/RestAPI';
 import {Prompt, PromptUtil} from '../helper/Prompt';
 import {logout} from '../redux/features/authSlice';
 import {changeTheme} from '../redux/features/settingsSlice';
@@ -15,6 +18,7 @@ import CentralStyles from '../styles/CentralStyles';
 
 export const SettingsScreen = () => {
   const selectedTheme = useSelector((state: RootState) => state.settings.theme);
+  const backendUrl = useSelector((state: RootState) => state.settings.backendUrl);
   const dispatch = useDispatch();
   const {t} = useTranslation('translation');
 
@@ -23,31 +27,22 @@ export const SettingsScreen = () => {
       title: t('screens.settings.deleteAccount'),
       message: t('screens.settings.deleteAccountConfirmationQuestion'),
       button1: t('common.delete'),
+      button1Callback: () => {
+        RestAPI.deleteAccount();
+        dispatch(logout());
+      },
       button2: t('common.cancel'),
     });
-    // Alert.alert(
-    //     t('screens.settings.deleteAccount'),
-    //     t('screens.settings.deleteAccountConfirmationQuestion'), [
-    //       {
-    //         text: t('common.cancel'),
-    //         onPress: () => console.log('Cancel Pressed'),
-    //         style: 'cancel',
-    //       },
-    //       {
-    //         text: t('common.delete'),
-    //         onPress: () => console.log('OK Pressed'),
-    //         style: 'destructive',
-    //       },
-    //     ] );
   };
   return (
     <>
       <Layout style={[CentralStyles.fullscreen]}>
         <View style={CentralStyles.contentContainer}>
           <ScrollView>
-            <CustomCard>
-              <Button onPress={() => dispatch(logout())}>Logout</Button>
-            </CustomCard>
+            <HardDriveIcon style={{alignSelf: 'center', width: 100, height: 100}}/>
+            <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{backendUrl}</Text>
+            <Divider style={{marginTop: 10, marginBottom: 10}}/>
+            <Button onPress={() => dispatch(logout())}>Logout</Button>
             <Spacer height={20} />
             <CustomCard>
               <Text category="label">{t('screens.settings.theme')}</Text>

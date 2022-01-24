@@ -1,3 +1,4 @@
+/* eslint-disable react/display-name */
 import * as eva from '@eva-design/eva';
 import {ApplicationProvider, IconRegistry} from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
@@ -11,7 +12,7 @@ import MainNavigation from './src/navigation/MainNavigation';
 import {RootState, store} from './src/redux/store';
 import {myDarkTheme} from './src/styles/custom-theme-dark';
 import {myLightTheme} from './src/styles/custom-theme-light';
-import {Provider as PaperProvider} from 'react-native-paper';
+import {DarkTheme, DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 
 enableScreens();
 
@@ -19,9 +20,9 @@ export default () => {
   return (
     <>
       <Provider store={store}>
-        <PaperProvider>
-          <ReduxWrappedApp />
-        </PaperProvider>
+
+        <ReduxWrappedApp />
+
       </Provider>
     </>
   );
@@ -29,8 +30,28 @@ export default () => {
 
 const ReduxWrappedApp = () => {
   const selectedTheme = useSelector((state: RootState) => state.settings.theme);
+  const paperTheme = {
+    ...DefaultTheme,
+    roundness: 2,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: '#72B600',
+      accent: '#FFE102',
+    },
+
+  };
+
+  const darkPaperTheme = {
+    ...DarkTheme,
+    roundness: 2,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: '#72B600',
+      accent: '#FFE102',
+    },
+  };
   return (
-    <>
+    <PaperProvider theme={selectedTheme === 'light' ? paperTheme : darkPaperTheme}>
       <IconRegistry icons={EvaIconsPack} />
       <ApplicationProvider
         {...eva}
@@ -41,7 +62,7 @@ const ReduxWrappedApp = () => {
         <MainNavigation />
         <Prompt/>
       </ApplicationProvider>
-    </>
+    </PaperProvider>
   );
 };
 

@@ -12,7 +12,9 @@
     "create": "Erstellen",
     "next": "Weiter",
     "previous": "Zurrück",
-    "createImperative": "Erstelle"
+    "createImperative": "Erstelle",
+    "delete": "Löschen",
+    "cancel": "Abbrechen"
   },
   "navigation": {
     "tabMyRecipes": "MEINE REZEPTE",
@@ -50,7 +52,8 @@
       "light": "Hell",
       "dark": "Dunkel",
       "dangerZone": "Gefahrenzone",
-      "deleteAccount": "Account löschen"
+      "deleteAccount": "Account löschen",
+      "deleteAccountConfirmationQuestion": "Willst du wirklich deinen Account und alle deine Rezepte löscnen? Diese Aktion ist sofort wirksam und kann nicht rückgängig gemacht werden"
     },
     "import": {
       "URLToImport": "URL zum importieren",

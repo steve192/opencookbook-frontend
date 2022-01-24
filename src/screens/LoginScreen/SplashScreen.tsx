@@ -3,8 +3,10 @@ import * as Updates from 'expo-updates';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {useDispatch} from 'react-redux';
+import Configuration from '../../Configuration';
 import RestAPI from '../../dao/RestAPI';
 import {login, logout} from '../../redux/features/authSlice';
+import {changeBackendUrl} from '../../redux/features/settingsSlice';
 import {LoginBackdrop} from './LoginBackdrop';
 
 
@@ -29,6 +31,9 @@ export const SplashScreen = () => {
       } catch (e) {
         // TODO: handle or log error
       }
+
+      // TODO: Proper management of backend url via redux
+      dispatch(changeBackendUrl(await Configuration.getBackendURL()));
 
       try {
         setStatusText('Logging in...');

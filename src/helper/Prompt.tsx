@@ -1,19 +1,22 @@
 import React from 'react';
 import {View} from 'react-native';
-import {Button, Paragraph, Dialog, Portal, Provider} from 'react-native-paper';
+import {Button, Paragraph, Dialog, Portal, Provider, withTheme} from 'react-native-paper';
 import {Text, ThemedComponentProps, ThemeType, withStyles} from '@ui-kitten/components';
 
 interface Options {
   title: string;
   message: string;
   button1:string;
+  button1Callback?: () => void;
   button2: string;
+  button2Callback?: () => void ;
 }
 interface State extends Options{
   shown: boolean;
 }
 
-interface Props extends ThemedComponentProps {
+interface Props {
+  theme: ReactNativePaper.Theme
 }
 class PromptWithoutStyles extends React.Component<Props, State> {
   private static component: PromptWithoutStyles;
@@ -25,7 +28,9 @@ class PromptWithoutStyles extends React.Component<Props, State> {
       title: '',
       message: '',
       button1: '',
+      button1Callback: undefined,
       button2: '',
+      button2Callback: undefined,
     };
   }
 
@@ -40,8 +45,16 @@ class PromptWithoutStyles extends React.Component<Props, State> {
           <Paragraph>{this.state.message}</Paragraph>
         </Dialog.Content>
         <Dialog.Actions>
-          <Button color={this.props.eva?.theme?.['color-danger-default']} onPress={() => undefined}>{this.state.button1}</Button>
-          <Button color={this.props.eva?.theme?.['color-control-default']} onPress={() => undefined}>{this.state.button2}</Button>
+          <Button color={this.props.theme.colors.error} onPress={() => {
+            this.state.button1Callback?.();
+            this.setState({shown: false});
+          }
+          }>{this.state.button1}</Button>
+          <Button color={this.props.theme.colors.text} onPress={() => {
+            this.state.button2Callback?.();
+            this.setState({shown: false});
+          }
+          }>{this.state.button2}</Button>
         </Dialog.Actions>
       </Dialog>
     );
@@ -61,4 +74,4 @@ export const PromptUtil = {
   },
 };
 
-export const Prompt = withStyles(PromptWithoutStyles);
+export const Prompt = withTheme(PromptWithoutStyles);
