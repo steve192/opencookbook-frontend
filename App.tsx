@@ -32,11 +32,12 @@ const ReduxWrappedApp = () => {
   const selectedTheme = useSelector((state: RootState) => state.settings.theme);
   const paperTheme = {
     ...DefaultTheme,
-    roundness: 2,
+    roundness: 10,
     colors: {
       ...DefaultTheme.colors,
       primary: '#72B600',
       accent: '#FFE102',
+      background: '#FFFFFF',
     },
 
   };

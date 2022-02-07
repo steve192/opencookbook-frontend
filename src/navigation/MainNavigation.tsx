@@ -1,11 +1,12 @@
 import {BottomTabBarProps, createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {BottomNavigation, BottomNavigationTab, useTheme} from '@ui-kitten/components';
+import {useTheme} from '@ui-kitten/components';
 import {createURL} from 'expo-linking';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {KeyboardAvoidingView, Platform} from 'react-native';
+import {BottomNavigation, withTheme} from 'react-native-paper';
 import {CalendarIcon, HomeIcon, SettingsIcon} from '../assets/Icons';
 import {useAppSelector} from '../redux/hooks';
 import {GuidedCookingScreen} from '../screens/GuidedCookingScreen';
@@ -101,44 +102,50 @@ const MainNavigation = () => {
   };
 
 
-  const BottomTabBar = (props: BottomTabBarProps) => (
-    <>
-      <BottomNavigation
-        selectedIndex={props.state.index}
-        onSelect={(index) => props.navigation.navigate(props.state.routeNames[index])}>
-        <BottomNavigationTab title={t('navigation.tabMyRecipes')} icon={<HomeIcon />} />
-        <BottomNavigationTab title={t('navigation.tabWeekplan')} icon={<CalendarIcon />} />
-        <BottomNavigationTab title={t('navigation.tabSettings')} icon={<SettingsIcon />} />
-      </BottomNavigation>
-    </>
-  );
-
-
-  const BottomTabNavigation = () => {
+  const BottomTabNavigation = withTheme((props) => {
+    const [index, setIndex] = React.useState(0);
+    const [routes] = React.useState([
+      {key: 'recipesListScreen', title: t('navigation.tabMyRecipes'), icon: 'home', color: '#FFFFFF'},
+      {key: 'weeklyScreen', title: t('navigation.tabWeekplan'), icon: 'calendar'},
+      {key: 'settingsScreen', title: t('navigation.tabSettings'), icon: 'cog-off-outline'},
+    ]);
+    const renderScene = BottomNavigation.SceneMap({
+      recipesListScreen: recipeScrenNavigation,
+      weeklyScreen: WeeklyRecipeListScreen,
+      settingsScreen: SettingsScreen,
+    });
     return (
-      <BottomTab.Navigator
-        backBehavior="history"
-        screenOptions={{
-          headerStyle: {backgroundColor: theme['color-primary-default']},
-          headerTintColor: theme['text-alternate-color'],
-        }}
-        tabBar={(props) => <BottomTabBar {...props} />}>
-        <BottomTab.Screen
-          name="RecipesListScreen"
-          component={recipeScrenNavigation}
-          options={{headerShown: false}} />
-        <BottomTab.Screen
-          name="WeeklyScreen"
-          component={WeeklyRecipeListScreen}
-          options={{title: t('screens.weekplan.screenTitle'), headerShown: true}} />
-        <BottomTab.Screen
-          name="SettingsScreen"
-          component={SettingsScreen}
-          options={{title: t('screens.settings.screenTitle'), headerShown: true}} />
+      <BottomNavigation
+        activeColor={props.theme.colors.primary}
+        barStyle={{backgroundColor: props.theme.colors.background}}
+        navigationState={{index, routes}}
+        onIndexChange={setIndex}
+        renderScene={renderScene}
+      />
 
-      </BottomTab.Navigator>
+    // <BottomTab.Navigator
+    //   backBehavior="history"
+    //   screenOptions={{
+    //     headerStyle: {backgroundColor: theme['color-primary-default']},
+    //     headerTintColor: theme['text-alternate-color'],
+    //   }}
+    //   tabBar={(props) => <BottomTabBar {...props} />}>
+    //   <BottomTab.Screen
+    //     name="RecipesListScreen"
+    //     component={recipeScrenNavigation}
+    //     options={{headerShown: false}} />
+    //   <BottomTab.Screen
+    //     name="WeeklyScreen"
+    //     component={WeeklyRecipeListScreen}
+    //     options={{title: t('screens.weekplan.screenTitle'), headerShown: true}} />
+    //   <BottomTab.Screen
+    //     name="SettingsScreen"
+    //     component={SettingsScreen}
+    //     options={{title: t('screens.settings.screenTitle'), headerShown: true}} />
+
+    // </BottomTab.Navigator>
     );
-  };
+  });
 
   const recipeScrenNavigation = () => (
     <Stack.Navigator

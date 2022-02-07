@@ -3,8 +3,10 @@ import {Layout, Text, useTheme} from '@ui-kitten/components';
 import React, {useLayoutEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
+import {Button, Divider, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {DeleteIcon, PlusIcon, SaveIcon} from '../../assets/Icons';
+import {DeleteIcon, SaveIcon} from '../../assets/Icons';
+import {ChunkView} from '../../ChunkView';
 import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
 import {IngredientUse, Recipe, RecipeGroup} from '../../dao/RestAPI';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
@@ -14,8 +16,6 @@ import CentralStyles from '../../styles/CentralStyles';
 import {IngredientFormField} from './IngredientFromField';
 import {RecipeFormField} from './PreparationStepFormField';
 import {RecipeGroupFormField} from './RecipeGroupFormField';
-import {ChunkView} from '../../ChunkView';
-import {Button, Divider, TextInput} from 'react-native-paper';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeWizardScreen'>;
@@ -158,8 +158,7 @@ const RecipeWizardScreen = (props: Props) => {
       )}
       <Spacer height={10} />
       <Button
-        style={{marginHorizontal: 16}}
-        mode="contained"
+        icon="plus"
         onPress={addIngredient} >{t('common.more')}</Button>
     </>;
 
@@ -181,7 +180,6 @@ const RecipeWizardScreen = (props: Props) => {
       )}
       <Spacer height={10} />
       <Button
-        mode="contained"
         icon="plus"
         onPress={addPreparationStep} >{t('common.more')}</Button>
     </>;
@@ -218,6 +216,7 @@ const RecipeWizardScreen = (props: Props) => {
             <Divider style={{marginVertical: 10}} />
             <Spacer height={15} />
             <TextInput
+              mode='outlined'
               label={t('screens.editRecipe.servings')}
               keyboardType='numeric'
               value={recipeData.servings?.toString()}
@@ -230,6 +229,8 @@ const RecipeWizardScreen = (props: Props) => {
           </View>
           <Button
             mode="contained"
+            style={{height: 50}}
+            theme={{roundness: 0}}
             onPress={() => saveRecipe()}>{props.route.params?.editing ? 'Save' : 'Create'}</Button>
         </ScrollView>
       </ChunkView>

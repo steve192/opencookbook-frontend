@@ -1,7 +1,8 @@
-import {Button, Input, useTheme} from '@ui-kitten/components';
+import {Button, useTheme} from '@ui-kitten/components';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
+import {TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {DeleteIcon} from '../../assets/Icons';
 import {SelectionPopup} from '../../components/SelectionPopup';
@@ -75,28 +76,29 @@ export const IngredientFormField = (props: Props) => {
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View style={{flex: 1, flexDirection: 'column'}}>
             <View style={{flex: 1, flexDirection: 'row'}}>
-              <Input
+              <TextInput
+                mode="outlined"
                 style={{width: 100}}
                 keyboardType="numeric"
                 value={(amount ? amount.toString() : '')}
-                placeholder={t('screens.editRecipe.amount')}
+                label={t('screens.editRecipe.amount')}
                 onChangeText={onAmountChange} />
               <Spacer width={5} />
               <SelectionPopup
                 style={{flex: 1}}
+                label={t('screens.editRecipe.unit')}
                 value={unit}
                 options={availableUnits.map((availableUnit, index) => ({key: index.toString(), value: availableUnit}))}
                 onValueChanged={(selectedOption) => setUnit(selectedOption.value)}
-                placeholder={t('screens.editRecipe.searchOrCreateUnit')}
               />
             </View>
             <Spacer height={5} />
             <View style={{justifyContent: 'center', flex: 1}}>
               <SelectionPopup
+                label={t('screens.editRecipe.ingredient')}
                 value={ingredientQuery}
                 options={availableIngredients.map((ingredient) => ({key: ingredient.id ? ingredient.id.toString() : '', value: ingredient.name}))}
                 onValueChanged={(selectedOption) => setIngredient(selectedOption.value)}
-                placeholder={t('screens.editRecipe.searchOrCreateIngredients')}
                 allowAdditionalValues={true}
               />
             </View>

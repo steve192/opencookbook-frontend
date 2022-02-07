@@ -14,7 +14,8 @@
     "previous": "Previous",
     "createImperative": "Create",
     "delete": "Delete",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "more": "More"
   },
   "navigation": {
     "tabMyRecipes": "MY RECIPES",

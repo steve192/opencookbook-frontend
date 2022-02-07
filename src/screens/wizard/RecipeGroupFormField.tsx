@@ -50,7 +50,7 @@ export const RecipeGroupFormField = (props: Props) => {
   return (
     <>
       <SelectionPopup
-        placeholder={t('screens.editRecipe.searchOrCreateRecipeGroup')}
+        label={t('screens.editRecipe.searchOrCreateRecipeGroup')}
         value={props.recipeGroup ? props.recipeGroup.title : ''}
         onValueChanged={setRecipeGroup}
         options={getOptions()}

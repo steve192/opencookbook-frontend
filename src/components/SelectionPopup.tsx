@@ -1,8 +1,9 @@
 import {HeaderHeightContext} from '@react-navigation/elements';
-import {Divider, Input, Layout, List, ListItem, Text} from '@ui-kitten/components';
+import {Layout, List, ListItem, Text} from '@ui-kitten/components';
 import React, {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ListRenderItemInfo, Modal, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
+import {Divider, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 
 
@@ -13,6 +14,7 @@ export interface Option {
 }
 interface Props {
     value: string,
+    label?: string,
     options: Option[],
     onValueChanged?: (newValue: Option) => void,
     placeholder?: string,
@@ -81,9 +83,12 @@ export const SelectionPopup = (props: Props) => {
         style={props.style}
         onPress={() => openModal()}>
         <View pointerEvents="none">
-          <Input
+          <TextInput
+            label={props.label}
+            disabled={true}
+            mode="outlined"
             placeholder={props.placeholder}
-            value={props.value}></Input>
+            value={props.value}/>
         </View>
       </Pressable>
 
@@ -107,7 +112,7 @@ export const SelectionPopup = (props: Props) => {
                                         <Layout style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, styles.modalView]}>
                                           <View
                                             style={{flexDirection: 'row', alignContent: 'center'}}>
-                                            <Input placeholder={props.placeholder} ref={modalInputRef} onChangeText={onSearchInputChange} style={{flex: 1}} value={value} />
+                                            <TextInput placeholder={props.placeholder} ref={modalInputRef} onChangeText={onSearchInputChange} style={{flex: 1}} value={value} />
                                             <Spacer width={10} />
                                           </View>
                                           <Divider style={{paddingVertical: 2, marginVertical: 10}} />
