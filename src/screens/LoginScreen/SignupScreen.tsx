@@ -1,6 +1,6 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Button, CheckBox, Input, Text, useTheme} from '@ui-kitten/components';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Linking, StyleSheet, View} from 'react-native';
 import Spacer from 'react-spacer';
@@ -34,8 +34,8 @@ export const SignupScreen = ({route, navigation}: Props) => {
   };
 
   const passwordsMatching = password === passwordConfirm;
-  // TODO: Check if email is valid
-  const allFieldsOk = passwordsMatching && password && email;
+
+  const allFieldsOk = passwordsMatching && password && email && isEmailValid(email);
 
 
   return (
@@ -81,6 +81,15 @@ export const SignupScreen = ({route, navigation}: Props) => {
       </View>
     </LoginBackdrop>
   );
+};
+
+const isEmailValid = (email: string): boolean => {
+  const matches = String(email)
+      .toLowerCase()
+      .match(
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      );
+  return matches ? true : false;
 };
 
 const styles = StyleSheet.create({
