@@ -9,6 +9,7 @@
     "sunday": "Sunday"
   },
   "common": {
+    "unknownerror": "Unknown error occured",
     "ok": "Okay",
     "create": "Create",
     "next": "Next",
@@ -27,6 +28,8 @@
   },
   "screens": {
     "login": {
+      "invaliduserpass": "Wrong username or password",
+      "inactiveaccount": "Your account is not active. Please check your inbox for your activation email",
       "activationpendingtitle": "Account created - activation pending",
       "activationpending": "Your account was created an an activation mail was sent to your email. Please click the link in your email to activate your account",
       "forgotPassword": "Forgot your password?",

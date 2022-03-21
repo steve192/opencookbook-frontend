@@ -1,5 +1,6 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Button, Card, Icon, Input, Modal, Text} from '@ui-kitten/components';
+import {AxiosError} from 'axios';
 import Constants from 'expo-constants';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -30,8 +31,14 @@ const LoginScreen = ({route, navigation}: Props) => {
   const doLogin = () => {
     RestAPI.authenticate(email, password).then(() => {
       dispatch(login());
-    }).catch((error: Error) => {
-      setApiErrorMessage(error.toString());
+    }).catch((error: AxiosError) => {
+      if (error.response?.status === 401) {
+        setApiErrorMessage(t('screens.login.invaliduserpass'));
+      } else if (error.response?.status === 403 && !error.response.data.userActive) {
+        setApiErrorMessage(t('screens.login.inactiveaccount'));
+      } else {
+        setApiErrorMessage(t('common.unknownerror'));
+      }
     });
   };
 

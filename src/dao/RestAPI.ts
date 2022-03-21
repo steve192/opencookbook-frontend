@@ -331,10 +331,6 @@ class RestAPI {
       password: password,
     });
 
-    if (response.status > 299) {
-      throw Error('Server responded with http ' + response.status);
-    }
-
     Configuration.setAuthToken(response.data.token);
     Configuration.setRefreshToken(response.data.refreshToken);
   }
