@@ -5,7 +5,6 @@ import {BottomNavigation, BottomNavigationTab, useTheme} from '@ui-kitten/compon
 import {createURL} from 'expo-linking';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {KeyboardAvoidingView, Platform} from 'react-native';
 import {CalendarIcon, HomeIcon, SettingsIcon} from '../assets/Icons';
 import {useAppSelector} from '../redux/hooks';
 import {GuidedCookingScreen} from '../screens/GuidedCookingScreen';
@@ -19,6 +18,8 @@ import {RecipeScreen} from '../screens/RecipeScreen';
 import {SettingsScreen} from '../screens/SettingsScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
+import {Text} from 'react-native-paper';
+import {AccountActivationScreen} from '../screens/AccountActivationScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -153,15 +154,55 @@ const MainNavigation = () => {
     </Stack.Navigator>
   );
 
+  const BaseNavigator = () => (
+    // This basically is an interceptor before the linking is resolved in the "normal" stack ("default" route)
+    <Stack.Navigator
+      screenOptions={{headerShown: false}}>
+      <Stack.Screen
+        name='default'
+        component={authentificationNavigator}
+      />
+      <Stack.Screen
+        name='AccountActivationScreen'
+        component={AccountActivationScreen}
+      />
+    </Stack.Navigator>
+  );
+
+  const authentificationNavigator = () => (
+    isLoading ? <SplashScreen /> : loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />
+  );
+
   return (
     <NavigationContainer
 
       linking={{
-
         prefixes: [createURL('/')],
+        config: {
+          screens: {
+            AccountActivationScreen: 'activateAccount',
+            default: {
+              screens: {
+                RecipeScreen: 'recipe',
+                RecipeWizardScreen: 'editRecipe',
+                OverviewScreen: {
+                  screens: {
+                    SettingsScreen: 'settings',
+                    WeeklyScreen: 'weekly',
+                    RecipesListScreen: {
+                      screens: {
+                        RecipeListDetailScreen: 'myRecipes',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       }}
     >
-      {isLoading ? <SplashScreen /> : loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />}
+      <BaseNavigator/>
     </NavigationContainer>
   );
 };

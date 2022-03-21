@@ -27,6 +27,11 @@
     "screenTitleGuidedCooking": "Kochmodus"
   },
   "screens": {
+    "accountActivationScreen": {
+      "success": "Super, dein Account wurde erfolgreich aktiviert. Du kannst dich nun normal einloggen!",
+      "error": "Etwas ist schiefgelaufen. Vielleicht ist der Link nicht mehr gültig oder wurde schon verwendet",
+      "processing": "Aktiviere deinen Account..."
+    },
     "login": {
       "invaliduserpass": "Falscher Benutzername oder falsches Passwort",
       "inactiveaccount": "Dein Account ist nicht aktiv. Bitte überprüfe dein Postfach für die Aktivierungs-Mail",

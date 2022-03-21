@@ -27,6 +27,11 @@
     "screenTitleGuidedCooking": "Guided cooking"
   },
   "screens": {
+    "accountActivationScreen": {
+      "success": "Great, your account was successfully activated. You can now login normally!",
+      "error": "Something went wrong. Maybe the link you clicked is not valid anymore or was used already.",
+      "processing": "Activating your account..."
+    },
     "login": {
       "invaliduserpass": "Wrong username or password",
       "inactiveaccount": "Your account is not active. Please check your inbox for your activation email",

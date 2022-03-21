@@ -335,6 +335,10 @@ class RestAPI {
     Configuration.setRefreshToken(response.data.refreshToken);
   }
 
+  static async activateAccount(activationId: string) {
+    await axios.get(await this.url('/users/activate?activationId=' + activationId));
+  }
+
   static async registerUser(emailAddress: string, password: string) {
     const response = await axios.post(await this.url('/users/signup'), {
       emailAddress: emailAddress,
