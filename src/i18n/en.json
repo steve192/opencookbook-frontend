@@ -9,6 +9,9 @@
     "sunday": "Sunday"
   },
   "common": {
+    "save": "Save",
+    "unknownerror": "Unknown error occured",
+    "ok": "Okay",
     "create": "Create",
     "next": "Next",
     "previous": "Previous",
@@ -25,7 +28,16 @@
     "screenTitleGuidedCooking": "Guided cooking"
   },
   "screens": {
+    "accountActivationScreen": {
+      "success": "Great, your account was successfully activated. You can now login normally!",
+      "error": "Something went wrong. Maybe the link you clicked is not valid anymore or was used already.",
+      "processing": "Activating your account..."
+    },
     "login": {
+      "invaliduserpass": "Wrong username or password",
+      "inactiveaccount": "Your account is not active. Please check your inbox for your activation email",
+      "activationpendingtitle": "Account created - activation pending",
+      "activationpending": "Your account was created an an activation mail was sent to your email. Please click the link in your email to activate your account",
       "forgotPassword": "Forgot your password?",
       "createAccount": "Don't have an account? Create",
       "email": "E-Mail",

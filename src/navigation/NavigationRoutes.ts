@@ -1,6 +1,8 @@
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
 
-
+export type BaseNavigatorProps = {
+    AccountActivationScreen: { activationId: string}
+}
 export type LoginNavigationProps = {
     LoginScreen: undefined
     SignupScreen: undefined

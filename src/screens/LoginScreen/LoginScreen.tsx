@@ -1,5 +1,5 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {Button, Card, Icon, Input, Modal, Text} from '@ui-kitten/components';
+import {AxiosError} from 'axios';
 import Constants from 'expo-constants';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -10,8 +10,9 @@ import Configuration from '../../Configuration';
 import RestAPI from '../../dao/RestAPI';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import {login} from '../../redux/features/authSlice';
-import CentralStyles from '../../styles/CentralStyles';
+import CentralStyles, {OwnColors} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
+import {Button, Card, Colors, IconButton, Modal, Text, TextInput, useTheme} from 'react-native-paper';
 
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'LoginScreen'>;
@@ -26,12 +27,19 @@ const LoginScreen = ({route, navigation}: Props) => {
   const dispatch = useDispatch();
 
   const {t} = useTranslation('translation');
+  const {colors} = useTheme();
 
   const doLogin = () => {
     RestAPI.authenticate(email, password).then(() => {
       dispatch(login());
-    }).catch((error: Error) => {
-      setApiErrorMessage(error.toString());
+    }).catch((error: AxiosError) => {
+      if (error.response?.status === 401) {
+        setApiErrorMessage(t('screens.login.invaliduserpass'));
+      } else if (error.response?.status === 403 && !error.response.data.userActive) {
+        setApiErrorMessage(t('screens.login.inactiveaccount'));
+      } else {
+        setApiErrorMessage(t('common.unknownerror'));
+      }
     });
   };
 
@@ -41,45 +49,58 @@ const LoginScreen = ({route, navigation}: Props) => {
 
   const settingsModal = (
     <Modal
+      style={[CentralStyles.contentContainer]}
       visible={settingsModalVisible}
-      backdropStyle={styles.modalBackdrop}
-      onBackdropPress={() => setSettingsModalVisible(false)}>
-      <Card disabled={true} style={styles.innerLoginContainer}>
-        <Text>Server URL</Text>
-        <Input value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
+      onDismiss={() => setSettingsModalVisible(false)}>
+      <Card>
+        <TextInput label="Server URL" value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
         <Button onPress={() => {
           Configuration.setBackendURL(serverUrl).then(() => {
             setSettingsModalVisible(false);
           });
         }}>
-                    Save
+          {t('common.save')}
         </Button>
       </Card>
     </Modal>
   );
 
+
   return (
     <LoginBackdrop>
-      <Button status="control" onPress={() => setSettingsModalVisible(true)} accessoryLeft={<Icon name="settings-outline" />} style={styles.settingsButton} />
+      <IconButton
+        icon="cog"
+        color={OwnColors.bluishGrey}
+        size={20}
+        onPress={() => setSettingsModalVisible(true)}
+      />
       <View style={styles.loginContainer}>
         <View style={styles.innerLoginContainer}>
           <Text style={styles.title}>CookPal</Text>
-          <Input value={email} keyboardType='email-address' onChangeText={(text) => setEmail(text)} placeholder="E-Mail"></Input>
+          <TextInput mode="flat" dense={true} value={email} keyboardType='email-address' onChangeText={(text) => setEmail(text)} label="E-Mail"/>
           <Spacer height={10} />
-          <Input value={password} onChangeText={(text) => setPassword(text)} placeholder="Password" secureTextEntry={true} />
+          <TextInput mode="flat" dense={true} value={password} onChangeText={(text) => setPassword(text)} label="Password" secureTextEntry={true} />
           <View style={styles.forgotPasswordContainer}>
             <Button
-              appearance='ghost'
-              status='basic'
+              color={OwnColors.bluishGrey}
+              compact={true}
+              uppercase={false}
+              labelStyle={{fontWeight: 'bold'}}
               onPress={() => null}>
               {t('screens.login.forgotPassword')}
             </Button>
           </View>
-          <Button style={CentralStyles.elementSpacing} onPress={doLogin}>Login</Button>
-          {apiErrorMessage && <Text status="danger">{apiErrorMessage}</Text>}
           <Button
-            appearance='ghost'
-            status='basic'
+            mode="contained"
+            labelStyle={{fontWeight: 'bold', color: 'white'}}
+            style={CentralStyles.elementSpacing}
+            onPress={doLogin}>Login</Button>
+          {apiErrorMessage && <Text theme={{colors: {text: colors.error}}}>{apiErrorMessage}</Text>}
+          <Button
+            color={OwnColors.bluishGrey}
+            compact={true}
+            uppercase={false}
+            labelStyle={{fontWeight: 'bold'}}
             onPress={() => navigation.navigate('SignupScreen')}
           >
             {t('screens.login.createAccount')}
@@ -105,15 +126,6 @@ const styles = StyleSheet.create({
   forgotPasswordContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-  },
-  settingsButton: {
-    width: 16,
-    height: 16,
-    alignSelf: 'flex-end',
-    right: 16,
-    top: 0,
-    borderRadius: 24,
-    marginBottom: 10,
   },
   title: {
     paddingBottom: 20,
