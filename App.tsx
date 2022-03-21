@@ -37,7 +37,6 @@ const ReduxWrappedApp = () => {
       ...DefaultTheme.colors,
       primary: '#72B600',
       accent: '#FFE102',
-      grey: '#8f9bb3',
     },
 
   };

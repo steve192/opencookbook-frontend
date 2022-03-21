@@ -1,5 +1,8 @@
 import {StyleSheet} from 'react-native';
 
+export const OwnColors = {
+  bluishGrey: '#8f9bb3',
+};
 export default StyleSheet.create({
   scrollView: {
     marginVertical: 10,

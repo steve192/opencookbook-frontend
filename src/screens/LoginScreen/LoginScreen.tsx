@@ -10,7 +10,7 @@ import Configuration from '../../Configuration';
 import RestAPI from '../../dao/RestAPI';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import {login} from '../../redux/features/authSlice';
-import CentralStyles from '../../styles/CentralStyles';
+import CentralStyles, {OwnColors} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
 import {Button, Card, Colors, IconButton, Modal, Text, TextInput, useTheme} from 'react-native-paper';
 
@@ -70,7 +70,7 @@ const LoginScreen = ({route, navigation}: Props) => {
     <LoginBackdrop>
       <IconButton
         icon="cog"
-        color={Colors.grey50}
+        color={OwnColors.bluishGrey}
         size={20}
         onPress={() => setSettingsModalVisible(true)}
       />
@@ -82,7 +82,7 @@ const LoginScreen = ({route, navigation}: Props) => {
           <TextInput mode="flat" dense={true} value={password} onChangeText={(text) => setPassword(text)} label="Password" secureTextEntry={true} />
           <View style={styles.forgotPasswordContainer}>
             <Button
-              color={colors.grey}
+              color={OwnColors.bluishGrey}
               compact={true}
               uppercase={false}
               labelStyle={{fontWeight: 'bold'}}
@@ -97,7 +97,7 @@ const LoginScreen = ({route, navigation}: Props) => {
             onPress={doLogin}>Login</Button>
           {apiErrorMessage && <Text theme={{colors: {text: colors.error}}}>{apiErrorMessage}</Text>}
           <Button
-            color={colors.grey}
+            color={OwnColors.bluishGrey}
             compact={true}
             uppercase={false}
             labelStyle={{fontWeight: 'bold'}}
