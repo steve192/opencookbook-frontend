@@ -8,7 +8,7 @@ import {PromptUtil} from '../../helper/Prompt';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
-import {Checkbox, Button, Text, TextInput, useTheme, HelperText} from 'react-native-paper';
+import {Checkbox, Button, Text, TextInput, useTheme, HelperText, Colors} from 'react-native-paper';
 
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'SignupScreen'>;
@@ -27,13 +27,12 @@ export const SignupScreen = (props: Props) => {
 
   const register = () => {
     RestAPI.registerUser(email, password).then(() => {
-      setApiErrorMessage(undefined);
+      setApiErrorMessage('');
       props.navigation.goBack();
       PromptUtil.show({
         button2: t('common.ok'),
         message: t('screens.login.activationpending'),
         title: t('screens.login.activationpendingtitle'),
-        button1: '',
       });
     }).catch((error: Error) => {
       setApiErrorMessage(error.toString());
@@ -101,7 +100,7 @@ export const SignupScreen = (props: Props) => {
             disabled={allFieldsOk ? false : true}
             style={CentralStyles.elementSpacing}
             onPress={register}>{t('screens.login.register')}</Button>
-          {apiErrorMessage && <Text >{apiErrorMessage}</Text>}
+          <Text style={{fontWeight: 'bold', color: Colors.red200, textAlign: 'center'}}>{apiErrorMessage}</Text>
         </View>
       </View>
     </LoginBackdrop>
