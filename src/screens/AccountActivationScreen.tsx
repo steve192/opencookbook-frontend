@@ -27,7 +27,7 @@ export const AccountActivationScreen = (props: Props) => {
     }).catch(() => {
       setActivationError(true);
     });
-  });
+  }, [props.route.params.activationId]);
 
   const renderActivationPending =
     <>
@@ -40,15 +40,15 @@ export const AccountActivationScreen = (props: Props) => {
 
   const renderActivationError =
     <>
-      <Icon style={{textAlign: 'center'}} name="exclamation-circle" size={30} color={Colors.red500} />
+      <Icon style={{textAlign: 'center'}} name="exclamation-circle" size={30} color={Colors.red200} />
       <Spacer height={20}/>
-      <Text style={{fontWeight: 'bold', color: Colors.red500, textAlign: 'center'}}>{t('screens.accountActivationScreen.error')}</Text>
+      <Text style={{fontWeight: 'bold', color: Colors.red200, textAlign: 'center'}}>{t('screens.accountActivationScreen.error')}</Text>
     </>;
   const renderActivationSuccess =
     <>
-      <Icon style={{textAlign: 'center'}} name="check-circle" size={30} color={Colors.green500} />
+      <Icon style={{textAlign: 'center'}} name="check-circle" size={30} color={Colors.green200} />
       <Spacer height={20}/>
-      <Text style={{fontWeight: 'bold', color: Colors.green500, textAlign: 'center'}}>{t('screens.accountActivationScreen.success')}</Text>
+      <Text style={{fontWeight: 'bold', color: Colors.green200, textAlign: 'center'}}>{t('screens.accountActivationScreen.success')}</Text>
     </>;
 
   return (
@@ -58,7 +58,10 @@ export const AccountActivationScreen = (props: Props) => {
         justifyContent: 'center',
         alignItems: 'center'}}>
 
-        <View style={CentralStyles.contentContainer}>
+        <View style={[CentralStyles.contentContainer,
+          {
+            backgroundColor: 'rgba(0,0,0,0.47)',
+          }]}>
           {!activationError && !activationSuccess && renderActivationPending }
           {activationError && renderActivationError }
           {activationSuccess && renderActivationSuccess }

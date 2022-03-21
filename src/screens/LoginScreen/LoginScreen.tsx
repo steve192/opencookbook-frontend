@@ -33,10 +33,10 @@ const LoginScreen = ({route, navigation}: Props) => {
     RestAPI.authenticate(email, password).then(() => {
       dispatch(login());
     }).catch((error: AxiosError) => {
-      if (error.response?.status === 401) {
-        setApiErrorMessage(t('screens.login.invaliduserpass'));
-      } else if (error.response?.status === 403 && !error.response.data.userActive) {
+      if (error.response?.status === 401 && error.response.data.userActive === false) {
         setApiErrorMessage(t('screens.login.inactiveaccount'));
+      } else if (error.response?.status === 401) {
+        setApiErrorMessage(t('screens.login.invaliduserpass'));
       } else {
         setApiErrorMessage(t('common.unknownerror'));
       }
