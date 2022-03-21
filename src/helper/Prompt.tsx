@@ -1,5 +1,6 @@
 import React from 'react';
 import {Button, Dialog, Paragraph, withTheme} from 'react-native-paper';
+import CentralStyles from '../styles/CentralStyles';
 
 interface Options {
   title: string;
@@ -42,7 +43,7 @@ class PromptWithoutStyles extends React.Component<Props, State> {
   }
 
   renderPrompt() {
-    return <Dialog visible={this.state.shown} onDismiss={() => this.setState({shown: false})}>
+    return <Dialog style={CentralStyles.contentContainer} visible={this.state.shown} onDismiss={() => this.setState({shown: false})}>
       <Dialog.Title>{this.state.title}</Dialog.Title>
       <Dialog.Content>
         <Paragraph>{this.state.message}</Paragraph>
