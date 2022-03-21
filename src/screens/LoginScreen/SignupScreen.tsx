@@ -1,10 +1,11 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Button, CheckBox, Input, Text, useTheme} from '@ui-kitten/components';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Linking, StyleSheet, View} from 'react-native';
+import {Alert, Linking, StyleSheet, View} from 'react-native';
 import Spacer from 'react-spacer';
 import RestAPI from '../../dao/RestAPI';
+import {PromptUtil} from '../../helper/Prompt';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
@@ -12,7 +13,7 @@ import {LoginBackdrop} from './LoginBackdrop';
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'SignupScreen'>;
 
-export const SignupScreen = ({route, navigation}: Props) => {
+export const SignupScreen = (props: Props) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [passwordConfirm, setPasswordConfirm] = useState<string>('');
@@ -27,7 +28,13 @@ export const SignupScreen = ({route, navigation}: Props) => {
   const register = () => {
     RestAPI.registerUser(email, password).then(() => {
       setApiErrorMessage(undefined);
-      navigation.goBack();
+      props.navigation.goBack();
+      PromptUtil.show({
+        button2: t('common.ok'),
+        message: t('screens.login.activationpending'),
+        title: t('screens.login.activationpendingtitle'),
+        button1: '',
+      });
     }).catch((error: Error) => {
       setApiErrorMessage(error.toString());
     });
@@ -36,7 +43,6 @@ export const SignupScreen = ({route, navigation}: Props) => {
   const passwordsMatching = password === passwordConfirm;
 
   const allFieldsOk = passwordsMatching && password && email && isEmailValid(email);
-
 
   return (
     <LoginBackdrop>

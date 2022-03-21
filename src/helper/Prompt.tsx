@@ -37,25 +37,28 @@ class PromptWithoutStyles extends React.Component<Props, State> {
       return <></>;
     }
     return (
-      <Dialog visible={this.state.shown} onDismiss={() => this.setState({shown: false}) }>
-        <Dialog.Title>{this.state.title}</Dialog.Title>
-        <Dialog.Content>
-          <Paragraph>{this.state.message}</Paragraph>
-        </Dialog.Content>
-        <Dialog.Actions>
-          <Button color={this.props.theme.colors.error} onPress={() => {
-            this.state.button1Callback?.();
-            this.setState({shown: false});
-          }
-          }>{this.state.button1}</Button>
-          <Button color={this.props.theme.colors.text} onPress={() => {
-            this.state.button2Callback?.();
-            this.setState({shown: false});
-          }
-          }>{this.state.button2}</Button>
-        </Dialog.Actions>
-      </Dialog>
+      this.renderPrompt()
     );
+  }
+
+  renderPrompt() {
+    return <Dialog visible={this.state.shown} onDismiss={() => this.setState({shown: false})}>
+      <Dialog.Title>{this.state.title}</Dialog.Title>
+      <Dialog.Content>
+        <Paragraph>{this.state.message}</Paragraph>
+      </Dialog.Content>
+      <Dialog.Actions>
+        {this.state.button1 && <Button color={this.props.theme.colors.error} onPress={() => {
+          this.state.button1Callback?.();
+          this.setState({shown: false});
+        } }>{this.state.button1}</Button>}
+
+        { this.state.button2 && <Button color={this.props.theme.colors.text} onPress={() => {
+          this.state.button2Callback?.();
+          this.setState({shown: false});
+        } }>{this.state.button2}</Button> }
+      </Dialog.Actions>
+    </Dialog>;
   }
 
   componentDidMount() {

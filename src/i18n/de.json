@@ -9,6 +9,7 @@
     "sunday": "Sonntag"
   },
   "common": {
+    "ok": "Okay",
     "create": "Erstellen",
     "next": "Weiter",
     "previous": "Zurrück",
@@ -26,6 +27,8 @@
   },
   "screens": {
     "login": {
+      "activationpendingtitle": "Account erstellt - Aktivierung ausstehend",
+      "activationpending": "Dein Account wurde erstellt und eine Aktivierungs-Mail wurde dir zugesandt. Bitte klicke den Link in der Mail um deinen Account zu aktivieren",
       "forgotPassword": "Passwort vergessen?",
       "createAccount": "Noch keinen Account? Jetzt erstellen",
       "email": "E-Mail",
