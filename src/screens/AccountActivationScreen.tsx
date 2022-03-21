@@ -1,7 +1,7 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {View, StyleSheet} from 'react-native';
+import {View} from 'react-native';
 import RestAPI from '../dao/RestAPI';
 import {BaseNavigatorProps} from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';

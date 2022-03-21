@@ -18,7 +18,6 @@ import {RecipeScreen} from '../screens/RecipeScreen';
 import {SettingsScreen} from '../screens/SettingsScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
-import {Text} from 'react-native-paper';
 import {AccountActivationScreen} from '../screens/AccountActivationScreen';
 
 
