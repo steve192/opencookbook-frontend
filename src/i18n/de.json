@@ -9,6 +9,7 @@
     "sunday": "Sonntag"
   },
   "common": {
+    "save": "Speichern",
     "unknownerror": "Unknown error occured",
     "ok": "Okay",
     "create": "Erstellen",

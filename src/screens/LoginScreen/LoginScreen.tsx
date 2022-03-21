@@ -1,5 +1,4 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {Card, Icon, Modal} from '@ui-kitten/components';
 import {AxiosError} from 'axios';
 import Constants from 'expo-constants';
 import React, {useEffect, useState} from 'react';
@@ -13,7 +12,7 @@ import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import {login} from '../../redux/features/authSlice';
 import CentralStyles from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
-import {Button, Text, TextInput, useTheme} from 'react-native-paper';
+import {Button, Card, Colors, IconButton, Modal, Text, TextInput, useTheme} from 'react-native-paper';
 
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'LoginScreen'>;
@@ -50,18 +49,17 @@ const LoginScreen = ({route, navigation}: Props) => {
 
   const settingsModal = (
     <Modal
+      style={[CentralStyles.contentContainer]}
       visible={settingsModalVisible}
-      backdropStyle={styles.modalBackdrop}
-      onBackdropPress={() => setSettingsModalVisible(false)}>
-      <Card disabled={true} style={styles.innerLoginContainer}>
-        <Text>Server URL</Text>
-        <TextInput value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
+      onDismiss={() => setSettingsModalVisible(false)}>
+      <Card>
+        <TextInput label="Server URL" value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
         <Button onPress={() => {
           Configuration.setBackendURL(serverUrl).then(() => {
             setSettingsModalVisible(false);
           });
         }}>
-                    Save
+          {t('common.save')}
         </Button>
       </Card>
     </Modal>
@@ -70,11 +68,12 @@ const LoginScreen = ({route, navigation}: Props) => {
 
   return (
     <LoginBackdrop>
-      <Button
-        mode='outlined'
+      <IconButton
+        icon="cog"
+        color={Colors.grey50}
+        size={20}
         onPress={() => setSettingsModalVisible(true)}
-        icon="gear"
-        style={styles.settingsButton} />
+      />
       <View style={styles.loginContainer}>
         <View style={styles.innerLoginContainer}>
           <Text style={styles.title}>CookPal</Text>
@@ -127,15 +126,6 @@ const styles = StyleSheet.create({
   forgotPasswordContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-  },
-  settingsButton: {
-    width: 16,
-    height: 16,
-    alignSelf: 'flex-end',
-    right: 16,
-    top: 0,
-    borderRadius: 24,
-    marginBottom: 10,
   },
   title: {
     paddingBottom: 20,
