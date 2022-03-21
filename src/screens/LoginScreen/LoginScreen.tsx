@@ -1,5 +1,5 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {Button, Card, Icon, Input, Modal, Text} from '@ui-kitten/components';
+import {Card, Icon, Modal} from '@ui-kitten/components';
 import {AxiosError} from 'axios';
 import Constants from 'expo-constants';
 import React, {useEffect, useState} from 'react';
@@ -13,6 +13,7 @@ import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import {login} from '../../redux/features/authSlice';
 import CentralStyles from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
+import {Button, Text, TextInput, useTheme} from 'react-native-paper';
 
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'LoginScreen'>;
@@ -27,6 +28,7 @@ const LoginScreen = ({route, navigation}: Props) => {
   const dispatch = useDispatch();
 
   const {t} = useTranslation('translation');
+  const {colors} = useTheme();
 
   const doLogin = () => {
     RestAPI.authenticate(email, password).then(() => {
@@ -53,7 +55,7 @@ const LoginScreen = ({route, navigation}: Props) => {
       onBackdropPress={() => setSettingsModalVisible(false)}>
       <Card disabled={true} style={styles.innerLoginContainer}>
         <Text>Server URL</Text>
-        <Input value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
+        <TextInput value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
         <Button onPress={() => {
           Configuration.setBackendURL(serverUrl).then(() => {
             setSettingsModalVisible(false);
@@ -65,28 +67,41 @@ const LoginScreen = ({route, navigation}: Props) => {
     </Modal>
   );
 
+
   return (
     <LoginBackdrop>
-      <Button status="control" onPress={() => setSettingsModalVisible(true)} accessoryLeft={<Icon name="settings-outline" />} style={styles.settingsButton} />
+      <Button
+        mode='outlined'
+        onPress={() => setSettingsModalVisible(true)}
+        icon="gear"
+        style={styles.settingsButton} />
       <View style={styles.loginContainer}>
         <View style={styles.innerLoginContainer}>
           <Text style={styles.title}>CookPal</Text>
-          <Input value={email} keyboardType='email-address' onChangeText={(text) => setEmail(text)} placeholder="E-Mail"></Input>
+          <TextInput mode="flat" dense={true} value={email} keyboardType='email-address' onChangeText={(text) => setEmail(text)} label="E-Mail"/>
           <Spacer height={10} />
-          <Input value={password} onChangeText={(text) => setPassword(text)} placeholder="Password" secureTextEntry={true} />
+          <TextInput mode="flat" dense={true} value={password} onChangeText={(text) => setPassword(text)} label="Password" secureTextEntry={true} />
           <View style={styles.forgotPasswordContainer}>
             <Button
-              appearance='ghost'
-              status='basic'
+              color={colors.grey}
+              compact={true}
+              uppercase={false}
+              labelStyle={{fontWeight: 'bold'}}
               onPress={() => null}>
               {t('screens.login.forgotPassword')}
             </Button>
           </View>
-          <Button style={CentralStyles.elementSpacing} onPress={doLogin}>Login</Button>
-          {apiErrorMessage && <Text status="danger">{apiErrorMessage}</Text>}
           <Button
-            appearance='ghost'
-            status='basic'
+            mode="contained"
+            labelStyle={{fontWeight: 'bold', color: 'white'}}
+            style={CentralStyles.elementSpacing}
+            onPress={doLogin}>Login</Button>
+          {apiErrorMessage && <Text theme={{colors: {text: colors.error}}}>{apiErrorMessage}</Text>}
+          <Button
+            color={colors.grey}
+            compact={true}
+            uppercase={false}
+            labelStyle={{fontWeight: 'bold'}}
             onPress={() => navigation.navigate('SignupScreen')}
           >
             {t('screens.login.createAccount')}

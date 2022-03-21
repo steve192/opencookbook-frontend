@@ -50,7 +50,7 @@ export const SplashScreen = () => {
     <LoginBackdrop>
       <View style={styles.loginContainer}>
         <View style={styles.innerLoginContainer}>
-          <Text style={styles.title}>OpenCookbook</Text>
+          <Text style={styles.title}>CookPal</Text>
           <View style={{
             justifyContent: 'center',
             alignItems: 'center',

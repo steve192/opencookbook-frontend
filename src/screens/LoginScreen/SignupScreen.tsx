@@ -1,14 +1,14 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {Button, CheckBox, Input, Text, useTheme} from '@ui-kitten/components';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Alert, Linking, StyleSheet, View} from 'react-native';
+import {Linking, StyleSheet, View} from 'react-native';
 import Spacer from 'react-spacer';
 import RestAPI from '../../dao/RestAPI';
 import {PromptUtil} from '../../helper/Prompt';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
+import {Checkbox, Button, Text, TextInput, useTheme, HelperText} from 'react-native-paper';
 
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'SignupScreen'>;
@@ -20,9 +20,9 @@ export const SignupScreen = (props: Props) => {
   const [apiErrorMessage, setApiErrorMessage] = useState<string>();
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
 
-  const theme = useTheme();
 
   const {t} = useTranslation('translation');
+  const {colors} = useTheme();
 
 
   const register = () => {
@@ -41,48 +41,67 @@ export const SignupScreen = (props: Props) => {
   };
 
   const passwordsMatching = password === passwordConfirm;
+  const emailValid = email && isEmailValid(email);
 
-  const allFieldsOk = passwordsMatching && password && email && isEmailValid(email);
+  const allFieldsOk = passwordsMatching && password && emailValid;
 
   return (
     <LoginBackdrop>
       <View style={styles.loginContainer}>
         <View style={styles.innerLoginContainer}>
           <Text style={styles.title}>{t('screens.login.register')}</Text>
-          <Input value={email} onChangeText={(text) => setEmail(text)} placeholder={t('screens.login.email')}></Input>
+          <TextInput
+            dense={true}
+            mode="flat"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+            error={!emailValid}
+            label={t('screens.login.email')}/>
           <Spacer height={20} />
 
-          <Input
-            status={passwordsMatching ? 'basic' : 'danger'}
+          <TextInput
+            dense={true}
+            mode="flat"
             value={password} onChangeText={setPassword}
-            placeholder={t('screens.login.password')}
+            label={t('screens.login.password')}
             secureTextEntry={true} />
           <Spacer height={5} />
-          <Input
-            status={passwordsMatching ? 'basic' : 'danger'}
+          <TextInput
+            dense={true}
+            mode="flat"
             value={passwordConfirm}
             onChangeText={setPasswordConfirm}
-            placeholder={t('screens.login.passwordConfirm')}
+            label={t('screens.login.passwordConfirm')}
+            error={!passwordsMatching}
             secureTextEntry={true} />
 
-          {!passwordsMatching && <Text status="danger">{t('screens.login.errorNoPasswordMatch')}</Text>}
+          <HelperText type="error" visible={!passwordsMatching} >{t('screens.login.errorNoPasswordMatch')}</HelperText>
           <Spacer height={20} />
-          <View style={{flexDirection: 'row'}}>
-            <CheckBox checked={termsAccepted} onChange={setTermsAccepted} />
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Checkbox
+              status={termsAccepted ? 'checked' : 'unchecked'}
+              color={colors.primary}
+              uncheckedColor={colors.surface}
+              onPress={() => setTermsAccepted(!termsAccepted)} />
             <Text
               onPress={() => setTermsAccepted(!termsAccepted)}
               style={{paddingLeft: 10, color: 'white'}}>
               {t('screens.login.acceptTOC')}{' '}
               <Text
                 onPress={() => Linking.openURL('https://google.com')}
-                style={{color: theme['color-primary-default']}}>
+                style={{color: colors.primary}}>
                 {t('screens.login.toc')}
               </Text>
             </Text>
           </View>
           <Spacer height={20} />
-          <Button disabled={allFieldsOk ? false : true} style={CentralStyles.elementSpacing} onPress={register}>{t('screens.login.register')}</Button>
-          {apiErrorMessage && <Text status="danger">{apiErrorMessage}</Text>}
+          <Button
+            mode="contained"
+            theme={{dark: true}}
+            disabled={allFieldsOk ? false : true}
+            style={CentralStyles.elementSpacing}
+            onPress={register}>{t('screens.login.register')}</Button>
+          {apiErrorMessage && <Text >{apiErrorMessage}</Text>}
         </View>
       </View>
     </LoginBackdrop>
