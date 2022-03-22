@@ -19,6 +19,7 @@ import {SettingsScreen} from '../screens/SettingsScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import {AccountActivationScreen} from '../screens/AccountActivationScreen';
+import {PasswordResetScreen} from '../screens/PasswordResetScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -165,6 +166,10 @@ const MainNavigation = () => {
         name='AccountActivationScreen'
         component={AccountActivationScreen}
       />
+      <Stack.Screen
+        name='PasswordResetScreen'
+        component={PasswordResetScreen}
+      />
     </Stack.Navigator>
   );
 
@@ -180,6 +185,7 @@ const MainNavigation = () => {
         config: {
           screens: {
             AccountActivationScreen: 'activateAccount',
+            PasswordResetScreen: 'resetPassword',
             default: {
               screens: {
                 RecipeScreen: 'recipe',
