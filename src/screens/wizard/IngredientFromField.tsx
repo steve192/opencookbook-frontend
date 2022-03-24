@@ -17,7 +17,7 @@ interface Props {
 export const IngredientFormField = (props: Props) => {
   const [ingredientQuery, setIngredientQuery] = useState<string>(props.ingredient.ingredient.name);
   const [unit, setUnit] = useState<string>(props.ingredient.unit);
-  const [amount, setAmount] = useState<string>(String(props.ingredient.amount));
+  const [amount, setAmount] = useState<string>(props.ingredient.amount === 0 ? '': String(props.ingredient.amount));
 
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
 
