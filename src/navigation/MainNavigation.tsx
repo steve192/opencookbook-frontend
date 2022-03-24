@@ -187,7 +187,7 @@ const MainNavigation = () => {
     <NavigationContainer
 
       linking={{
-        prefixes: [createURL('/')],
+        prefixes: [createURL('/'), 'https://beta.cookpal.io/'],
         config: {
           screens: {
             AccountActivationScreen: 'activateAccount',
