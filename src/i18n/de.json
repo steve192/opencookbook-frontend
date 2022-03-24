@@ -17,7 +17,8 @@
     "previous": "Zurrück",
     "createImperative": "Erstelle",
     "delete": "Löschen",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "email": "E-Mail"
   },
   "navigation": {
     "tabMyRecipes": "MEINE REZEPTE",
@@ -28,6 +29,20 @@
     "screenTitleGuidedCooking": "Kochmodus"
   },
   "screens": {
+    "resetPassword": {
+      "unknownErrorSendingRequest": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es in ein paar Minuten noch einmal",
+      "successRequestSent": {
+        "title": "Anfrage gesendet",
+        "message": "Wenn unter der angegebenen E-Mail addresse ein Account existiert, wurde eine E-Mail zum zurücksetzen des Passworts gesendet. Bitte klicke den Link in dieser E-Mail um dein Passwort zurückzusetzen."
+      },
+      "successPasswordReset": {
+        "title": "Passwort wurde geändert",
+        "message": "Dein neues Passwort wurde erfolgreich gesetzt. Du kannst es absofort zum einloggen verwenden"
+      },
+      "title": "Passwort zurücksetzen",
+      "enterNewPassword": "Neues Passwort eingeben",
+      "resetPasswordButton": "Passwort zurücksetzen"
+    },
     "accountActivationScreen": {
       "success": "Super, dein Account wurde erfolgreich aktiviert. Du kannst dich nun normal einloggen!",
       "error": "Etwas ist schiefgelaufen. Vielleicht ist der Link nicht mehr gültig oder wurde schon verwendet",

@@ -16,6 +16,13 @@ export default StyleSheet.create({
     width: 32,
     height: 32,
   },
+  loginTitle: {
+    paddingBottom: 20,
+    fontWeight: 'bold',
+    fontSize: 30,
+    textAlign: 'center',
+    color: 'white',
+  },
   contentContainer: {
     width: '100%',
     alignSelf: 'center',
@@ -23,6 +30,14 @@ export default StyleSheet.create({
     paddingVertical: 24,
     paddingHorizontal: 16,
     maxWidth: 800,
+  },
+  smallContentContainer: {
+    width: '100%',
+    alignSelf: 'center',
+    justifyContent: 'center',
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+    maxWidth: 500,
   },
   fullscreen: {width: '100%', height: '100%'},
 });

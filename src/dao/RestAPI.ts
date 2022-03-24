@@ -339,6 +339,13 @@ class RestAPI {
     await axios.get(await this.url('/users/activate?activationId=' + activationId));
   }
 
+  static async requestPasswordReset(emailAddress: string) {
+    await axios.post(await this.url('/users/requestPasswordReset'), {emailAddress: emailAddress});
+  }
+  static async resetPassword(passwordResetId: string, newPassword: string) {
+    await axios.post(await this.url('/users/resetPassword'), {newPassword: newPassword, passwordResetId: passwordResetId});
+  }
+
   static async registerUser(emailAddress: string, password: string) {
     const response = await axios.post(await this.url('/users/signup'), {
       emailAddress: emailAddress,
