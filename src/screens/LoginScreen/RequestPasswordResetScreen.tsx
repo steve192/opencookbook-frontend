@@ -1,18 +1,16 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import RestAPI from '../../dao/RestAPI';
-import {BaseNavigatorProps} from '../../navigation/NavigationRoutes';
+import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
-import {Button, Colors, ProgressBar, Text, TextInput} from 'react-native-paper';
+import {Button, Text, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import {PromptUtil} from '../../helper/Prompt';
 import {SuccessErrorBanner} from '../../components/SuccessErrorBanner';
 
-type Props = NativeStackScreenProps<BaseNavigatorProps, 'RequestPasswordResetScreen'>;
+type Props = NativeStackScreenProps<LoginNavigationProps, 'RequestPasswordResetScreen'>;
 export const RequestPasswordResetScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const [emailAddress, setEmailAddress] = useState('');

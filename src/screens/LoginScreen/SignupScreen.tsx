@@ -8,7 +8,7 @@ import {PromptUtil} from '../../helper/Prompt';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
-import {Checkbox, Button, Text, TextInput, useTheme, HelperText, Colors} from 'react-native-paper';
+import {Checkbox, Button, Text, useTheme, Colors} from 'react-native-paper';
 import {EmailValidationInput} from '../../components/EmailValidationInput';
 import {PasswordValidationInput} from '../../components/PasswordValidationInput';
 
