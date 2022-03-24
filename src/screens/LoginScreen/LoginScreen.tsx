@@ -12,7 +12,7 @@ import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import {login} from '../../redux/features/authSlice';
 import CentralStyles, {OwnColors} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
-import {Button, Card, Colors, IconButton, Modal, Text, TextInput, useTheme} from 'react-native-paper';
+import {Button, Card, IconButton, Modal, Text, TextInput, useTheme} from 'react-native-paper';
 
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'LoginScreen'>;
@@ -75,8 +75,8 @@ const LoginScreen = ({route, navigation}: Props) => {
         onPress={() => setSettingsModalVisible(true)}
       />
       <View style={styles.loginContainer}>
-        <View style={styles.innerLoginContainer}>
-          <Text style={styles.title}>CookPal</Text>
+        <View style={CentralStyles.smallContentContainer}>
+          <Text style={CentralStyles.loginTitle}>CookPal</Text>
           <TextInput mode="flat" dense={true} value={email} keyboardType='email-address' onChangeText={(text) => setEmail(text)} label="E-Mail"/>
           <Spacer height={10} />
           <TextInput mode="flat" dense={true} value={password} onChangeText={(text) => setPassword(text)} label="Password" secureTextEntry={true} />
@@ -86,7 +86,7 @@ const LoginScreen = ({route, navigation}: Props) => {
               compact={true}
               uppercase={false}
               labelStyle={{fontWeight: 'bold'}}
-              onPress={() => null}>
+              onPress={() => navigation.navigate('RequestPasswordResetScreen')}>
               {t('screens.login.forgotPassword')}
             </Button>
           </View>
@@ -126,18 +126,6 @@ const styles = StyleSheet.create({
   forgotPasswordContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-  },
-  title: {
-    paddingBottom: 20,
-    fontWeight: 'bold',
-    fontSize: 30,
-    textAlign: 'center',
-    color: 'white',
-  },
-  innerLoginContainer: {
-    maxWidth: 500,
-    width: '100%',
-    // opacity: 0.8
   },
   loginContainer: {
     flex: 1,

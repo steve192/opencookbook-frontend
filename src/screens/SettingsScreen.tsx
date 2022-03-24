@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
 import {HardDriveIcon} from '../assets/Icons';
 import {CustomCard} from '../components/CustomCard';
+import Configuration from '../Configuration';
 import RestAPI from '../dao/RestAPI';
 import {PromptUtil} from '../helper/Prompt';
 import {logout} from '../redux/features/authSlice';
@@ -41,7 +42,11 @@ export const SettingsScreen = () => {
             <HardDriveIcon style={{alignSelf: 'center', width: 100, height: 100}}/>
             <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{backendUrl}</Text>
             <Divider style={{marginTop: 10, marginBottom: 10}}/>
-            <Button onPress={() => dispatch(logout())}>Logout</Button>
+            <Button onPress={() => {
+              Configuration.setAuthToken('');
+              Configuration.setRefreshToken('');
+              dispatch(logout());
+            }}>Logout</Button>
             <Spacer height={20} />
             <CustomCard>
               <Text category="label">{t('screens.settings.theme')}</Text>

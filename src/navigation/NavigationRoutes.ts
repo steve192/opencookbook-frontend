@@ -2,10 +2,12 @@ import {Recipe, RecipeGroup} from '../dao/RestAPI';
 
 export type BaseNavigatorProps = {
     AccountActivationScreen: { activationId: string}
+    PasswordResetScreen: { id: string}
 }
 export type LoginNavigationProps = {
     LoginScreen: undefined
     SignupScreen: undefined
+    RequestPasswordResetScreen: undefined
 }
 export type MainNavigationProps = {
     OverviewScreen: undefined

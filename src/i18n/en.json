@@ -17,7 +17,8 @@
     "previous": "Previous",
     "createImperative": "Create",
     "delete": "Delete",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "email": "E-mail"
   },
   "navigation": {
     "tabMyRecipes": "MY RECIPES",
@@ -28,6 +29,20 @@
     "screenTitleGuidedCooking": "Guided cooking"
   },
   "screens": {
+    "resetPassword": {
+      "unknownErrorSendingRequest": "An unknown error occured. Please retry in a few minutes",
+      "successRequestSent": {
+        "title": "Password reset request sent",
+        "message": "If there is an account associated with the email address you entered, an email to reset your password was sent to you. Please click the link in the email"
+      },
+      "successPasswordReset": {
+        "title": "New password set",
+        "message": "Your password was successfully set"
+      },
+      "title": "Reset Password",
+      "enterNewPassword": "Enter new password",
+      "resetPasswordButton": "Reset Password"
+    },
     "accountActivationScreen": {
       "success": "Great, your account was successfully activated. You can now login normally!",
       "error": "Something went wrong. Maybe the link you clicked is not valid anymore or was used already.",

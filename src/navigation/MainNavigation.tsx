@@ -19,6 +19,8 @@ import {SettingsScreen} from '../screens/SettingsScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import {AccountActivationScreen} from '../screens/AccountActivationScreen';
+import {PasswordResetScreen} from '../screens/PasswordResetScreen';
+import {RequestPasswordResetScreen} from '../screens/LoginScreen/RequestPasswordResetScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -45,6 +47,11 @@ const MainNavigation = () => {
         name="SignupScreen"
         component={SignupScreen}
         options={{headerShown: false}} />
+      <Stack.Screen
+        name='RequestPasswordResetScreen'
+        component={RequestPasswordResetScreen}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 
@@ -165,6 +172,10 @@ const MainNavigation = () => {
         name='AccountActivationScreen'
         component={AccountActivationScreen}
       />
+      <Stack.Screen
+        name='PasswordResetScreen'
+        component={PasswordResetScreen}
+      />
     </Stack.Navigator>
   );
 
@@ -176,12 +187,14 @@ const MainNavigation = () => {
     <NavigationContainer
 
       linking={{
-        prefixes: [createURL('/')],
+        prefixes: [createURL('/'), 'https://beta.cookpal.io/'],
         config: {
           screens: {
             AccountActivationScreen: 'activateAccount',
+            PasswordResetScreen: 'resetPassword',
             default: {
               screens: {
+                RequestPasswordResetScreen: 'requestResetPassword',
                 RecipeScreen: 'recipe',
                 RecipeWizardScreen: 'editRecipe',
                 OverviewScreen: {
