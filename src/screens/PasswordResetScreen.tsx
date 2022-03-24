@@ -22,7 +22,7 @@ export const PasswordResetScreen = (props: Props) => {
 
 
   const resetPassword = () => {
-    if (!props.route.params?.id || passwordOk) {
+    if (!props.route.params?.id || !passwordOk) {
       return;
     }
     RestAPI.resetPassword(props.route.params.id, newPassword).then(() => {
@@ -33,6 +33,29 @@ export const PasswordResetScreen = (props: Props) => {
       setSuccess(false);
     });
   };
+
+  const resetForm =
+    <View style={{flex: 1,
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center'}}>
+
+      <Text style={CentralStyles.loginTitle}>{t('screens.resetPassword.title')}</Text>
+      <View style={CentralStyles.smallContentContainer}>
+        <PasswordValidationInput
+          onValidityChange={setPasswordOk}
+          onPasswordChange={setNewPassword}
+        />
+        {/* t('screens.resetPassword.enterNewPassword') */}
+        <Spacer height={20}/>
+        <Button
+          disabled={!passwordOk || newPassword.length === 0}
+          mode='contained'
+          theme={{dark: true}}
+          onPress={resetPassword}
+        >{t('screens.resetPassword.resetPasswordButton')}</Button>
+      </View>
+    </View>;
 
 
   return (
@@ -45,25 +68,8 @@ export const PasswordResetScreen = (props: Props) => {
         errorContent={t('screens.resetPassword.unknownErrorSendingRequest')}
         successContent={t('screens.resetPassword.successPasswordReset.message')}
       />
-      <View style={{flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'}}>
+      {!success && resetForm}
 
-        <Text style={CentralStyles.loginTitle}>{t('screens.resetPassword.title')}</Text>
-        <View style={CentralStyles.smallContentContainer}>
-          <PasswordValidationInput
-            onValidityChange={setPasswordOk}
-            onPasswordChange={setNewPassword}
-          />
-          {/* t('screens.resetPassword.enterNewPassword') */}
-          <Spacer height={20}/>
-          <Button
-            mode='contained'
-            onPress={resetPassword}
-          >{t('screens.resetPassword.resetPasswordButton')}</Button>
-        </View>
-      </View>
     </LoginBackdrop>
   );
 };
