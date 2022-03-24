@@ -331,12 +331,19 @@ class RestAPI {
       password: password,
     });
 
-    if (response.status > 299) {
-      throw Error('Server responded with http ' + response.status);
-    }
-
     Configuration.setAuthToken(response.data.token);
     Configuration.setRefreshToken(response.data.refreshToken);
+  }
+
+  static async activateAccount(activationId: string) {
+    await axios.get(await this.url('/users/activate?activationId=' + activationId));
+  }
+
+  static async requestPasswordReset(emailAddress: string) {
+    await axios.post(await this.url('/users/requestPasswordReset'), {emailAddress: emailAddress});
+  }
+  static async resetPassword(passwordResetId: string, newPassword: string) {
+    await axios.post(await this.url('/users/resetPassword'), {newPassword: newPassword, passwordResetId: passwordResetId});
   }
 
   static async registerUser(emailAddress: string, password: string) {

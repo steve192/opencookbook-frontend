@@ -1,13 +1,11 @@
-import {BottomTabBarProps, createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useTheme} from '@ui-kitten/components';
 import {createURL} from 'expo-linking';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {KeyboardAvoidingView, Platform} from 'react-native';
 import {BottomNavigation, withTheme} from 'react-native-paper';
-import {CalendarIcon, HomeIcon, SettingsIcon} from '../assets/Icons';
 import {useAppSelector} from '../redux/hooks';
 import {GuidedCookingScreen} from '../screens/GuidedCookingScreen';
 import {ImportScreen} from '../screens/ImportScreen';
@@ -20,6 +18,9 @@ import {RecipeScreen} from '../screens/RecipeScreen';
 import {SettingsScreen} from '../screens/SettingsScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
+import {AccountActivationScreen} from '../screens/AccountActivationScreen';
+import {PasswordResetScreen} from '../screens/PasswordResetScreen';
+import {RequestPasswordResetScreen} from '../screens/LoginScreen/RequestPasswordResetScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -46,6 +47,11 @@ const MainNavigation = () => {
         name="SignupScreen"
         component={SignupScreen}
         options={{headerShown: false}} />
+      <Stack.Screen
+        name='RequestPasswordResetScreen'
+        component={RequestPasswordResetScreen}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 
@@ -160,15 +166,61 @@ const MainNavigation = () => {
     </Stack.Navigator>
   );
 
+  const BaseNavigator = () => (
+    // This basically is an interceptor before the linking is resolved in the "normal" stack ("default" route)
+    <Stack.Navigator
+      screenOptions={{headerShown: false}}>
+      <Stack.Screen
+        name='default'
+        component={authentificationNavigator}
+      />
+      <Stack.Screen
+        name='AccountActivationScreen'
+        component={AccountActivationScreen}
+      />
+      <Stack.Screen
+        name='PasswordResetScreen'
+        component={PasswordResetScreen}
+      />
+    </Stack.Navigator>
+  );
+
+  const authentificationNavigator = () => (
+    isLoading ? <SplashScreen /> : loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />
+  );
+
   return (
     <NavigationContainer
 
       linking={{
-
-        prefixes: [createURL('/')],
+        prefixes: [createURL('/'), 'https://beta.cookpal.io/'],
+        config: {
+          screens: {
+            AccountActivationScreen: 'activateAccount',
+            PasswordResetScreen: 'resetPassword',
+            default: {
+              screens: {
+                RequestPasswordResetScreen: 'requestResetPassword',
+                RecipeScreen: 'recipe',
+                RecipeWizardScreen: 'editRecipe',
+                OverviewScreen: {
+                  screens: {
+                    SettingsScreen: 'settings',
+                    WeeklyScreen: 'weekly',
+                    RecipesListScreen: {
+                      screens: {
+                        RecipeListDetailScreen: 'myRecipes',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       }}
     >
-      {isLoading ? <SplashScreen /> : loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />}
+      <BaseNavigator/>
     </NavigationContainer>
   );
 };

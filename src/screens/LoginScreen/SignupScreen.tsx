@@ -1,82 +1,92 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {Button, CheckBox, Input, Text, useTheme} from '@ui-kitten/components';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Linking, StyleSheet, View} from 'react-native';
 import Spacer from 'react-spacer';
 import RestAPI from '../../dao/RestAPI';
+import {PromptUtil} from '../../helper/Prompt';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
+import {Checkbox, Button, Text, useTheme, Colors} from 'react-native-paper';
+import {EmailValidationInput} from '../../components/EmailValidationInput';
+import {PasswordValidationInput} from '../../components/PasswordValidationInput';
 
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'SignupScreen'>;
 
-export const SignupScreen = ({route, navigation}: Props) => {
+export const SignupScreen = (props: Props) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [passwordConfirm, setPasswordConfirm] = useState<string>('');
   const [apiErrorMessage, setApiErrorMessage] = useState<string>();
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
+  const [emailOk, setEmailValid] = useState(false);
+  const [passwordOk, setPasswordOk] = useState(false);
 
-  const theme = useTheme();
 
   const {t} = useTranslation('translation');
+  const {colors} = useTheme();
 
 
   const register = () => {
     RestAPI.registerUser(email, password).then(() => {
-      setApiErrorMessage(undefined);
-      navigation.goBack();
+      setApiErrorMessage('');
+      props.navigation.goBack();
+      PromptUtil.show({
+        button2: t('common.ok'),
+        message: t('screens.login.activationpending'),
+        title: t('screens.login.activationpendingtitle'),
+      });
     }).catch((error: Error) => {
       setApiErrorMessage(error.toString());
     });
   };
 
-  const passwordsMatching = password === passwordConfirm;
-  // TODO: Check if email is valid
-  const allFieldsOk = passwordsMatching && password && email;
 
+  const allFieldsOk = passwordOk && password && emailOk && termsAccepted;
 
   return (
     <LoginBackdrop>
       <View style={styles.loginContainer}>
-        <View style={styles.innerLoginContainer}>
-          <Text style={styles.title}>{t('screens.login.register')}</Text>
-          <Input value={email} onChangeText={(text) => setEmail(text)} placeholder={t('screens.login.email')}></Input>
+        <View style={CentralStyles.smallContentContainer}>
+          <Text style={CentralStyles.loginTitle}>{t('screens.login.register')}</Text>
+          <EmailValidationInput
+            value={email}
+            onChangeText={setEmail}
+            onValidityChange={setEmailValid}
+          />
           <Spacer height={20} />
+          <PasswordValidationInput
+            onValidityChange={setPasswordOk}
+            onPasswordChange={setPassword}
+          />
 
-          <Input
-            status={passwordsMatching ? 'basic' : 'danger'}
-            value={password} onChangeText={setPassword}
-            placeholder={t('screens.login.password')}
-            secureTextEntry={true} />
-          <Spacer height={5} />
-          <Input
-            status={passwordsMatching ? 'basic' : 'danger'}
-            value={passwordConfirm}
-            onChangeText={setPasswordConfirm}
-            placeholder={t('screens.login.passwordConfirm')}
-            secureTextEntry={true} />
-
-          {!passwordsMatching && <Text status="danger">{t('screens.login.errorNoPasswordMatch')}</Text>}
           <Spacer height={20} />
-          <View style={{flexDirection: 'row'}}>
-            <CheckBox checked={termsAccepted} onChange={setTermsAccepted} />
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Checkbox
+              status={termsAccepted ? 'checked' : 'unchecked'}
+              color={colors.primary}
+              uncheckedColor={colors.surface}
+              onPress={() => setTermsAccepted(!termsAccepted)} />
             <Text
               onPress={() => setTermsAccepted(!termsAccepted)}
               style={{paddingLeft: 10, color: 'white'}}>
               {t('screens.login.acceptTOC')}{' '}
               <Text
                 onPress={() => Linking.openURL('https://google.com')}
-                style={{color: theme['color-primary-default']}}>
+                style={{color: colors.primary}}>
                 {t('screens.login.toc')}
               </Text>
             </Text>
           </View>
           <Spacer height={20} />
-          <Button disabled={allFieldsOk ? false : true} style={CentralStyles.elementSpacing} onPress={register}>{t('screens.login.register')}</Button>
-          {apiErrorMessage && <Text status="danger">{apiErrorMessage}</Text>}
+          <Button
+            mode="contained"
+            theme={{dark: true}}
+            disabled={allFieldsOk ? false : true}
+            style={CentralStyles.elementSpacing}
+            onPress={register}>{t('screens.login.register')}</Button>
+          <Text style={{fontWeight: 'bold', color: Colors.red200, textAlign: 'center'}}>{apiErrorMessage}</Text>
         </View>
       </View>
     </LoginBackdrop>
@@ -84,18 +94,6 @@ export const SignupScreen = ({route, navigation}: Props) => {
 };
 
 const styles = StyleSheet.create({
-  title: {
-    paddingBottom: 20,
-    fontWeight: 'bold',
-    fontSize: 30,
-    textAlign: 'center',
-    color: 'white',
-  },
-  innerLoginContainer: {
-    maxWidth: 500,
-    width: '100%',
-    // opacity: 0.8
-  },
   loginContainer: {
     flex: 1,
     flexDirection: 'column',
