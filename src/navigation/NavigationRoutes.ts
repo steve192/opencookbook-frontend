@@ -7,6 +7,7 @@ export type BaseNavigatorProps = {
 export type LoginNavigationProps = {
     LoginScreen: undefined
     SignupScreen: undefined
+    RequestPasswordResetScreen: undefined
 }
 export type MainNavigationProps = {
     OverviewScreen: undefined

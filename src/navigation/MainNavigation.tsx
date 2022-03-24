@@ -20,6 +20,7 @@ import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeLi
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import {AccountActivationScreen} from '../screens/AccountActivationScreen';
 import {PasswordResetScreen} from '../screens/PasswordResetScreen';
+import {RequestPasswordResetScreen} from '../screens/LoginScreen/RequestPasswordResetScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -46,6 +47,11 @@ const MainNavigation = () => {
         name="SignupScreen"
         component={SignupScreen}
         options={{headerShown: false}} />
+      <Stack.Screen
+        name='RequestPasswordResetScreen'
+        component={RequestPasswordResetScreen}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 
@@ -188,6 +194,7 @@ const MainNavigation = () => {
             PasswordResetScreen: 'resetPassword',
             default: {
               screens: {
+                RequestPasswordResetScreen: 'requestResetPassword',
                 RecipeScreen: 'recipe',
                 RecipeWizardScreen: 'editRecipe',
                 OverviewScreen: {

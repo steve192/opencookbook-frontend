@@ -86,7 +86,7 @@ const LoginScreen = ({route, navigation}: Props) => {
               compact={true}
               uppercase={false}
               labelStyle={{fontWeight: 'bold'}}
-              onPress={() => null}>
+              onPress={() => navigation.navigate('RequestPasswordResetScreen')}>
               {t('screens.login.forgotPassword')}
             </Button>
           </View>
