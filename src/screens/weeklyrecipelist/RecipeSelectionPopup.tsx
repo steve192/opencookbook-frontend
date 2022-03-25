@@ -1,5 +1,4 @@
 import {HeaderHeightContext} from '@react-navigation/elements';
-import {Layout} from '@ui-kitten/components';
 import React, {useState} from 'react';
 import {Modal, Pressable, StyleSheet, View} from 'react-native';
 import {RecipeList} from '../../components/RecipeList';
@@ -34,12 +33,12 @@ export const RecipeSelectionPopup = (props: Props) => {
                             <>
                               <View style={styles.centeredView}>
                                 {/* headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
-                                <Layout style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, styles.modalView]}>
+                                <View style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, styles.modalView]}>
                                   <RecipeList
-                                    shownRecipeGroupId={shownRecipeGroup}
+                                    shownRecipeGroupId={shownRecipeGroup?.id}
                                     onRecipeClick={props.onRecipeSelected}
                                     onRecipeGroupClick={onRecipeGroupSelected} />
-                                </Layout>
+                                </View>
                               </View>
                             </>
             }
