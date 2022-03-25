@@ -1,10 +1,9 @@
-import {Layout, Text, useTheme} from '@ui-kitten/components';
 import {AxiosError} from 'axios';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Button, Divider, TextInput} from 'react-native-paper';
+import {Button, Divider, HelperText, TextInput, Text, useTheme, Caption} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {CheckmarkIcon, WarningIcon} from '../assets/Icons';
 import RestAPI from '../dao/RestAPI';
@@ -19,8 +18,8 @@ export const ImportScreen = (props: Props) => {
   const [importError, setImportError] = useState<string>('');
   const [importSuccess, setImportSuccess] = useState<boolean>(false);
 
-  const theme = useTheme();
   const {t} = useTranslation('translation');
+  const theme = useTheme();
 
   const startImport = () => {
     setImportPending(true);
@@ -39,12 +38,12 @@ export const ImportScreen = (props: Props) => {
     });
   };
   return (
-    <Layout style={CentralStyles.fullscreen}>
+    <View style={CentralStyles.fullscreen}>
       <View style={CentralStyles.contentContainer}>
         <TextInput label={t('screens.import.URLToImport')} value={importURL} onChangeText={setImportURL} />
         <Spacer height={10} />
         <Button icon={importSuccess ? 'check' : undefined} mode="contained" loading={importPending} onPress={startImport}>
-          {importSuccess ? <CheckmarkIcon fill={theme['text-success-color']}/> : undefined}
+          {importSuccess ? <CheckmarkIcon fill={theme.colors.accent}/> : undefined}
           Import
         </Button>
         <Spacer height={80} />
@@ -52,29 +51,29 @@ export const ImportScreen = (props: Props) => {
 
           {importError.length > 0 &&
                         <>
-                          <WarningIcon width={16} height={16} fill={theme['text-danger-color']} />
-                          <Text status="danger">{t('screens.import.importFailed')} {importError}</Text>
+                          <WarningIcon width={16} height={16} fill={theme.colors.error} />
+                          <HelperText type='error' >{t('screens.import.importFailed')} {importError}</HelperText>
                         </>
           }
 
           {importSuccess &&
                         <>
-                          <CheckmarkIcon width={16} height={16} fill={theme['text-success-color']} />
-                          <Text status="success">{t('screens.import.importSuccess')}</Text>
+                          <CheckmarkIcon width={16} height={16} fill={theme.colors.accent} />
+                          <Text style={{color: theme.colors.accent}}>{t('screens.import.importSuccess')}</Text>
                         </>
           }
         </View>
         <Spacer height={20} />
         <Divider />
         <Spacer height={20} />
-        <Text category="label">{t('screens.import.supportedServices')}</Text>
+        <Caption>{t('screens.import.supportedServices')}</Caption>
         <Spacer height={10} />
         <ScrollView>
           <Text>Chefkoch</Text>
           <Text>HelloFresh</Text>
         </ScrollView>
       </View>
-    </Layout>
+    </View>
 
   );
 };
