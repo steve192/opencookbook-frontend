@@ -83,6 +83,7 @@
       "deleteAccountConfirmationQuestion": "Willst du wirklich deinen Account und alle deine Rezepte löscnen? Diese Aktion ist sofort wirksam und kann nicht rückgängig gemacht werden"
     },
     "import": {
+      "notSupported": "Die Webseite wird leider noch nicht unterstüzt",
       "URLToImport": "URL zum importieren",
       "import": "Importieren",
       "supportedServices": "Unterstützte Dienste",
