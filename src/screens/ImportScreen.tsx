@@ -1,4 +1,5 @@
 import {Button, Divider, Input, Layout, Spinner, Text, useTheme} from '@ui-kitten/components';
+import {AxiosError} from 'axios';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
@@ -27,8 +28,12 @@ export const ImportScreen = (props: Props) => {
       setImportPending(false);
       setImportError('');
       setImportSuccess(true);
-    }).catch((error) => {
+    }).catch((error: AxiosError) => {
       setImportPending(false);
+      if (error.response?.status === 501) {
+        setImportError(t('screens.import.notSupported'));
+        return;
+      }
       setImportError(error.toString());
     });
   };
