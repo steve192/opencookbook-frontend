@@ -2,9 +2,9 @@ import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {Button, Layout, useTheme} from '@ui-kitten/components';
-import React from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {FloatingAction, IActionProps} from 'react-native-floating-action';
+import {FAB} from 'react-native-paper';
 import {DeleteIcon} from '../assets/Icons';
 import {RecipeList} from '../components/RecipeList';
 import RestAPI, {Recipe} from '../dao/RestAPI';
@@ -25,6 +25,8 @@ type Props = CompositeScreenProps<
 const RecipeListScreen = (props: Props) => {
   const theme = useTheme();
   const {t} = useTranslation('translation');
+
+  const [fabOpen, setFabOpen] = useState(false);
 
   const shownRecipeGroup = useAppSelector((state) => state.recipes.recipeGroups.filter((recipeGroup) => recipeGroup.id == props.route.params?.shownRecipeGroupId)[0]);
 
@@ -51,42 +53,6 @@ const RecipeListScreen = (props: Props) => {
         });
   };
 
-  const addActions: IActionProps[] = [
-    {
-      text: t('screens.overview.addRecipe'),
-      name: 'addRecipe',
-      color: theme['color-primary-default'],
-    },
-    {
-      text: t('screens.overview.importRecipe'),
-      name: 'importRecipe',
-      color: theme['color-primary-default'],
-    },
-    {
-      text: t('screens.overview.addRecipeGroup'),
-      name: 'addRecipeGroup',
-      color: theme['color-primary-default'],
-    },
-
-  ];
-
-  const onActionButtonPress = (pressedItem: string | undefined) => {
-    if (!pressedItem) {
-      return;
-    }
-
-    switch (pressedItem) {
-      case 'importRecipe':
-        props.navigation.navigate('ImportScreen', {});
-        break;
-      case 'addRecipe':
-        props.navigation.navigate('RecipeWizardScreen', {});
-        break;
-      case 'addRecipeGroup':
-        props.navigation.navigate('RecipeGroupEditScreen', {});
-        break;
-    }
-  };
 
   const openRecipe = (recipe: Recipe) => {
     if (recipe.id) {
@@ -104,10 +70,29 @@ const RecipeListScreen = (props: Props) => {
           shownRecipeGroupId={props.route.params?.shownRecipeGroupId && parseInt(props.route.params.shownRecipeGroupId)}
           onRecipeClick={openRecipe}
           onRecipeGroupClick={(recipeGroup) => props.navigation.push('RecipeListDetailScreen', {shownRecipeGroupId: recipeGroup.id})} />
-        <FloatingAction
-          actions={addActions}
-          onPressItem={onActionButtonPress}
-          color={theme['color-primary-default']} />
+        <FAB.Group
+          icon="plus"
+          open={fabOpen}
+          visible={true}
+          onStateChange={(state) => setFabOpen(state.open)}
+          actions={[
+            {
+              icon: 'plus',
+              label: t('screens.overview.importRecipe'),
+              onPress: () => props.navigation.navigate('ImportScreen', {}),
+            },
+            {
+              icon: 'plus',
+              label: t('screens.overview.addRecipe'),
+              onPress: () => props.navigation.navigate('RecipeWizardScreen', {}),
+            },
+            {
+              icon: 'plus',
+              label: t('screens.overview.addRecipeGroup'),
+              onPress: () => props.navigation.navigate('RecipeGroupEditScreen', {}),
+            },
+          ]}
+        />
       </Layout>
     </>
   );
