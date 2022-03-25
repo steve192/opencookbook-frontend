@@ -25,6 +25,28 @@
       "bundleIdentifier": "com.sterul.opencookbook"
     },
     "android": {
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "beta.cookpal.io",
+              "pathPrefix": "/"
+            },
+            {
+              "scheme": "https",
+              "host": "*.cookpal.io",
+              "pathPrefix": "/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#295700"
@@ -35,7 +57,7 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
       ],
-      "versionCode": 8
+      "versionCode": 10
     },
     "web": {
       "favicon": "./assets/icon.png"

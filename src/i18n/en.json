@@ -84,6 +84,7 @@
       "deleteAccountConfirmationQuestion": "Do you really want to delete your account and all your recipes? This action is effective immidiately and cannot be undone"
     },
     "import": {
+      "notSupported": "The website is unfortunately not supported yet",
       "URLToImport": "URL to import",
       "import": "Import",
       "supportedServices": "Supported services",
