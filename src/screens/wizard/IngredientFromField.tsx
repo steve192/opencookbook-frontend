@@ -1,10 +1,8 @@
-import {Button, useTheme} from '@ui-kitten/components';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
-import {TextInput} from 'react-native-paper';
+import {Colors, IconButton, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {DeleteIcon} from '../../assets/Icons';
 import {SelectionPopup} from '../../components/SelectionPopup';
 import RestAPI, {Ingredient, IngredientUse} from '../../dao/RestAPI';
 
@@ -24,7 +22,6 @@ export const IngredientFormField = (props: Props) => {
 
   const [availableIngredients, setAvailableIngredients] = useState<Ingredient[]>([]);
 
-  const theme = useTheme();
   const {t} = useTranslation('translation');
 
   const setIngredient = (text: string) => {
@@ -72,7 +69,7 @@ export const IngredientFormField = (props: Props) => {
 
   return (
     <>
-      <View style={{borderWidth: 1, borderColor: theme['background-basic-color-4'], padding: 10, borderRadius: 16}}>
+      <View style={{borderWidth: 1, borderColor: Colors.grey50, padding: 10, borderRadius: 16}}>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View style={{flex: 1, flexDirection: 'column'}}>
             <View style={{flex: 1, flexDirection: 'row'}}>
@@ -103,11 +100,8 @@ export const IngredientFormField = (props: Props) => {
               />
             </View>
           </View>
-          <Button
-            style={{height: 32, width: 32, margin: 10}}
-            size="small"
-            status="control"
-            accessoryLeft={<DeleteIcon />}
+          <IconButton
+            icon="delete-outline"
             onPress={() => props.onRemovePress()} />
         </View>
       </View>
