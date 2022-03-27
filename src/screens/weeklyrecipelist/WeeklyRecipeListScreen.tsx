@@ -49,11 +49,11 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   const addRecipeToWeekplanDay = (recipe: Recipe, weekplanDay: WeekplanDay) => {
     const newWeekplanDay = {...weekplanDay, recipes: [...weekplanDay.recipes]};
     // @ts-ignore id is always set
-    newWeekplanDay.recipes.push({id: recipe.id, title: recipe.title});
+    newWeekplanDay.recipes.push({id: recipe.id, title: recipe.title, type: 'NORMAL_RECIPE'});
     dispatch(updateSingleWeekplanDay(newWeekplanDay));
     setRecipeSelectionVisible(false);
   };
-  const removeRecipeFromWeekplanDay = (recipeId: number, weekplanDay: WeekplanDay) => {
+  const removeRecipeFromWeekplanDay = (recipeId: number | string, weekplanDay: WeekplanDay) => {
     const newWeekplanDay = {...weekplanDay, recipes: [...weekplanDay.recipes]};
     newWeekplanDay.recipes = newWeekplanDay.recipes.filter((existingRecipe) => existingRecipe.id !== recipeId);
     dispatch(updateSingleWeekplanDay(newWeekplanDay));
@@ -94,14 +94,17 @@ export const WeeklyRecipeListScreen = (props: Props) => {
               </View>
               <SideScroller>
                 {weekplanDays.filter((weekplanDay) => weekplanDay.day === weekdayDate.toString(dateFormat)).map((weekplanDay) => (
-                  weekplanDay.recipes.map((recipe, index) => (
-                    <WeeklyRecipeCard
-                      key={weekplanDay.day + index}
-                      onPress={() => openRecipe(recipe.id)}
-                      onRemovePress={() => removeRecipeFromWeekplanDay(recipe.id, weekplanDay)}
-                      title={recipe.title}
-                      imageUuid={recipe.titleImageUuid} />
-                  ))
+                  weekplanDay.recipes.map((recipe, index) => {
+                    if (recipe.type === 'NORMAL_RECIPE') {
+                      return <WeeklyRecipeCard
+                        key={weekplanDay.day + index}
+                        // @ts-ignore
+                        onPress={() => openRecipe(recipe.id)}
+                        onRemovePress={() => removeRecipeFromWeekplanDay(recipe.id, weekplanDay)}
+                        title={recipe.title}
+                        imageUuid={recipe.titleImageUuid} />;
+                    }
+                  })
                 ))}
               </SideScroller>
             </CustomCard>

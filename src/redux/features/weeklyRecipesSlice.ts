@@ -24,7 +24,13 @@ export const updateSingleWeekplanDay = createAsyncThunk(
           // @ts-ignore Cannot be undefined
           weekplanDay.recipes
               .filter((recipe) => recipe.id)
-              .map((recipe) => recipe.id));
+              .map((recipe) => {
+                if (recipe.type === 'NORMAL_RECIPE') {
+                  return {id: recipe.id, type: recipe.type};
+                } else if (recipe.type === 'SIMPLE_RECIPE') {
+                  return {id: recipe.id, type: recipe.type, title: recipe.title};
+                }
+              }));
     },
 );
 
