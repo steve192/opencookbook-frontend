@@ -37,8 +37,9 @@ export interface RecipeGroup {
 }
 
 export interface WeekplanDayRecipeInfo {
-    id: number;
+    id: number | string;
     title: string;
+    type: 'SIMPLE_RECIPE' | 'NORMAL_RECIPE'
     titleImageUuid: string;
 }
 export interface WeekplanDay {
