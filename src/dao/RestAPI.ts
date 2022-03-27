@@ -57,8 +57,8 @@ class RestAPI {
     const response = await this.get('/users/self');
     return response?.data;
   }
-  static async setWeekplanRecipes(date: string, recipeIds: number[]): Promise<WeekplanDay> {
-    const response = await this.put(`/weekplan/${date}`, {recipeIds});
+  static async setWeekplanRecipes(date: string, recipes: WeekplanDayRecipeInfo[]): Promise<WeekplanDay> {
+    const response = await this.put(`/weekplan/${date}`, {recipes: recipes});
     return response?.data;
   }
   static async getWeekplanDays(from: XDate, to: XDate): Promise<WeekplanDay[]> {
