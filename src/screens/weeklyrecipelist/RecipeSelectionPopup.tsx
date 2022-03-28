@@ -28,21 +28,16 @@ export const RecipeSelectionPopup = (props: Props) => {
         <Pressable
           onPress={props.onClose}
           style={styles.modalBackdrop}>
-          <HeaderHeightContext.Consumer>
-            {(headerHeight) => headerHeight &&
-                            <>
-                              <View style={styles.centeredView}>
-                                {/* headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
-                                <View style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, styles.modalView]}>
-                                  <RecipeList
-                                    shownRecipeGroupId={shownRecipeGroup?.id}
-                                    onRecipeClick={props.onRecipeSelected}
-                                    onRecipeGroupClick={onRecipeGroupSelected} />
-                                </View>
-                              </View>
-                            </>
-            }
-          </HeaderHeightContext.Consumer>
+          <>
+            <View style={styles.centeredView}>
+              <View style={[styles.modalView]}>
+                <RecipeList
+                  shownRecipeGroupId={shownRecipeGroup?.id}
+                  onRecipeClick={props.onRecipeSelected}
+                  onRecipeGroupClick={onRecipeGroupSelected} />
+              </View>
+            </View>
+          </>
         </Pressable>
       </Modal>
     </View>

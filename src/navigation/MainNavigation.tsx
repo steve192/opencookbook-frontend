@@ -1,11 +1,10 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {useTheme} from '@ui-kitten/components';
 import {createURL} from 'expo-linking';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {BottomNavigation, withTheme} from 'react-native-paper';
+import {BottomNavigation, withTheme, useTheme} from 'react-native-paper';
 import {useAppSelector} from '../redux/hooks';
 import {GuidedCookingScreen} from '../screens/GuidedCookingScreen';
 import {ImportScreen} from '../screens/ImportScreen';
@@ -21,17 +20,18 @@ import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import {AccountActivationScreen} from '../screens/AccountActivationScreen';
 import {PasswordResetScreen} from '../screens/PasswordResetScreen';
 import {RequestPasswordResetScreen} from '../screens/LoginScreen/RequestPasswordResetScreen';
+import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 
 
 const Stack = createNativeStackNavigator();
-const BottomTab = createBottomTabNavigator();
+const BottomTab = createMaterialBottomTabNavigator();
 const MainNavigation = () => {
-  const theme = useTheme();
   const loggedIn = useAppSelector((state) => state.auth.loggedIn);
   const isLoading = useAppSelector((state) => state.auth.isLoading);
 
 
   const {t} = useTranslation('translation');
+  const theme = useTheme();
 
   const LoginStackNavigation = () => (
     <Stack.Navigator
@@ -109,60 +109,45 @@ const MainNavigation = () => {
 
 
   const BottomTabNavigation = withTheme((props) => {
-    const [index, setIndex] = React.useState(0);
-    const [routes] = React.useState([
-      {key: 'recipesListScreen', title: t('navigation.tabMyRecipes'), icon: 'home', color: '#FFFFFF'},
-      {key: 'weeklyScreen', title: t('navigation.tabWeekplan'), icon: 'calendar'},
-      {key: 'settingsScreen', title: t('navigation.tabSettings'), icon: 'cog-off-outline'},
-    ]);
-    const renderScene = BottomNavigation.SceneMap({
-      recipesListScreen: recipeScrenNavigation,
-      weeklyScreen: WeeklyRecipeListScreen,
-      settingsScreen: SettingsScreen,
-    });
     return (
-      <BottomNavigation
-        activeColor={props.theme.colors.primary}
-        barStyle={{backgroundColor: props.theme.colors.background}}
-        navigationState={{index, routes}}
-        onIndexChange={setIndex}
-        renderScene={renderScene}
-      />
 
-    // <BottomTab.Navigator
-    //   backBehavior="history"
-    //   screenOptions={{
-    //     headerStyle: {backgroundColor: theme['color-primary-default']},
-    //     headerTintColor: theme['text-alternate-color'],
-    //   }}
-    //   tabBar={(props) => <BottomTabBar {...props} />}>
-    //   <BottomTab.Screen
-    //     name="RecipesListScreen"
-    //     component={recipeScrenNavigation}
-    //     options={{headerShown: false}} />
-    //   <BottomTab.Screen
-    //     name="WeeklyScreen"
-    //     component={WeeklyRecipeListScreen}
-    //     options={{title: t('screens.weekplan.screenTitle'), headerShown: true}} />
-    //   <BottomTab.Screen
-    //     name="SettingsScreen"
-    //     component={SettingsScreen}
-    //     options={{title: t('screens.settings.screenTitle'), headerShown: true}} />
+      <BottomTab.Navigator
+        backBehavior="history"
+        labeled={true}
+        barStyle={{backgroundColor: theme.colors.background}}
 
-    // </BottomTab.Navigator>
+      >
+        <BottomTab.Screen
+          name="RecipesListScreen"
+          component={recipeScrenNavigation}
+          options={{
+            title: t('screens.overview.myRecipes'),
+            tabBarIcon: 'home',
+          }} />
+        <BottomTab.Screen
+          name="WeeklyScreen"
+          component={WeeklyRecipeListScreen}
+          options={{
+            title: t('screens.weekplan.screenTitle'),
+            tabBarIcon: 'calendar',
+          }} />
+        <BottomTab.Screen
+          name="SettingsScreen"
+          component={SettingsScreen}
+          options={{title: t('screens.settings.screenTitle'),
+            tabBarIcon: 'cog-off-outline',
+          }} />
+
+      </BottomTab.Navigator>
     );
   });
 
   const recipeScrenNavigation = () => (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: {backgroundColor: theme['color-primary-default']},
-        headerTintColor: theme['text-alternate-color'],
-      }}>
+    <Stack.Navigator>
       <Stack.Screen
         name="RecipeListDetailScreen"
         component={RecipeListScreen}
-        options={{headerShown: true}} />
+        options={{headerShown: false}} />
     </Stack.Navigator>
   );
 
