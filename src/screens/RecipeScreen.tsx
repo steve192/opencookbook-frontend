@@ -5,7 +5,7 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Button, Divider} from 'react-native-paper';
+import {Appbar, Button, Divider, useTheme} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {EditIcon} from '../assets/Icons';
 import {ChunkView} from '../ChunkView';
@@ -27,6 +27,8 @@ export const RecipeScreen = (props: Props) => {
   const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 0);
   const {t} = useTranslation('translation');
 
+  const theme = useTheme();
+
 
   useEffect(() => {
     // Load recipe if recipe id of screen has changed or screen is navigated to
@@ -39,15 +41,16 @@ export const RecipeScreen = (props: Props) => {
         });
 
 
-    props.navigation.setOptions({title: displayedRecipe ? displayedRecipe.title : 'Loading'});
-
     props.navigation.setOptions({
+      title: displayedRecipe ? displayedRecipe.title : 'Loading',
       headerRight: () => (
-        <Button
+        <Appbar.Action
+          icon="delete-outline"
+          color={theme.colors.error}
           onPress={() => props.navigation.navigate('RecipeWizardScreen', {
             editing: true,
             recipeId: displayedRecipe.id,
-          })} accessoryLeft={<EditIcon />} />
+          })} />
       ),
     });
   }, [props.route.params.recipeId, focussed]);
