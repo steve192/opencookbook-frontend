@@ -1,9 +1,9 @@
-import {Button, Divider, Text, useTheme} from '@ui-kitten/components';
+import {useTheme} from '@ui-kitten/components';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
+import {Divider, IconButton, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {MinusIcon, PlusIcon} from '../assets/Icons';
 import {IngredientUse} from '../dao/RestAPI';
 import CentralStyles from '../styles/CentralStyles';
 
@@ -57,9 +57,9 @@ export const IngredientList = (props: Props) => {
       </View>
       <Spacer height={20} />
       {props.enableServingScaling && <View style={styles.servingsContainer}>
-        <Button
-          style={CentralStyles.iconButton}
-          size='tiny'
+        <IconButton
+          size={32}
+          animated
           onPress={() => {
             if (props.scaledServings === 1) {
               return;
@@ -67,13 +67,13 @@ export const IngredientList = (props: Props) => {
             updateServings(
                 props.scaledServings - 1);
           }}
-          accessoryLeft={<MinusIcon />} />
+          icon="minus-circle" />
         <Text style={{paddingHorizontal: 20}}> {props.scaledServings} {t('screens.recipe.servings')}</Text>
-        <Button
-          style={CentralStyles.iconButton}
-          size='tiny'
+        <IconButton
+          size={32}
+          animated
           onPress={() => updateServings(props.scaledServings + 1)}
-          accessoryLeft={<PlusIcon />} />
+          icon="plus-circle" />
       </View>}
     </>
   );
