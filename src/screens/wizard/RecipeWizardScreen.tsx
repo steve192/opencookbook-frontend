@@ -2,7 +2,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useLayoutEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Button, Caption, Divider, Surface, TextInput, useTheme} from 'react-native-paper';
+import {Appbar, Button, Caption, Divider, Surface, TextInput, useTheme} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {DeleteIcon, SaveIcon} from '../../assets/Icons';
 import {ChunkView} from '../../ChunkView';
@@ -50,8 +50,16 @@ const RecipeWizardScreen = (props: Props) => {
       title: props.route.params?.editing ? t('screens.editRecipe.screenTitleEdit') : t('screens.editRecipe.screenTitleCreate'),
       headerRight: () => (
         <>
-          <Button onPress={() => onDeleteRecipe()} ><DeleteIcon fill={theme.colors.error} /> </Button>
-          <Button onPress={() => saveRecipe()} ><SaveIcon /> </Button>
+          <Appbar.Action
+            icon="delete-outline"
+            color={theme.colors.error}
+            onPress={() => onDeleteRecipe()}
+          />
+          <Appbar.Action
+            icon="content-save-outline"
+            color={theme.colors.textOnPrimary}
+            onPress={() => saveRecipe()}
+          />
         </>
       ),
     });

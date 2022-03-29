@@ -45,8 +45,8 @@ export const RecipeScreen = (props: Props) => {
       title: displayedRecipe ? displayedRecipe.title : 'Loading',
       headerRight: () => (
         <Appbar.Action
-          icon="delete-outline"
-          color={theme.colors.error}
+          icon="pencil-outline"
+          color={theme.colors.textOnPrimary}
           onPress={() => props.navigation.navigate('RecipeWizardScreen', {
             editing: true,
             recipeId: displayedRecipe.id,
