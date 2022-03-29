@@ -1,10 +1,10 @@
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
-import {Button, Layout, useTheme} from '@ui-kitten/components';
+import {Button, Layout} from '@ui-kitten/components';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {FAB} from 'react-native-paper';
+import {Appbar, FAB, useTheme} from 'react-native-paper';
 import {DeleteIcon} from '../assets/Icons';
 import {RecipeList} from '../components/RecipeList';
 import RestAPI, {Recipe} from '../dao/RestAPI';
@@ -65,6 +65,9 @@ const RecipeListScreen = (props: Props) => {
   return (
     <>
       <Layout style={CentralStyles.fullscreen}>
+        <Appbar.Header>
+          <Appbar.Content color={theme.colors.textOnPrimary} title={t('screens.overview.myRecipes')}/>
+        </Appbar.Header>
         <RecipeList
           // @ts-ignore Route params are sometimes string
           shownRecipeGroupId={props.route.params?.shownRecipeGroupId && parseInt(props.route.params.shownRecipeGroupId)}
@@ -75,21 +78,26 @@ const RecipeListScreen = (props: Props) => {
           open={fabOpen}
           visible={true}
           onStateChange={(state) => setFabOpen(state.open)}
+          fabStyle={{
+            backgroundColor: theme.colors.primary,
+          }}
+          color={theme.colors.textOnPrimary}
           actions={[
             {
-              icon: 'plus',
-              label: t('screens.overview.importRecipe'),
-              onPress: () => props.navigation.navigate('ImportScreen', {}),
-            },
-            {
+              small: false,
               icon: 'plus',
               label: t('screens.overview.addRecipe'),
               onPress: () => props.navigation.navigate('RecipeWizardScreen', {}),
             },
             {
-              icon: 'plus',
+              icon: 'group',
               label: t('screens.overview.addRecipeGroup'),
               onPress: () => props.navigation.navigate('RecipeGroupEditScreen', {}),
+            },
+            {
+              icon: 'import',
+              label: t('screens.overview.importRecipe'),
+              onPress: () => props.navigation.navigate('ImportScreen', {}),
             },
           ]}
         />

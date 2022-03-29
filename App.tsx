@@ -12,7 +12,7 @@ import MainNavigation from './src/navigation/MainNavigation';
 import {RootState, store} from './src/redux/store';
 import {myDarkTheme} from './src/styles/custom-theme-dark';
 import {myLightTheme} from './src/styles/custom-theme-light';
-import {DarkTheme, DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
+import {Colors, DarkTheme, DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 
 enableScreens();
 
@@ -27,20 +27,23 @@ export default () => {
     </>
   );
 };
+const paperTheme = {
+  ...DefaultTheme,
+  roundness: 10,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#72B600',
+    accent: '#FFE102',
+    background: '#FFFFFF',
+    textOnPrimary: Colors.white,
+  },
+
+};
+
 
 const ReduxWrappedApp = () => {
   const selectedTheme = useSelector((state: RootState) => state.settings.theme);
-  const paperTheme = {
-    ...DefaultTheme,
-    roundness: 10,
-    colors: {
-      ...DefaultTheme.colors,
-      primary: '#72B600',
-      accent: '#FFE102',
-      background: '#FFFFFF',
-    },
 
-  };
 
   const darkPaperTheme = {
     ...DarkTheme,

@@ -5,7 +5,7 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Divider, IconButton, Subheading, Text} from 'react-native-paper';
+import {Appbar, Divider, IconButton, Subheading, Text, useTheme} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import XDate from 'xdate';
 import {ChunkView} from '../../ChunkView';
@@ -31,6 +31,8 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   const now = new XDate();
   const {t} = useTranslation('translation');
   const dispatch = useDispatch();
+
+  const theme = useTheme();
 
   const [recipeSelectionVisible, setRecipeSelectionVisible] = useState<boolean>(false);
 
@@ -113,6 +115,9 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     <>
       <ChunkView>
         <View style={CentralStyles.fullscreen}>
+          <Appbar.Header>
+            <Appbar.Content color={theme.colors.textOnPrimary} title={t('screens.weekplan.screenTitle')}/>
+          </Appbar.Header>
           <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
             <Divider style={{marginVertical: 25}}/>
             <Subheading>{t('screens.weekplan.currentWeek')}</Subheading>

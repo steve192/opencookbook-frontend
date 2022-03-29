@@ -3,7 +3,7 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Button, Caption, Divider, Text, useTheme} from 'react-native-paper';
+import {Appbar, Button, Caption, Divider, Text, useTheme} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
 import {HardDriveIcon} from '../assets/Icons';
@@ -38,6 +38,9 @@ export const SettingsScreen = () => {
   return (
     <>
       <View style={[CentralStyles.fullscreen]}>
+        <Appbar.Header>
+          <Appbar.Content color={theme.colors.textOnPrimary} title={t('screens.settings.screenTitle')}/>
+        </Appbar.Header>
         <View style={CentralStyles.contentContainer}>
           <ScrollView>
             <HardDriveIcon style={{alignSelf: 'center', width: 100, height: 100}}/>
