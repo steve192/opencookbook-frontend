@@ -4,7 +4,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createURL} from 'expo-linking';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {BottomNavigation, withTheme, useTheme, Colors} from 'react-native-paper';
+import {BottomNavigation, withTheme, useTheme, Colors, Appbar} from 'react-native-paper';
 import {useAppSelector} from '../redux/hooks';
 import {GuidedCookingScreen} from '../screens/GuidedCookingScreen';
 import {ImportScreen} from '../screens/ImportScreen';
@@ -60,8 +60,14 @@ const MainNavigation = () => {
       <>
         <Stack.Navigator
           screenOptions={{
-            headerStyle: {backgroundColor: theme['color-primary-default']},
-            headerTintColor: theme['text-alternate-color'],
+            header: (nav) => (
+              <Appbar.Header>
+                {nav.back ? (
+                  <Appbar.BackAction color={theme.colors.textOnPrimary} onPress={() => nav.navigation.goBack()} />
+                ) : null}
+                <Appbar.Content color={theme.colors.textOnPrimary} title={nav.options.title} />
+              </Appbar.Header>
+            ),
           }}>
           <Stack.Screen
             name="OverviewScreen"
