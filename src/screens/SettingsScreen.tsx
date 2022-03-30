@@ -1,5 +1,8 @@
 import {Picker} from '@react-native-picker/picker';
-import React from 'react';
+import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
+import {CompositeScreenProps, useIsFocused} from '@react-navigation/native';
+import {StackScreenProps} from '@react-navigation/stack';
+import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
@@ -10,17 +13,33 @@ import {CustomCard} from '../components/CustomCard';
 import Configuration from '../Configuration';
 import RestAPI from '../dao/RestAPI';
 import {PromptUtil} from '../helper/Prompt';
+import {MainNavigationProps, OverviewNavigationProps} from '../navigation/NavigationRoutes';
 import {logout} from '../redux/features/authSlice';
 import {changeTheme} from '../redux/features/settingsSlice';
 import {RootState} from '../redux/store';
 import CentralStyles from '../styles/CentralStyles';
 
-export const SettingsScreen = () => {
+type Props =
+    CompositeScreenProps<
+        StackScreenProps<MainNavigationProps, 'OverviewScreen'>,
+        BottomTabScreenProps<OverviewNavigationProps, 'SettingsScreen'>
+    >;
+
+export const SettingsScreen = (props: Props) => {
   const selectedTheme = useSelector((state: RootState) => state.settings.theme);
   const backendUrl = useSelector((state: RootState) => state.settings.backendUrl);
   const dispatch = useDispatch();
   const {t} = useTranslation('translation');
   const theme = useTheme();
+
+  useEffect(() => {
+    return props.navigation.addListener('focus', () => {
+      props.navigation.getParent()?.setOptions({
+        title: t('screens.settings.screenTitle'),
+        headerRight: undefined,
+      });
+    });
+  }, [props.navigation]);
 
   const deleteAccount = () => {
     PromptUtil.show({
@@ -37,9 +56,6 @@ export const SettingsScreen = () => {
   return (
     <>
       <View style={[CentralStyles.fullscreen]}>
-        <Appbar.Header>
-          <Appbar.Content color={theme.colors.textOnPrimary} title={t('screens.settings.screenTitle')}/>
-        </Appbar.Header>
         <View style={CentralStyles.contentContainer}>
           <ScrollView>
             <Avatar.Icon style={{alignSelf: 'center', backgroundColor: 'transparent'}} size={100} color={theme.colors.text} icon="server"/>

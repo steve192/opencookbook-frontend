@@ -73,9 +73,6 @@ const MainNavigation = () => {
           <Stack.Screen
             name="OverviewScreen"
             component={BottomTabNavigation}
-            options={
-              {headerShown: false}
-            }
           />
           <Stack.Screen
             name="RecipeWizardScreen"

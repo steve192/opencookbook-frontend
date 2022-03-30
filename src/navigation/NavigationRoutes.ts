@@ -21,6 +21,7 @@ export type MainNavigationProps = {
 export type OverviewNavigationProps = {
     RecipesListScreen: undefined,
     WeeklyScreen: undefined,
+    SettingsScreen: undefined,
 }
 
 export type RecipeScreenNavigation = {

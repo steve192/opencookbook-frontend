@@ -1,7 +1,7 @@
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
-import {CompositeScreenProps} from '@react-navigation/native';
+import {CompositeScreenProps, useIsFocused} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Appbar, FAB, Surface, useTheme} from 'react-native-paper';
 import {RecipeList} from '../components/RecipeList';
@@ -25,22 +25,29 @@ const RecipeListScreen = (props: Props) => {
   const {t} = useTranslation('translation');
 
   const [fabOpen, setFabOpen] = useState(false);
+  const focussed = useIsFocused();
 
   const shownRecipeGroup = useAppSelector((state) => state.recipes.recipeGroups.filter((recipeGroup) => recipeGroup.id == props.route.params?.shownRecipeGroupId)[0]);
 
-  if (props.route.params?.shownRecipeGroupId) {
-    props.navigation.setOptions({
-      title: shownRecipeGroup?.title,
-      headerRight: () => (
-        <Appbar.Action
-          icon="delete-outline"
-          color={theme.colors.error}
-          onPress={() => shownRecipeGroup.id && deleteRecipeGroup(shownRecipeGroup.id)} />
-      ),
+
+  useEffect(() => {
+    return props.navigation.addListener('focus', () => {
+      if (shownRecipeGroup !== undefined) {
+        props.navigation.getParent()?.getParent()?.setOptions({
+          title: shownRecipeGroup?.title,
+          headerRight: () => (
+            <Appbar.Action
+              icon="delete-outline"
+              color={theme.colors.error}
+              onPress={() => shownRecipeGroup.id && deleteRecipeGroup(shownRecipeGroup.id)} />
+          ),
+        });
+      } else {
+        props.navigation.getParent()?.getParent()?.setOptions({title: t('screens.overview.myRecipes')});
+      }
     });
-  } else {
-    props.navigation.setOptions({title: t('screens.overview.myRecipes')});
-  }
+  }, [props.navigation]);
+
 
   const deleteRecipeGroup = (groupId: number) => {
     RestAPI.deleteRecipeGroup(groupId)
@@ -58,13 +65,11 @@ const RecipeListScreen = (props: Props) => {
       });
     }
   };
+  console.log(props.navigation);
 
   return (
     <>
       <Surface style={CentralStyles.fullscreen}>
-        <Appbar.Header>
-          <Appbar.Content color={theme.colors.textOnPrimary} title={t('screens.overview.myRecipes')}/>
-        </Appbar.Header>
         <RecipeList
           // @ts-ignore Route params are sometimes string
           shownRecipeGroupId={props.route.params?.shownRecipeGroupId && parseInt(props.route.params.shownRecipeGroupId)}

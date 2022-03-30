@@ -23,7 +23,7 @@ import {WeeklyRecipeCard} from './WeeklyRecipeCard';
 type Props =
     CompositeScreenProps<
         StackScreenProps<MainNavigationProps, 'OverviewScreen'>,
-        BottomTabScreenProps<OverviewNavigationProps, 'RecipesListScreen'>
+        BottomTabScreenProps<OverviewNavigationProps, 'WeeklyScreen'>
     >;
 
 const dateFormat = 'yyyy-MM-dd';
@@ -46,6 +46,15 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     }));
   };
   useEffect(loadData, []);
+
+  useEffect(() => {
+    return props.navigation.addListener('focus', () => {
+      props.navigation.getParent()?.setOptions({
+        title: t('screens.weekplan.screenTitle'),
+        headerRight: undefined,
+      });
+    });
+  }, [props.navigation]);
 
   const addRecipeToWeekplanDay = (recipe: Recipe, weekplanDay: WeekplanDay) => {
     const newWeekplanDay = {...weekplanDay, recipes: [...weekplanDay.recipes]};
@@ -115,9 +124,6 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     <>
       <ChunkView>
         <View style={CentralStyles.fullscreen}>
-          <Appbar.Header>
-            <Appbar.Content color={theme.colors.textOnPrimary} title={t('screens.weekplan.screenTitle')}/>
-          </Appbar.Header>
           <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
             <Subheading>{t('screens.weekplan.currentWeek')}</Subheading>
             {renderWeek(getCurrentWeekNumber(now), now.getFullYear())}
