@@ -43,25 +43,6 @@ export const RecipeImageViewPager = (props: Props) => {
     });
   };
 
-  const renderMobileViewpager = () => {
-    <PagerView
-      ref={pagerRef.current}
-      initialPage={shownImageIndex}
-      onPageSelected={(event) => setShownImageIndex(event.nativeEvent.position)}
-      style={styles.recipeImage}>
-      {props.images.length === 0 ?
-                    <Image
-                      source={require('../../assets/placeholder.png')}
-                      style={styles.recipeImage} /> :
-
-                    props.images.map((image, imageIndex) =>
-                      <RecipeImageComponent
-                        key={image.uuid}
-                        uuid={image.uuid} />,
-                    )}
-    </PagerView>;
-  };
-
   const renderWebViewpager = () => {
     <Swiper
       onActiveIndexChange={(e) => setShownImageIndex(e.activeIndex)}
@@ -79,7 +60,22 @@ export const RecipeImageViewPager = (props: Props) => {
 
   return (
     <View style={[styles.recipeImageContainer, props.style]}>
-      {Platform.OS === 'web' ? renderWebViewpager() : renderMobileViewpager()}
+      <PagerView
+        ref={pagerRef.current}
+        initialPage={shownImageIndex}
+        onPageSelected={(event) => setShownImageIndex(event.nativeEvent.position)}
+        style={styles.recipeImage}>
+        {props.images.length === 0 ?
+                    <Image
+                      source={require('../../assets/placeholder.png')}
+                      style={styles.recipeImage} /> :
+
+                    props.images.map((image, imageIndex) =>
+                      <RecipeImageComponent
+                        key={image.uuid}
+                        uuid={image.uuid} />,
+                    )}
+      </PagerView>
 
       {shownImageIndex !== 0 &&
                 <Pressable

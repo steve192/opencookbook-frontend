@@ -119,7 +119,6 @@ export const WeeklyRecipeListScreen = (props: Props) => {
             <Appbar.Content color={theme.colors.textOnPrimary} title={t('screens.weekplan.screenTitle')}/>
           </Appbar.Header>
           <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
-            <Divider style={{marginVertical: 25}}/>
             <Subheading>{t('screens.weekplan.currentWeek')}</Subheading>
             {renderWeek(getCurrentWeekNumber(now), now.getFullYear())}
             <Divider style={{marginVertical: 25}}/>

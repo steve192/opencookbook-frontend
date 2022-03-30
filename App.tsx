@@ -47,11 +47,13 @@ const ReduxWrappedApp = () => {
 
   const darkPaperTheme = {
     ...DarkTheme,
-    roundness: 2,
+    roundness: 10,
     colors: {
-      ...DefaultTheme.colors,
+      ...DarkTheme.colors,
       primary: '#72B600',
       accent: '#FFE102',
+      background: '#000000',
+      textOnPrimary: Colors.white,
     },
   };
   return (
