@@ -1,9 +1,9 @@
 import {HeaderHeightContext} from '@react-navigation/elements';
-import {Layout, List, ListItem, Text} from '@ui-kitten/components';
+import {List, ListItem} from '@ui-kitten/components';
 import React, {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ListRenderItemInfo, Modal, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
-import {Divider, TextInput} from 'react-native-paper';
+import {Divider, TextInput, Text, Surface} from 'react-native-paper';
 import Spacer from 'react-spacer';
 
 
@@ -30,7 +30,7 @@ export const SelectionPopup = (props: Props) => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');
 
-  const modalInputRef = useRef<Input>(null);
+  const modalInputRef = useRef<typeof TextInput>();
 
   const {t} = useTranslation('translation');
 
@@ -109,7 +109,7 @@ export const SelectionPopup = (props: Props) => {
                                     <>
                                       <View style={styles.centeredView}>
                                         {/* headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
-                                        <Layout style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, styles.modalView]}>
+                                        <Surface style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, styles.modalView]}>
                                           <View
                                             style={{flexDirection: 'row', alignContent: 'center'}}>
                                             <TextInput placeholder={props.placeholder} ref={modalInputRef} onChangeText={onSearchInputChange} style={{flex: 1}} value={value} />
@@ -123,7 +123,7 @@ export const SelectionPopup = (props: Props) => {
                                             ItemSeparatorComponent={Divider}
                                             data={getListItemData()}
                                           />
-                                        </Layout>
+                                        </Surface>
                                       </View>
                                     </>
                         }

@@ -1,8 +1,8 @@
-import {Button, Icon, Text, ViewPager} from '@ui-kitten/components';
+import {ViewPager} from '@ui-kitten/components';
 import * as ImagePicker from 'expo-image-picker';
 import React, {useState} from 'react';
 import {Image, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
-import {Avatar} from 'react-native-paper';
+import {Avatar, IconButton, Text} from 'react-native-paper';
 import RestAPI, {RecipeImage} from '../dao/RestAPI';
 import {RecipeImageComponent} from './RecipeImageComponent';
 
@@ -74,7 +74,11 @@ export const RecipeImageViewPager = (props: Props) => {
       }
 
       {props.allowEdit &&
-                <Button onPress={selectImage} style={styles.imageButton} status="basic" accessoryLeft={<Icon name="camera" />} />
+                   <IconButton
+                     onPress={selectImage}
+                     style={styles.imageButton}
+                     icon="camera-outline"
+                   />
       }
 
       <Text style={styles.indexIndicator}>{shownImageIndex + 1} / {props.images.length}</Text>

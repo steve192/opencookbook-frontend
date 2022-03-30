@@ -1,10 +1,9 @@
 import {MaterialIcons} from '@expo/vector-icons';
-import {useTheme} from '@ui-kitten/components';
 import fuzzy from 'fuzzy';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, RefreshControl, StyleSheet, View, ViewProps} from 'react-native';
-import {Headline, Searchbar, Surface, Text} from 'react-native-paper';
+import {Headline, Searchbar, Surface, Text, useTheme} from 'react-native-paper';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {fetchMyRecipeGroups, fetchMyRecipes} from '../redux/features/recipesSlice';
@@ -118,7 +117,7 @@ export const RecipeList = (props: Props) => {
               padding: 16,
               fontWeight: 'bold',
               position: 'absolute',
-              color: theme['text-alternate-color'],
+              color: theme.colors.textOnPrimary,
             }}>
             {recipeGroup.title}
           </Headline>
@@ -145,8 +144,8 @@ export const RecipeList = (props: Props) => {
 
   const renderNoItemsNotice = () => (
     <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', flex: 1}}>
-      <MaterialIcons name="no-food" size={64} color={theme['text-disabled-color']} />
-      <Headline style={{padding: 64, color: theme['text-disabled-color']}}>
+      <MaterialIcons name="no-food" size={64} color={theme.colors.disabled} />
+      <Headline style={{padding: 64, color: theme.colors.disabled}}>
         {t('screens.overview.noRecipesMessage')}
       </Headline>
     </View>

@@ -1,15 +1,13 @@
-import {useTheme} from '@ui-kitten/components';
 import React from 'react';
 import {View} from 'react-native';
-import {Surface} from 'react-native-paper';
+import {Colors, Surface} from 'react-native-paper';
 
 
 export const CustomCard = (props: React.ComponentPropsWithRef<typeof View> ) => {
-  const theme = useTheme();
   return (
     <Surface style={[{
       borderWidth: 1,
-      borderColor: theme['background-basic-color-4'],
+      borderColor: Colors.grey300,
       padding: 10,
       borderRadius: 5,
       shadowColor: '#000',

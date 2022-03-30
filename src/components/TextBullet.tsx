@@ -1,7 +1,6 @@
-import {Text} from '@ui-kitten/components';
 import React from 'react';
 import {Pressable, StyleProp, StyleSheet, ViewStyle} from 'react-native';
-import {useTheme} from 'react-native-paper';
+import {useTheme, Text} from 'react-native-paper';
 
 
 interface Props {
