@@ -1,8 +1,8 @@
-import {Avatar, Button, Icon, Text, ViewPager} from '@ui-kitten/components';
+import {Button, Icon, Text, ViewPager} from '@ui-kitten/components';
 import * as ImagePicker from 'expo-image-picker';
 import React, {useState} from 'react';
-import {Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
-import {ArrowBackwardIcon, ArrowForwardIcon} from '../assets/Icons';
+import {Image, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
+import {Avatar} from 'react-native-paper';
 import RestAPI, {RecipeImage} from '../dao/RestAPI';
 import {RecipeImageComponent} from './RecipeImageComponent';
 
@@ -45,7 +45,7 @@ export const RecipeImageViewPager = (props: Props) => {
         onSelect={setShownImageIndex}
         style={styles.recipeImage}>
         {props.images.length === 0 ?
-                    <Avatar
+                    <Image
                       source={require('../../assets/placeholder.png')}
                       style={styles.recipeImage} /> :
 
@@ -61,7 +61,7 @@ export const RecipeImageViewPager = (props: Props) => {
                 <Pressable
                   onPress={() => setShownImageIndex(shownImageIndex - 1)}
                   style={styles.backwardButton}>
-                  <ArrowBackwardIcon width={50} height={50} fill="rgb(209,209,209)" />
+                  <Avatar.Icon icon="arrow-left" size={50} color="rgb(209,209,209)" />
                 </Pressable>
       }
 
@@ -69,7 +69,7 @@ export const RecipeImageViewPager = (props: Props) => {
                 <Pressable
                   style={styles.forwardButton}
                   onPress={() => setShownImageIndex(shownImageIndex + 1)}>
-                  <ArrowForwardIcon width={50} height={50} fill="rgb(209,209,209)" />
+                  <Avatar.Icon icon="arrow-right" size={50} color="rgb(209,209,209)" />
                 </Pressable>
       }
 

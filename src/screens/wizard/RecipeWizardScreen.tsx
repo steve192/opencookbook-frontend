@@ -4,7 +4,6 @@ import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {Appbar, Button, Caption, Divider, Surface, TextInput, useTheme} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {DeleteIcon, SaveIcon} from '../../assets/Icons';
 import {ChunkView} from '../../ChunkView';
 import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
 import {IngredientUse, Recipe, RecipeGroup} from '../../dao/RestAPI';

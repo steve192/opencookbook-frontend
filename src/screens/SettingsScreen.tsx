@@ -3,10 +3,9 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Appbar, Button, Caption, Divider, Text, useTheme} from 'react-native-paper';
+import {Appbar, Avatar, Button, Caption, Divider, Text, useTheme} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
-import {HardDriveIcon} from '../assets/Icons';
 import {CustomCard} from '../components/CustomCard';
 import Configuration from '../Configuration';
 import RestAPI from '../dao/RestAPI';
@@ -43,9 +42,9 @@ export const SettingsScreen = () => {
         </Appbar.Header>
         <View style={CentralStyles.contentContainer}>
           <ScrollView>
-            <HardDriveIcon style={{alignSelf: 'center', width: 100, height: 100}}/>
+            <Avatar.Icon style={{alignSelf: 'center', backgroundColor: 'transparent'}} size={100} color={theme.colors.text} icon="server"/>
             <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{backendUrl}</Text>
-            <Divider style={{marginTop: 10, marginBottom: 10}}/>
+            <Spacer height={20} />
             <Button
               mode='outlined'
               onPress={() => {
@@ -53,6 +52,7 @@ export const SettingsScreen = () => {
                 Configuration.setRefreshToken('');
                 dispatch(logout());
               }}>Logout</Button>
+            <Divider style={{marginTop: 10, marginBottom: 10}}/>
             <Spacer height={20} />
             <CustomCard>
               <Caption>{t('screens.settings.theme')}</Caption>

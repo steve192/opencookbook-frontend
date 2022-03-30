@@ -3,9 +3,8 @@ import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Button, Divider, HelperText, TextInput, Text, useTheme, Caption} from 'react-native-paper';
+import {Button, Caption, Divider, HelperText, Text, TextInput, useTheme} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {CheckmarkIcon, WarningIcon} from '../assets/Icons';
 import RestAPI from '../dao/RestAPI';
 import CentralStyles from '../styles/CentralStyles';
 
@@ -53,8 +52,12 @@ export const ImportScreen = (props: Props) => {
       <View style={CentralStyles.contentContainer}>
         <TextInput label={t('screens.import.URLToImport')} value={importURL} onChangeText={setImportURL} />
         <Spacer height={10} />
-        <Button icon={importSuccess ? 'check' : undefined} mode="contained" loading={importPending} onPress={startImport}>
-          {importSuccess ? <CheckmarkIcon fill={theme.colors.accent}/> : undefined}
+        <Button
+          color={importError.length > 0 ? theme.colors.error:theme.colors.primary}
+          icon={importSuccess ? 'check' : importError.length > 0 ? 'alert-circle-outline' : undefined}
+          mode="contained"
+          loading={importPending}
+          onPress={startImport}>
           Import
         </Button>
         <Spacer height={80} />
@@ -62,14 +65,12 @@ export const ImportScreen = (props: Props) => {
 
           {importError.length > 0 &&
                         <>
-                          <WarningIcon width={16} height={16} fill={theme.colors.error} />
                           <HelperText type='error' >{t('screens.import.importFailed')} {importError}</HelperText>
                         </>
           }
 
           {importSuccess &&
                         <>
-                          <CheckmarkIcon width={16} height={16} fill={theme.colors.accent} />
                           <Text style={{color: theme.colors.accent}}>{t('screens.import.importSuccess')}</Text>
                         </>
           }
