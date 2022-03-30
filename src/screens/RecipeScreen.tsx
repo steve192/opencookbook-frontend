@@ -98,7 +98,12 @@ export const RecipeScreen = (props: Props) => {
             {displayedRecipe && renderIngredientsSection()}
 
             <Spacer height={20} />
-            <Button mode="contained" onPress={() => displayedRecipe && props.navigation.navigate('GuidedCookingScreen', {recipe: displayedRecipe, scaledServings: scaledServings})}>{t('screens.recipe.startCookingButton')}</Button>
+            <Button
+              mode="contained"
+              dark={true}
+              onPress={() => displayedRecipe && props.navigation.navigate('GuidedCookingScreen', {recipe: displayedRecipe, scaledServings: scaledServings})}>
+              {t('screens.recipe.startCookingButton')}
+            </Button>
             <Spacer height={20} />
 
             {displayedRecipe && renderStepsSection()}

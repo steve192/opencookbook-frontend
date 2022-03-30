@@ -67,7 +67,14 @@ export const SettingsScreen = () => {
             <View style={{padding: 10, borderWidth: 1, borderRadius: 16, borderColor: 'red'}}>
               <Caption style={{color: theme.colors.error}}>{t('screens.settings.dangerZone')}</Caption>
               <Spacer height={20} />
-              <Button icon="alert-circle-outline" mode="contained" color={theme.colors.error} onPress={deleteAccount}>{t('screens.settings.deleteAccount')}</Button>
+              <Button
+                dark={true}
+                icon="alert-circle-outline"
+                mode="contained"
+                color={theme.colors.error}
+                onPress={deleteAccount}>
+                {t('screens.settings.deleteAccount')}
+              </Button>
             </View>
           </ScrollView>
         </View>

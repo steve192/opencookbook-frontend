@@ -1,6 +1,7 @@
-import {Text, useTheme} from '@ui-kitten/components';
+import {Text} from '@ui-kitten/components';
 import React from 'react';
 import {Pressable, StyleProp, StyleSheet, ViewStyle} from 'react-native';
+import {useTheme} from 'react-native-paper';
 
 
 interface Props {
@@ -13,10 +14,10 @@ export const TextBullet = (props: Props) => {
   const theme = useTheme();
 
   const additionalStylesContainer = props.selected ?
-        {backgroundColor: theme['color-primary-default'], borderColor: theme['color-primary-default']} :
-        {borderColor: theme['color-primary-default']};
+        {backgroundColor: theme.colors.primary, borderColor: theme.colors.primary} :
+        {borderColor: theme.colors.primary};
 
-  const additionalStylesText = props.selected ? {color: theme['text-alternate-color']} : {color: theme['color-primary-default']};
+  const additionalStylesText = props.selected ? {color: theme.colors.textOnPrimary} : {color: theme.colors.primary};
 
   return (
     <Pressable
