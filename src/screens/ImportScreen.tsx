@@ -38,6 +38,7 @@ export const ImportScreen = (props: Props) => {
       setImportPending(false);
       setImportError('');
       setImportSuccess(true);
+      setImportURL('');
     }).catch((error: AxiosError) => {
       setImportPending(false);
       if (error.response?.status === 501) {
