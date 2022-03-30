@@ -1,7 +1,7 @@
 import * as Updates from 'expo-updates';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {ActivityIndicator, Text} from 'react-native-paper';
+import {ActivityIndicator, Text, useTheme} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import Configuration from '../../Configuration';
 import RestAPI from '../../dao/RestAPI';
@@ -56,7 +56,7 @@ export const SplashScreen = () => {
             alignItems: 'center',
           }}>
             <ActivityIndicator />
-            <Text style={{color: theme['text-alternate-color']}}>{statusText}</Text>
+            <Text style={{color: theme.colors.textOnPrimary}}>{statusText}</Text>
           </View>
         </View>
       </View>
