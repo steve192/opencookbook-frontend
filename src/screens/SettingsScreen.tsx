@@ -1,12 +1,12 @@
 import {Picker} from '@react-native-picker/picker';
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
-import {CompositeScreenProps, useIsFocused} from '@react-navigation/native';
+import {CompositeScreenProps} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Appbar, Avatar, Button, Caption, Divider, Text, useTheme} from 'react-native-paper';
+import {Avatar, Button, Caption, Divider, Text, useTheme} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
 import {CustomCard} from '../components/CustomCard';

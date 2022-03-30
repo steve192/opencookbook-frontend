@@ -1,11 +1,11 @@
 import * as ImagePicker from 'expo-image-picker';
 import React, {useRef, useState} from 'react';
 import {Image, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
+import PagerView from 'react-native-pager-view';
 import {Avatar, IconButton, Text} from 'react-native-paper';
 import {Swiper, SwiperSlide} from 'swiper/react/swiper-react';
 import RestAPI, {RecipeImage} from '../dao/RestAPI';
 import {RecipeImageComponent} from './RecipeImageComponent';
-import PagerView from 'react-native-pager-view';
 
 
 interface Props {

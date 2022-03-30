@@ -1,26 +1,25 @@
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createURL} from 'expo-linking';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {BottomNavigation, withTheme, useTheme, Colors, Appbar} from 'react-native-paper';
+import {Appbar, useTheme, withTheme} from 'react-native-paper';
 import {useAppSelector} from '../redux/hooks';
+import {AccountActivationScreen} from '../screens/AccountActivationScreen';
 import {GuidedCookingScreen} from '../screens/GuidedCookingScreen';
 import {ImportScreen} from '../screens/ImportScreen';
 import LoginScreen from '../screens/LoginScreen/LoginScreen';
+import {RequestPasswordResetScreen} from '../screens/LoginScreen/RequestPasswordResetScreen';
 import {SignupScreen} from '../screens/LoginScreen/SignupScreen';
 import {SplashScreen} from '../screens/LoginScreen/SplashScreen';
+import {PasswordResetScreen} from '../screens/PasswordResetScreen';
 import {RecipeGroupEditScreen} from '../screens/RecipeGroupEditScreen';
 import RecipeListScreen from '../screens/RecipeListScreen';
 import {RecipeScreen} from '../screens/RecipeScreen';
 import {SettingsScreen} from '../screens/SettingsScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
-import {AccountActivationScreen} from '../screens/AccountActivationScreen';
-import {PasswordResetScreen} from '../screens/PasswordResetScreen';
-import {RequestPasswordResetScreen} from '../screens/LoginScreen/RequestPasswordResetScreen';
-import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
 
 
 const Stack = createNativeStackNavigator();
@@ -34,11 +33,7 @@ const MainNavigation = () => {
   const theme = useTheme();
 
   const LoginStackNavigation = () => (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: {backgroundColor: theme['color-primary-default']},
-        headerTintColor: theme['text-alternate-color'],
-      }}>
+    <Stack.Navigator>
       <Stack.Screen
         name="LoginScreen"
         component={LoginScreen}
