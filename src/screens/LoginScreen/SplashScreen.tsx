@@ -1,7 +1,7 @@
-import {Spinner, Text, useTheme} from '@ui-kitten/components';
 import * as Updates from 'expo-updates';
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
+import {ActivityIndicator, Text} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import Configuration from '../../Configuration';
 import RestAPI from '../../dao/RestAPI';
@@ -55,7 +55,7 @@ export const SplashScreen = () => {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-            <Spinner />
+            <ActivityIndicator />
             <Text style={{color: theme['text-alternate-color']}}>{statusText}</Text>
           </View>
         </View>

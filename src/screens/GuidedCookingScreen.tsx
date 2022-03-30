@@ -1,5 +1,5 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {Button, Divider, Layout, Text, ViewPager} from '@ui-kitten/components';
+import {ViewPager} from '@ui-kitten/components';
 import {useKeepAwake} from 'expo-keep-awake';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -12,6 +12,7 @@ import {TextBullet} from '../components/TextBullet';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
 import fuzzy from 'fuzzy';
+import {Button, Caption, Divider, Surface} from 'react-native-paper';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 export const GuidedCookingScreen = (props: Props) => {
@@ -24,7 +25,7 @@ export const GuidedCookingScreen = (props: Props) => {
   useKeepAwake();
 
   return (
-    <Layout style={{flex: 1}} >
+    <Surface style={{flex: 1}} >
       <ScrollView>
         <View style={CentralStyles.contentContainer}>
           <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
@@ -54,7 +55,7 @@ export const GuidedCookingScreen = (props: Props) => {
               <Spacer height={20} />
               <Divider />
               <Spacer height={20} />
-              <Text category="label">{t('screens.guidedCooking.ingredients')}</Text>
+              <Caption>{t('screens.guidedCooking.ingredients')}</Caption>
               <IngredientList
                 ingredients={recipe.neededIngredients
                     .filter((neededIngredient) => isIngredientContainedInText(neededIngredient.ingredient.name, step))}
@@ -93,7 +94,7 @@ export const GuidedCookingScreen = (props: Props) => {
           </View>
         </View>
       </View>
-    </Layout>
+    </Surface>
   );
 };
 

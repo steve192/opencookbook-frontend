@@ -1,4 +1,3 @@
-import {HeaderHeightContext} from '@react-navigation/elements';
 import React, {useState} from 'react';
 import {Modal, Pressable, StyleSheet, View} from 'react-native';
 import {RecipeList} from '../../components/RecipeList';

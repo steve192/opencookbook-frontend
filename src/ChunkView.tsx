@@ -1,6 +1,6 @@
-import {Spinner} from '@ui-kitten/components';
 import React, {useEffect, useRef, useState} from 'react';
 import {InteractionManager, View} from 'react-native';
+import {ActivityIndicator} from 'react-native-paper';
 
 const BATCH_SIZE = 100;
 
@@ -13,7 +13,7 @@ export const ChunkView = ({children}) => {
   const placeholderView = () => (
     <View style={{alignItems: 'center', justifyContent: 'center', height: '100%'}}>
       <View>
-        <Spinner size="giant"/>
+        <ActivityIndicator size="large"/>
       </View>
     </View>
   );

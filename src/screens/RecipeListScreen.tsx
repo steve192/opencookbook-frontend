@@ -1,11 +1,9 @@
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
-import {Button, Layout} from '@ui-kitten/components';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Appbar, FAB, useTheme} from 'react-native-paper';
-import {DeleteIcon} from '../assets/Icons';
+import {Appbar, FAB, Surface, useTheme} from 'react-native-paper';
 import {RecipeList} from '../components/RecipeList';
 import RestAPI, {Recipe} from '../dao/RestAPI';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
@@ -34,11 +32,10 @@ const RecipeListScreen = (props: Props) => {
     props.navigation.setOptions({
       title: shownRecipeGroup?.title,
       headerRight: () => (
-        <>
-          <Button
-            onPress={() => shownRecipeGroup.id && deleteRecipeGroup(shownRecipeGroup.id)}
-            accessoryLeft={<DeleteIcon fill={theme['color-danger-default']} />} />
-        </>
+        <Appbar.Action
+          icon="delete-outline"
+          color={theme.colors.error}
+          onPress={() => shownRecipeGroup.id && deleteRecipeGroup(shownRecipeGroup.id)} />
       ),
     });
   } else {
@@ -64,7 +61,7 @@ const RecipeListScreen = (props: Props) => {
 
   return (
     <>
-      <Layout style={CentralStyles.fullscreen}>
+      <Surface style={CentralStyles.fullscreen}>
         <Appbar.Header>
           <Appbar.Content color={theme.colors.textOnPrimary} title={t('screens.overview.myRecipes')}/>
         </Appbar.Header>
@@ -101,7 +98,7 @@ const RecipeListScreen = (props: Props) => {
             },
           ]}
         />
-      </Layout>
+      </Surface>
     </>
   );
 };

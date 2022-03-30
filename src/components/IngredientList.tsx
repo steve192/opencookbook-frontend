@@ -5,7 +5,6 @@ import {StyleSheet, View} from 'react-native';
 import {Divider, IconButton, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {IngredientUse} from '../dao/RestAPI';
-import CentralStyles from '../styles/CentralStyles';
 
 
 interface Props {
