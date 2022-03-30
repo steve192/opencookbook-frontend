@@ -21,10 +21,20 @@ export const ImportScreen = (props: Props) => {
   const theme = useTheme();
   const {t} = useTranslation('translation');
 
+  const sanatizeUrl = (url: string) => {
+    const urlFindingRegex = /.*((http|https)\S+).*/gm;
+    const matches = urlFindingRegex.exec(url);
+    if (matches?.length != 3) {
+      return '';
+    }
+    return matches[1];
+  };
+
   const startImport = () => {
     setImportPending(true);
     setImportSuccess(false);
-    RestAPI.importRecipe(importURL).then((importedRecipe) => {
+    const sanatizedUrl = sanatizeUrl(importURL);
+    RestAPI.importRecipe(sanatizedUrl).then((importedRecipe) => {
       setImportPending(false);
       setImportError('');
       setImportSuccess(true);
