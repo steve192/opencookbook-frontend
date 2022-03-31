@@ -61,12 +61,4 @@ export default class AppPersistence {
   static getApiRoute(): string {
     return '/api/v1';
   }
-
-  static async getCachedImage(uuid: string) {
-    return AsyncStorage.getItem('image:' + uuid);
-  }
-
-  static async cacheImage(uuid: string, data:string) {
-    await AsyncStorage.setItem('image:' + uuid, data);
-  }
 }
