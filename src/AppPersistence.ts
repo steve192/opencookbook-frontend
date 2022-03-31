@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import {Platform} from 'react-native';
 
-export default class Configuration {
+export default class AppPersistence {
   static async setAuthToken(token: string) {
     if (Platform.OS === 'web') {
       await AsyncStorage.setItem('authToken', token);
@@ -60,5 +60,13 @@ export default class Configuration {
 
   static getApiRoute(): string {
     return '/api/v1';
+  }
+
+  static async getCachedImage(uuid: string) {
+    return AsyncStorage.getItem('image:' + uuid);
+  }
+
+  static async cacheImage(uuid: string, data:string) {
+    await AsyncStorage.setItem('image:' + uuid, data);
   }
 }

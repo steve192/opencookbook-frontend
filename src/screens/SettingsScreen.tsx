@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
 import {HardDriveIcon} from '../assets/Icons';
 import {CustomCard} from '../components/CustomCard';
-import Configuration from '../Configuration';
+import AppPersistence from '../AppPersistence';
 import RestAPI from '../dao/RestAPI';
 import {PromptUtil} from '../helper/Prompt';
 import {logout} from '../redux/features/authSlice';
@@ -43,8 +43,8 @@ export const SettingsScreen = () => {
             <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{backendUrl}</Text>
             <Divider style={{marginTop: 10, marginBottom: 10}}/>
             <Button onPress={() => {
-              Configuration.setAuthToken('');
-              Configuration.setRefreshToken('');
+              AppPersistence.setAuthToken('');
+              AppPersistence.setRefreshToken('');
               dispatch(logout());
             }}>Logout</Button>
             <Spacer height={20} />

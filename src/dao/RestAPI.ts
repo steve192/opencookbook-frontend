@@ -2,7 +2,7 @@ import axios, {AxiosError, AxiosRequestConfig, AxiosRequestHeaders} from 'axios'
 import {Buffer} from 'buffer';
 import {Platform} from 'react-native';
 import XDate from 'xdate';
-import Configuration from '../Configuration';
+import AppPersistence from '../AppPersistence';
 
 
 export interface Ingredient {
@@ -81,8 +81,8 @@ class RestAPI {
     await this.delete('/recipe-groups/' + groupId);
   }
   static async refreshToken() {
-    const response = await axios.post(await this.url('/users/refreshToken'), {refreshToken: await Configuration.getRefreshToken()});
-    await Configuration.setAuthToken(response.data.token);
+    const response = await axios.post(await this.url('/users/refreshToken'), {refreshToken: await AppPersistence.getRefreshToken()});
+    await AppPersistence.setAuthToken(response.data.token);
   }
   static async createNewRecipeGroup(recipeGroup: RecipeGroup): Promise<RecipeGroup> {
     const response = await this.post('/recipe-groups', recipeGroup);
@@ -255,19 +255,26 @@ class RestAPI {
   }
 
 
-  static async getImageAsDataURI(uuid: string) {
+  static async getImageAsDataURI(uuid: string): Promise<string> {
+    const cachedImage = await AppPersistence.getCachedImage(uuid);
+    if (cachedImage) {
+      return cachedImage;
+    }
     try {
       const response = await axios.get(await this.url('/recipes-images/' + uuid), {
         headers: {
-          'Authorization': 'Bearer ' + await Configuration.getAuthToken(),
+          'Authorization': 'Bearer ' + await AppPersistence.getAuthToken(),
         },
         responseType: 'arraybuffer',
       });
 
       const base64String = Buffer.from(response.data).toString('base64');
-      return 'data:image/jpg;base64,' + base64String;
+      const datastring = 'data:image/jpg;base64,' + base64String;
+      await AppPersistence.cacheImage(uuid, datastring);
+      return datastring;
     } catch (e) {
       await this.handleAxiosError(e);
+      return '';
     }
   }
   static async uploadImage(uri: string): Promise<string> {
@@ -313,7 +320,7 @@ class RestAPI {
   }
 
   static async getAuthHeader(): Promise<AxiosRequestHeaders> {
-    const token = await Configuration.getAuthToken();
+    const token = await AppPersistence.getAuthToken();
     return {'Authorization': 'Bearer ' + token};
   }
   static async getIngredients(filter: string = ''): Promise<Ingredient[]> {
@@ -332,8 +339,8 @@ class RestAPI {
       password: password,
     });
 
-    Configuration.setAuthToken(response.data.token);
-    Configuration.setRefreshToken(response.data.refreshToken);
+    AppPersistence.setAuthToken(response.data.token);
+    AppPersistence.setRefreshToken(response.data.refreshToken);
   }
 
   static async activateAccount(activationId: string) {
@@ -359,7 +366,7 @@ class RestAPI {
   }
 
   private static async url(path: string) {
-    return await Configuration.getBackendURL() + Configuration.getApiRoute() + path;
+    return await AppPersistence.getBackendURL() + AppPersistence.getApiRoute() + path;
   }
 
   private static async post(apiPath: string, data: any) {
