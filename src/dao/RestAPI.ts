@@ -256,10 +256,6 @@ class RestAPI {
 
 
   static async getImageAsDataURI(uuid: string): Promise<string> {
-    // const cachedImage = await AppPersistence.getCachedImage(uuid);
-    // if (cachedImage) {
-    //   return cachedImage;
-    // }
     try {
       const response = await axios.get(await this.url('/recipes-images/' + uuid), {
         headers: {
@@ -269,9 +265,7 @@ class RestAPI {
       });
 
       const base64String = Buffer.from(response.data).toString('base64');
-      const datastring = 'data:image/jpg;base64,' + base64String;
-      // await AppPersistence.cacheImage(uuid, datastring);
-      return datastring;
+      return 'data:image/jpg;base64,' + base64String;
     } catch (e) {
       await this.handleAxiosError(e);
       return '';

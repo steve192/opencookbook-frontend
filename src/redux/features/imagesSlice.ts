@@ -72,7 +72,7 @@ export const imagesSlice = createSlice({
             console.error('Error caching image', e);
           });
         }).catch((e) => {
-          console.error('error creating image cache dir');
+          console.error('error creating image cache dir', e);
         });
       } else {
         imageCache.set(action.meta.arg, action.payload);
