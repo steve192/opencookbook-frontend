@@ -58,7 +58,7 @@
       "email": "E-Mail",
       "password": "Passwort",
       "acceptTOC": "Ich akzeptiere die",
-      "toc": "Nutzungsbedingungen",
+      "toc": "Nutzungsbedingungen und Datenschutzerklärung",
       "register": "Registrieren",
       "passwordConfirm": "Passwort bestätigen",
       "errorNoPasswordMatch": "Passwörter stimmen nicht überein"

@@ -21,6 +21,7 @@ import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import {AccountActivationScreen} from '../screens/AccountActivationScreen';
 import {PasswordResetScreen} from '../screens/PasswordResetScreen';
 import {RequestPasswordResetScreen} from '../screens/LoginScreen/RequestPasswordResetScreen';
+import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -43,6 +44,11 @@ const MainNavigation = () => {
         name="LoginScreen"
         component={LoginScreen}
         options={{headerShown: false}} />
+      <Stack.Screen
+        name='TermsOfServiceScreen'
+        component={TermsOfServiceScreen}
+        options={{title: t('screens.login.toc')}}
+      />
       <Stack.Screen
         name="SignupScreen"
         component={SignupScreen}
@@ -196,6 +202,7 @@ const MainNavigation = () => {
               screens: {
                 RequestPasswordResetScreen: 'requestResetPassword',
                 RecipeScreen: 'recipe',
+                TermsOfServiceScreen: 'tos',
                 RecipeWizardScreen: 'editRecipe',
                 OverviewScreen: {
                   screens: {

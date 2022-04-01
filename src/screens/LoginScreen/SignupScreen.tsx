@@ -73,7 +73,7 @@ export const SignupScreen = (props: Props) => {
               style={{paddingLeft: 10, color: 'white'}}>
               {t('screens.login.acceptTOC')}{' '}
               <Text
-                onPress={() => Linking.openURL('https://google.com')}
+                onPress={() => props.navigation.navigate('TermsOfServiceScreen')}
                 style={{color: colors.primary}}>
                 {t('screens.login.toc')}
               </Text>
