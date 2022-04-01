@@ -49,6 +49,10 @@ export interface WeekplanDay {
 export interface UserInfo {
 
 }
+
+export interface InstanceInfo {
+  termsOfService: string;
+}
 /**
  * RESTApi for communication with opencookbook backend
  */
@@ -73,6 +77,10 @@ class RestAPI {
         }),
       });
     });
+  }
+
+  static async getInstanceInfo(): Promise<InstanceInfo> {
+    return (await this.get('/instance')).data;
   }
   static async deleteAccount() {
     await this.delete('/users/self');
