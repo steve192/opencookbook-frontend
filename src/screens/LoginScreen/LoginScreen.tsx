@@ -6,7 +6,7 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {useDispatch} from 'react-redux';
 import Spacer from 'react-spacer';
-import Configuration from '../../Configuration';
+import AppPersistence from '../../AppPersistence';
 import RestAPI from '../../dao/RestAPI';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import {login} from '../../redux/features/authSlice';
@@ -44,7 +44,7 @@ const LoginScreen = ({route, navigation}: Props) => {
   };
 
   useEffect(() => {
-    Configuration.getBackendURL().then(setServerUrl);
+    AppPersistence.getBackendURL().then(setServerUrl);
   }, []);
 
   const settingsModal = (
@@ -55,7 +55,7 @@ const LoginScreen = ({route, navigation}: Props) => {
       <Card>
         <TextInput label="Server URL" value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
         <Button onPress={() => {
-          Configuration.setBackendURL(serverUrl).then(() => {
+          AppPersistence.setBackendURL(serverUrl).then(() => {
             setSettingsModalVisible(false);
           });
         }}>

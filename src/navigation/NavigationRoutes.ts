@@ -8,6 +8,7 @@ export type LoginNavigationProps = {
     LoginScreen: undefined
     SignupScreen: undefined
     RequestPasswordResetScreen: undefined
+    TermsOfServiceScreen: undefined
 }
 export type MainNavigationProps = {
     OverviewScreen: undefined

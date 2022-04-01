@@ -60,7 +60,7 @@
       "password": "Password",
       "passwordConfirm": "Password confirm",
       "acceptTOC": "I accept the",
-      "toc": "terms and conditions",
+      "toc": "terms and conditions and privacy policy",
       "register": "Register",
       "errorNoPasswordMatch": "Passwords do not match"
     },

@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import {Platform} from 'react-native';
 
-export default class Configuration {
+export default class AppPersistence {
   static async setAuthToken(token: string) {
     if (Platform.OS === 'web') {
       await AsyncStorage.setItem('authToken', token);

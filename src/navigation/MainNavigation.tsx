@@ -1,24 +1,25 @@
-import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {createURL} from 'expo-linking';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createURL } from 'expo-linking';
 import React from 'react';
-import {useTranslation} from 'react-i18next';
-import {Appbar, useTheme, withTheme} from 'react-native-paper';
-import {useAppSelector} from '../redux/hooks';
-import {AccountActivationScreen} from '../screens/AccountActivationScreen';
-import {GuidedCookingScreen} from '../screens/GuidedCookingScreen';
-import {ImportScreen} from '../screens/ImportScreen';
+import { useTranslation } from 'react-i18next';
+import { Appbar, useTheme, withTheme } from 'react-native-paper';
+import { useAppSelector } from '../redux/hooks';
+import { AccountActivationScreen } from '../screens/AccountActivationScreen';
+import { GuidedCookingScreen } from '../screens/GuidedCookingScreen';
+import { ImportScreen } from '../screens/ImportScreen';
 import LoginScreen from '../screens/LoginScreen/LoginScreen';
-import {RequestPasswordResetScreen} from '../screens/LoginScreen/RequestPasswordResetScreen';
-import {SignupScreen} from '../screens/LoginScreen/SignupScreen';
-import {SplashScreen} from '../screens/LoginScreen/SplashScreen';
-import {PasswordResetScreen} from '../screens/PasswordResetScreen';
-import {RecipeGroupEditScreen} from '../screens/RecipeGroupEditScreen';
+import { RequestPasswordResetScreen } from '../screens/LoginScreen/RequestPasswordResetScreen';
+import { SignupScreen } from '../screens/LoginScreen/SignupScreen';
+import { SplashScreen } from '../screens/LoginScreen/SplashScreen';
+import { PasswordResetScreen } from '../screens/PasswordResetScreen';
+import { RecipeGroupEditScreen } from '../screens/RecipeGroupEditScreen';
 import RecipeListScreen from '../screens/RecipeListScreen';
-import {RecipeScreen} from '../screens/RecipeScreen';
-import {SettingsScreen} from '../screens/SettingsScreen';
-import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
+import { RecipeScreen } from '../screens/RecipeScreen';
+import { SettingsScreen } from '../screens/SettingsScreen';
+import { TermsOfServiceScreen } from '../screens/TermsOfSerciceScreen';
+import { WeeklyRecipeListScreen } from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 
 
@@ -38,6 +39,11 @@ const MainNavigation = () => {
         name="LoginScreen"
         component={LoginScreen}
         options={{headerShown: false}} />
+      <Stack.Screen
+        name='TermsOfServiceScreen'
+        component={TermsOfServiceScreen}
+        options={{title: t('screens.login.toc')}}
+      />
       <Stack.Screen
         name="SignupScreen"
         component={SignupScreen}
@@ -188,6 +194,7 @@ const MainNavigation = () => {
               screens: {
                 RequestPasswordResetScreen: 'requestResetPassword',
                 RecipeScreen: 'recipe',
+                TermsOfServiceScreen: 'tos',
                 RecipeWizardScreen: 'editRecipe',
                 OverviewScreen: {
                   screens: {

@@ -10,7 +10,7 @@ import {Avatar, Button, Caption, Divider, Text, useTheme} from 'react-native-pap
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
 import {CustomCard} from '../components/CustomCard';
-import Configuration from '../Configuration';
+import AppPersistence from '../AppPersistence';
 import RestAPI from '../dao/RestAPI';
 import {PromptUtil} from '../helper/Prompt';
 import {MainNavigationProps, OverviewNavigationProps} from '../navigation/NavigationRoutes';
@@ -64,8 +64,9 @@ export const SettingsScreen = (props: Props) => {
             <Button
               mode='outlined'
               onPress={() => {
-                Configuration.setAuthToken('');
-                Configuration.setRefreshToken('');
+                AppPersistence.setAuthToken('');
+              AppPersistence.setRefreshToken('');
+              dispatch(logout());
                 dispatch(logout());
               }}>Logout</Button>
             <Divider style={{marginTop: 10, marginBottom: 10}}/>
