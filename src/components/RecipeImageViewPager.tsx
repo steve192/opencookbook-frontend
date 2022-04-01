@@ -1,10 +1,10 @@
-import {ViewPager} from '@ui-kitten/components';
 import * as ImagePicker from 'expo-image-picker';
 import React, {useState} from 'react';
 import {Image, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import {Avatar, IconButton, Text} from 'react-native-paper';
 import RestAPI, {RecipeImage} from '../dao/RestAPI';
 import {RecipeImageComponent} from './RecipeImageComponent';
+import {ViewPager} from './ViewPager';
 
 interface Props {
     onImageAdded?: (uuid: string) => void,
@@ -42,7 +42,7 @@ export const RecipeImageViewPager = (props: Props) => {
     <View style={[styles.recipeImageContainer, props.style]}>
       <ViewPager
         selectedIndex={shownImageIndex}
-        onSelect={setShownImageIndex}
+        onIndexChange={setShownImageIndex}
         style={styles.recipeImage}>
         {props.images.length === 0 ?
                     <Image
@@ -54,8 +54,6 @@ export const RecipeImageViewPager = (props: Props) => {
                         key={image.uuid}
                         uuid={image.uuid} />,
                     )}
-
-
       </ViewPager>
       {shownImageIndex !== 0 &&
                 <Pressable
