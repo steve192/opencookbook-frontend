@@ -1,6 +1,5 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useState} from 'react';
-import {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 import {StaticHtmlViewer} from '../components/StaticHtmlViewer';
 import RestAPI from '../dao/RestAPI';
