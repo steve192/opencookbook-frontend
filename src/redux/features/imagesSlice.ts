@@ -45,7 +45,7 @@ export const fetchSingleImage = createAsyncThunk<string, string, { state: RootSt
           cached = undefined;
         }
       } else {
-        cached = await imageCache.get('uuid');
+        // cached = await imageCache.get('uuid');
       }
       if (cached) {
         // @ts-ignore
@@ -75,7 +75,7 @@ export const imagesSlice = createSlice({
           console.error('error creating image cache dir', e);
         });
       } else {
-        imageCache.set(action.meta.arg, action.payload);
+        // imageCache.set(action.meta.arg, action.payload);
       }
       state.imageMap[action.meta.arg] = action.payload;
     });

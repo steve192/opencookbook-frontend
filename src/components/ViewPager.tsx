@@ -1,29 +1,41 @@
-import React, {ReactNode} from 'react';
-import {StyleProp, ViewStyle} from 'react-native';
-import {Swiper, SwiperSlide} from 'swiper/react/swiper-react';
+import React, {Component, ReactNode} from 'react';
+import {StyleProp, StyleSheet, ViewStyle} from 'react-native';
+import Slider from 'react-touch-drag-slider';
 
 interface Props {
-    selectedIndex: number;
-    onIndexChange: (index: number) => void;
-    style: StyleProp<ViewStyle>;
-    children: ReactNode | ReactNode[];
+    selectedIndex: number,
+    onIndexChange: (index: number) => void,
+    style: StyleProp<ViewStyle>,
+    children: ReactNode | ReactNode[],
 }
 
-export const ViewPager = (props: Props) => {
-  return <Swiper
-    autoHeight={false}
-    onActiveIndexChange={(e) => props.onIndexChange(e.activeIndex)}
-    tabIndex={props.selectedIndex}
-  >
+interface State {
+  movement: number
+}
 
-    {Array.isArray(props.children) ? props.children.map((child, index) =>
-      <SwiperSlide
-        key={index}>
-        {child}
-      </SwiperSlide>,
-    ): <SwiperSlide
-    >
-      {props.children}
-    </SwiperSlide>}
-  </Swiper>;
-};
+export class ViewPager extends Component<Props, State> {
+  render() {
+    return (
+
+      <Slider>
+        {this.props.children}
+      </Slider>
+    );
+  }
+}
+
+
+const styles = StyleSheet.create({
+  main: {
+    'background-color': '#000',
+    'overflow': 'hidden',
+    'position': 'relative',
+  },
+
+  swiper: {
+    'display': 'flex',
+    'overflow-x': 'visible',
+    'transition-property': 'transform',
+    'will-change': 'transform',
+  },
+});
