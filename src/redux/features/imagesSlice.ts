@@ -9,10 +9,12 @@ import {RootState} from '../store';
 
 export interface ImageStoreState {
     imageMap: { [uuid: string]: string }
+    thumbnailImageMap: { [uuid: string]: string }
 }
 
 const initialState: ImageStoreState = {
   imageMap: {},
+  thumbnailImageMap: {},
 };
 
 const imageCache = new Cache({
@@ -55,6 +57,30 @@ export const fetchSingleImage = createAsyncThunk<string, string, { state: RootSt
       return RestAPI.getImageAsDataURI(uuid);
     },
 );
+export const fetchSingleThumbnailImage = createAsyncThunk<string, string, { state: RootState }>(
+    'fetchSingleThumbnailImage',
+    async (uuid: string, {getState}): Promise<string> => {
+      if (getState().images.thumbnailImageMap[uuid]) {
+        return getState().images.thumbnailImageMap[uuid];
+      }
+      let cached = undefined;
+      if (Platform.OS === 'android') {
+        try {
+          cached = await FileSystem.readAsStringAsync(FileSystem.cacheDirectory + '/images/thumbnails/' + uuid);
+        } catch (e) {
+          cached = undefined;
+        }
+      } else {
+        cached = await imageCache.get('uuid-thumbnail');
+      }
+      if (cached) {
+        // @ts-ignore
+        return cached;
+      }
+      console.warn('not cached');
+      return RestAPI.getThumbnailImageAsDataURI(uuid);
+    },
+);
 
 export const imagesSlice = createSlice({
   name: 'images',
@@ -78,6 +104,21 @@ export const imagesSlice = createSlice({
         imageCache.set(action.meta.arg, action.payload);
       }
       state.imageMap[action.meta.arg] = action.payload;
+    });
+
+    builder.addCase(fetchSingleThumbnailImage.fulfilled, (state, action) => {
+      if (Platform.OS === 'android') {
+        ensureDirExists(FileSystem.cacheDirectory + '/images/thumbnails/').then(() => {
+          FileSystem.writeAsStringAsync(FileSystem.cacheDirectory + '/images/thumbnails/' + action.meta.arg, action.payload ).catch((e) => {
+            console.error('Error caching image', e);
+          });
+        }).catch((e) => {
+          console.error('error creating image cache dir', e);
+        });
+      } else {
+        imageCache.set(action.meta.arg + '-thumbnail', action.payload);
+      }
+      state.thumbnailImageMap[action.meta.arg] = action.payload;
     });
   },
 });

@@ -20,6 +20,7 @@ export const WeeklyRecipeCard = (props: Props) => {
       onPress={props.onPress}>
       <Layout style={{height: 80, borderRadius: 16, overflow: 'hidden'}}>
         <RecipeImageComponent
+          useThumbnail={true}
           forceFitScaling={true}
           uuid={props.imageUuid} />
       </Layout>
