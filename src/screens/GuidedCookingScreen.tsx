@@ -1,5 +1,4 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {ViewPager} from '@ui-kitten/components';
 import {useKeepAwake} from 'expo-keep-awake';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -13,6 +12,7 @@ import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
 import fuzzy from 'fuzzy';
 import {Button, Caption, Divider, Surface} from 'react-native-paper';
+import {ViewPager} from '../components/ViewPager';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 export const GuidedCookingScreen = (props: Props) => {
@@ -45,7 +45,7 @@ export const GuidedCookingScreen = (props: Props) => {
         <Spacer height={20} />
         <ViewPager
           selectedIndex={currentStep}
-          onSelect={setCurrentStep}>
+          onIndexChange={setCurrentStep}>
           {recipe.preparationSteps.map((step, index) =>
             <View key={index} style={CentralStyles.contentContainer}>
               <PreparationStepText

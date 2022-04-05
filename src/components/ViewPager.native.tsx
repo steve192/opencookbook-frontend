@@ -5,7 +5,7 @@ import PagerView from 'react-native-pager-view';
 interface Props {
     selectedIndex: number;
     onIndexChange: (index: number) => void;
-    style: StyleProp<ViewStyle>;
+    style?: StyleProp<ViewStyle>;
     children: ReactNode | ReactNode[];
 }
 

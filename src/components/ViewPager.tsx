@@ -5,7 +5,7 @@ import Slider from 'react-touch-drag-slider';
 interface Props {
     selectedIndex: number,
     onIndexChange: (index: number) => void,
-    style: StyleProp<ViewStyle>,
+    style?: StyleProp<ViewStyle>,
     children: ReactNode | ReactNode[],
 }
 
