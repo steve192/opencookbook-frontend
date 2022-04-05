@@ -263,6 +263,23 @@ class RestAPI {
   }
 
 
+  static async getThumbnailImageAsDataURI(uuid: string): Promise<string> {
+    try {
+      const response = await axios.get(await this.url('/recipes-images/thumbnail/' + uuid), {
+        headers: {
+          'Authorization': 'Bearer ' + await AppPersistence.getAuthToken(),
+        },
+        responseType: 'arraybuffer',
+      });
+
+      const base64String = Buffer.from(response.data).toString('base64');
+      return 'data:image/jpg;base64,' + base64String;
+    } catch (e) {
+      await this.handleAxiosError(e);
+      return '';
+    }
+  }
+
   static async getImageAsDataURI(uuid: string): Promise<string> {
     try {
       const response = await axios.get(await this.url('/recipes-images/' + uuid), {
