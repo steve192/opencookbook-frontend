@@ -118,7 +118,7 @@ export const imagesSlice = createSlice({
       } else {
         imageCache.set(action.meta.arg + '-thumbnail', action.payload);
       }
-      state.imageMap[action.meta.arg] = action.payload;
+      state.thumbnailImageMap[action.meta.arg] = action.payload;
     });
   },
 });
