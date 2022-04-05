@@ -82,6 +82,7 @@ export const RecipeList = (props: Props) => {
         onPress={() => props.onRecipeClick(recipe)}>
         <Layout style={{height: 180, borderRadius: 16, overflow: 'hidden'}}>
           <RecipeImageComponent
+            useThumbnail={true}
             forceFitScaling={true}
             uuid={recipe.images.length > 0 ? recipe.images[0].uuid : undefined} />
         </Layout>
