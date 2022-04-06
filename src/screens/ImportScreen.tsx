@@ -7,6 +7,8 @@ import {ScrollView} from 'react-native-gesture-handler';
 import Spacer from 'react-spacer';
 import {CheckmarkIcon, WarningIcon} from '../assets/Icons';
 import RestAPI from '../dao/RestAPI';
+import {createRecipe, importRecipe} from '../redux/features/recipesSlice';
+import {useAppDispatch} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 
 interface Props {
@@ -20,6 +22,7 @@ export const ImportScreen = (props: Props) => {
 
   const theme = useTheme();
   const {t} = useTranslation('translation');
+  const dispatch = useAppDispatch();
 
   const sanatizeUrl = (url: string) => {
     const urlFindingRegex = /.*((http|https)\S+).*/gm;
@@ -34,7 +37,8 @@ export const ImportScreen = (props: Props) => {
     setImportPending(true);
     setImportSuccess(false);
     const sanatizedUrl = sanatizeUrl(importURL);
-    RestAPI.importRecipe(sanatizedUrl).then((importedRecipe) => {
+
+    dispatch(importRecipe(sanatizedUrl)).unwrap().then((e) => {
       setImportPending(false);
       setImportError('');
       setImportSuccess(true);
