@@ -32,8 +32,6 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const dispatch = useDispatch();
 
-  const theme = useTheme();
-
   const [recipeSelectionVisible, setRecipeSelectionVisible] = useState<boolean>(false);
 
   const [selectedWeekplanDay, setSelectedWeekplanDay] = useState<WeekplanDay>();
