@@ -6,8 +6,7 @@ import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import Spacer from 'react-spacer';
 import {CheckmarkIcon, WarningIcon} from '../assets/Icons';
-import RestAPI from '../dao/RestAPI';
-import {createRecipe, importRecipe} from '../redux/features/recipesSlice';
+import {importRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 
@@ -38,7 +37,7 @@ export const ImportScreen = (props: Props) => {
     setImportSuccess(false);
     const sanatizedUrl = sanatizeUrl(importURL);
 
-    dispatch(importRecipe(sanatizedUrl)).unwrap().then((e) => {
+    dispatch(importRecipe(sanatizedUrl)).unwrap().then(() => {
       setImportPending(false);
       setImportError('');
       setImportSuccess(true);
