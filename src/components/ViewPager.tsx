@@ -16,7 +16,6 @@ interface State {
 export class ViewPager extends Component<Props, State> {
   render() {
     return (
-
       <Slider>
         {this.props.children}
       </Slider>
