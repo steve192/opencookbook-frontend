@@ -6,8 +6,8 @@ import {RecipeImageComponent} from '../../components/RecipeImageComponent';
 
 interface Props {
     title: string;
-    imageUuid: string;
-    onPress: () => void;
+    imageUuid?: string;
+    onPress?: () => void;
     onRemovePress: () => void;
 }
 export const WeeklyRecipeCard = (props: Props) => {
@@ -19,13 +19,13 @@ export const WeeklyRecipeCard = (props: Props) => {
       style={styles.card}
       onLongPress={() => setEditMode(!editMode)}
       onPress={props.onPress}>
-      <View style={{height: 80, borderRadius: 16, overflow: 'hidden'}}>
+      {props.imageUuid && <View style={{height: 80, borderRadius: 16, overflow: 'hidden'}}>
         <RecipeImageComponent
           useThumbnail={true}
           forceFitScaling={true}
           uuid={props.imageUuid} />
-      </View>
-      <Paragraph>
+      </View>}
+      <Paragraph style={{textAlign: 'center', fontWeight: 'bold'}}>
         {props.title}
       </Paragraph>
       {editMode &&
@@ -40,7 +40,9 @@ export const WeeklyRecipeCard = (props: Props) => {
 
 const styles = StyleSheet.create({
   card: {
+    justifyContent: 'center',
     width: 120,
+    minHeight: 110,
     margin: 3,
     borderColor: 'rgba(0,0,0,0.09)',
     borderRadius: 16,

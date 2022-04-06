@@ -73,7 +73,7 @@ class RestAPI {
       return ({
         ...weekplanDay,
         recipes: weekplanDay.recipes.map((recipe) => {
-          return ({...recipe, type: 'Recipe'});
+          return ({...recipe});
         }),
       });
     });
