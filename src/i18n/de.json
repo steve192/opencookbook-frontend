@@ -34,7 +34,9 @@
       "simplerecipeinput": "Was gibt es zu essen?",
       "savesimplerecipe": "Speichern",
       "simple": "Spontanes Essen",
-      "normal": "Eines meiner gespeicherten Rezepte"
+      "simpledescription": "Füge einen spontanten Plan für ein Rezept hinzu für welches du noch kein Rezept angelegt hast",
+      "normal": "Eines meiner gespeicherten Rezepte",
+      "normaldescription": "Füge eines deiner gespeicherten Rezepte hinzu"
     },
     "resetPassword": {
       "unknownErrorSendingRequest": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es in ein paar Minuten noch einmal",

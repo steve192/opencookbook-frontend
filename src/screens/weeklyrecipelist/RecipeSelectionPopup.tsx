@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Modal, Pressable, View, StyleSheet, TouchableWithoutFeedback} from 'react-native';
-import {Button, Divider, Headline, Surface, TextInput, TouchableRipple} from 'react-native-paper';
+import {Button, Caption, Divider, Headline, Surface, TextInput, TouchableRipple} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {RecipeList} from '../../components/RecipeList';
 import {Recipe, RecipeGroup} from '../../dao/RestAPI';
@@ -53,13 +53,19 @@ export const RecipeSelectionPopup = (props: Props) => {
         <TouchableRipple
           style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
           onPress={() => setSelectionType('simple')}>
-          <Headline>{t('screens.recipeselectionpopup.simple')}</Headline>
+          <>
+            <Headline>{t('screens.recipeselectionpopup.simple')}</Headline>
+            <Caption>{t('screens.recipeselectionpopup.simpledescription')}</Caption>
+          </>
         </TouchableRipple>
         <Divider/>
         <TouchableRipple
           style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
           onPress={() => setSelectionType('normal')}>
-          <Headline>{t('screens.recipeselectionpopup.normal')}</Headline>
+          <>
+            <Headline>{t('screens.recipeselectionpopup.normal')}</Headline>
+            <Caption>{t('screens.recipeselectionpopup.normaldescription')}</Caption>
+          </>
         </TouchableRipple>
       </View>;
     }
