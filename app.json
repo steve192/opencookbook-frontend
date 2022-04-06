@@ -57,7 +57,7 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
       ],
-      "versionCode": 11
+      "versionCode": 13
     },
     "web": {
       "favicon": "./assets/icon.png"
