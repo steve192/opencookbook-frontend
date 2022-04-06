@@ -30,6 +30,12 @@
     "screenTitleGuidedCooking": "Kochmodus"
   },
   "screens": {
+    "recipeselectionpopup": {
+      "simplerecipeinput": "Was gibt es zu essen?",
+      "savesimplerecipe": "Speichern",
+      "simple": "Spontanes Essen",
+      "normal": "Eines meiner gespeicherten Rezepte"
+    },
     "resetPassword": {
       "unknownErrorSendingRequest": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es in ein paar Minuten noch einmal",
       "successRequestSent": {

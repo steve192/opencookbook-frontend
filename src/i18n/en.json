@@ -30,6 +30,12 @@
     "screenTitleGuidedCooking": "Guided cooking"
   },
   "screens": {
+    "recipeselectionpopup": {
+      "simplerecipeinput": "What's for dinner?",
+      "savesimplerecipe": "Save",
+      "simple": "Spontaneous meal",
+      "normal": "One of my saved recipes"
+    },
     "resetPassword": {
       "unknownErrorSendingRequest": "An unknown error occured. Please retry in a few minutes",
       "successRequestSent": {
