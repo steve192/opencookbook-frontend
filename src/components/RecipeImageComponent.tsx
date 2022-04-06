@@ -1,18 +1,23 @@
 import React, {useEffect, useState} from 'react';
 import {Image, Platform, StyleSheet, View} from 'react-native';
-import {fetchSingleImage} from '../redux/features/imagesSlice';
+import {fetchSingleImage, fetchSingleThumbnailImage} from '../redux/features/imagesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 
 interface Props {
     uuid?: string
     forceFitScaling?: boolean
+    useThumbnail?: boolean
     blurredMode?: boolean
 }
 export const RecipeImageComponent = (props: Props) => {
   let imageData;
   if (props.uuid) {
     // @ts-ignore
-    imageData = useAppSelector((state) => state.images.imageMap[props.uuid]);
+    if (props.useThumbnail) {
+      imageData = useAppSelector((state) => state.images.thumbnailImageMap[props.uuid]);
+    } else {
+      imageData = useAppSelector((state) => state.images.imageMap[props.uuid]);
+    }
   }
   const [requestPending, setRequestPending] = useState<boolean>(false);
   const dispatch = useAppDispatch();
@@ -22,9 +27,15 @@ export const RecipeImageComponent = (props: Props) => {
   useEffect(() => {
     if (!requestPending && props.uuid) {
       setRequestPending(true);
-      dispatch(fetchSingleImage(props.uuid)).finally(() => {
-        setRequestPending(false);
-      });
+      if (props.useThumbnail) {
+        dispatch(fetchSingleThumbnailImage(props.uuid)).finally(() => {
+          setRequestPending(false);
+        });
+      } else {
+        dispatch(fetchSingleImage(props.uuid)).finally(() => {
+          setRequestPending(false);
+        });
+      }
     }
   }, [props.uuid]);
 
