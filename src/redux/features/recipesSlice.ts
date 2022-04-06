@@ -1,4 +1,5 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {AxiosError} from 'axios';
 import RestAPI, {Recipe, RecipeGroup} from '../../dao/RestAPI';
 import {RootState} from '../store';
 
@@ -50,6 +51,17 @@ export const updateRecipe = createAsyncThunk<Recipe, Recipe, { state: RootState 
     'updateRecipe',
     async (recipe: Recipe, {getState}): Promise<Recipe> => {
       return RestAPI.updateRecipe(recipe);
+    },
+);
+
+export const importRecipe = createAsyncThunk<Recipe, string, { state: RootState, rejectValue: AxiosError }>(
+    'importRecipe',
+    async (importURL: string, thunk) => {
+      try {
+        return await RestAPI.importRecipe(importURL);
+      } catch (e) {
+        return thunk.rejectWithValue(e as AxiosError);
+      }
     },
 );
 
@@ -173,6 +185,17 @@ export const recipesSlice = createSlice({
           });
         })
         .addCase(updateRecipe.rejected, (state, action) => {
+          state.pendingRequests--;
+        });
+    builder
+        .addCase(importRecipe.pending, (state, action) => {
+          state.pendingRequests++;
+        })
+        .addCase(importRecipe.fulfilled, (state, action) => {
+          state.pendingRequests--;
+          state.recipeGroups.push(action.payload);
+        })
+        .addCase(importRecipe.rejected, (state, action) => {
           state.pendingRequests--;
         });
   },
