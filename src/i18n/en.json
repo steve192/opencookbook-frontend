@@ -35,7 +35,7 @@
       "savesimplerecipe": "Save",
       "simple": "Spontaneous meal",
       "simpledescription": "Add a spontaneous recipe for which you have not added a recipe yet",
-      "normal": "One of my saved recipes",
+      "normal": "Recipe",
       "normaldescription": "Add one of your saved recipes"
     },
     "resetPassword": {
