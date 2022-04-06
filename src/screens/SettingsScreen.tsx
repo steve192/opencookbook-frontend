@@ -6,7 +6,7 @@ import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Avatar, Button, Caption, Divider, Text, useTheme} from 'react-native-paper';
+import {Avatar, Button, Caption, Divider, Surface, Text, useTheme} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
 import {CustomCard} from '../components/CustomCard';
@@ -55,7 +55,7 @@ export const SettingsScreen = (props: Props) => {
   };
   return (
     <>
-      <View style={[CentralStyles.fullscreen]}>
+      <Surface style={[CentralStyles.fullscreen]}>
         <View style={CentralStyles.contentContainer}>
           <ScrollView>
             <Avatar.Icon style={{alignSelf: 'center', backgroundColor: 'transparent'}} size={100} color={theme.colors.text} icon="server"/>
@@ -65,8 +65,8 @@ export const SettingsScreen = (props: Props) => {
               mode='outlined'
               onPress={() => {
                 AppPersistence.setAuthToken('');
-              AppPersistence.setRefreshToken('');
-              dispatch(logout());
+                AppPersistence.setRefreshToken('');
+                dispatch(logout());
                 dispatch(logout());
               }}>Logout</Button>
             <Divider style={{marginTop: 10, marginBottom: 10}}/>
@@ -95,7 +95,7 @@ export const SettingsScreen = (props: Props) => {
             </View>
           </ScrollView>
         </View>
-      </View>
+      </Surface>
     </>
   );
 };

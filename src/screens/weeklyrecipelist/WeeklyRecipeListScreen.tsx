@@ -5,7 +5,7 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Divider, IconButton, Subheading, Text, useTheme} from 'react-native-paper';
+import {Divider, IconButton, Subheading, Surface, Text, useTheme} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import XDate from 'xdate';
 import {ChunkView} from '../../ChunkView';
@@ -123,7 +123,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   return (
     <>
       <ChunkView>
-        <View style={CentralStyles.fullscreen}>
+        <Surface style={CentralStyles.fullscreen}>
           <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
             <Subheading>{t('screens.weekplan.currentWeek')}</Subheading>
             {renderWeek(getCurrentWeekNumber(now), now.getFullYear())}
@@ -137,7 +137,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
             <Subheading>{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 3}</Subheading>
             {renderWeek(getCurrentWeekNumber(now) + 3, now.getFullYear())}
           </ScrollView>
-        </View>
+        </Surface>
       </ChunkView>
 
       <RecipeSelectionPopup
