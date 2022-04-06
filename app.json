@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "opencookbook",
+    "name": "CookPal",
     "slug": "opencookbook",
-    "scheme": "opencookbook",
+    "scheme": "cookpal",
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
