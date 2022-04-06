@@ -36,7 +36,7 @@ export const RecipeSelectionPopup = (props: Props) => {
         onRecipeClick={props.onRecipeSelected}
         onRecipeGroupClick={onRecipeGroupSelected} />;
     } else if (selectionType === 'simple') {
-      return <View style={CentralStyles.fullscreen}>
+      return <View style={[CentralStyles.fullscreen, {justifyContent: 'center'}]}>
         <TextInput
           value={simpleRecipeName}
           onChangeText={setSimpleRecipeName}
