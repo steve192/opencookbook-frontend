@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {Modal, Pressable, StyleSheet, View} from 'react-native';
+import {Surface} from 'react-native-paper';
 import {RecipeList} from '../../components/RecipeList';
 import {Recipe, RecipeGroup} from '../../dao/RestAPI';
 
@@ -29,12 +30,12 @@ export const RecipeSelectionPopup = (props: Props) => {
           style={styles.modalBackdrop}>
           <>
             <View style={styles.centeredView}>
-              <View style={[styles.modalView]}>
+              <Surface style={[styles.modalView]}>
                 <RecipeList
                   shownRecipeGroupId={shownRecipeGroup?.id}
                   onRecipeClick={props.onRecipeSelected}
                   onRecipeGroupClick={onRecipeGroupSelected} />
-              </View>
+              </Surface>
             </View>
           </>
         </Pressable>
