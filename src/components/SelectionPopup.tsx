@@ -1,9 +1,9 @@
 import {HeaderHeightContext} from '@react-navigation/elements';
-import {List, ListItem} from '@ui-kitten/components';
 import React, {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ListRenderItemInfo, Modal, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
-import {Divider, TextInput, Text, Surface} from 'react-native-paper';
+import {ScrollView} from 'react-native-gesture-handler';
+import {Divider, TextInput, Text, Surface, List} from 'react-native-paper';
 import Spacer from 'react-spacer';
 
 
@@ -116,13 +116,15 @@ export const SelectionPopup = (props: Props) => {
                                             <Spacer width={10} />
                                           </View>
                                           <Divider style={{paddingVertical: 2, marginVertical: 10}} />
-                                          <List
-                                            keyboardShouldPersistTaps='handled'
-                                            style={{flex: 1}}
-                                            renderItem={renderListItem}
-                                            ItemSeparatorComponent={Divider}
-                                            data={getListItemData()}
-                                          />
+                                          <ScrollView>
+                                            {getListItemData().map((data, index) =>
+                                              <List.Item
+                                                key={index}
+                                                title={data.option.value}
+                                                onPress={() => data.option.newlyCreated ? applySelection({key: '', value: value, newlyCreated: true}) : applySelection(data.option)}
+                                              />,
+                                            )}
+                                          </ScrollView>
                                         </Surface>
                                       </View>
                                     </>
