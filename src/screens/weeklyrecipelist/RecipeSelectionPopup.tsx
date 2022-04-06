@@ -52,19 +52,19 @@ export const RecipeSelectionPopup = (props: Props) => {
       return <View style={{flex: 1}}>
         <TouchableRipple
           style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
-          onPress={() => setSelectionType('simple')}>
+          onPress={() => setSelectionType('normal')}>
           <>
-            <Headline>{t('screens.recipeselectionpopup.simple')}</Headline>
-            <Caption>{t('screens.recipeselectionpopup.simpledescription')}</Caption>
+            <Headline>{t('screens.recipeselectionpopup.normal')}</Headline>
+            <Caption>{t('screens.recipeselectionpopup.normaldescription')}</Caption>
           </>
         </TouchableRipple>
         <Divider/>
         <TouchableRipple
           style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
-          onPress={() => setSelectionType('normal')}>
+          onPress={() => setSelectionType('simple')}>
           <>
-            <Headline>{t('screens.recipeselectionpopup.normal')}</Headline>
-            <Caption>{t('screens.recipeselectionpopup.normaldescription')}</Caption>
+            <Headline>{t('screens.recipeselectionpopup.simple')}</Headline>
+            <Caption>{t('screens.recipeselectionpopup.simpledescription')}</Caption>
           </>
         </TouchableRipple>
       </View>;
