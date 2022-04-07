@@ -42,9 +42,6 @@ export const ViewPager = (props: Props) => {
       slidesPerView={1}
       spaceBetween={0}
       onSlideChange={(swiper) => props.onIndexChange(swiper.activeIndex)}
-      onReachEnd={() => {
-        console.log('reach end');
-      }}
     >
       {slides}
     </Swiper>
