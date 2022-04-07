@@ -43,7 +43,10 @@ const RecipeListScreen = (props: Props) => {
           ),
         });
       } else {
-        props.navigation.getParent()?.getParent()?.setOptions({title: t('screens.overview.myRecipes')});
+        props.navigation.getParent()?.getParent()?.setOptions({
+          title: t('screens.overview.myRecipes'),
+          headerRight: undefined,
+        });
       }
     });
   }, [props.navigation]);
