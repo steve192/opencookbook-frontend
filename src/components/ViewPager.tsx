@@ -1,6 +1,6 @@
-import React, {ReactNode} from 'react';
+import React, {ReactNode, useEffect, useState} from 'react';
 import {StyleProp, StyleSheet, ViewStyle} from 'react-native';
-import {Swiper, SwiperSlide} from 'swiper/react';
+import {Swiper, SwiperSlide} from 'swiper/react/swiper-react.js';
 import 'swiper/swiper-bundle.css';
 
 interface Props {
@@ -13,6 +13,12 @@ interface Props {
 
 export const ViewPager = (props: Props) => {
   let slides = [];
+
+  const [swiperInstance, setSwiperInstance] = useState<any>();
+
+  useEffect(() => {
+    swiperInstance?.slideTo(props.selectedIndex);
+  }, [props.selectedIndex]);
 
 
   if (Array.isArray(props.children)) {
@@ -31,7 +37,8 @@ export const ViewPager = (props: Props) => {
   return (
     <Swiper
       id="swiper"
-      style={{height: '100%', width: '100%'}}
+      onSwiper={(swiper) => setSwiperInstance(swiper)}
+      style={{height: '100%', width: '100%', zIndex: -1}}
       slidesPerView={1}
       spaceBetween={0}
       onSlideChange={(swiper) => props.onIndexChange(swiper.activeIndex)}
