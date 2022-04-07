@@ -37,8 +37,9 @@ export const RecipeScreen = (props: Props) => {
             props.navigation.goBack();
           }
         });
+  }, [props.route.params.recipeId, focussed]);
 
-
+  useEffect(() => {
     props.navigation.setOptions({
       title: displayedRecipe ? displayedRecipe.title : 'Loading',
       headerRight: () => (
@@ -51,7 +52,7 @@ export const RecipeScreen = (props: Props) => {
           })} />
       ),
     });
-  }, [props.route.params.recipeId, focussed]);
+  }, [displayedRecipe]);
 
   const renderIngredientsSection = () =>
     <>
