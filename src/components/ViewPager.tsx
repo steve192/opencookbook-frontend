@@ -1,6 +1,7 @@
-import React, {Component, ReactNode} from 'react';
+import React, {ReactNode} from 'react';
 import {StyleProp, StyleSheet, ViewStyle} from 'react-native';
-import Slider from 'react-touch-drag-slider';
+import {Swiper, SwiperSlide} from 'swiper/react';
+import 'swiper/swiper-bundle.css';
 
 interface Props {
     selectedIndex: number,
@@ -9,19 +10,39 @@ interface Props {
     children: ReactNode | ReactNode[],
 }
 
-interface State {
-  movement: number
-}
 
-export class ViewPager extends Component<Props, State> {
-  render() {
-    return (
-      <Slider>
-        {this.props.children}
-      </Slider>
-    );
+export const ViewPager = (props: Props) => {
+  let slides = [];
+
+
+  if (Array.isArray(props.children)) {
+    slides = props.children.map((child, index) =>
+      <SwiperSlide
+        key={index}
+        style={{height: '100%', overflow: 'hidden'}}>
+        {child}
+      </SwiperSlide>);
+  } else {
+    slides.push(<SwiperSlide
+      style={{height: '100%'}}>
+      {props.children}
+    </SwiperSlide>);
   }
-}
+  return (
+    <Swiper
+      id="swiper"
+      style={{height: '100%', width: '100%'}}
+      slidesPerView={1}
+      spaceBetween={0}
+      onSlideChange={(swiper) => props.onIndexChange(swiper.activeIndex)}
+      onReachEnd={() => {
+        console.log('reach end');
+      }}
+    >
+      {slides}
+    </Swiper>
+  );
+};
 
 
 const styles = StyleSheet.create({
