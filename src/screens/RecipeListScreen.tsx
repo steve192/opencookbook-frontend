@@ -25,10 +25,8 @@ const RecipeListScreen = (props: Props) => {
   const {t} = useTranslation('translation');
 
   const [fabOpen, setFabOpen] = useState(false);
-  const focussed = useIsFocused();
 
   const shownRecipeGroup = useAppSelector((state) => state.recipes.recipeGroups.filter((recipeGroup) => recipeGroup.id == props.route.params?.shownRecipeGroupId)[0]);
-
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
