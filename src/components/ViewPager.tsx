@@ -1,5 +1,5 @@
 import React, {ReactNode, useEffect, useState} from 'react';
-import {StyleProp, StyleSheet, ViewStyle} from 'react-native';
+import {StyleProp, ViewStyle} from 'react-native';
 import {Swiper, SwiperSlide} from 'swiper/react/swiper-react.js';
 import 'swiper/swiper-bundle.css';
 
@@ -47,19 +47,3 @@ export const ViewPager = (props: Props) => {
     </Swiper>
   );
 };
-
-
-const styles = StyleSheet.create({
-  main: {
-    'background-color': '#000',
-    'overflow': 'hidden',
-    'position': 'relative',
-  },
-
-  swiper: {
-    'display': 'flex',
-    'overflow-x': 'visible',
-    'transition-property': 'transform',
-    'will-change': 'transform',
-  },
-});
