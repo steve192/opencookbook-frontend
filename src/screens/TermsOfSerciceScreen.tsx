@@ -3,10 +3,10 @@ import React, {useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 import {StaticHtmlViewer} from '../components/StaticHtmlViewer';
 import RestAPI from '../dao/RestAPI';
-import {LoginNavigationProps} from '../navigation/NavigationRoutes';
+import {BaseNavigatorProps} from '../navigation/NavigationRoutes';
 
 
-type Props = NativeStackScreenProps<LoginNavigationProps, 'TermsOfServiceScreen'>;
+type Props = NativeStackScreenProps<BaseNavigatorProps, 'TermsOfServiceScreen'>;
 export const TermsOfServiceScreen = (props: Props) => {
   const [tos, setTos] = useState('');
 
