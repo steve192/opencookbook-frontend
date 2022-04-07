@@ -1,13 +1,14 @@
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
-import {CompositeScreenProps, useIsFocused} from '@react-navigation/native';
+import {CompositeScreenProps} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Appbar, FAB, Surface, useTheme} from 'react-native-paper';
 import {RecipeList} from '../components/RecipeList';
-import RestAPI, {Recipe} from '../dao/RestAPI';
+import {Recipe} from '../dao/RestAPI';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
-import {useAppSelector} from '../redux/hooks';
+import {deleteRecipeGroup} from '../redux/features/recipesSlice';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 
 
@@ -22,6 +23,7 @@ type Props = CompositeScreenProps<
 
 const RecipeListScreen = (props: Props) => {
   const theme = useTheme();
+  const dispatch = useAppDispatch();
   const {t} = useTranslation('translation');
 
   const [fabOpen, setFabOpen] = useState(false);
@@ -37,7 +39,7 @@ const RecipeListScreen = (props: Props) => {
             <Appbar.Action
               icon="delete-outline"
               color={theme.colors.error}
-              onPress={() => shownRecipeGroup.id && deleteRecipeGroup(shownRecipeGroup.id)} />
+              onPress={() => shownRecipeGroup.id && dispatchDeleteRecipeGroup(shownRecipeGroup.id)} />
           ),
         });
       } else {
@@ -47,12 +49,10 @@ const RecipeListScreen = (props: Props) => {
   }, [props.navigation]);
 
 
-  const deleteRecipeGroup = (groupId: number) => {
-    RestAPI.deleteRecipeGroup(groupId)
-        .then(() => props.navigation.goBack())
-        .catch(() => {
-        // TODO: Error handling
-        });
+  const dispatchDeleteRecipeGroup = (groupId: number) => {
+    dispatch(deleteRecipeGroup(groupId)).then(() => {
+      props.navigation.goBack();
+    });
   };
 
 
