@@ -22,7 +22,7 @@ export const RecipeScreen = (props: Props) => {
   const focussed = useIsFocused();
 
   const displayedRecipe = useAppSelector((state) => state.recipes.recipes.filter((recipe) => recipe.id == props.route.params.recipeId)[0]);
-  const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 0);
+  const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 1);
   const {t} = useTranslation('translation');
 
   const theme = useTheme();
@@ -52,6 +52,7 @@ export const RecipeScreen = (props: Props) => {
           })} />
       ),
     });
+    displayedRecipe && setScaledServings(displayedRecipe.servings);
   }, [displayedRecipe]);
 
   const renderIngredientsSection = () =>
