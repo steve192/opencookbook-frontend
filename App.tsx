@@ -47,6 +47,7 @@ const ReduxWrappedApp = () => {
       primary: '#72B600',
       accent: '#FFE102',
       background: '#000000',
+      success: '#72B600',
       textOnPrimary: Colors.white,
     },
   };

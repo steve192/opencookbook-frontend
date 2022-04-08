@@ -1,4 +1,5 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import {AxiosError} from 'axios';
 import RestAPI, {Recipe, RecipeGroup} from '../../dao/RestAPI';
 import {RootState} from '../store';
 
@@ -42,26 +43,43 @@ export const fetchMyRecipeGroups = createAsyncThunk(
 
 export const createRecipeGroup = createAsyncThunk<RecipeGroup, RecipeGroup, { state: RootState }>(
     'createRecipeGroup',
-    async (recipeGroup: RecipeGroup, {getState}): Promise<RecipeGroup> => {
+    async (recipeGroup: RecipeGroup): Promise<RecipeGroup> => {
       return RestAPI.createNewRecipeGroup(recipeGroup);
+    },
+);
+export const deleteRecipeGroup = createAsyncThunk<void, number, { state: RootState }>(
+    'deleteRecipeGroup',
+    async (groupId: number) => {
+      RestAPI.deleteRecipeGroup(groupId);
     },
 );
 export const updateRecipe = createAsyncThunk<Recipe, Recipe, { state: RootState }>(
     'updateRecipe',
-    async (recipe: Recipe, {getState}): Promise<Recipe> => {
+    async (recipe: Recipe): Promise<Recipe> => {
       return RestAPI.updateRecipe(recipe);
+    },
+);
+
+export const importRecipe = createAsyncThunk<Recipe, string, { state: RootState, rejectValue: AxiosError }>(
+    'importRecipe',
+    async (importURL: string, thunk) => {
+      try {
+        return await RestAPI.importRecipe(importURL);
+      } catch (e) {
+        return thunk.rejectWithValue(e as AxiosError);
+      }
     },
 );
 
 export const createRecipe = createAsyncThunk<Recipe, Recipe, { state: RootState }>(
     'createRecipe',
-    async (recipe: Recipe, {getState}): Promise<Recipe> => {
+    async (recipe: Recipe): Promise<Recipe> => {
       return RestAPI.createNewRecipe(recipe);
     },
 );
 export const deleteRecipe = createAsyncThunk<void, Recipe, { state: RootState }>(
     'deleteRecipe',
-    async (recipe: Recipe, {getState}): Promise<void> => {
+    async (recipe: Recipe): Promise<void> => {
       return RestAPI.deleteRecipe(recipe);
     },
 );
@@ -89,19 +107,19 @@ export const recipesSlice = createSlice({
         });
 
     builder
-        .addCase(fetchMyRecipeGroups.pending, (state, action) => {
+        .addCase(fetchMyRecipeGroups.pending, (state) => {
           state.pendingRequests++;
         })
         .addCase(fetchMyRecipeGroups.fulfilled, (state, action) => {
           state.pendingRequests--;
           state.recipeGroups = action.payload;
         })
-        .addCase(fetchMyRecipeGroups.rejected, (state, action) => {
+        .addCase(fetchMyRecipeGroups.rejected, (state) => {
           state.pendingRequests--;
         });
 
     builder
-        .addCase(fetchSingleRecipe.pending, (state, action) => {
+        .addCase(fetchSingleRecipe.pending, (state) => {
           state.pendingRequests++;
         })
         .addCase(fetchSingleRecipe.fulfilled, (state, action) => {
@@ -117,35 +135,35 @@ export const recipesSlice = createSlice({
             }
           });
         })
-        .addCase(fetchSingleRecipe.rejected, (state, action) => {
+        .addCase(fetchSingleRecipe.rejected, (state) => {
           state.pendingRequests--;
         });
 
     builder
-        .addCase(createRecipe.pending, (state, action) => {
+        .addCase(createRecipe.pending, (state) => {
           state.pendingRequests++;
         })
         .addCase(createRecipe.fulfilled, (state, action) => {
           state.pendingRequests--;
           state.recipes.push(action.payload);
         })
-        .addCase(createRecipe.rejected, (state, action) => {
+        .addCase(createRecipe.rejected, (state) => {
           state.pendingRequests--;
         });
     builder
-        .addCase(createRecipeGroup.pending, (state, action) => {
+        .addCase(createRecipeGroup.pending, (state) => {
           state.pendingRequests++;
         })
         .addCase(createRecipeGroup.fulfilled, (state, action) => {
           state.pendingRequests--;
           state.recipeGroups.push(action.payload);
         })
-        .addCase(createRecipeGroup.rejected, (state, action) => {
+        .addCase(createRecipeGroup.rejected, (state) => {
           state.pendingRequests--;
         });
 
     builder
-        .addCase(deleteRecipe.pending, (state, action) => {
+        .addCase(deleteRecipe.pending, (state) => {
           state.pendingRequests++;
         })
         .addCase(deleteRecipe.fulfilled, (state, action) => {
@@ -156,12 +174,28 @@ export const recipesSlice = createSlice({
             }
           });
         })
-        .addCase(deleteRecipe.rejected, (state, action) => {
+        .addCase(deleteRecipe.rejected, (state) => {
           state.pendingRequests--;
         });
 
     builder
-        .addCase(updateRecipe.pending, (state, action) => {
+        .addCase(deleteRecipeGroup.pending, (state) => {
+          state.pendingRequests++;
+        })
+        .addCase(deleteRecipeGroup.fulfilled, (state, action) => {
+          state.pendingRequests--;
+          state.recipeGroups.forEach((group, index) => {
+            if (group.id === action.meta.arg) {
+              state.recipeGroups.splice(index, 1);
+            }
+          });
+        })
+        .addCase(deleteRecipeGroup.rejected, (state) => {
+          state.pendingRequests--;
+        });
+
+    builder
+        .addCase(updateRecipe.pending, (state) => {
           state.pendingRequests++;
         })
         .addCase(updateRecipe.fulfilled, (state, action) => {
@@ -172,7 +206,18 @@ export const recipesSlice = createSlice({
             }
           });
         })
-        .addCase(updateRecipe.rejected, (state, action) => {
+        .addCase(updateRecipe.rejected, (state) => {
+          state.pendingRequests--;
+        });
+    builder
+        .addCase(importRecipe.pending, (state, action) => {
+          state.pendingRequests++;
+        })
+        .addCase(importRecipe.fulfilled, (state, action) => {
+          state.pendingRequests--;
+          state.recipeGroups.push(action.payload);
+        })
+        .addCase(importRecipe.rejected, (state, action) => {
           state.pendingRequests--;
         });
   },

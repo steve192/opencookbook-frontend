@@ -1,9 +1,9 @@
 import {HeaderHeightContext} from '@react-navigation/elements';
 import React, {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ListRenderItemInfo, Modal, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
+import {Modal, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Divider, TextInput, Text, Surface, List} from 'react-native-paper';
+import {Divider, List, Surface, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 
 
@@ -38,18 +38,6 @@ export const SelectionPopup = (props: Props) => {
   const openModal = () => {
     setModalVisible(true);
   };
-
-
-  const renderListItem = (info: ListRenderItemInfo<ListItemData>) =>
-    <ListItem
-      key={info.index}
-      title={
-        <Text
-          style={{fontWeight: info.item.option.newlyCreated ? 'bold' : 'normal'}}>
-          {info.item.option.value}
-        </Text>}
-      onPress={() => info.item.option.newlyCreated ? applySelection({key: '', value: value, newlyCreated: true}) : applySelection(info.item.option)}
-    />;
 
   const onSearchInputChange = (newText: string) => {
     setValue(newText);
@@ -116,7 +104,7 @@ export const SelectionPopup = (props: Props) => {
                                             <Spacer width={10} />
                                           </View>
                                           <Divider style={{paddingVertical: 2, marginVertical: 10}} />
-                                          <ScrollView>
+                                          <ScrollView keyboardShouldPersistTaps={'handled'}>
                                             {getListItemData().map((data, index) =>
                                               <List.Item
                                                 key={index}

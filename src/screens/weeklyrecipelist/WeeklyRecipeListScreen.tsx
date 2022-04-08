@@ -5,7 +5,7 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Divider, IconButton, Subheading, Surface, Text, useTheme} from 'react-native-paper';
+import {Divider, IconButton, Subheading, Surface, Text} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import XDate from 'xdate';
 import {ChunkView} from '../../ChunkView';

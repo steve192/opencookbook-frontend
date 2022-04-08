@@ -1,4 +1,4 @@
-import React, {ReactNode, useRef} from 'react';
+import React, {Fragment, ReactNode, useRef} from 'react';
 import {StyleProp, ViewStyle} from 'react-native';
 import PagerView from 'react-native-pager-view';
 
@@ -17,6 +17,8 @@ export const ViewPager = (props: Props) => {
     initialPage={props.selectedIndex}
     onPageSelected={(event) => props.onIndexChange(event.nativeEvent.position)}
     style={props.style}>
-    {props.children}
+    <Fragment >
+      {props.children}
+    </Fragment>
   </PagerView>;
 };

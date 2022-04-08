@@ -18,6 +18,12 @@ export const IngredientFormField = (props: Props) => {
   const [unit, setUnit] = useState<string>(props.ingredient.unit);
   const [amount, setAmount] = useState<string>(props.ingredient.amount === 0 ? '': String(props.ingredient.amount));
 
+  useEffect(() => {
+    setIngredientQuery(props.ingredient.ingredient.name);
+    setUnit(props.ingredient.unit);
+    setAmount(props.ingredient.amount === 0 ? '': String(props.ingredient.amount));
+  }, [props.ingredient]);
+
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
 
   const [availableIngredients, setAvailableIngredients] = useState<Ingredient[]>([]);

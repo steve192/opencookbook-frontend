@@ -22,7 +22,7 @@ export const RecipeScreen = (props: Props) => {
   const focussed = useIsFocused();
 
   const displayedRecipe = useAppSelector((state) => state.recipes.recipes.filter((recipe) => recipe.id == props.route.params.recipeId)[0]);
-  const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 0);
+  const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 1);
   const {t} = useTranslation('translation');
 
   const theme = useTheme();
@@ -37,8 +37,9 @@ export const RecipeScreen = (props: Props) => {
             props.navigation.goBack();
           }
         });
+  }, [props.route.params.recipeId, focussed]);
 
-
+  useEffect(() => {
     props.navigation.setOptions({
       title: displayedRecipe ? displayedRecipe.title : 'Loading',
       headerRight: () => (
@@ -51,7 +52,8 @@ export const RecipeScreen = (props: Props) => {
           })} />
       ),
     });
-  }, [props.route.params.recipeId, focussed]);
+    displayedRecipe && setScaledServings(displayedRecipe.servings);
+  }, [displayedRecipe]);
 
   const renderIngredientsSection = () =>
     <>

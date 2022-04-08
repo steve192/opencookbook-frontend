@@ -5,7 +5,8 @@ import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Button, Caption, Divider, HelperText, Text, TextInput, useTheme} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import RestAPI from '../dao/RestAPI';
+import {importRecipe} from '../redux/features/recipesSlice';
+import {useAppDispatch} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 
 interface Props {
@@ -19,6 +20,7 @@ export const ImportScreen = (props: Props) => {
 
   const {t} = useTranslation('translation');
   const theme = useTheme();
+  const dispatch = useAppDispatch();
 
   const sanatizeUrl = (url: string) => {
     const urlFindingRegex = /.*((http|https)\S+).*/gm;
@@ -33,7 +35,8 @@ export const ImportScreen = (props: Props) => {
     setImportPending(true);
     setImportSuccess(false);
     const sanatizedUrl = sanatizeUrl(importURL);
-    RestAPI.importRecipe(sanatizedUrl).then((importedRecipe) => {
+
+    dispatch(importRecipe(sanatizedUrl)).unwrap().then(() => {
       setImportPending(false);
       setImportError('');
       setImportSuccess(true);
@@ -71,7 +74,7 @@ export const ImportScreen = (props: Props) => {
 
           {importSuccess &&
                         <>
-                          <Text style={{color: theme.colors.accent}}>{t('screens.import.importSuccess')}</Text>
+                          <Text style={{color: theme.colors.success}}>{t('screens.import.importSuccess')}</Text>
                         </>
           }
         </View>

@@ -1,18 +1,18 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useKeepAwake} from 'expo-keep-awake';
+import fuzzy from 'fuzzy';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
+import {Button, Caption, Divider, Surface} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {IngredientList} from '../components/IngredientList';
 import {PreparationStepText} from '../components/PreparationStepText';
 import {TextBullet} from '../components/TextBullet';
+import {ViewPager} from '../components/ViewPager';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
-import fuzzy from 'fuzzy';
-import {Button, Caption, Divider, Surface} from 'react-native-paper';
-import {ViewPager} from '../components/ViewPager';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 export const GuidedCookingScreen = (props: Props) => {
@@ -44,10 +44,16 @@ export const GuidedCookingScreen = (props: Props) => {
         <Divider />
         <Spacer height={20} />
         <ViewPager
+          style={{backgroundColor: 'blue'}}
           selectedIndex={currentStep}
           onIndexChange={setCurrentStep}>
           {recipe.preparationSteps.map((step, index) =>
-            <View key={index} style={CentralStyles.contentContainer}>
+
+            <Surface
+              key={index}
+              style={[CentralStyles.contentContainer, {elevation: 0, marginLeft: 'auto', marginRight: 'auto'}]}
+
+            >
               <PreparationStepText
                 style={[styles.preparationStep, {fontSize: textSize}]}
                 value={step}
@@ -70,11 +76,10 @@ export const GuidedCookingScreen = (props: Props) => {
                 scaledServings={props.route.params.scaledServings}
                 servings={recipe.servings}
               />
-            </View>,
+            </Surface>,
           )}
 
         </ViewPager>
-
       </ScrollView>
       <View>
         <Spacer height={20} />
