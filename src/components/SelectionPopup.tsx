@@ -1,9 +1,9 @@
 import {HeaderHeightContext} from '@react-navigation/elements';
 import React, {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ListRenderItemInfo, Modal, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
+import {Modal, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
-import {Divider, TextInput, Text, Surface, List} from 'react-native-paper';
+import {Divider, List, Surface, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 
 
