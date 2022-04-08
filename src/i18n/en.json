@@ -9,6 +9,7 @@
     "sunday": "Sunday"
   },
   "common": {
+    "or": "or",
     "save": "Save",
     "unknownerror": "Unknown error occured",
     "ok": "Okay",
@@ -109,7 +110,8 @@
       "import": "Import",
       "supportedServices": "Supported services",
       "importSuccess": "Import successful",
-      "importFailed": "Import failed"
+      "importFailed": "Import failed",
+      "startRecipeBrowser": "Search recipes on the web"
     },
     "editRecipe": {
       "screenTitleEdit": "Edit recipe",
