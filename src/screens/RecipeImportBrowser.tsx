@@ -2,7 +2,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import {AxiosError} from 'axios';
 import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {BackHandler} from 'react-native';
+import {BackHandler, View} from 'react-native';
 import {ActivityIndicator, Caption, Divider, Surface, Text, TouchableRipple, useTheme} from 'react-native-paper';
 import WebView from 'react-native-webview';
 import RestAPI from '../dao/RestAPI';
@@ -43,12 +43,18 @@ export const RecipeImportBrowser = () => {
   );
 
   const analyseIfSiteIsImportable = (url: string) => {
-    setImportStatus('not_started');
     setCurrentURL(url);
     setImportPossible(availableImportHosts.some((host) => url.includes(host)));
+    if (importStatus === 'pending') {
+      return;
+    }
+    setImportStatus('not_started');
   };
 
   const startImport = () => {
+    if (importStatus === 'pending') {
+      return;
+    }
     setImportStatus('pending');
     dispatch(importRecipe(currentURL)).unwrap().then(() => {
       setImportStatus('success');
@@ -98,7 +104,7 @@ export const RecipeImportBrowser = () => {
     'not_started': importPossible ? theme.colors.primary : theme.colors.accent,
     'failed': theme.colors.error,
     'pending': theme.colors.accent,
-    'success': theme.colors.accent,
+    'success': theme.colors.primary,
   };
 
   return (
@@ -114,7 +120,12 @@ export const RecipeImportBrowser = () => {
       <TouchableRipple
         onPress={() => startImport()}
         style={{height: 70, margin: 10, backgroundColor: buttonColors[importStatus]}}>
-        {renderImportButtonContent()}
+        <View style={{
+          justifyContent: 'center',
+          alignItems: 'center',
+          flex: 1}}>
+          {renderImportButtonContent()}
+        </View>
       </TouchableRipple>
     </Surface>
 
