@@ -58,7 +58,7 @@ export const RecipeImportBrowser = () => {
     setImportStatus('pending');
     dispatch(importRecipe(currentURL)).unwrap().then(() => {
       setImportStatus('success');
-    }).catch((error: AxiosError) => {
+    }).catch(() => {
       setImportStatus('failed');
     });
   };
