@@ -25,7 +25,7 @@ export const ViewPager = (props: Props) => {
     slides = props.children.map((child, index) =>
       <SwiperSlide
         key={index}
-        style={{height: '100%', overflow: 'hidden'}}>
+        style={{height: '100%', width: '100%', overflow: 'hidden'}}>
         {child}
       </SwiperSlide>);
   } else {

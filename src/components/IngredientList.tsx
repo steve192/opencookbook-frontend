@@ -35,9 +35,8 @@ export const IngredientList = (props: Props) => {
     <>
       {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
       <View style={{alignItems: 'center', justifyContent: 'center'}}>
-        {props.ingredients.map((ingredient, index) => {
-          console.log(ingredient.amount > 0 ? `${scaleIngredient(ingredient.amount)} ${ingredient.unit}` : '');
-          return <React.Fragment key={index}>
+        {props.ingredients.map((ingredient, index) =>
+          <React.Fragment key={index}>
             <Divider />
             <View style={{flex: 1, alignSelf: 'stretch', flexDirection: 'row'}}>
               <Text
@@ -51,8 +50,7 @@ export const IngredientList = (props: Props) => {
 
               <Text style={{flex: 4, alignSelf: 'stretch', color: props.greyedOutStyle ? theme.colors.disabled : theme.colors.text}} >{ingredient.ingredient.name}</Text>
             </View>
-          </React.Fragment>;
-        },
+          </React.Fragment>,
         )}
       </View>
       <Spacer height={20} />
