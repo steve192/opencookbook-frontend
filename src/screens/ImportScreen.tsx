@@ -71,7 +71,7 @@ export const ImportScreen = (props: Props) => {
 
           {importSuccess &&
                         <>
-                          <Text style={{color: theme.colors.accent}}>{t('screens.import.importSuccess')}</Text>
+                          <Text style={{color: theme.colors.success}}>{t('screens.import.importSuccess')}</Text>
                         </>
           }
         </View>

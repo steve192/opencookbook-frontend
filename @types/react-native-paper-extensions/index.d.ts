@@ -4,6 +4,7 @@ declare module ReactNativePaper {
   // eslint-disable-next-line no-unused-vars
   interface ThemeColors {
     textOnPrimary: string;
+    success: string;
   }
 }
 
