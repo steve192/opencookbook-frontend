@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
-import {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Modal, Pressable, View, StyleSheet, TouchableWithoutFeedback} from 'react-native';
+import {Modal, Pressable, StyleSheet, TouchableWithoutFeedback, View} from 'react-native';
 import {Button, Caption, Divider, Headline, Surface, TextInput, TouchableRipple} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {RecipeList} from '../../components/RecipeList';
