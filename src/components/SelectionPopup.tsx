@@ -39,18 +39,6 @@ export const SelectionPopup = (props: Props) => {
     setModalVisible(true);
   };
 
-
-  const renderListItem = (info: ListRenderItemInfo<ListItemData>) =>
-    <ListItem
-      key={info.index}
-      title={
-        <Text
-          style={{fontWeight: info.item.option.newlyCreated ? 'bold' : 'normal'}}>
-          {info.item.option.value}
-        </Text>}
-      onPress={() => info.item.option.newlyCreated ? applySelection({key: '', value: value, newlyCreated: true}) : applySelection(info.item.option)}
-    />;
-
   const onSearchInputChange = (newText: string) => {
     setValue(newText);
   };

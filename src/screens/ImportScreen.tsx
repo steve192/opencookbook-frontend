@@ -33,7 +33,7 @@ export const ImportScreen = (props: Props) => {
     setImportPending(true);
     setImportSuccess(false);
     const sanatizedUrl = sanatizeUrl(importURL);
-    RestAPI.importRecipe(sanatizedUrl).then((importedRecipe) => {
+    RestAPI.importRecipe(sanatizedUrl).then(() => {
       setImportPending(false);
       setImportError('');
       setImportSuccess(true);

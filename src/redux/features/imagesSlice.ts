@@ -86,9 +86,6 @@ export const imagesSlice = createSlice({
   name: 'images',
   initialState,
   reducers: {
-    // changeTheme: (state, action: PayloadAction<themes>) => {
-    //     state.theme = action.payload;
-    // }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchSingleImage.fulfilled, (state, action) => {

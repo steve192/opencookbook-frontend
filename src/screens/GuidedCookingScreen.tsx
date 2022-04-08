@@ -1,18 +1,18 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useKeepAwake} from 'expo-keep-awake';
-import React, {Fragment, useState} from 'react';
+import fuzzy from 'fuzzy';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
+import {Button, Caption, Divider, Surface} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {IngredientList} from '../components/IngredientList';
 import {PreparationStepText} from '../components/PreparationStepText';
 import {TextBullet} from '../components/TextBullet';
+import {ViewPager} from '../components/ViewPager';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
-import fuzzy from 'fuzzy';
-import {Button, Caption, Divider, Surface, Text} from 'react-native-paper';
-import {ViewPager} from '../components/ViewPager';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 export const GuidedCookingScreen = (props: Props) => {

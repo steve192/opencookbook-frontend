@@ -108,7 +108,7 @@ const MainNavigation = () => {
   };
 
 
-  const BottomTabNavigation = withTheme((props) => {
+  const BottomTabNavigation = withTheme(() => {
     return (
 
       <BottomTab.Navigator
