@@ -47,6 +47,12 @@ export const createRecipeGroup = createAsyncThunk<RecipeGroup, RecipeGroup, { st
       return RestAPI.createNewRecipeGroup(recipeGroup);
     },
 );
+export const updateRecipeGroup = createAsyncThunk<RecipeGroup, RecipeGroup, { state: RootState }>(
+    'updateRecipeGroup',
+    async (recipeGroup: RecipeGroup): Promise<RecipeGroup> => {
+      return RestAPI.updateRecipeGroup(recipeGroup);
+    },
+);
 export const deleteRecipeGroup = createAsyncThunk<void, number, { state: RootState }>(
     'deleteRecipeGroup',
     async (groupId: number) => {
@@ -207,6 +213,21 @@ export const recipesSlice = createSlice({
           });
         })
         .addCase(updateRecipe.rejected, (state) => {
+          state.pendingRequests--;
+        });
+    builder
+        .addCase(updateRecipeGroup.pending, (state) => {
+          state.pendingRequests++;
+        })
+        .addCase(updateRecipeGroup.fulfilled, (state, action) => {
+          state.pendingRequests--;
+          state.recipeGroups.forEach((group, index) => {
+            if (group.id === action.meta.arg.id) {
+              state.recipeGroups[index] = action.payload;
+            }
+          });
+        })
+        .addCase(updateRecipeGroup.rejected, (state) => {
           state.pendingRequests--;
         });
     builder

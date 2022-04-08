@@ -1,4 +1,4 @@
-import {Recipe, RecipeGroup} from '../dao/RestAPI';
+import {Recipe} from '../dao/RestAPI';
 
 export type BaseNavigatorProps = {
     AccountActivationScreen: { activationId: string}
@@ -15,7 +15,7 @@ export type MainNavigationProps = {
     RecipeWizardScreen: { editing?: boolean, recipeId?: number }
     RecipeScreen: { recipeId: number }
     ImportScreen: { importUrl?: string },
-    RecipeGroupEditScreen: { recipeGroup?: RecipeGroup, onRecipeGroupChanges?: (changedRecipeGroup: RecipeGroup) => void }
+    RecipeGroupEditScreen: { recipeGroupId: number, editing: boolean}
     GuidedCookingScreen: { recipe: Recipe, scaledServings: number }
 };
 

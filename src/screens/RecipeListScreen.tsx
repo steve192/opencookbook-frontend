@@ -7,8 +7,7 @@ import {Appbar, FAB, Surface, useTheme} from 'react-native-paper';
 import {RecipeList} from '../components/RecipeList';
 import {Recipe} from '../dao/RestAPI';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
-import {deleteRecipeGroup} from '../redux/features/recipesSlice';
-import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {useAppSelector} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 
 
@@ -23,7 +22,6 @@ type Props = CompositeScreenProps<
 
 const RecipeListScreen = (props: Props) => {
   const theme = useTheme();
-  const dispatch = useAppDispatch();
   const {t} = useTranslation('translation');
 
   const [fabOpen, setFabOpen] = useState(false);
@@ -37,9 +35,9 @@ const RecipeListScreen = (props: Props) => {
           title: shownRecipeGroup?.title,
           headerRight: () => (
             <Appbar.Action
-              icon="delete-outline"
-              color={theme.colors.error}
-              onPress={() => shownRecipeGroup.id && dispatchDeleteRecipeGroup(shownRecipeGroup.id)} />
+              icon="pencil-outline"
+              color={theme.colors.textOnPrimary}
+              onPress={() => shownRecipeGroup.id && props.navigation.navigate('RecipeGroupEditScreen', {editing: true, recipeGroupId: shownRecipeGroup.id})} />
           ),
         });
       } else {
@@ -49,14 +47,7 @@ const RecipeListScreen = (props: Props) => {
         });
       }
     });
-  }, [props.navigation]);
-
-
-  const dispatchDeleteRecipeGroup = (groupId: number) => {
-    dispatch(deleteRecipeGroup(groupId)).then(() => {
-      props.navigation.goBack();
-    });
-  };
+  }, [props.navigation, shownRecipeGroup]);
 
 
   const openRecipe = (recipe: Recipe) => {
