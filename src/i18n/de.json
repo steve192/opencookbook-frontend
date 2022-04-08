@@ -30,6 +30,17 @@
     "screenTitleGuidedCooking": "Kochmodus"
   },
   "screens": {
+    "importbrowser": {
+      "importsecure": "Importieren",
+      "importsecuredescription": "Achte darauf auf einem Rezept zu sein",
+      "importinsecure": "Importieren (Erfolg ungewiss)",
+      "importinsecuredescription": "Die Seite wird offiziell nicht unterstüzt. Du kannst es trotzdem probieren",
+      "failed": "Der Import ist leider fehlgeschlagen",
+      "faileddescription": "Die Seite wird leider noch noch unterstüzt oder du befindest dich nicht auf einem Rezept",
+      "success": "Das Rezept wurde erfolgreich importiert",
+      "successdescription": "Du findest es nun unter deinen gespeicherten Rezepten",
+      "pending": "Import läuft..."
+    },
     "recipeselectionpopup": {
       "simplerecipeinput": "Was gibt es zu essen?",
       "savesimplerecipe": "Speichern",

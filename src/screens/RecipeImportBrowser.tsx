@@ -2,18 +2,16 @@ import {useFocusEffect} from '@react-navigation/native';
 import {AxiosError} from 'axios';
 import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {BackHandler, View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
-import {Button, Caption, Divider, HelperText, Surface, Text, TextInput, useTheme} from 'react-native-paper';
+import {BackHandler} from 'react-native';
+import {ActivityIndicator, Caption, Divider, Surface, Text, TouchableRipple, useTheme} from 'react-native-paper';
 import WebView from 'react-native-webview';
-import Spacer from 'react-spacer';
 import RestAPI from '../dao/RestAPI';
 import {importRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 
 
-export const RecipeImportBrowser = (props: Props) => {
+export const RecipeImportBrowser = () => {
   const {t} = useTranslation('translation');
   const theme = useTheme();
   const dispatch = useAppDispatch();
@@ -21,6 +19,9 @@ export const RecipeImportBrowser = (props: Props) => {
 
   const [importPossible, setImportPossible] = useState(false);
   const [availableImportHosts, setAvailableImportHosts] = useState<string[]>([]);
+  const [importStatus, setImportStatus] = useState<'not_started'|'pending'|'failed'|'success'>('not_started');
+  const [currentURL, setCurrentURL] = useState('');
+
   useEffect(() => {
     RestAPI.getAvailableImportHosts().then((list) => {
       setAvailableImportHosts(list);
@@ -42,10 +43,64 @@ export const RecipeImportBrowser = (props: Props) => {
   );
 
   const analyseIfSiteIsImportable = (url: string) => {
+    setImportStatus('not_started');
+    setCurrentURL(url);
     setImportPossible(availableImportHosts.some((host) => url.includes(host)));
   };
+
   const startImport = () => {
+    setImportStatus('pending');
+    dispatch(importRecipe(currentURL)).unwrap().then(() => {
+      setImportStatus('success');
+    }).catch((error: AxiosError) => {
+      setImportStatus('failed');
+    });
   };
+
+  const renderImportButtonContent = () => {
+    switch (importStatus) {
+      case 'not_started':
+        return <>
+          <Text
+            style={{textAlign: 'center'}}
+          >{importPossible ? t('screens.importbrowser.importsecure') : t('screens.importbrowser.importinsecure')}</Text>
+          <Caption
+            style={{textAlign: 'center'}}
+          >{importPossible ? t('screens.importbrowser.importsecuredescription') : t('screens.importbrowser.importinsecuredescription')}</Caption>
+        </>;
+      case 'failed':
+        return <>
+          <Text
+            style={{textAlign: 'center'}}
+          >{t('screens.importbrowser.failed')}</Text>
+          <Caption
+            style={{textAlign: 'center'}}
+          >{ t('screens.importbrowser.faileddescription')}</Caption>
+        </>;
+      case 'pending':
+        return <>
+          <Text
+            style={{textAlign: 'center'}}
+          >{t('screens.importbrowser.pending')}</Text>
+          <ActivityIndicator/>
+        </>;
+      case 'success':
+        return <>
+          <Text
+            style={{textAlign: 'center'}}
+          >{t('screens.importbrowser.success')}</Text>
+        </>;
+    }
+  };
+
+
+  const buttonColors: {[key in typeof importStatus]: string} = {
+    'not_started': importPossible ? theme.colors.primary : theme.colors.accent,
+    'failed': theme.colors.error,
+    'pending': theme.colors.accent,
+    'success': theme.colors.accent,
+  };
+
   return (
     <Surface style={CentralStyles.fullscreen}>
       <WebView
@@ -55,13 +110,12 @@ export const RecipeImportBrowser = (props: Props) => {
         source={{uri: 'https://google.com'}}>
 
       </WebView>
-      <Button
-        color={importPossible ? theme.colors.primary : theme.colors.error}
-        disabled={!importPossible}
-        contentStyle={{marginVertical: 20}}
-        theme={{roundness: 0}}
-        mode="contained"
-      >{t('screens.importbrowser.import')}</Button>
+      <Divider/>
+      <TouchableRipple
+        onPress={() => startImport()}
+        style={{height: 70, margin: 10, backgroundColor: buttonColors[importStatus]}}>
+        {renderImportButtonContent()}
+      </TouchableRipple>
     </Surface>
 
   );

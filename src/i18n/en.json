@@ -30,6 +30,17 @@
     "screenTitleGuidedCooking": "Guided cooking"
   },
   "screens": {
+    "importbrowser": {
+      "importsecure": "Import",
+      "importsecuredescription": "Make sure to be on a recipe",
+      "importinsecure": "Import (success uncertain)",
+      "importinsecuredescription": "This recipe site not officially supported. You can try it anyway",
+      "failed": "Unfortunately the import failed",
+      "faileddescription": "This recipe site is not supported yet or you are not on a recipe",
+      "success": "Imported successfully",
+      "successdescription": "You can find this recipe in your recipes now",
+      "pending": "Import pending..."
+    },
     "recipeselectionpopup": {
       "simplerecipeinput": "What's for dinner?",
       "savesimplerecipe": "Save",
