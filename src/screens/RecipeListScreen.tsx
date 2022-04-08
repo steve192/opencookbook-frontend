@@ -38,7 +38,7 @@ const RecipeListScreen = (props: Props) => {
           headerRight: () => (
             <Appbar.Action
               icon="pencil-outline"
-              // color={theme.colors.error}
+              color={theme.colors.textOnPrimary}
               onPress={() => shownRecipeGroup.id && props.navigation.navigate('RecipeGroupEditScreen', {editing: true, recipeGroupId: shownRecipeGroup.id})} />
           ),
         });
