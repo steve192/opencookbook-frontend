@@ -2,7 +2,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AxiosError} from 'axios';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {Button, Caption, Divider, HelperText, Text, TextInput, useTheme} from 'react-native-paper';
 import Spacer from 'react-spacer';
@@ -51,6 +51,14 @@ export const ImportScreen = (props: Props) => {
       setImportError(error.toString());
     });
   };
+
+  const renderNativeOnlySection = () =>
+    <>
+      <Spacer height={40} />
+      <Caption style={{textAlign: 'center'}}>{t('common.or')}</Caption>
+      <Spacer height={80} />
+      <Button onPress={() => props.navigation.navigate('RecipeImportBrowser')}>{t('screens.import.startRecipeBrowser')}</Button>
+    </>;
   return (
     <View style={CentralStyles.fullscreen}>
       <View style={CentralStyles.contentContainer}>
@@ -79,10 +87,7 @@ export const ImportScreen = (props: Props) => {
                         </>
           }
         </View>
-        <Spacer height={40} />
-        <Caption style={{textAlign: 'center'}}>{t('common.or')}</Caption>
-        <Spacer height={80} />
-        <Button onPress={() => props.navigation.navigate('RecipeImportBrowser')}>{t('screens.import.startRecipeBrowser')}</Button>
+        {Platform.OS !== 'web' && renderNativeOnlySection()}
       </View>
     </View>
 
