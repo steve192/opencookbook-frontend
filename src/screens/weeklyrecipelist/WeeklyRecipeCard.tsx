@@ -6,8 +6,8 @@ import {RecipeImageComponent} from '../../components/RecipeImageComponent';
 
 interface Props {
     title: string;
-    imageUuid: string;
-    onPress: () => void;
+    imageUuid?: string;
+    onPress?: () => void;
     onRemovePress: () => void;
 }
 export const WeeklyRecipeCard = (props: Props) => {
@@ -15,36 +15,44 @@ export const WeeklyRecipeCard = (props: Props) => {
 
   const theme = useTheme();
   return (
-    <Pressable
-      style={styles.card}
-      onLongPress={() => setEditMode(!editMode)}
-      onPress={props.onPress}>
-      <View style={{height: 80, borderRadius: 16, overflow: 'hidden'}}>
-        <RecipeImageComponent
-          useThumbnail={true}
-          forceFitScaling={true}
-          uuid={props.imageUuid} />
-      </View>
-      <Paragraph>
-        {props.title}
-      </Paragraph>
+    <View style={styles.borderCard}>
+      <Pressable
+        style={styles.card}
+        onLongPress={() => setEditMode(!editMode)}
+        onPress={props.onPress}>
+        {props.imageUuid && <View style={{height: 80, borderRadius: 16, overflow: 'hidden'}}>
+          <RecipeImageComponent
+            useThumbnail={true}
+            forceFitScaling={true}
+            uuid={props.imageUuid} />
+        </View>}
+        <Paragraph style={{textAlign: 'center', fontWeight: 'bold'}}>
+          {props.title}
+        </Paragraph>
+      </Pressable>
       {editMode &&
       <IconButton
+        style={{alignSelf: 'center'}}
         color={theme.colors.error}
         icon="delete-outline"
         onPress={props.onRemovePress} />}
-    </Pressable>
+    </View>
 
   );
 };
 
 const styles = StyleSheet.create({
   card: {
+    justifyContent: 'center',
     width: 120,
+    minHeight: 110,
     margin: 3,
+
+
+  },
+  borderCard: {
     borderColor: 'rgba(0,0,0,0.09)',
     borderRadius: 16,
     borderWidth: 1,
-
   },
 });

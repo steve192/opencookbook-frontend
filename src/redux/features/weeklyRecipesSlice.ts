@@ -23,7 +23,6 @@ export const updateSingleWeekplanDay = createAsyncThunk(
           weekplanDay.day,
           // @ts-ignore Cannot be undefined
           weekplanDay.recipes
-              .filter((recipe) => recipe.id)
               .map((recipe) => {
                 if (recipe.type === 'NORMAL_RECIPE') {
                   return {id: recipe.id, type: recipe.type};

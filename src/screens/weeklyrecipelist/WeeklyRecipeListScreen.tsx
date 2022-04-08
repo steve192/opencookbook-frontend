@@ -61,6 +61,13 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     dispatch(updateSingleWeekplanDay(newWeekplanDay));
     setRecipeSelectionVisible(false);
   };
+  const addSimpleRecipeToWeekplanDay = (recipe: string, weekplanDay: WeekplanDay) => {
+    const newWeekplanDay = {...weekplanDay, recipes: [...weekplanDay.recipes]};
+    // @ts-ignore id is always set
+    newWeekplanDay.recipes.push({title: recipe, type: 'SIMPLE_RECIPE'});
+    dispatch(updateSingleWeekplanDay(newWeekplanDay));
+    setRecipeSelectionVisible(false);
+  };
   const removeRecipeFromWeekplanDay = (recipeId: number | string, weekplanDay: WeekplanDay) => {
     const newWeekplanDay = {...weekplanDay, recipes: [...weekplanDay.recipes]};
     newWeekplanDay.recipes = newWeekplanDay.recipes.filter((existingRecipe) => existingRecipe.id !== recipeId);
@@ -109,6 +116,12 @@ export const WeeklyRecipeListScreen = (props: Props) => {
                         onRemovePress={() => removeRecipeFromWeekplanDay(recipe.id, weekplanDay)}
                         title={recipe.title}
                         imageUuid={recipe.titleImageUuid} />;
+                    } else if (recipe.type === 'SIMPLE_RECIPE') {
+                      return <WeeklyRecipeCard
+                        key={weekplanDay.day + index}
+                        // @ts-ignore
+                        onRemovePress={() => removeRecipeFromWeekplanDay(recipe.id, weekplanDay)}
+                        title={recipe.title} />;
                     }
                   })
                 ))}
@@ -143,6 +156,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
         onClose={() => setRecipeSelectionVisible(false)}
         // @ts-ignore cannot be undefined
         onRecipeSelected={(recipe) => addRecipeToWeekplanDay(recipe, selectedWeekplanDay)}
+        onSimpleRecipeSelected={(text) => addSimpleRecipeToWeekplanDay(text, selectedWeekplanDay)}
       />
     </>
   );
