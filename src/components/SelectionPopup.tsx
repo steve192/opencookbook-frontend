@@ -116,7 +116,7 @@ export const SelectionPopup = (props: Props) => {
                                             <Spacer width={10} />
                                           </View>
                                           <Divider style={{paddingVertical: 2, marginVertical: 10}} />
-                                          <ScrollView>
+                                          <ScrollView keyboardShouldPersistTaps={'handled'}>
                                             {getListItemData().map((data, index) =>
                                               <List.Item
                                                 key={index}
