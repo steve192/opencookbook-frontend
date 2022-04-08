@@ -1,17 +1,17 @@
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AxiosError} from 'axios';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
-import {Button, Caption, Divider, HelperText, Text, TextInput, useTheme} from 'react-native-paper';
+import {Platform, View} from 'react-native';
+import {Button, Caption, HelperText, Text, TextInput, useTheme} from 'react-native-paper';
 import Spacer from 'react-spacer';
+import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {importRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 
-interface Props {
-    importUrl?: string
-}
+
+type Props = NativeStackScreenProps<MainNavigationProps, 'ImportScreen'>;
 export const ImportScreen = (props: Props) => {
   const [importURL, setImportURL] = useState<string>('');
   const [importPending, setImportPending] = useState<boolean>(false);
@@ -50,6 +50,14 @@ export const ImportScreen = (props: Props) => {
       setImportError(error.toString());
     });
   };
+
+  const renderNativeOnlySection = () =>
+    <>
+      <Spacer height={40} />
+      <Caption style={{textAlign: 'center'}}>{t('common.or')}</Caption>
+      <Spacer height={80} />
+      <Button onPress={() => props.navigation.navigate('RecipeImportBrowser')}>{t('screens.import.startRecipeBrowser')}</Button>
+    </>;
   return (
     <View style={CentralStyles.fullscreen}>
       <View style={CentralStyles.contentContainer}>
@@ -78,15 +86,7 @@ export const ImportScreen = (props: Props) => {
                         </>
           }
         </View>
-        <Spacer height={20} />
-        <Divider />
-        <Spacer height={20} />
-        <Caption>{t('screens.import.supportedServices')}</Caption>
-        <Spacer height={10} />
-        <ScrollView>
-          <Text>Chefkoch</Text>
-          <Text>HelloFresh</Text>
-        </ScrollView>
+        {Platform.OS !== 'web' && renderNativeOnlySection()}
       </View>
     </View>
 

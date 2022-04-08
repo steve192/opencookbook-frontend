@@ -86,7 +86,7 @@ const RecipeListScreen = (props: Props) => {
             {
               icon: 'group',
               label: t('screens.overview.addRecipeGroup'),
-              onPress: () => props.navigation.navigate('RecipeGroupEditScreen', {}),
+              onPress: () => props.navigation.navigate('RecipeGroupEditScreen', {editing: false}),
             },
             {
               icon: 'import',

@@ -15,6 +15,7 @@ import {SignupScreen} from '../screens/LoginScreen/SignupScreen';
 import {SplashScreen} from '../screens/LoginScreen/SplashScreen';
 import {PasswordResetScreen} from '../screens/PasswordResetScreen';
 import {RecipeGroupEditScreen} from '../screens/RecipeGroupEditScreen';
+import {RecipeImportBrowser} from '../screens/RecipeImportBrowser';
 import RecipeListScreen from '../screens/RecipeListScreen';
 import {RecipeScreen} from '../screens/RecipeScreen';
 import {SettingsScreen} from '../screens/SettingsScreen';
@@ -73,6 +74,13 @@ const MainNavigation = () => {
           <Stack.Screen
             name="RecipeWizardScreen"
             component={RecipeWizardScreen}
+          />
+          <Stack.Screen
+            name="RecipeImportBrowser"
+            component={RecipeImportBrowser}
+            options={{
+              title: t('navigation.screenTitleImportBrowser'),
+            }}
           />
           <Stack.Screen
             name="ImportScreen"
@@ -196,6 +204,7 @@ const MainNavigation = () => {
                 RequestPasswordResetScreen: 'requestResetPassword',
                 RecipeScreen: 'recipe',
                 RecipeWizardScreen: 'editRecipe',
+                ImportScreen: 'import',
                 OverviewScreen: {
                   screens: {
                     SettingsScreen: 'settings',

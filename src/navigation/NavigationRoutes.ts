@@ -12,10 +12,11 @@ export type LoginNavigationProps = {
 }
 export type MainNavigationProps = {
     OverviewScreen: undefined
+    RecipeImportBrowser: undefined
     RecipeWizardScreen: { editing?: boolean, recipeId?: number }
     RecipeScreen: { recipeId: number }
     ImportScreen: { importUrl?: string },
-    RecipeGroupEditScreen: { recipeGroupId: number, editing: boolean}
+    RecipeGroupEditScreen: { recipeGroupId?: number, editing: boolean}
     GuidedCookingScreen: { recipe: Recipe, scaledServings: number }
 };
 
