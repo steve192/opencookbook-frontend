@@ -96,6 +96,10 @@ class RestAPI {
     const response = await this.post('/recipe-groups', recipeGroup);
     return {...response?.data, type: 'RecipeGroup'};
   }
+  static async updateRecipeGroup(recipeGroup: RecipeGroup): Promise<RecipeGroup> {
+    const response = await this.put('/recipe-groups/' + recipeGroup.id, recipeGroup);
+    return {...response?.data, type: 'RecipeGroup'};
+  }
   static async getRecipeGroups(): Promise<RecipeGroup[]> {
     const response = await this.get('/recipe-groups');
     return response?.data.map((item: RecipeGroup) => {

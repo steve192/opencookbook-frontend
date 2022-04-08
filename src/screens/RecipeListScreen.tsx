@@ -37,9 +37,9 @@ const RecipeListScreen = (props: Props) => {
           title: shownRecipeGroup?.title,
           headerRight: () => (
             <Appbar.Action
-              icon="delete-outline"
-              color={theme.colors.error}
-              onPress={() => shownRecipeGroup.id && dispatchDeleteRecipeGroup(shownRecipeGroup.id)} />
+              icon="pencil-outline"
+              // color={theme.colors.error}
+              onPress={() => shownRecipeGroup.id && props.navigation.navigate('RecipeGroupEditScreen', {editing: true, recipeGroupId: shownRecipeGroup.id})} />
           ),
         });
       } else {
@@ -49,14 +49,7 @@ const RecipeListScreen = (props: Props) => {
         });
       }
     });
-  }, [props.navigation]);
-
-
-  const dispatchDeleteRecipeGroup = (groupId: number) => {
-    dispatch(deleteRecipeGroup(groupId)).then(() => {
-      props.navigation.goBack();
-    });
-  };
+  }, [props.navigation, shownRecipeGroup]);
 
 
   const openRecipe = (recipe: Recipe) => {
