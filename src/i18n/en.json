@@ -22,6 +22,7 @@
     "email": "E-mail"
   },
   "navigation": {
+    "screenTitleImportBrowser": "Recipe import browser",
     "tabMyRecipes": "MY RECIPES",
     "tabWeekplan": "WEEKPLAN",
     "tabSettings": "Settings",
