@@ -1,24 +1,21 @@
-import {Button, Input, InputProps, useTheme} from '@ui-kitten/components';
 import React from 'react';
 import {View} from 'react-native';
-import {DeleteIcon} from '../../assets/Icons';
+import {IconButton, TextInput, withTheme} from 'react-native-paper';
+import {TextInputProps} from 'react-native-paper/lib/typescript/components/TextInput/TextInput';
 
 
-export const RecipeFormField = (inputProps: InputProps & { onRemovePress: Function }) => {
-  const theme = useTheme();
+export const RecipeFormField = withTheme((inputProps: TextInputProps & { onRemovePress: Function }) => {
   return (
 
-    <View style={{alignItems: 'center', flexDirection: 'row', borderWidth: 1, borderColor: theme['background-basic-color-4'], padding: 10, borderRadius: 16}}>
-      <Input
+    <View style={{alignItems: 'center', flexDirection: 'row'}}>
+      <TextInput
+        mode='outlined'
         style={{flex: 1}}
         {...inputProps} />
-      <Button
-        style={{height: 32, width: 32, margin: 10}}
-        size="small"
-        status="control"
-        accessoryLeft={<DeleteIcon />}
+      <IconButton
+        icon="delete-outline"
         onPress={() => inputProps.onRemovePress()} />
 
     </View>
   );
-};
+});

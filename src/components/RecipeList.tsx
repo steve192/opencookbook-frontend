@@ -1,16 +1,15 @@
 import {MaterialIcons} from '@expo/vector-icons';
-import {Input, Layout, Text, useTheme} from '@ui-kitten/components';
+import fuzzy from 'fuzzy';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, RefreshControl, StyleSheet, View, ViewProps} from 'react-native';
+import {Headline, Searchbar, Surface, Text, useTheme} from 'react-native-paper';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
-import {CrossIcon, SearchIcon} from '../assets/Icons';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {fetchMyRecipeGroups, fetchMyRecipes} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 import {RecipeImageComponent} from './RecipeImageComponent';
-import fuzzy from 'fuzzy';
 
 interface Props {
     shownRecipeGroupId: number | undefined
@@ -80,12 +79,12 @@ export const RecipeList = (props: Props) => {
         key={recipe.id}
         style={[styles.recipeCard]}
         onPress={() => props.onRecipeClick(recipe)}>
-        <Layout style={{height: 180, borderRadius: 16, overflow: 'hidden'}}>
+        <Surface style={{height: 180, borderRadius: 16, overflow: 'hidden'}}>
           <RecipeImageComponent
             useThumbnail={true}
             forceFitScaling={true}
             uuid={recipe.images.length > 0 ? recipe.images[0].uuid : undefined} />
-        </Layout>
+        </Surface>
         {renderRecipeTitle(undefined, recipe.title)}
       </Pressable>
     );
@@ -104,7 +103,7 @@ export const RecipeList = (props: Props) => {
             overflow: 'hidden',
           }]}
         onPress={() => props.onRecipeGroupClick(recipeGroup)}>
-        <Layout style={{flex: 1, height: '100%', flexWrap: 'wrap'}}>
+        <Surface style={{flex: 1, height: '100%', flexWrap: 'wrap'}}>
           {firstFewGroupRecipes.map((recipe) =>
             <RecipeImageComponent
               blurredMode={true}
@@ -112,18 +111,17 @@ export const RecipeList = (props: Props) => {
               forceFitScaling={true}
               uuid={recipe.images.length > 0 ? recipe.images[0].uuid : undefined} />,
           )}
-        </Layout>
+        </Surface>
         <View style={{backgroundColor: 'rgba(0,0,0,0.3)', position: 'absolute', width: '100%', height: '100%'}} >
-          <Text
-            category={'h4'}
+          <Headline
             style={{
               padding: 16,
               fontWeight: 'bold',
               position: 'absolute',
-              color: theme['text-alternate-color'],
+              color: theme.colors.textOnPrimary,
             }}>
             {recipeGroup.title}
-          </Text>
+          </Headline>
         </View>
       </Pressable>
 
@@ -147,10 +145,10 @@ export const RecipeList = (props: Props) => {
 
   const renderNoItemsNotice = () => (
     <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', flex: 1}}>
-      <MaterialIcons name="no-food" size={64} color={theme['text-disabled-color']} />
-      <Text category="h4" style={{padding: 64, color: theme['text-disabled-color']}}>
+      <MaterialIcons name="no-food" size={64} color={theme.colors.disabled} />
+      <Headline style={{padding: 64, color: theme.colors.disabled}}>
         {t('screens.overview.noRecipesMessage')}
-      </Text>
+      </Headline>
     </View>
   );
 
@@ -200,13 +198,11 @@ export const RecipeList = (props: Props) => {
       renderNoItemsNotice() }
 
       <View style={[CentralStyles.contentContainer, styles.searchContainer]}>
-        <Input
+        <Searchbar
           value={searchStringPendingInput}
           onChangeText={updateSearchString}
           style={{flex: 1, width: '100%', maxWidth: 500, alignSelf: 'center'}}
-          placeholder={t('screens.overview.searchPlaceholder')}
-          accessoryLeft={SearchIcon}
-          accessoryRight={searchStringPendingInput ? <CrossIcon onPress={() => updateSearchString('')}/> : undefined}/>
+          placeholder={t('screens.overview.searchPlaceholder')}/>
       </View>
     </View>
   );

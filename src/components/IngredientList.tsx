@@ -1,11 +1,9 @@
-import {Button, Divider, Text, useTheme} from '@ui-kitten/components';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
+import {Divider, IconButton, Text, useTheme} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {MinusIcon, PlusIcon} from '../assets/Icons';
 import {IngredientUse} from '../dao/RestAPI';
-import CentralStyles from '../styles/CentralStyles';
 
 
 interface Props {
@@ -45,21 +43,21 @@ export const IngredientList = (props: Props) => {
                 style={{
                   flex: 2,
                   alignSelf: 'stretch',
-                  color: props.greyedOutStyle ? theme['color-control-disabled']: theme['color-primary-default'],
+                  color: props.greyedOutStyle ? theme.colors.disabled: theme.colors.primary,
                   fontWeight: 'bold',
                 }}>{ingredient.amount > 0 ? `${scaleIngredient(ingredient.amount)} ${ingredient.unit}` : ''}
               </Text>
 
-              <Text style={{flex: 4, alignSelf: 'stretch', color: props.greyedOutStyle ? theme['color-basic-transparent-600'] : theme['text-basic-color']}} >{ingredient.ingredient.name}</Text>
+              <Text style={{flex: 4, alignSelf: 'stretch', color: props.greyedOutStyle ? theme.colors.disabled : theme.colors.text}} >{ingredient.ingredient.name}</Text>
             </View>
           </React.Fragment>,
         )}
       </View>
       <Spacer height={20} />
       {props.enableServingScaling && <View style={styles.servingsContainer}>
-        <Button
-          style={CentralStyles.iconButton}
-          size='tiny'
+        <IconButton
+          size={32}
+          animated
           onPress={() => {
             if (props.scaledServings === 1) {
               return;
@@ -67,13 +65,13 @@ export const IngredientList = (props: Props) => {
             updateServings(
                 props.scaledServings - 1);
           }}
-          accessoryLeft={<MinusIcon />} />
+          icon="minus-circle" />
         <Text style={{paddingHorizontal: 20}}> {props.scaledServings} {t('screens.recipe.servings')}</Text>
-        <Button
-          style={CentralStyles.iconButton}
-          size='tiny'
+        <IconButton
+          size={32}
+          animated
           onPress={() => updateServings(props.scaledServings + 1)}
-          accessoryLeft={<PlusIcon />} />
+          icon="plus-circle" />
       </View>}
     </>
   );

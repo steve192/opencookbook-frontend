@@ -1,8 +1,9 @@
 import {HeaderHeightContext} from '@react-navigation/elements';
-import {Divider, Input, Layout, List, ListItem, Text} from '@ui-kitten/components';
 import React, {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ListRenderItemInfo, Modal, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
+import {Modal, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
+import {ScrollView} from 'react-native-gesture-handler';
+import {Divider, List, Surface, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 
 
@@ -13,6 +14,7 @@ export interface Option {
 }
 interface Props {
     value: string,
+    label?: string,
     options: Option[],
     onValueChanged?: (newValue: Option) => void,
     placeholder?: string,
@@ -28,7 +30,7 @@ export const SelectionPopup = (props: Props) => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [value, setValue] = useState<string>('');
 
-  const modalInputRef = useRef<Input>(null);
+  const modalInputRef = useRef<typeof TextInput>();
 
   const {t} = useTranslation('translation');
 
@@ -36,18 +38,6 @@ export const SelectionPopup = (props: Props) => {
   const openModal = () => {
     setModalVisible(true);
   };
-
-
-  const renderListItem = (info: ListRenderItemInfo<ListItemData>) =>
-    <ListItem
-      key={info.index}
-      title={
-        <Text
-          style={{fontWeight: info.item.option.newlyCreated ? 'bold' : 'normal'}}>
-          {info.item.option.value}
-        </Text>}
-      onPress={() => info.item.option.newlyCreated ? applySelection({key: '', value: value, newlyCreated: true}) : applySelection(info.item.option)}
-    />;
 
   const onSearchInputChange = (newText: string) => {
     setValue(newText);
@@ -81,9 +71,12 @@ export const SelectionPopup = (props: Props) => {
         style={props.style}
         onPress={() => openModal()}>
         <View pointerEvents="none">
-          <Input
+          <TextInput
+            label={props.label}
+            disabled={true}
+            mode="outlined"
             placeholder={props.placeholder}
-            value={props.value}></Input>
+            value={props.value}/>
         </View>
       </Pressable>
 
@@ -104,21 +97,23 @@ export const SelectionPopup = (props: Props) => {
                                     <>
                                       <View style={styles.centeredView}>
                                         {/* headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
-                                        <Layout style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, styles.modalView]}>
+                                        <Surface style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, styles.modalView]}>
                                           <View
                                             style={{flexDirection: 'row', alignContent: 'center'}}>
-                                            <Input placeholder={props.placeholder} ref={modalInputRef} onChangeText={onSearchInputChange} style={{flex: 1}} value={value} />
+                                            <TextInput placeholder={props.placeholder} ref={modalInputRef} onChangeText={onSearchInputChange} style={{flex: 1}} value={value} />
                                             <Spacer width={10} />
                                           </View>
                                           <Divider style={{paddingVertical: 2, marginVertical: 10}} />
-                                          <List
-                                            keyboardShouldPersistTaps='handled'
-                                            style={{flex: 1}}
-                                            renderItem={renderListItem}
-                                            ItemSeparatorComponent={Divider}
-                                            data={getListItemData()}
-                                          />
-                                        </Layout>
+                                          <ScrollView keyboardShouldPersistTaps={'handled'}>
+                                            {getListItemData().map((data, index) =>
+                                              <List.Item
+                                                key={index}
+                                                title={data.option.value}
+                                                onPress={() => data.option.newlyCreated ? applySelection({key: '', value: value, newlyCreated: true}) : applySelection(data.option)}
+                                              />,
+                                            )}
+                                          </ScrollView>
+                                        </Surface>
                                       </View>
                                     </>
                         }

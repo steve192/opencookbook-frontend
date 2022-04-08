@@ -1,14 +1,13 @@
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
-import {Button, Divider, Layout, Text} from '@ui-kitten/components';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
+import {Divider, IconButton, Subheading, Surface, Text} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import XDate from 'xdate';
-import {PlusIcon} from '../../assets/Icons';
 import {ChunkView} from '../../ChunkView';
 import {CustomCard} from '../../components/CustomCard';
 import {SideScroller} from '../../components/SideScroller';
@@ -24,7 +23,7 @@ import {WeeklyRecipeCard} from './WeeklyRecipeCard';
 type Props =
     CompositeScreenProps<
         StackScreenProps<MainNavigationProps, 'OverviewScreen'>,
-        BottomTabScreenProps<OverviewNavigationProps, 'RecipesListScreen'>
+        BottomTabScreenProps<OverviewNavigationProps, 'WeeklyScreen'>
     >;
 
 const dateFormat = 'yyyy-MM-dd';
@@ -45,6 +44,15 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     }));
   };
   useEffect(loadData, []);
+
+  useEffect(() => {
+    return props.navigation.addListener('focus', () => {
+      props.navigation.getParent()?.setOptions({
+        title: t('screens.weekplan.screenTitle'),
+        headerRight: undefined,
+      });
+    });
+  }, [props.navigation]);
 
   const addRecipeToWeekplanDay = (recipe: Recipe, weekplanDay: WeekplanDay) => {
     const newWeekplanDay = {...weekplanDay, recipes: [...weekplanDay.recipes]};
@@ -82,10 +90,8 @@ export const WeeklyRecipeListScreen = (props: Props) => {
             <CustomCard key={weekdayIndex} style={{marginVertical: 5}}>
               <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                 <Text style={styles.weekTitle}>{weekday} {weekdayDate.toLocaleDateString()}</Text>
-                <Button
-                  size="tiny"
-                  accessoryRight={PlusIcon}
-                  appearance="outline"
+                <IconButton
+                  icon="plus-circle-outline"
                   onPress={() => {
                     setRecipeSelectionVisible(true);
                     setSelectedWeekplanDay(existingWeekplanDay ? existingWeekplanDay : {day: weekdayDate.toString(dateFormat), recipes: []});
@@ -115,22 +121,21 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   return (
     <>
       <ChunkView>
-        <Layout style={CentralStyles.fullscreen}>
+        <Surface style={CentralStyles.fullscreen}>
           <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
-            <Divider style={{marginVertical: 25}}/>
-            <Text category="h5">{t('screens.weekplan.currentWeek')}</Text>
+            <Subheading>{t('screens.weekplan.currentWeek')}</Subheading>
             {renderWeek(getCurrentWeekNumber(now), now.getFullYear())}
             <Divider style={{marginVertical: 25}}/>
-            <Text category="h5">{t('screens.weekplan.nextWeek')}</Text>
+            <Subheading>{t('screens.weekplan.nextWeek')}</Subheading>
             {renderWeek(getCurrentWeekNumber(now) + 1, now.getFullYear())}
             <Divider style={{marginVertical: 25}}/>
-            <Text category="h5">{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 2}</Text>
+            <Subheading>{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 2}</Subheading>
             {renderWeek(getCurrentWeekNumber(now) + 2, now.getFullYear())}
             <Divider style={{marginVertical: 25}}/>
-            <Text category="h5">{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 3}</Text>
+            <Subheading>{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 3}</Subheading>
             {renderWeek(getCurrentWeekNumber(now) + 3, now.getFullYear())}
           </ScrollView>
-        </Layout>
+        </Surface>
       </ChunkView>
 
       <RecipeSelectionPopup

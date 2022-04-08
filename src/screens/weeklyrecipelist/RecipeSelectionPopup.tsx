@@ -1,7 +1,6 @@
-import {HeaderHeightContext} from '@react-navigation/elements';
-import {Layout} from '@ui-kitten/components';
 import React, {useState} from 'react';
 import {Modal, Pressable, StyleSheet, View} from 'react-native';
+import {Surface} from 'react-native-paper';
 import {RecipeList} from '../../components/RecipeList';
 import {Recipe, RecipeGroup} from '../../dao/RestAPI';
 
@@ -29,21 +28,16 @@ export const RecipeSelectionPopup = (props: Props) => {
         <Pressable
           onPress={props.onClose}
           style={styles.modalBackdrop}>
-          <HeaderHeightContext.Consumer>
-            {(headerHeight) => headerHeight &&
-                            <>
-                              <View style={styles.centeredView}>
-                                {/* headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
-                                <Layout style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, styles.modalView]}>
-                                  <RecipeList
-                                    shownRecipeGroupId={shownRecipeGroup}
-                                    onRecipeClick={props.onRecipeSelected}
-                                    onRecipeGroupClick={onRecipeGroupSelected} />
-                                </Layout>
-                              </View>
-                            </>
-            }
-          </HeaderHeightContext.Consumer>
+          <>
+            <View style={styles.centeredView}>
+              <Surface style={[styles.modalView]}>
+                <RecipeList
+                  shownRecipeGroupId={shownRecipeGroup?.id}
+                  onRecipeClick={props.onRecipeSelected}
+                  onRecipeGroupClick={onRecipeGroupSelected} />
+              </Surface>
+            </View>
+          </>
         </Pressable>
       </Modal>
     </View>

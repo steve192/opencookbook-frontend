@@ -1,11 +1,10 @@
-import {Button, Divider, Input, Layout, Spinner, Text, useTheme} from '@ui-kitten/components';
 import {AxiosError} from 'axios';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
+import {Button, Caption, Divider, HelperText, Text, TextInput, useTheme} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {CheckmarkIcon, WarningIcon} from '../assets/Icons';
 import {importRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
@@ -19,8 +18,8 @@ export const ImportScreen = (props: Props) => {
   const [importError, setImportError] = useState<string>('');
   const [importSuccess, setImportSuccess] = useState<boolean>(false);
 
-  const theme = useTheme();
   const {t} = useTranslation('translation');
+  const theme = useTheme();
   const dispatch = useAppDispatch();
 
   const sanatizeUrl = (url: string) => {
@@ -41,6 +40,7 @@ export const ImportScreen = (props: Props) => {
       setImportPending(false);
       setImportError('');
       setImportSuccess(true);
+      setImportURL('');
     }).catch((error: AxiosError) => {
       setImportPending(false);
       if (error.response?.status === 501) {
@@ -51,43 +51,44 @@ export const ImportScreen = (props: Props) => {
     });
   };
   return (
-    <Layout style={CentralStyles.fullscreen}>
+    <View style={CentralStyles.fullscreen}>
       <View style={CentralStyles.contentContainer}>
-        <Text>URL to import</Text>
-        <Input value={importURL} onChangeText={setImportURL} />
+        <TextInput label={t('screens.import.URLToImport')} value={importURL} onChangeText={setImportURL} />
         <Spacer height={10} />
-        <Button onPress={startImport}>Import</Button>
+        <Button
+          color={importError.length > 0 ? theme.colors.error:theme.colors.primary}
+          icon={importSuccess ? 'check' : importError.length > 0 ? 'alert-circle-outline' : undefined}
+          mode="contained"
+          loading={importPending}
+          onPress={startImport}>
+          Import
+        </Button>
         <Spacer height={80} />
         <View style={{flexDirection: 'row', justifyContent: 'center', alignContent: 'center'}}>
-          {importPending &&
-                        <Spinner size="giant" />
-          }
 
           {importError.length > 0 &&
                         <>
-                          <WarningIcon width={16} height={16} fill={theme['text-danger-color']} />
-                          <Text status="danger">{t('screens.import.importFailed')} {importError}</Text>
+                          <HelperText type='error' >{t('screens.import.importFailed')} {importError}</HelperText>
                         </>
           }
 
           {importSuccess &&
                         <>
-                          <CheckmarkIcon width={16} height={16} fill={theme['text-success-color']} />
-                          <Text status="success">{t('screens.import.importSuccess')}</Text>
+                          <Text style={{color: theme.colors.success}}>{t('screens.import.importSuccess')}</Text>
                         </>
           }
         </View>
         <Spacer height={20} />
         <Divider />
         <Spacer height={20} />
-        <Text category="label">{t('screens.import.supportedServices')}</Text>
+        <Caption>{t('screens.import.supportedServices')}</Caption>
         <Spacer height={10} />
         <ScrollView>
           <Text>Chefkoch</Text>
           <Text>HelloFresh</Text>
         </ScrollView>
       </View>
-    </Layout>
+    </View>
 
   );
 };

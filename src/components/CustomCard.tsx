@@ -1,13 +1,13 @@
-import {Layout, LayoutProps, useTheme} from '@ui-kitten/components';
 import React from 'react';
+import {View} from 'react-native';
+import {Colors, Surface} from 'react-native-paper';
 
 
-export const CustomCard = (props: LayoutProps) => {
-  const theme = useTheme();
+export const CustomCard = (props: React.ComponentPropsWithRef<typeof View> ) => {
   return (
-    <Layout style={[{
+    <Surface style={[{
       borderWidth: 1,
-      borderColor: theme['background-basic-color-4'],
+      borderColor: Colors.grey300,
       padding: 10,
       borderRadius: 5,
       shadowColor: '#000',
@@ -21,6 +21,6 @@ export const CustomCard = (props: LayoutProps) => {
       elevation: 1,
     }, props.style]}>
       {props.children}
-    </Layout>
+    </Surface>
   );
 };

@@ -1,9 +1,8 @@
-import {Button, Input, useTheme} from '@ui-kitten/components';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
+import {Colors, IconButton, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {DeleteIcon} from '../../assets/Icons';
 import {SelectionPopup} from '../../components/SelectionPopup';
 import RestAPI, {Ingredient, IngredientUse} from '../../dao/RestAPI';
 
@@ -19,11 +18,16 @@ export const IngredientFormField = (props: Props) => {
   const [unit, setUnit] = useState<string>(props.ingredient.unit);
   const [amount, setAmount] = useState<string>(props.ingredient.amount === 0 ? '': String(props.ingredient.amount));
 
+  useEffect(() => {
+    setIngredientQuery(props.ingredient.ingredient.name);
+    setUnit(props.ingredient.unit);
+    setAmount(props.ingredient.amount === 0 ? '': String(props.ingredient.amount));
+  }, [props.ingredient]);
+
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
 
   const [availableIngredients, setAvailableIngredients] = useState<Ingredient[]>([]);
 
-  const theme = useTheme();
   const {t} = useTranslation('translation');
 
   const setIngredient = (text: string) => {
@@ -71,41 +75,39 @@ export const IngredientFormField = (props: Props) => {
 
   return (
     <>
-      <View style={{borderWidth: 1, borderColor: theme['background-basic-color-4'], padding: 10, borderRadius: 16}}>
+      <View style={{borderWidth: 1, borderColor: Colors.grey50, padding: 10, borderRadius: 16}}>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View style={{flex: 1, flexDirection: 'column'}}>
             <View style={{flex: 1, flexDirection: 'row'}}>
-              <Input
+              <TextInput
+                mode="outlined"
                 style={{width: 100}}
                 keyboardType="numeric"
                 value={(amount ? amount.toString() : '')}
-                placeholder={t('screens.editRecipe.amount')}
+                label={t('screens.editRecipe.amount')}
                 onChangeText={onAmountChange} />
               <Spacer width={5} />
               <SelectionPopup
                 style={{flex: 1}}
+                label={t('screens.editRecipe.unit')}
                 value={unit}
                 options={availableUnits.map((availableUnit, index) => ({key: index.toString(), value: availableUnit}))}
                 onValueChanged={(selectedOption) => setUnit(selectedOption.value)}
-                placeholder={t('screens.editRecipe.searchOrCreateUnit')}
               />
             </View>
             <Spacer height={5} />
             <View style={{justifyContent: 'center', flex: 1}}>
               <SelectionPopup
+                label={t('screens.editRecipe.ingredient')}
                 value={ingredientQuery}
                 options={availableIngredients.map((ingredient) => ({key: ingredient.id ? ingredient.id.toString() : '', value: ingredient.name}))}
                 onValueChanged={(selectedOption) => setIngredient(selectedOption.value)}
-                placeholder={t('screens.editRecipe.searchOrCreateIngredients')}
                 allowAdditionalValues={true}
               />
             </View>
           </View>
-          <Button
-            style={{height: 32, width: 32, margin: 10}}
-            size="small"
-            status="control"
-            accessoryLeft={<DeleteIcon />}
+          <IconButton
+            icon="delete-outline"
             onPress={() => props.onRemovePress()} />
         </View>
       </View>

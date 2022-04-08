@@ -1,10 +1,10 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {Button, Divider, Input, Layout, Text, useTheme} from '@ui-kitten/components';
 import React, {useLayoutEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
+import {Appbar, Button, Caption, Divider, Surface, TextInput, useTheme} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {DeleteIcon, PlusIcon, SaveIcon} from '../../assets/Icons';
+import {ChunkView} from '../../ChunkView';
 import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
 import {IngredientUse, Recipe, RecipeGroup} from '../../dao/RestAPI';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
@@ -14,7 +14,6 @@ import CentralStyles from '../../styles/CentralStyles';
 import {IngredientFormField} from './IngredientFromField';
 import {RecipeFormField} from './PreparationStepFormField';
 import {RecipeGroupFormField} from './RecipeGroupFormField';
-import {ChunkView} from '../../ChunkView';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeWizardScreen'>;
@@ -50,8 +49,16 @@ const RecipeWizardScreen = (props: Props) => {
       title: props.route.params?.editing ? t('screens.editRecipe.screenTitleEdit') : t('screens.editRecipe.screenTitleCreate'),
       headerRight: () => (
         <>
-          <Button onPress={() => onDeleteRecipe()} accessoryLeft={<DeleteIcon fill={theme['color-danger-default']} />} />
-          <Button onPress={() => saveRecipe()} accessoryLeft={<SaveIcon />} />
+          <Appbar.Action
+            icon="delete-outline"
+            color={theme.colors.error}
+            onPress={() => onDeleteRecipe()}
+          />
+          <Appbar.Action
+            icon="content-save-outline"
+            color={theme.colors.textOnPrimary}
+            onPress={() => saveRecipe()}
+          />
         </>
       ),
     });
@@ -145,7 +152,7 @@ const RecipeWizardScreen = (props: Props) => {
 
   const renderIngredientsSection = () =>
     <>
-      <Text category="label">{t('screens.editRecipe.ingredients')}</Text>
+      <Caption>{t('screens.editRecipe.ingredients')}</Caption>
       {recipeData.neededIngredients.map((neededIngredient, ingredientIndex) =>
         <React.Fragment key={ingredientIndex}>
           <IngredientFormField
@@ -157,16 +164,14 @@ const RecipeWizardScreen = (props: Props) => {
       )}
       <Spacer height={10} />
       <Button
-        style={{marginHorizontal: 16}}
-        size="small"
-        accessoryLeft={PlusIcon}
-        onPress={addIngredient} />
+        icon="plus"
+        onPress={addIngredient} >{t('common.more')}</Button>
     </>;
 
 
   const renderPreparationStepsSection = () =>
     <>
-      <Text category="label">{t('screens.editRecipe.preparationSteps')}</Text>
+      <Caption>{t('screens.editRecipe.preparationSteps')}</Caption>
       {recipeData.preparationSteps.map((preparationStep, preparationStepIndex) =>
         <React.Fragment key={preparationStepIndex}>
           <RecipeFormField
@@ -180,12 +185,14 @@ const RecipeWizardScreen = (props: Props) => {
         </React.Fragment>,
       )}
       <Spacer height={10} />
-      <Button size="small" accessoryLeft={PlusIcon} onPress={addPreparationStep} />
+      <Button
+        icon="plus"
+        onPress={addPreparationStep} >{t('common.more')}</Button>
     </>;
 
   const renderGroupSelectionSection = () => (
     <>
-      <Text category="label">{t('screens.editRecipe.recipeGroups')}</Text>
+      <Caption>{t('screens.editRecipe.recipeGroups')}</Caption>
       <RecipeGroupFormField
         recipeGroup={recipeData.recipeGroups?.[0]}
         onRecipeGroupChange={setRecipeGroup} />
@@ -193,7 +200,7 @@ const RecipeWizardScreen = (props: Props) => {
   );
 
   return (
-    <Layout style={styles.contentContainer}>
+    <Surface style={styles.contentContainer}>
       <ChunkView>
         <ScrollView
           keyboardShouldPersistTaps='handled'>
@@ -205,8 +212,8 @@ const RecipeWizardScreen = (props: Props) => {
           />
           <View style={[CentralStyles.contentContainer, CentralStyles.elementSpacing]}>
 
-            <Text category="label">{t('screens.editRecipe.title')}</Text>
-            <Input
+            <TextInput
+              label={t('screens.editRecipe.title')}
               value={recipeData.title}
               onChangeText={(newText) => setRecipeData({...recipeData, title: newText})}
               placeholder="Name" />
@@ -214,9 +221,9 @@ const RecipeWizardScreen = (props: Props) => {
             {renderIngredientsSection()}
             <Divider style={{marginVertical: 10}} />
             <Spacer height={15} />
-            <Text category="label">{t('screens.editRecipe.servings')}</Text>
-            <Input
-              placeholder="Serving size"
+            <TextInput
+              mode='outlined'
+              label={t('screens.editRecipe.servings')}
               keyboardType='numeric'
               value={recipeData.servings?.toString()}
               // @ts-ignore
@@ -227,11 +234,13 @@ const RecipeWizardScreen = (props: Props) => {
             {renderGroupSelectionSection()}
           </View>
           <Button
-            size="giant"
-            onPress={() => saveRecipe()}>{props.route.params?.editing ? 'Save' : 'Create'}</Button>
+            mode="contained"
+            contentStyle={{height: 50}}
+            theme={{roundness: 0}}
+            onPress={() => saveRecipe()}>{props.route.params?.editing ? t('common.save'): t('common.create')}</Button>
         </ScrollView>
       </ChunkView>
-    </Layout>
+    </Surface>
   );
 };
 

@@ -1,8 +1,8 @@
-import {Text, useTheme} from '@ui-kitten/components';
 import React from 'react';
 import {StyleProp, TextStyle, View} from 'react-native';
 import {IngredientUse} from '../dao/RestAPI';
 import fuzzy from 'fuzzy';
+import {Text, useTheme} from 'react-native-paper';
 
 interface Props {
     value: string;
@@ -13,7 +13,7 @@ export const PreparationStepText = (props: Props) => {
   const theme = useTheme();
 
   const ingredientStyle: TextStyle = {
-    color: theme['color-primary-default'],
+    color: theme.colors.primary,
     fontWeight: 'bold',
   };
 

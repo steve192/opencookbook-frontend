@@ -1,12 +1,11 @@
 import {useIsFocused} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {Button, Divider, Layout, Text} from '@ui-kitten/components';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
+import {Appbar, Button, Caption, Divider, useTheme, Text, Surface} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {EditIcon} from '../assets/Icons';
 import {ChunkView} from '../ChunkView';
 import {IngredientList} from '../components/IngredientList';
 import {RecipeImageViewPager} from '../components/RecipeImageViewPager';
@@ -23,8 +22,10 @@ export const RecipeScreen = (props: Props) => {
   const focussed = useIsFocused();
 
   const displayedRecipe = useAppSelector((state) => state.recipes.recipes.filter((recipe) => recipe.id == props.route.params.recipeId)[0]);
-  const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 0);
+  const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 1);
   const {t} = useTranslation('translation');
+
+  const theme = useTheme();
 
 
   useEffect(() => {
@@ -36,24 +37,27 @@ export const RecipeScreen = (props: Props) => {
             props.navigation.goBack();
           }
         });
+  }, [props.route.params.recipeId, focussed]);
 
-
-    props.navigation.setOptions({title: displayedRecipe ? displayedRecipe.title : 'Loading'});
-
+  useEffect(() => {
     props.navigation.setOptions({
+      title: displayedRecipe ? displayedRecipe.title : 'Loading',
       headerRight: () => (
-        <Button
+        <Appbar.Action
+          icon="pencil-outline"
+          color={theme.colors.textOnPrimary}
           onPress={() => props.navigation.navigate('RecipeWizardScreen', {
             editing: true,
             recipeId: displayedRecipe.id,
-          })} accessoryLeft={<EditIcon />} />
+          })} />
       ),
     });
-  }, [props.route.params.recipeId, focussed]);
+    displayedRecipe && setScaledServings(displayedRecipe.servings);
+  }, [displayedRecipe]);
 
   const renderIngredientsSection = () =>
     <>
-      <Text category="label">{t('screens.recipe.ingredients')}</Text>
+      <Caption>{t('screens.recipe.ingredients')}</Caption>
       <IngredientList
         ingredients={displayedRecipe.neededIngredients}
         servings={displayedRecipe.servings}
@@ -67,7 +71,7 @@ export const RecipeScreen = (props: Props) => {
 
   const renderStepsSection = () => (
     <>
-      <Text category="label">{t('screens.recipe.preparationSteps')}</Text>
+      <Caption>{t('screens.recipe.preparationSteps')}</Caption>
       <Spacer height={20} />
       {displayedRecipe && displayedRecipe.preparationSteps.map((preparationStep, index) => (
         <React.Fragment key={index}>
@@ -86,7 +90,7 @@ export const RecipeScreen = (props: Props) => {
   return (
 
     <ChunkView>
-      <Layout style={CentralStyles.fullscreen}>
+      <Surface style={CentralStyles.fullscreen}>
         <ScrollView>
           <RecipeImageViewPager
             style={{height: 320}}
@@ -96,14 +100,19 @@ export const RecipeScreen = (props: Props) => {
             {displayedRecipe && renderIngredientsSection()}
 
             <Spacer height={20} />
-            <Button onPress={() => displayedRecipe && props.navigation.navigate('GuidedCookingScreen', {recipe: displayedRecipe, scaledServings: scaledServings})}>{t('screens.recipe.startCookingButton')}</Button>
+            <Button
+              mode="contained"
+              dark={true}
+              onPress={() => displayedRecipe && props.navigation.navigate('GuidedCookingScreen', {recipe: displayedRecipe, scaledServings: scaledServings})}>
+              {t('screens.recipe.startCookingButton')}
+            </Button>
             <Spacer height={20} />
 
             {displayedRecipe && renderStepsSection()}
 
           </View>
         </ScrollView>
-      </Layout>
+      </Surface>
       <Text/>
     </ChunkView>
   );

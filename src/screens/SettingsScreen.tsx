@@ -1,26 +1,45 @@
 import {Picker} from '@react-native-picker/picker';
-import {Button, Divider, Layout, Text} from '@ui-kitten/components';
-import React from 'react';
+import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
+import {CompositeScreenProps} from '@react-navigation/native';
+import {StackScreenProps} from '@react-navigation/stack';
+import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
+import {Avatar, Button, Caption, Divider, Surface, Text, useTheme} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
-import {HardDriveIcon} from '../assets/Icons';
 import {CustomCard} from '../components/CustomCard';
 import AppPersistence from '../AppPersistence';
 import RestAPI from '../dao/RestAPI';
 import {PromptUtil} from '../helper/Prompt';
+import {MainNavigationProps, OverviewNavigationProps} from '../navigation/NavigationRoutes';
 import {logout} from '../redux/features/authSlice';
 import {changeTheme} from '../redux/features/settingsSlice';
 import {RootState} from '../redux/store';
 import CentralStyles from '../styles/CentralStyles';
 
-export const SettingsScreen = () => {
+type Props =
+    CompositeScreenProps<
+        StackScreenProps<MainNavigationProps, 'OverviewScreen'>,
+        BottomTabScreenProps<OverviewNavigationProps, 'SettingsScreen'>
+    >;
+
+export const SettingsScreen = (props: Props) => {
   const selectedTheme = useSelector((state: RootState) => state.settings.theme);
   const backendUrl = useSelector((state: RootState) => state.settings.backendUrl);
   const dispatch = useDispatch();
   const {t} = useTranslation('translation');
+  const theme = useTheme();
+
+  useEffect(() => {
+    return props.navigation.addListener('focus', () => {
+      props.navigation.getParent()?.setOptions({
+        title: t('screens.settings.screenTitle'),
+        headerRight: undefined,
+      });
+    });
+  }, [props.navigation]);
 
   const deleteAccount = () => {
     PromptUtil.show({
@@ -36,20 +55,24 @@ export const SettingsScreen = () => {
   };
   return (
     <>
-      <Layout style={[CentralStyles.fullscreen]}>
+      <Surface style={[CentralStyles.fullscreen]}>
         <View style={CentralStyles.contentContainer}>
           <ScrollView>
-            <HardDriveIcon style={{alignSelf: 'center', width: 100, height: 100}}/>
+            <Avatar.Icon style={{alignSelf: 'center', backgroundColor: 'transparent'}} size={100} color={theme.colors.text} icon="server"/>
             <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{backendUrl}</Text>
+            <Spacer height={20} />
+            <Button
+              mode='outlined'
+              onPress={() => {
+                AppPersistence.setAuthToken('');
+                AppPersistence.setRefreshToken('');
+                dispatch(logout());
+                dispatch(logout());
+              }}>Logout</Button>
             <Divider style={{marginTop: 10, marginBottom: 10}}/>
-            <Button onPress={() => {
-              AppPersistence.setAuthToken('');
-              AppPersistence.setRefreshToken('');
-              dispatch(logout());
-            }}>Logout</Button>
             <Spacer height={20} />
             <CustomCard>
-              <Text category="label">{t('screens.settings.theme')}</Text>
+              <Caption>{t('screens.settings.theme')}</Caption>
               <Picker
                 selectedValue={selectedTheme}
                 onValueChange={(value) => dispatch(changeTheme(value))}>
@@ -59,13 +82,20 @@ export const SettingsScreen = () => {
             </CustomCard>
             <Spacer height={20} />
             <View style={{padding: 10, borderWidth: 1, borderRadius: 16, borderColor: 'red'}}>
-              <Text category="label" status="danger">{t('screens.settings.dangerZone')}</Text>
+              <Caption style={{color: theme.colors.error}}>{t('screens.settings.dangerZone')}</Caption>
               <Spacer height={20} />
-              <Button onPress={deleteAccount} status="danger">{t('screens.settings.deleteAccount')}</Button>
+              <Button
+                dark={true}
+                icon="alert-circle-outline"
+                mode="contained"
+                color={theme.colors.error}
+                onPress={deleteAccount}>
+                {t('screens.settings.deleteAccount')}
+              </Button>
             </View>
           </ScrollView>
         </View>
-      </Layout>
+      </Surface>
     </>
   );
 };
