@@ -107,6 +107,11 @@ class RestAPI {
     });
   }
 
+  static async getAvailableImportHosts(): Promise<string[]> {
+    const response = await this.get('/recipes/import/available-hosts');
+    return response?.data;
+  }
+
   static async getUnits(): Promise<string[]> {
     return [
       '',
