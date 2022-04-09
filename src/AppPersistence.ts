@@ -45,7 +45,7 @@ export default class AppPersistence {
     }
     if (!backendUrl) {
       // Default backend url if not set
-      backendUrl = Constants.manifest?.extra?.defaultApiUrl ? Constants.manifest?.extra?.defaultApiUrl : '';
+      backendUrl = Constants.manifest?.extra?.defaultApiUrl ? Constants.manifest?.extra?.defaultApiUrl : 'https://beta.cookpal.io';
     }
     return backendUrl;
   }
