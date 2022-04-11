@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
-import ReactDOM from 'react-dom';
-import {Animated, Easing, GestureResponderEvent, GestureResponderHandlers, Image, LayoutRectangle, NativeTouchEvent, PanResponder, PanResponderGestureState, Platform, StyleSheet, View} from 'react-native';
-import {overlay, Portal} from 'react-native-paper';
+import {Animated, Easing, GestureResponderEvent, Image, NativeTouchEvent, PanResponder, PanResponderGestureState, Platform, StyleSheet, View} from 'react-native';
+import {Portal} from 'react-native-paper';
 import {fetchSingleImage, fetchSingleThumbnailImage} from '../redux/features/imagesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 
