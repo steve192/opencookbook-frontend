@@ -1,5 +1,7 @@
-import React, {useEffect, useState} from 'react';
-import {Image, Platform, StyleSheet, View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import ReactDOM from 'react-dom';
+import {Animated, Easing, GestureResponderEvent, GestureResponderHandlers, Image, LayoutRectangle, NativeTouchEvent, PanResponder, PanResponderGestureState, Platform, StyleSheet, View} from 'react-native';
+import {overlay, Portal} from 'react-native-paper';
 import {fetchSingleImage, fetchSingleThumbnailImage} from '../redux/features/imagesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 
@@ -21,6 +23,15 @@ export const RecipeImageComponent = (props: Props) => {
   }
   const [requestPending, setRequestPending] = useState<boolean>(false);
   const dispatch = useAppDispatch();
+
+  const [isDragging, setIsDragging] = useState(false);
+
+  const gestureInProgress = useRef<number>();
+  const initialTouches = useRef<NativeTouchEvent[]>();
+  const imageLayout = useRef<LayoutRectangle>();
+
+  const gesturePosition = new Animated.ValueXY();
+  const scaleValue = new Animated.Value(1);
 
 
   // Hook for loading images used and putting them in the buffer
@@ -44,21 +55,194 @@ export const RecipeImageComponent = (props: Props) => {
   // Blurring is stronger on web, compensate
   const blurAmount = Platform.OS === 'web' ? 2 : 10;
 
+  useEffect(() => {
+    Animated.timing(opacity, {
+      useNativeDriver: false,
+      toValue: isDragging ? 0 : 1,
+      duration: 200,
+    }).start();
+  }, [isDragging]);
+
+  const onStartGesture = async (event: GestureResponderEvent, gestureState: PanResponderGestureState ) => {
+    if (gestureInProgress.current) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+
+    gestureInProgress.current = gestureState.stateID;
+    const {touches} = event.nativeEvent;
+
+    initialTouches.current = touches;
+
+    setIsDragging(true);
+  };
+
+  const onGestureMove = (event: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+    const {touches} = event.nativeEvent;
+    if (!gestureInProgress.current) {
+      return;
+    }
+
+    if (touches.length < 2) {
+      onGestureRelease(event, gestureState);
+      return;
+    }
+
+    const currentPosition = getPosition(touches);
+    const initialPosition = getPosition(initialTouches.current);
+
+    const {x, y} = getDeltaTranslation(currentPosition, initialPosition);
+    gesturePosition.x.setValue(x);
+    gesturePosition.y.setValue(y);
+
+    // for scaling photo
+    const currentDistance = getDistance(touches);
+    const initialDistance = getDistance(initialTouches.current);
+    const newScale = getScale(currentDistance, initialDistance);
+    scaleValue.setValue(Math.max(newScale, 1));
+  };
+
+  const onGestureRelease = (event: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+    gestureInProgress.current = undefined;
+    initialTouches.current = [];
+
+    Animated.parallel([
+      Animated.timing(gesturePosition.x, {
+        useNativeDriver: false,
+        toValue: 0,
+        duration: 500,
+        easing: Easing.linear,
+      }),
+      Animated.timing(gesturePosition.y, {
+        useNativeDriver: false,
+        toValue: 0,
+        duration: 500,
+        easing: Easing.linear,
+      }),
+      Animated.timing(scaleValue, {
+        useNativeDriver: false,
+        toValue: 1,
+        duration: 500,
+        easing: Easing.linear,
+      }),
+    ]).start(() => {
+      gesturePosition.setOffset({
+        x: 0,
+        y:
+          (imageLayout.current &&
+            imageLayout.current.y) ||
+          0,
+      });
+      requestAnimationFrame(() => {
+        opacity.setValue(1);
+        setIsDragging(false);
+      });
+    });
+  };
+
+
+  const gestureHandler = PanResponder.create({
+    onStartShouldSetPanResponderCapture: ({nativeEvent}) => {
+      return nativeEvent.touches.length === 2;
+    },
+    onMoveShouldSetPanResponderCapture: ({nativeEvent}) => {
+      return nativeEvent.touches.length === 2;
+    },
+    onPanResponderGrant: onStartGesture,
+    onPanResponderMove: onGestureMove,
+    onPanResponderRelease: onGestureMove,
+    onPanResponderTerminationRequest: () => {
+      return gestureInProgress.current == undefined;
+    },
+    onPanResponderTerminate: (event, gestureState) => {
+      return onGestureRelease(event, gestureState);
+    },
+  });
+
+  const opacity = new Animated.Value(1);
+
+  const image =
+  <Animated.View
+    {...gestureHandler.panHandlers}
+    style={[{
+      opacity: opacity,
+    }, styles.recipeImage]}
+  >
+    <Image
+      onLayout={(e) => imageLayout.current = e.nativeEvent.layout}
+      blurRadius={props.blurredMode ? blurAmount : undefined}
+      source={imageData ? {uri: imageData} : require('../../assets/placeholder.png')}
+      style={[styles.recipeImage, {resizeMode: resizeMode}]} >
+    </Image>
+  </Animated.View>;
+
+
+  let overlayImage;
+  if (isDragging) {
+    const animatedStyle = {
+      transform: gesturePosition.getTranslateTransform(),
+    };
+    animatedStyle.transform.push({
+      scale: scaleValue,
+    });
+
+    const imageStyle = [
+      {
+        position: 'absolute',
+        zIndex: 10,
+        width: imageLayout.current?.width,
+        height: imageLayout.current?.height,
+        opacity: 1,
+        // opacity: isLoaded ? 1 : 0,
+      },
+      animatedStyle,
+    ];
+
+    overlayImage =
+     <Portal>
+       <View style={{
+         position: 'absolute',
+         top: 0,
+         left: 0,
+         bottom: 0,
+         right: 0,
+       }}>
+         <Animated.View style={{
+           // opacity: 0.5,
+           position: 'absolute',
+           top: 0,
+           left: 0,
+           bottom: 0,
+           right: 0,
+           //  backgroundColor: 'black',
+
+         }}>
+           <Animated.Image
+             style={imageStyle}
+             source={imageData ? {uri: imageData} : require('../../assets/placeholder.png')}>
+
+           </Animated.Image>
+         </Animated.View>
+       </View>
+     </Portal>;
+  }
+
   return (
-    <View style={[styles.recipeImage]}>
-      <Image
-        blurRadius={props.blurredMode ? blurAmount : undefined}
-        source={imageData ? {uri: imageData} : require('../../assets/placeholder.png')}
-        style={[styles.recipeImage, {resizeMode: resizeMode}]} >
-      </Image>
-      {requestPending &&
+    <>
+      <View style={[styles.recipeImage]}>
+        {image}
+        {requestPending &&
                 <View style={styles.loadingSpinner}>
                   {/* <Spinner size="giant" /> */}
                 </View>}
 
-    </View>
+      </View>
+      { isDragging && overlayImage }
+    </>
   );
 };
+
 
 const styles = StyleSheet.create({
   loadingSpinner: {
@@ -80,3 +264,34 @@ const styles = StyleSheet.create({
 
   },
 });
+
+
+export function pow2abs(a, b) {
+  return Math.pow(Math.abs(a - b), 2);
+}
+
+export function getDistance(touches) {
+  const [a, b] = touches;
+  if (a == null || b == null) {
+    return 0;
+  }
+  return Math.sqrt(pow2abs(a.pageX, b.pageX) + pow2abs(a.pageY, b.pageY));
+}
+
+export function getPosition(touches) {
+  const [a, b] = touches;
+  if (a == null || b == null) {
+    return {x: 0, y: 0};
+  }
+  return {x: a.pageX, y: a.pageY};
+}
+
+export function getDeltaTranslation(position, initial) {
+  return {x: position.x - initial.x, y: position.y - initial.y};
+}
+
+const SCALE_MULTIPLIER = 1;
+
+export function getScale(currentDistance, initialDistance) {
+  return (currentDistance / initialDistance) * SCALE_MULTIPLIER;
+}
