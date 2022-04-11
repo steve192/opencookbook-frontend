@@ -28,10 +28,11 @@ export const RecipeImageComponent = (props: Props) => {
 
   const gestureInProgress = useRef<number>();
   const initialTouches = useRef<NativeTouchEvent[]>();
-  const imageLayout = useRef<LayoutRectangle>();
+  const imageLayout = useRef<{width: number, height:number, pageX:number, pageY:number}>();
+  const imageRef = useRef<Image>();
 
-  const gesturePosition = new Animated.ValueXY();
-  const scaleValue = new Animated.Value(1);
+  const pinchImagePosition = useRef(new Animated.ValueXY());
+  const scaleValue = useRef(new Animated.Value(1));
 
 
   // Hook for loading images used and putting them in the buffer
@@ -56,8 +57,8 @@ export const RecipeImageComponent = (props: Props) => {
   const blurAmount = Platform.OS === 'web' ? 2 : 10;
 
   useEffect(() => {
-    Animated.timing(opacity, {
-      useNativeDriver: false,
+    Animated.timing(opacity.current, {
+      useNativeDriver: true,
       toValue: isDragging ? 0 : 1,
       duration: 200,
     }).start();
@@ -74,6 +75,8 @@ export const RecipeImageComponent = (props: Props) => {
     const {touches} = event.nativeEvent;
 
     initialTouches.current = touches;
+    pinchImagePosition.current.setValue({x: 0, y: 0});
+    pinchImagePosition.current.setOffset({x: imageLayout.current?.pageX, y: imageLayout.current?.pageY});
 
     setIsDragging(true);
   };
@@ -89,18 +92,18 @@ export const RecipeImageComponent = (props: Props) => {
       return;
     }
 
-    const currentPosition = getPosition(touches);
-    const initialPosition = getPosition(initialTouches.current);
+    const currentTouchPosition = getPosition(touches);
+    const initialTouchPosition = getPosition(initialTouches.current);
 
-    const {x, y} = getDeltaTranslation(currentPosition, initialPosition);
-    gesturePosition.x.setValue(x);
-    gesturePosition.y.setValue(y);
+    const {x, y} = getDeltaTranslation(currentTouchPosition, initialTouchPosition);
+    pinchImagePosition.current.x.setValue(x);
+    pinchImagePosition.current.y.setValue(y);
 
     // for scaling photo
-    const currentDistance = getDistance(touches);
-    const initialDistance = getDistance(initialTouches.current);
-    const newScale = getScale(currentDistance, initialDistance);
-    scaleValue.setValue(Math.max(newScale, 1));
+    const distanceBetweenFingers = getDistance(touches);
+    const initialDistanceBetweenFingers = getDistance(initialTouches.current);
+    const newScale = getScale(distanceBetweenFingers, initialDistanceBetweenFingers);
+    scaleValue.current.setValue(Math.max(newScale, 1));
   };
 
   const onGestureRelease = (event: GestureResponderEvent, gestureState: PanResponderGestureState) => {
@@ -108,34 +111,31 @@ export const RecipeImageComponent = (props: Props) => {
     initialTouches.current = [];
 
     Animated.parallel([
-      Animated.timing(gesturePosition.x, {
-        useNativeDriver: false,
+      Animated.timing(pinchImagePosition.current.x, {
+        useNativeDriver: true,
         toValue: 0,
         duration: 500,
         easing: Easing.linear,
       }),
-      Animated.timing(gesturePosition.y, {
-        useNativeDriver: false,
+      Animated.timing(pinchImagePosition.current.y, {
+        useNativeDriver: true,
         toValue: 0,
         duration: 500,
         easing: Easing.linear,
       }),
-      Animated.timing(scaleValue, {
-        useNativeDriver: false,
+      Animated.timing(scaleValue.current, {
+        useNativeDriver: true,
         toValue: 1,
         duration: 500,
         easing: Easing.linear,
       }),
     ]).start(() => {
-      gesturePosition.setOffset({
-        x: 0,
-        y:
-          (imageLayout.current &&
-            imageLayout.current.y) ||
-          0,
+      pinchImagePosition.current.setOffset({
+        x: imageLayout.current ? imageLayout.current?.pageX : 0,
+        y: imageLayout.current ? imageLayout.current?.pageY : 0,
       });
       requestAnimationFrame(() => {
-        opacity.setValue(1);
+        opacity.current.setValue(1);
         setIsDragging(false);
       });
     });
@@ -160,17 +160,22 @@ export const RecipeImageComponent = (props: Props) => {
     },
   });
 
-  const opacity = new Animated.Value(1);
+  const opacity = useRef(new Animated.Value(1));
 
   const image =
   <Animated.View
     {...gestureHandler.panHandlers}
     style={[{
-      opacity: opacity,
+      opacity: opacity.current,
     }, styles.recipeImage]}
   >
     <Image
-      onLayout={(e) => imageLayout.current = e.nativeEvent.layout}
+      ref={imageRef}
+      onLayout={() => {
+        imageRef.current?.measure((x, y, width, height, pageX, pageY) => {
+          imageLayout.current = {width, height, pageX, pageY};
+        });
+      }}
       blurRadius={props.blurredMode ? blurAmount : undefined}
       source={imageData ? {uri: imageData} : require('../../assets/placeholder.png')}
       style={[styles.recipeImage, {resizeMode: resizeMode}]} >
@@ -181,10 +186,10 @@ export const RecipeImageComponent = (props: Props) => {
   let overlayImage;
   if (isDragging) {
     const animatedStyle = {
-      transform: gesturePosition.getTranslateTransform(),
+      transform: pinchImagePosition.current.getTranslateTransform(),
     };
     animatedStyle.transform.push({
-      scale: scaleValue,
+      scale: scaleValue.current,
     });
 
     const imageStyle = [
@@ -209,13 +214,11 @@ export const RecipeImageComponent = (props: Props) => {
          right: 0,
        }}>
          <Animated.View style={{
-           // opacity: 0.5,
            position: 'absolute',
            top: 0,
            left: 0,
            bottom: 0,
            right: 0,
-           //  backgroundColor: 'black',
 
          }}>
            <Animated.Image
