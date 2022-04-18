@@ -53,17 +53,14 @@ export const SelectionPopup = (props: Props) => {
             props.options.filter((option) => option.value.toLowerCase().startsWith(value.toLowerCase())) :
             props.options;
 
+    const listItems: ListItemData[] = [{option: {key: '', value: t('common.createImperative') + ' ' + value, newlyCreated: true}}];
     if (filteredItems.length > 0) {
-      const listItems: ListItemData[] = [];
       filteredItems.forEach((item) => {
         listItems.push({option: item});
       });
-      return listItems;
     }
-
-    return [{option: {key: '', value: t('common.createImperative') + ' ' + value, newlyCreated: true}}];
+    return listItems;
   };
-
 
   return (
     <>
