@@ -51,6 +51,7 @@ export const RecipeImageViewPager = (props: Props) => {
 
                     props.images.map((image, imageIndex) =>
                       <RecipeImageComponent
+                        zoomable={true}
                         useThumbnail={false}
                         key={image.uuid}
                         uuid={image.uuid} />,
