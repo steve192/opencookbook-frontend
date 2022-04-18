@@ -54,7 +54,6 @@ const ReduxWrappedApp = () => {
   };
   return (
     <PaperProvider theme={selectedTheme === 'light' ? paperTheme : darkPaperTheme}>
-      <StatusBar barStyle={selectedTheme === 'light' ? 'light-content' : 'dark-content'} />
       <MainNavigation />
       <Prompt/>
     </PaperProvider>
