@@ -68,9 +68,9 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     dispatch(updateSingleWeekplanDay(newWeekplanDay));
     setRecipeSelectionVisible(false);
   };
-  const removeRecipeFromWeekplanDay = (recipeId: number | string, weekplanDay: WeekplanDay) => {
+  const removeRecipeFromWeekplanDay = (index: number, weekplanDay: WeekplanDay) => {
     const newWeekplanDay = {...weekplanDay, recipes: [...weekplanDay.recipes]};
-    newWeekplanDay.recipes = newWeekplanDay.recipes.filter((existingRecipe) => existingRecipe.id !== recipeId);
+    newWeekplanDay.recipes.splice(index, 1);
     dispatch(updateSingleWeekplanDay(newWeekplanDay));
     setRecipeSelectionVisible(false);
   };
@@ -113,7 +113,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
                         key={weekplanDay.day + index}
                         // @ts-ignore
                         onPress={() => openRecipe(recipe.id)}
-                        onRemovePress={() => removeRecipeFromWeekplanDay(recipe.id, weekplanDay)}
+                        onRemovePress={() => removeRecipeFromWeekplanDay(index, weekplanDay)}
                         title={recipe.title}
                         imageUuid={recipe.titleImageUuid} />;
                     } else if (recipe.type === 'SIMPLE_RECIPE') {
