@@ -9,6 +9,7 @@ interface Props {
     forceFitScaling?: boolean
     useThumbnail?: boolean
     blurredMode?: boolean
+    zoomable?: boolean
 }
 export const RecipeImageComponent = (props: Props) => {
   let imageData;
@@ -161,9 +162,10 @@ export const RecipeImageComponent = (props: Props) => {
 
   const opacity = useRef(new Animated.Value(1));
 
+  const animatedViewProps = props.zoomable ? gestureHandler.panHandlers: null;
   const image =
   <Animated.View
-    {...gestureHandler.panHandlers}
+    {...animatedViewProps}
     style={[{
       opacity: opacity.current,
     }, styles.recipeImage]}
