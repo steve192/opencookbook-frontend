@@ -7,6 +7,7 @@ import './src/i18n/config';
 import MainNavigation from './src/navigation/MainNavigation';
 import {RootState, store} from './src/redux/store';
 import {Colors, DarkTheme, DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
+import {StatusBar} from 'react-native';
 
 enableScreens();
 
@@ -53,6 +54,7 @@ const ReduxWrappedApp = () => {
   };
   return (
     <PaperProvider theme={selectedTheme === 'light' ? paperTheme : darkPaperTheme}>
+      <StatusBar barStyle={selectedTheme === 'light' ? 'light-content' : 'dark-content'} />
       <MainNavigation />
       <Prompt/>
     </PaperProvider>
