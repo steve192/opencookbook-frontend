@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Animated, Easing, GestureResponderEvent, Image, NativeTouchEvent, PanResponder, PanResponderGestureState, Platform, StyleSheet, View} from 'react-native';
 import {Portal} from 'react-native-paper';
 import {fetchSingleImage, fetchSingleThumbnailImage} from '../redux/features/imagesSlice';
@@ -141,24 +141,31 @@ export const RecipeImageComponent = (props: Props) => {
     });
   };
 
+  useEffect(() => {
 
-  const gestureHandler = PanResponder.create({
-    onStartShouldSetPanResponderCapture: ({nativeEvent}) => {
-      return nativeEvent.touches.length === 2;
-    },
-    onMoveShouldSetPanResponderCapture: ({nativeEvent}) => {
-      return nativeEvent.touches.length === 2;
-    },
-    onPanResponderGrant: onStartGesture,
-    onPanResponderMove: onGestureMove,
-    onPanResponderRelease: onGestureMove,
-    onPanResponderTerminationRequest: () => {
-      return gestureInProgress.current == undefined;
-    },
-    onPanResponderTerminate: (event, gestureState) => {
-      return onGestureRelease(event, gestureState);
-    },
-  });
+  }, []);
+
+
+  const gestureHandler = useMemo(() => {
+    return PanResponder.create({
+      onStartShouldSetPanResponderCapture: ({nativeEvent}) => {
+        return nativeEvent.touches.length === 2;
+      },
+      onMoveShouldSetPanResponderCapture: ({nativeEvent}) => {
+        return nativeEvent.touches.length === 2;
+      },
+      onPanResponderGrant: onStartGesture,
+      onPanResponderMove: onGestureMove,
+      onPanResponderRelease: onGestureMove,
+      onPanResponderTerminationRequest: () => {
+        return gestureInProgress.current == undefined;
+      },
+      onPanResponderTerminate: (event, gestureState) => {
+        return onGestureRelease(event, gestureState);
+      },
+    });
+  }, []);
+
 
   const opacity = useRef(new Animated.Value(1));
 
