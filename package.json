@@ -10,7 +10,7 @@
     "publish-expo": "expo-cli publish --non-interactive",
     "publish-expo-beta": "expo-cli publish --release-channel=beta --non-interactive",
     "publish-preview": "expo-cli publish --release-channel=preview --non-interactive",
-    "build-android": "eas build --platform android --local"
+    "build-android": "eas build --platform android"
   },
   "dependencies": {
     "@eva-design/eva": "^2.1.1",
