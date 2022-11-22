@@ -1,12 +1,12 @@
 /* eslint-disable react/display-name */
 import React from 'react';
+import {Colors, DarkTheme, DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 import {enableScreens} from 'react-native-screens';
 import {Provider, useSelector} from 'react-redux';
 import {Prompt} from './src/helper/Prompt';
 import './src/i18n/config';
 import MainNavigation from './src/navigation/MainNavigation';
 import {RootState, store} from './src/redux/store';
-import {Colors, DarkTheme, DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
 
 enableScreens();
 

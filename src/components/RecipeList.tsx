@@ -12,9 +12,9 @@ import CentralStyles from '../styles/CentralStyles';
 import {RecipeImageComponent} from './RecipeImageComponent';
 
 interface Props {
-    shownRecipeGroupId: number | undefined
-    onRecipeClick: (recipe: Recipe) => void
-    onRecipeGroupClick: (recipeGroup: RecipeGroup) => void
+  shownRecipeGroupId: number | undefined
+  onRecipeClick: (recipe: Recipe) => void
+  onRecipeGroupClick: (recipeGroup: RecipeGroup) => void
 }
 export const RecipeList = (props: Props) => {
   const myRecipes = useAppSelector((state) => state.recipes.recipes);
@@ -40,7 +40,7 @@ export const RecipeList = (props: Props) => {
   };
   useEffect(refreshData, []);
 
-  const getShownItems = (includeGroupedRecipes=false): (RecipeGroup | Recipe)[] => {
+  const getShownItems = (includeGroupedRecipes = false): (RecipeGroup | Recipe)[] => {
     if (props.shownRecipeGroupId) {
       // Navigated in a group, return only group items
       return myRecipes.filter((recipe) => recipe.recipeGroups.filter((group) => group.id === props.shownRecipeGroupId).length > 0);
@@ -54,7 +54,7 @@ export const RecipeList = (props: Props) => {
   };
 
   const dataProvider = useMemo(() => {
-    let shownItems: (Recipe|RecipeGroup)[] = [];
+    let shownItems: (Recipe | RecipeGroup)[] = [];
     if (searchString !== '') {
       shownItems = getShownItems(true);
       shownItems = fuzzy
@@ -93,7 +93,7 @@ export const RecipeList = (props: Props) => {
     const firstFewGroupRecipes = myRecipes.filter((recipe) => recipe.recipeGroups.find((group) => group.id === recipeGroup.id)).splice(0, 4);
     return (
       <Pressable
-        key={'rg'+recipeGroup.id}
+        key={'rg' + recipeGroup.id}
         style={[
           styles.recipeCard,
           {
@@ -156,7 +156,7 @@ export const RecipeList = (props: Props) => {
   const updateSearchString = (newValue: string) => {
     setSearchStringPendingInput(newValue);
     searchDebounceTimer.current && clearTimeout(searchDebounceTimer.current);
-    searchDebounceTimer.current = setTimeout(()=>{
+    searchDebounceTimer.current = setTimeout(() => {
       // User has not entered anything for some time, start searching
       setSearchString(newValue);
     }, 500);
@@ -171,38 +171,39 @@ export const RecipeList = (props: Props) => {
     <View
       style={styles.container}
       onLayout={(event) => {
-        setComponentWith(event.nativeEvent.layout.width);
+        event.nativeEvent.layout.width > 0 && setComponentWith(event.nativeEvent.layout.width);
       }}>
 
 
-      { getShownItems().length > 0 && numberOfColumns !== 0 && componentWidth > 10?
-      <RecyclerListView
-        style={{flex: 1}}
-        layoutProvider={_layoutProvider}
-        dataProvider={dataProvider}
-        renderAheadOffset={1000}
-        canChangeSize={true}
-        // applyWindowCorrection={(offsetX, offsetY, windowCorrection) => ({
-        //   windowShift: 800,
-        // })}
-        scrollViewProps={{
-          refreshControl: (
-            <RefreshControl
-              refreshing={listRefreshing}
-              onRefresh={() => refreshData()}
-            />
-          ),
-        }}
-        // forceNonDeterministicRendering={true}
-        rowRenderer={renderItem} /> :
-      renderNoItemsNotice() }
+      {getShownItems().length > 0 && numberOfColumns !== 0 && componentWidth > 10 ?
+        <RecyclerListView
+          style={{flex: 1}}
+          suppressBoundedSizeException={true}
+          layoutProvider={_layoutProvider}
+          dataProvider={dataProvider}
+          renderAheadOffset={1000}
+          canChangeSize={true}
+          // applyWindowCorrection={(offsetX, offsetY, windowCorrection) => ({
+          //   windowShift: 800,
+          // })}
+          scrollViewProps={{
+            refreshControl: (
+              <RefreshControl
+                refreshing={listRefreshing}
+                onRefresh={() => refreshData()}
+              />
+            ),
+          }}
+          // forceNonDeterministicRendering={true}
+          rowRenderer={renderItem} /> :
+        renderNoItemsNotice()}
 
       <View style={[CentralStyles.contentContainer, styles.searchContainer]}>
         <Searchbar
           value={searchStringPendingInput}
           onChangeText={updateSearchString}
           style={{flex: 1, width: '100%', maxWidth: 500, alignSelf: 'center'}}
-          placeholder={t('screens.overview.searchPlaceholder')}/>
+          placeholder={t('screens.overview.searchPlaceholder')} />
       </View>
     </View>
   );
@@ -213,6 +214,8 @@ const styles = StyleSheet.create({
     alignContent: 'flex-start',
     flexDirection: 'column',
     flex: 1,
+    minHeight: 1,
+    minWidth: 1,
   },
   list: {
     flex: 1,
@@ -251,7 +254,7 @@ class LayoutUtil {
   static getLayoutProvider(componentWidth: number, numberOfColumns: number) {
     return new LayoutProvider(
         (index) => {
-          return index === 0 ? 'first': 'normal'; // Since we have just one view type
+          return index === 0 ? 'first' : 'normal'; // Since we have just one view type
         },
         (type, dim, index) => {
           if (type === 'first') {

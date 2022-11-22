@@ -6,6 +6,10 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "androidStatusBar": {
+      // "backgroundColor": "#C2185B",
+      "translucent": true
+    },
     "splash": {
       "image": "./assets/login-screen.png",
       "resizeMode": "cover",
@@ -16,9 +20,7 @@
       "checkAutomatically": "ON_ERROR_RECOVERY",
       "url": "https://expo.dev/@steve192/opencookbook"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "buildNumber": "0.0.1",
@@ -41,10 +43,7 @@
               "pathPrefix": "/"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ],
       "adaptiveIcon": {
@@ -57,7 +56,7 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
       ],
-      "versionCode": 14
+      "versionCode": 17
     },
     "web": {
       "favicon": "./assets/icon.png"
