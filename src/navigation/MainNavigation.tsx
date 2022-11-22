@@ -191,7 +191,6 @@ const MainNavigation = () => {
 
   return (
     <NavigationContainer
-
       linking={{
         prefixes: [createURL('/'), 'https://beta.cookpal.io/'],
         config: {
