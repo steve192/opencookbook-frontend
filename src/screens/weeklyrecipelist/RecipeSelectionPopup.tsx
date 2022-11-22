@@ -8,14 +8,14 @@ import {Recipe, RecipeGroup} from '../../dao/RestAPI';
 import CentralStyles from '../../styles/CentralStyles';
 
 interface Props {
-    visible: boolean;
-    onClose: () => void;
-    onRecipeSelected: (recipe: Recipe) => void;
-    onSimpleRecipeSelected: (name: string) => void;
+  visible: boolean;
+  onClose: () => void;
+  onRecipeSelected: (recipe: Recipe) => void;
+  onSimpleRecipeSelected: (name: string) => void;
 }
 
 export const RecipeSelectionPopup = (props: Props) => {
-  const [selectionType, setSelectionType] = useState<undefined|'simple'|'normal'>(undefined);
+  const [selectionType, setSelectionType] = useState<undefined | 'simple' | 'normal'>(undefined);
   const [shownRecipeGroup, setShownRecipeGroup] = useState<RecipeGroup>();
   const [simpleRecipeName, setSimpleRecipeName] = useState('');
   const onRecipeGroupSelected = (recipeGroup: RecipeGroup) => {
@@ -42,7 +42,7 @@ export const RecipeSelectionPopup = (props: Props) => {
           label={t('screens.recipeselectionpopup.simplerecipeinput')}
           multiline={true}
         />
-        <Spacer height={20}/>
+        <Spacer height={20} />
         <Button
           onPress={() => props.onSimpleRecipeSelected(simpleRecipeName)}
           mode="contained">{t('screens.recipeselectionpopup.savesimplerecipe')}</Button>
@@ -57,7 +57,7 @@ export const RecipeSelectionPopup = (props: Props) => {
             <Caption>{t('screens.recipeselectionpopup.normaldescription')}</Caption>
           </>
         </TouchableRipple>
-        <Divider/>
+        <Divider />
         <TouchableRipple
           style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}
           onPress={() => setSelectionType('simple')}>
