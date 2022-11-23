@@ -15,10 +15,13 @@
       "resizeMode": "cover",
       "backgroundColor": "#295700"
     },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
     "updates": {
       "fallbackToCacheTimeout": 0,
       "checkAutomatically": "ON_ERROR_RECOVERY",
-      "url": "https://expo.dev/@steve192/opencookbook"
+      "url": "https://u.expo.dev/1d5a474b-fc28-458a-a1e4-c9b4468bbfff"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -56,7 +59,7 @@
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
       ],
-      "versionCode": 17
+      "versionCode": 18
     },
     "web": {
       "favicon": "./assets/icon.png"

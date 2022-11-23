@@ -185,7 +185,7 @@ jobs:
         run: npm ci
 
       - name: publish to expo beta
-        run: npm run publish-expo
+        run: npm run publish-expo-production
         env:
           DEFAULT_API_URL: https://beta.cookpal.io
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
