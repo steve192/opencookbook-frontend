@@ -16,9 +16,7 @@ export const ViewPager = (props: Props) => {
     ref={pagerRef.current}
     initialPage={props.selectedIndex}
     onPageSelected={(event) => props.onIndexChange(event.nativeEvent.position)}
-    style={props.style}>
-    <Fragment >
-      {props.children}
-    </Fragment>
+    style={[props.style, {flex: 1}]}>
+    {props.children}
   </PagerView>;
 };
