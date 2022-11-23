@@ -107,7 +107,7 @@ const LoginScreen = ({route, navigation}: Props) => {
           </Button>
         </View>
       </View>
-      <Text style={styles.footer}>Alpha build @ {Constants.manifest?.extra?.buildTime}</Text>
+      <Text style={styles.footer}>Alpha build @ {Constants.expoConfig?.extra?.buildTime}</Text>
       {settingsModal}
     </LoginBackdrop>
   );
