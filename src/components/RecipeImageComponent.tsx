@@ -16,9 +16,9 @@ export const RecipeImageComponent = (props: Props) => {
   if (props.uuid) {
     // @ts-ignore
     if (props.useThumbnail) {
-      imageData = useAppSelector((state) => state.images.thumbnailImageMap[props.uuid]);
+      imageData = useAppSelector((state) => state.images.thumbnailImageMap[props.uuid!]);
     } else {
-      imageData = useAppSelector((state) => state.images.imageMap[props.uuid]);
+      imageData = useAppSelector((state) => state.images.imageMap[props.uuid!]);
     }
   }
   const [requestPending, setRequestPending] = useState<boolean>(false);
@@ -29,7 +29,7 @@ export const RecipeImageComponent = (props: Props) => {
   const gestureInProgress = useRef<number>();
   const initialTouches = useRef<NativeTouchEvent[]>();
   const initialImageSize = useRef<{width: number, height:number}>();
-  const imageRef = useRef<Image>();
+  const imageRef = useRef<Image>(null);
 
   const pinchImagePosition = useRef(new Animated.ValueXY());
   const scaleValue = useRef(new Animated.Value(1));
@@ -97,17 +97,14 @@ export const RecipeImageComponent = (props: Props) => {
       return;
     }
 
-    const currentTouchPosition = getPosition(touches);
-    const initialTouchPosition = getPosition(initialTouches.current);
+    const currentTouchPosition = getMiddleBetween2Touches(touches);
+    const initialTouchPosition = getMiddleBetween2Touches(initialTouches.current!);
 
     const {x, y} = getDeltaTranslation(currentTouchPosition, initialTouchPosition);
     pinchImagePosition.current.x.setValue(x);
     pinchImagePosition.current.y.setValue(y);
 
-    // for scaling photo
-    const distanceBetweenFingers = getDistance(touches);
-    const initialDistanceBetweenFingers = getDistance(initialTouches.current);
-    const newScale = getScale(distanceBetweenFingers, initialDistanceBetweenFingers);
+    const newScale = calculateScaleFromTouches(touches, initialTouches.current!);
     scaleValue.current.setValue(Math.max(newScale, 1));
   };
 
@@ -191,8 +188,7 @@ export const RecipeImageComponent = (props: Props) => {
       ref={imageRef}
       blurRadius={props.blurredMode ? blurAmount : undefined}
       source={imageData ? {uri: imageData} : require('../../assets/placeholder.png')}
-      style={[styles.recipeImage, {resizeMode: resizeMode}]} >
-    </Image>
+      style={[styles.recipeImage, {resizeMode: resizeMode}]} />
   </Animated.View>;
 
 
@@ -211,8 +207,8 @@ export const RecipeImageComponent = (props: Props) => {
         zIndex: 10,
         // These were saved when the touching started
         // This is not determed via onLayout since the images can be off screen (pagerview) when onLayout is called
-        width: initialImageSize.current.width,
-        height: initialImageSize.current.height,
+        width: initialImageSize.current?.width,
+        height: initialImageSize.current?.height,
         opacity: 1,
         // opacity: isLoaded ? 1 : 0,
       },
@@ -283,11 +279,18 @@ const styles = StyleSheet.create({
 });
 
 
-export function pow2abs(a, b) {
+function calculateScaleFromTouches(touches: NativeTouchEvent[], initialTouches: NativeTouchEvent[]) {
+  const distanceBetweenFingers = getDistanceBetween2Touches(touches);
+  const initialDistanceBetweenFingers = getDistanceBetween2Touches(initialTouches);
+  const scale = calculateScale(distanceBetweenFingers, initialDistanceBetweenFingers);
+  return scale;
+}
+
+function pow2abs(a: number, b: number) {
   return Math.pow(Math.abs(a - b), 2);
 }
 
-export function getDistance(touches) {
+function getDistanceBetween2Touches(touches: NativeTouchEvent[]) {
   const [a, b] = touches;
   if (a == null || b == null) {
     return 0;
@@ -295,7 +298,7 @@ export function getDistance(touches) {
   return Math.sqrt(pow2abs(a.pageX, b.pageX) + pow2abs(a.pageY, b.pageY));
 }
 
-export function getPosition(touches) {
+function getMiddleBetween2Touches(touches: NativeTouchEvent[]) {
   const [a, b] = touches;
   if (a == null || b == null) {
     return {x: 0, y: 0};
@@ -303,12 +306,12 @@ export function getPosition(touches) {
   return {x: a.pageX, y: a.pageY};
 }
 
-export function getDeltaTranslation(position, initial) {
+function getDeltaTranslation(position: {x: number, y:number}, initial: {x: number, y:number}) {
   return {x: position.x - initial.x, y: position.y - initial.y};
 }
 
 const SCALE_MULTIPLIER = 1;
 
-export function getScale(currentDistance, initialDistance) {
+function calculateScale(currentDistance: number, initialDistance: number) {
   return (currentDistance / initialDistance) * SCALE_MULTIPLIER;
 }
