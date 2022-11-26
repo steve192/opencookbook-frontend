@@ -14,8 +14,6 @@ export const ViewPager = (props: Props) => {
   const pagerRef = useRef<PagerView>();
 
   useEffect(() => {
-    console.log(pagerRef);
-    console.log(props.selectedIndex);
     pagerRef.current?.setPage(props.selectedIndex);
   }, [props.selectedIndex]);
 
