@@ -3,6 +3,7 @@ import {Animated, Easing, GestureResponderEvent, Image, NativeTouchEvent, PanRes
 import {Portal} from 'react-native-paper';
 import {fetchSingleImage, fetchSingleThumbnailImage} from '../redux/features/imagesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {RootState} from '../redux/store';
 
 interface Props {
     uuid?: string
@@ -12,15 +13,14 @@ interface Props {
     zoomable?: boolean
 }
 export const RecipeImageComponent = (props: Props) => {
-  let imageData;
-  if (props.uuid) {
-    // @ts-ignore
-    if (props.useThumbnail) {
-      imageData = useAppSelector((state) => state.images.thumbnailImageMap[props.uuid!]);
-    } else {
-      imageData = useAppSelector((state) => state.images.imageMap[props.uuid!]);
-    }
-  }
+  const selector = !props.uuid ?
+      () => undefined :
+      props.useThumbnail ?
+      (state: RootState) => state.images.thumbnailImageMap[props.uuid!] :
+      (state: RootState) => state.images.imageMap[props.uuid!];
+
+  const imageData = useAppSelector(selector);
+
   const [requestPending, setRequestPending] = useState<boolean>(false);
   const dispatch = useAppDispatch();
 
