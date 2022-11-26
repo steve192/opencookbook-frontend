@@ -28,7 +28,7 @@ export const RecipeImageComponent = (props: Props) => {
 
   const gestureInProgress = useRef<number>();
   const initialTouches = useRef<NativeTouchEvent[]>();
-  const imageLayout = useRef<{width: number, height:number, pageX:number, pageY:number}>();
+  const initialImageSize = useRef<{width: number, height:number}>();
   const imageRef = useRef<Image>();
 
   const pinchImagePosition = useRef(new Animated.ValueXY());
@@ -71,14 +71,19 @@ export const RecipeImageComponent = (props: Props) => {
     event.preventDefault();
     event.stopPropagation();
 
-    gestureInProgress.current = gestureState.stateID;
     const {touches} = event.nativeEvent;
 
-    initialTouches.current = touches;
-    pinchImagePosition.current.setValue({x: 0, y: 0});
-    pinchImagePosition.current.setOffset({x: imageLayout.current?.pageX, y: imageLayout.current?.pageY});
-
-    setIsDragging(true);
+    return new Promise<void>((resolve) => {
+      imageRef.current?.measure((x, y, width, height, pageX, pageY) => {
+        pinchImagePosition.current.setValue({x: 0, y: 0});
+        pinchImagePosition.current.setOffset({x: pageX, y: pageY});
+        initialImageSize.current = {width: width, height: height};
+        initialTouches.current = touches;
+        gestureInProgress.current = gestureState.stateID;
+        setIsDragging(true);
+        resolve();
+      });
+    });
   };
 
   const onGestureMove = (event: GestureResponderEvent, gestureState: PanResponderGestureState) => {
@@ -107,36 +112,41 @@ export const RecipeImageComponent = (props: Props) => {
   };
 
   const onGestureRelease = (event: GestureResponderEvent, gestureState: PanResponderGestureState) => {
-    gestureInProgress.current = undefined;
-    initialTouches.current = [];
+    return new Promise<void>((resolve) => {
+      imageRef.current?.measure((x, y, width, height, pageX, pageY) => {
+        gestureInProgress.current = undefined;
+        initialTouches.current = [];
 
-    Animated.parallel([
-      Animated.timing(pinchImagePosition.current.x, {
-        useNativeDriver: true,
-        toValue: 0,
-        duration: 500,
-        easing: Easing.linear,
-      }),
-      Animated.timing(pinchImagePosition.current.y, {
-        useNativeDriver: true,
-        toValue: 0,
-        duration: 500,
-        easing: Easing.linear,
-      }),
-      Animated.timing(scaleValue.current, {
-        useNativeDriver: true,
-        toValue: 1,
-        duration: 500,
-        easing: Easing.linear,
-      }),
-    ]).start(() => {
-      pinchImagePosition.current.setOffset({
-        x: imageLayout.current ? imageLayout.current?.pageX : 0,
-        y: imageLayout.current ? imageLayout.current?.pageY : 0,
-      });
-      requestAnimationFrame(() => {
-        opacity.current.setValue(1);
-        setIsDragging(false);
+        Animated.parallel([
+          Animated.timing(pinchImagePosition.current.x, {
+            useNativeDriver: true,
+            toValue: 0,
+            duration: 500,
+            easing: Easing.linear,
+          }),
+          Animated.timing(pinchImagePosition.current.y, {
+            useNativeDriver: true,
+            toValue: 0,
+            duration: 500,
+            easing: Easing.linear,
+          }),
+          Animated.timing(scaleValue.current, {
+            useNativeDriver: true,
+            toValue: 1,
+            duration: 500,
+            easing: Easing.linear,
+          }),
+        ]).start(() => {
+          pinchImagePosition.current.setOffset({
+            x: pageX,
+            y: pageY,
+          });
+          requestAnimationFrame(() => {
+            opacity.current.setValue(1);
+            setIsDragging(false);
+          });
+        });
+        resolve();
       });
     });
   };
@@ -179,11 +189,6 @@ export const RecipeImageComponent = (props: Props) => {
   >
     <Image
       ref={imageRef}
-      onLayout={() => {
-        imageRef.current?.measure((x, y, width, height, pageX, pageY) => {
-          imageLayout.current = {width, height, pageX, pageY};
-        });
-      }}
       blurRadius={props.blurredMode ? blurAmount : undefined}
       source={imageData ? {uri: imageData} : require('../../assets/placeholder.png')}
       style={[styles.recipeImage, {resizeMode: resizeMode}]} >
@@ -204,8 +209,10 @@ export const RecipeImageComponent = (props: Props) => {
       {
         position: 'absolute',
         zIndex: 10,
-        width: imageLayout.current?.width,
-        height: imageLayout.current?.height,
+        // These were saved when the touching started
+        // This is not determed via onLayout since the images can be off screen (pagerview) when onLayout is called
+        width: initialImageSize.current.width,
+        height: initialImageSize.current.height,
         opacity: 1,
         // opacity: isLoaded ? 1 : 0,
       },
@@ -232,7 +239,6 @@ export const RecipeImageComponent = (props: Props) => {
            <Animated.Image
              style={imageStyle}
              source={imageData ? {uri: imageData} : require('../../assets/placeholder.png')}>
-
            </Animated.Image>
          </Animated.View>
        </View>
