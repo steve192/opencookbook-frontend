@@ -1,5 +1,4 @@
-import React, {Fragment, ReactNode, useRef} from 'react';
-import {useEffect} from 'react';
+import React, {Fragment, ReactNode, useRef, useEffect} from 'react';
 import {StyleProp, ViewStyle} from 'react-native';
 import PagerView from 'react-native-pager-view';
 
