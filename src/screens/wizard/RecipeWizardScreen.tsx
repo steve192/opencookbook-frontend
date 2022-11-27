@@ -101,7 +101,7 @@ const RecipeWizardScreen = (props: Props) => {
     ingredientsCopy.push({
       ingredient: {id: undefined, name: ''},
       unit: '',
-      amount: 1,
+      amount: 0,
     });
     setRecipeData({...recipeData, neededIngredients: ingredientsCopy});
   };
