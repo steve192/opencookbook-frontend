@@ -144,7 +144,7 @@ export const RecipeList = (props: Props) => {
   );
 
   const renderNoItemsNotice = () => (
-    <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', flex: 1}}>
+    <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', flex: 1, position: 'absolute'}}>
       <MaterialIcons name="no-food" size={64} color={theme.colors.disabled} />
       <Headline style={{padding: 64, color: theme.colors.disabled}}>
         {t('screens.overview.noRecipesMessage')}
@@ -166,6 +166,7 @@ export const RecipeList = (props: Props) => {
   numberOfColumns = numberOfColumns > 4 ? 4 : numberOfColumns;
   const _layoutProvider = LayoutUtil.getLayoutProvider(componentWidth, numberOfColumns);
 
+  const showNoItemsNotice = !(getShownItems().length > 0 && numberOfColumns !== 0 && componentWidth > 10);
 
   return (
     <View
@@ -175,28 +176,28 @@ export const RecipeList = (props: Props) => {
       }}>
 
 
-      {getShownItems().length > 0 && numberOfColumns !== 0 && componentWidth > 10 ?
-        <RecyclerListView
-          style={{flex: 1}}
-          suppressBoundedSizeException={true}
-          layoutProvider={_layoutProvider}
-          dataProvider={dataProvider}
-          renderAheadOffset={1000}
-          canChangeSize={true}
-          // applyWindowCorrection={(offsetX, offsetY, windowCorrection) => ({
-          //   windowShift: 800,
-          // })}
-          scrollViewProps={{
-            refreshControl: (
-              <RefreshControl
-                refreshing={listRefreshing}
-                onRefresh={() => refreshData()}
-              />
-            ),
-          }}
-          // forceNonDeterministicRendering={true}
-          rowRenderer={renderItem} /> :
-        renderNoItemsNotice()}
+      <RecyclerListView
+        style={{flex: 1}}
+        suppressBoundedSizeException={true}
+        layoutProvider={_layoutProvider}
+        dataProvider={dataProvider}
+        renderAheadOffset={1000}
+        canChangeSize={true}
+        // applyWindowCorrection={(offsetX, offsetY, windowCorrection) => ({
+        //   windowShift: 800,
+        // })}
+        scrollViewProps={{
+          refreshControl: (
+            <RefreshControl
+              refreshing={listRefreshing}
+              onRefresh={() => refreshData()}
+            />
+          ),
+        }}
+        // forceNonDeterministicRendering={true}
+        rowRenderer={renderItem} />
+
+      { showNoItemsNotice && renderNoItemsNotice()}
 
       <View style={[CentralStyles.contentContainer, styles.searchContainer]}>
         <Searchbar
