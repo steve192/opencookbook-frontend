@@ -38,9 +38,9 @@ export const IngredientFormField = (props: Props) => {
   const invokeIngredientUpdate = (ingredientName: string, newAmount: string, newUnit: string) => {
     const existingIngredient = availableIngredients.find((ingredient) => ingredient.name.toLowerCase() === ingredientName.toLowerCase());
     if (existingIngredient) {
-      props.onIngredientChange({ingredient: existingIngredient, amount: parseFloat(newAmount), unit: newUnit});
+      props.onIngredientChange({ingredient: existingIngredient, amount: newAmount === '' ? 0 : parseFloat(newAmount), unit: newUnit});
     } else {
-      props.onIngredientChange({ingredient: {name: ingredientName}, amount: parseFloat(newAmount), unit: newUnit});
+      props.onIngredientChange({ingredient: {name: ingredientName}, amount: newAmount === '' ? 0 : parseFloat(newAmount), unit: newUnit});
     }
   };
 
