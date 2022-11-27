@@ -110,27 +110,30 @@ export const RecipeImageComponent = (props: Props) => {
 
   const onGestureRelease = (event: GestureResponderEvent, gestureState: PanResponderGestureState) => {
     return new Promise<void>((resolve) => {
+      if (!gestureInProgress.current) {
+        return;
+      }
+      gestureInProgress.current = undefined;
       imageRef.current?.measure((x, y, width, height, pageX, pageY) => {
-        gestureInProgress.current = undefined;
         initialTouches.current = [];
 
         Animated.parallel([
           Animated.timing(pinchImagePosition.current.x, {
             useNativeDriver: true,
             toValue: 0,
-            duration: 500,
+            duration: 100,
             easing: Easing.linear,
           }),
           Animated.timing(pinchImagePosition.current.y, {
             useNativeDriver: true,
             toValue: 0,
-            duration: 500,
+            duration: 100,
             easing: Easing.linear,
           }),
           Animated.timing(scaleValue.current, {
             useNativeDriver: true,
             toValue: 1,
-            duration: 500,
+            duration: 100,
             easing: Easing.linear,
           }),
         ]).start(() => {
@@ -139,6 +142,7 @@ export const RecipeImageComponent = (props: Props) => {
             y: pageY,
           });
           requestAnimationFrame(() => {
+            console.log('done');
             opacity.current.setValue(1);
             setIsDragging(false);
           });
@@ -210,7 +214,6 @@ export const RecipeImageComponent = (props: Props) => {
         width: initialImageSize.current?.width,
         height: initialImageSize.current?.height,
         opacity: 1,
-        // opacity: isLoaded ? 1 : 0,
       },
       animatedStyle,
     ];
