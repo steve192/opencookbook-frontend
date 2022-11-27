@@ -48,22 +48,31 @@ export const SelectionPopup = (props: Props) => {
     setModalVisible(false);
   };
 
+  const sortFunction = (a:Option, b:Option): number => {
+    if (a.value.toLocaleLowerCase() > b.value.toLocaleLowerCase()) {
+      return 1;
+    } else if (a.value == b.value) {
+      return 0;
+    } else {
+      return -1;
+    }
+  };
+
   const getListItemData = (): ListItemData[] => {
     const filteredItems = value ?
             props.options.filter((option) => option.value.toLowerCase().startsWith(value.toLowerCase())) :
             props.options;
 
+    filteredItems.sort(sortFunction);
+
+    const listItems: ListItemData[] = value.length > 0 ? [{option: {key: '', value: t('common.createImperative') + ' ' + value, newlyCreated: true}}] : [];
     if (filteredItems.length > 0) {
-      const listItems: ListItemData[] = [];
       filteredItems.forEach((item) => {
         listItems.push({option: item});
       });
-      return listItems;
     }
-
-    return [{option: {key: '', value: t('common.createImperative') + ' ' + value, newlyCreated: true}}];
+    return listItems;
   };
-
 
   return (
     <>
