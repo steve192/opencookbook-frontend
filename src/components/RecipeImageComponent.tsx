@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {Animated, Easing, GestureResponderEvent, Image, NativeTouchEvent, PanResponder, PanResponderGestureState, Platform, StyleSheet, View} from 'react-native';
+import {Animated, Easing, GestureResponderEvent, Image, NativeTouchEvent, PanResponder, PanResponderGestureState, Platform, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import {Portal} from 'react-native-paper';
 import {fetchSingleImage, fetchSingleThumbnailImage} from '../redux/features/imagesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
@@ -11,6 +11,7 @@ interface Props {
     useThumbnail?: boolean
     blurredMode?: boolean
     zoomable?: boolean
+    style?: StyleProp<ViewStyle>
 }
 export const RecipeImageComponent = (props: Props) => {
   const selector = !props.uuid ?
@@ -246,7 +247,7 @@ export const RecipeImageComponent = (props: Props) => {
 
   return (
     <>
-      <View style={[styles.recipeImage]}>
+      <View style={[styles.recipeImage, props.style]}>
         {image}
         {requestPending &&
                 <View style={styles.loadingSpinner}>

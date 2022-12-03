@@ -5,6 +5,7 @@ import {ScrollView, StyleSheet, View} from 'react-native';
 import {Appbar, Button, Caption, Divider, Surface, TextInput, useTheme} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {ChunkView} from '../../ChunkView';
+import {ImageEditorPopup} from '../../components/ImageEditorPopup';
 import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
 import {IngredientUse, Recipe, RecipeGroup} from '../../dao/RestAPI';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
@@ -239,6 +240,9 @@ const RecipeWizardScreen = (props: Props) => {
             theme={{roundness: 0}}
             onPress={() => saveRecipe()}>{props.route.params?.editing ? t('common.save'): t('common.create')}</Button>
         </ScrollView>
+        <ImageEditorPopup
+          images={recipeData.images}
+          onClose={() => null}/>
       </ChunkView>
     </Surface>
   );

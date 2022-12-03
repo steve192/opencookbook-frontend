@@ -1,7 +1,8 @@
 import * as ImagePicker from 'expo-image-picker';
 import React, {useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Image, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
-import {Avatar, IconButton, Text} from 'react-native-paper';
+import {Avatar, Button, IconButton, Text, useTheme} from 'react-native-paper';
 import RestAPI, {RecipeImage} from '../dao/RestAPI';
 import {RecipeImageComponent} from './RecipeImageComponent';
 import {ViewPager} from './ViewPager';
@@ -15,6 +16,11 @@ interface Props {
 
 export const RecipeImageViewPager = (props: Props) => {
   const [shownImageIndex, setShownImageIndex] = useState<number>(0);
+
+  const [editModeEntered, setEditModeEntered] = useState(true);
+
+  const theme = useTheme();
+  const {t} = useTranslation('translation');
 
   const selectImage = async () => {
     // Ask the user for the permission to access the media library
@@ -51,9 +57,9 @@ export const RecipeImageViewPager = (props: Props) => {
 
                     props.images.map((image, imageIndex) =>
                       <RecipeImageComponent
+                        key={image.uuid}
                         zoomable={true}
                         useThumbnail={false}
-                        key={image.uuid}
                         uuid={image.uuid} />,
                     )}
       </ViewPager>
@@ -74,11 +80,15 @@ export const RecipeImageViewPager = (props: Props) => {
       }
 
       {props.allowEdit &&
-                   <IconButton
-                     onPress={selectImage}
-                     style={styles.imageButton}
-                     icon="camera-outline"
-                   />
+      <Button
+        mode='outlined'
+        color='white'
+        style={styles.editButton}>{t('reipce.image.button.edit')}</Button>
+        //  <IconButton
+        //    onPress={selectImage}
+        //    style={styles.imageButton}
+        //    icon="camera-outline"
+        //  />
       }
 
       <Text style={styles.indexIndicator}>{shownImageIndex + 1} / {props.images.length}</Text>
@@ -96,7 +106,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     flex: 1,
     height: '100%',
-
   },
   forwardButton: {
     position: 'absolute',
@@ -124,17 +133,12 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: 'rgb(161, 161, 161)',
   },
-  imageButton: {
+  editButton: {
     position: 'absolute',
     alignSelf: 'flex-end',
     bottom: 16,
     right: 16,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: 'grey',
+    backgroundColor: 'rgba( 0,0,0,0.3)',
   },
   recipeImage: {
     width: '100%',
