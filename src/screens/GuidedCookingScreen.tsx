@@ -44,7 +44,7 @@ export const GuidedCookingScreen = (props: Props) => {
         <Divider />
         <Spacer height={20} />
         <ViewPager
-          style={{backgroundColor: 'blue'}}
+          style={{height: '100%'}}
           selectedIndex={currentStep}
           onIndexChange={setCurrentStep}>
           {recipe.preparationSteps.map((step, index) =>
