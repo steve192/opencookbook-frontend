@@ -13,6 +13,7 @@ import {login} from '../../redux/features/authSlice';
 import CentralStyles, {OwnColors} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
 import {Button, Card, IconButton, Modal, Text, TextInput, useTheme} from 'react-native-paper';
+import {PasswordInput} from '../../components/PasswordInput';
 
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'LoginScreen'>;
@@ -77,9 +78,9 @@ const LoginScreen = ({route, navigation}: Props) => {
       <View style={styles.loginContainer}>
         <View style={CentralStyles.smallContentContainer}>
           <Text style={CentralStyles.loginTitle}>CookPal</Text>
-          <TextInput mode="flat" dense={true} value={email} keyboardType='email-address' onChangeText={(text) => setEmail(text)} label="E-Mail"/>
+          <TextInput mode="flat" dense={true} value={email} keyboardType='email-address' onChangeText={(text) => setEmail(text)} label="E-Mail" />
           <Spacer height={10} />
-          <TextInput mode="flat" dense={true} value={password} onChangeText={(text) => setPassword(text)} label="Password" secureTextEntry={true} />
+          <PasswordInput password={password} setPassword={setPassword} label={t('screens.login.password')} />
           <View style={styles.forgotPasswordContainer}>
             <Button
               color={OwnColors.bluishGrey}

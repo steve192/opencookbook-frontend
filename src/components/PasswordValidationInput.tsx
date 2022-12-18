@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {HelperText, TextInput} from 'react-native-paper';
+import {HelperText} from 'react-native-paper';
 import Spacer from 'react-spacer';
+import {PasswordInput} from './PasswordInput';
 
 interface Props {
-    onValidityChange: (valid: boolean) => void;
-    onPasswordChange: (newPassword: string) => void;
+  onValidityChange: (valid: boolean) => void;
+  onPasswordChange: (newPassword: string) => void;
 }
 
 export const PasswordValidationInput = (props: Props) => {
@@ -28,22 +29,16 @@ export const PasswordValidationInput = (props: Props) => {
 
   return (
     <>
-      <TextInput
-        dense={true}
-        mode="flat"
-        value={password}
-        onChangeText={setPassword}
-        label={t('screens.login.password')}
-        secureTextEntry={true} />
+      <PasswordInput
+        password={password}
+        setPassword={setPassword}
+        label={t('screens.login.password')} />
       <Spacer height={5} />
-      <TextInput
-        dense={true}
-        mode="flat"
-        value={confirmedPassword}
-        onChangeText={setConfirmedPassword}
+      <PasswordInput
+        password={confirmedPassword}
+        setPassword={setConfirmedPassword}
         label={t('screens.login.passwordConfirm')}
-        error={!passwordsMatching}
-        secureTextEntry={true} />
+        error={!passwordsMatching} />
 
       <HelperText type="error" visible={!passwordsMatching} >{t('screens.login.errorNoPasswordMatch')}</HelperText>
     </>
