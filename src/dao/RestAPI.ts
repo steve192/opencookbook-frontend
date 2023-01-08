@@ -12,7 +12,7 @@ export interface Ingredient {
 
 export interface IngredientUse {
     ingredient: Ingredient
-    amount: number
+    amount: number,
     unit: string
 }
 

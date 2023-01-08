@@ -4,7 +4,7 @@ import {useTheme, Text} from 'react-native-paper';
 
 
 interface Props {
-    value: string
+    value: string,
     style?: StyleProp<ViewStyle>
     selected?: boolean
     onPress?: () => void

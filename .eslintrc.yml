@@ -17,3 +17,14 @@ rules:
   max-len: off
   react/prop-types: off
   require-jsdoc: off
+  member-delimitter-style:
+    - 2
+    - multiline:
+        delimiter: "semi"
+        requireLast: true
+    - singleline:
+        delimiter: "semi"
+        requireLast: true
+settings:
+  react:
+    version: "detect"
