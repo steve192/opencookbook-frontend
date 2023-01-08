@@ -28,26 +28,43 @@ const RecipeListScreen = (props: Props) => {
 
   const shownRecipeGroup = useAppSelector((state) => state.recipes.recipeGroups.filter((recipeGroup) => recipeGroup.id == props.route.params?.shownRecipeGroupId)[0]);
 
+
+  const [selectedRecipes, setSelectedRecipes] = useState(new Set<number>());
+  const [multiSelectionModeActive, setMultiSelectionModeActive] = useState(false);
+
   useEffect(() => {
-    return props.navigation.addListener('focus', () => {
-      if (shownRecipeGroup !== undefined) {
+    const adjustActionbar = () => {
+      if (multiSelectionModeActive) {
         props.navigation.getParent()?.getParent()?.setOptions({
           title: shownRecipeGroup?.title,
           headerRight: () => (
             <Appbar.Action
-              icon="pencil-outline"
+              icon="group"
               color={theme.colors.textOnPrimary}
-              onPress={() => shownRecipeGroup.id && props.navigation.navigate('RecipeGroupEditScreen', {editing: true, recipeGroupId: shownRecipeGroup.id})} />
+              onPress={() => null} />
           ),
         });
       } else {
-        props.navigation.getParent()?.getParent()?.setOptions({
-          title: t('screens.overview.myRecipes'),
-          headerRight: undefined,
-        });
+        if (shownRecipeGroup !== undefined) {
+          props.navigation.getParent()?.getParent()?.setOptions({
+            title: shownRecipeGroup?.title,
+            headerRight: () => (
+              <Appbar.Action
+                icon="pencil-outline"
+                color={theme.colors.textOnPrimary}
+                onPress={() => shownRecipeGroup.id && props.navigation.navigate('RecipeGroupEditScreen', {editing: true, recipeGroupId: shownRecipeGroup.id})} />
+            ),
+          });
+        } else {
+          props.navigation.getParent()?.getParent()?.setOptions({
+            title: t('screens.overview.myRecipes'),
+            headerRight: undefined,
+          });
+        }
       }
-    });
-  }, [props.navigation, shownRecipeGroup]);
+    };
+    return props.navigation.addListener('focus', adjustActionbar);
+  }, [props.navigation, shownRecipeGroup, multiSelectionModeActive, selectedRecipes]);
 
 
   const openRecipe = (recipe: Recipe) => {
@@ -57,7 +74,16 @@ const RecipeListScreen = (props: Props) => {
       });
     }
   };
-  console.log(props.navigation);
+
+  const onRecipeSelected = (selectedRecipe: number) => {
+    const selectedRecipesCopy = new Set(selectedRecipes);
+    if (selectedRecipesCopy.has(selectedRecipe)) {
+      selectedRecipesCopy.delete(selectedRecipe);
+    } else {
+      selectedRecipesCopy.add(selectedRecipe);
+    }
+    setSelectedRecipes(selectedRecipesCopy);
+  };
 
   return (
     <>
@@ -66,7 +92,11 @@ const RecipeListScreen = (props: Props) => {
           // @ts-ignore Route params are sometimes string
           shownRecipeGroupId={props.route.params?.shownRecipeGroupId && parseInt(props.route.params.shownRecipeGroupId)}
           onRecipeClick={openRecipe}
-          onRecipeGroupClick={(recipeGroup) => props.navigation.push('RecipeListDetailScreen', {shownRecipeGroupId: recipeGroup.id})} />
+          onRecipeGroupClick={(recipeGroup) => props.navigation.push('RecipeListDetailScreen', {shownRecipeGroupId: recipeGroup.id})}
+          onMultiSelectionModeToggled={() => setMultiSelectionModeActive(!multiSelectionModeActive)}
+          multiSelectionModeActive={multiSelectionModeActive}
+          onRecipeSelected={onRecipeSelected}
+          selectedRecipes={selectedRecipes} />
         <FAB.Group
           icon="plus"
           open={fabOpen}

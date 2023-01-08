@@ -3,7 +3,7 @@ import fuzzy from 'fuzzy';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, RefreshControl, StyleSheet, View, ViewProps} from 'react-native';
-import {Headline, Searchbar, Surface, Text, useTheme} from 'react-native-paper';
+import {Headline, RadioButton, Searchbar, Surface, Text, useTheme} from 'react-native-paper';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {fetchMyRecipeGroups, fetchMyRecipes} from '../redux/features/recipesSlice';
@@ -15,6 +15,10 @@ interface Props {
   shownRecipeGroupId: number | undefined
   onRecipeClick: (recipe: Recipe) => void
   onRecipeGroupClick: (recipeGroup: RecipeGroup) => void
+  onMultiSelectionModeToggled?: () => void
+  multiSelectionModeActive?: boolean
+  selectedRecipes?: Set<number>
+  onRecipeSelected?: (selectedRecipe: number) => void
 }
 export const RecipeList = (props: Props) => {
   const myRecipes = useAppSelector((state) => state.recipes.recipes);
@@ -71,14 +75,25 @@ export const RecipeList = (props: Props) => {
       // This is used for an initial offset due to the search input field
       // @ts-ignore
     }).cloneWithRows([{}].concat(shownItems));
-  }, [myRecipes, myRecipeGroups, searchString]);
+  }, [myRecipes, myRecipeGroups, searchString, props.selectedRecipes]);
+
+  const onRecipeClick = (recipe: Recipe) => {
+    if (props.multiSelectionModeActive) {
+      props.onRecipeSelected(recipe.id!);
+      return;
+    }
+
+    props.onRecipeClick(recipe);
+  };
 
   const createRecipeListItem = (recipe: Recipe) => {
     return (
       <Pressable
         key={recipe.id}
         style={[styles.recipeCard]}
-        onPress={() => props.onRecipeClick(recipe)}>
+        onPress={() => onRecipeClick(recipe)}
+        onLongPress={() => props.onMultiSelectionModeToggled?.()}>
+
         <Surface style={{height: 180, borderRadius: 16, overflow: 'hidden'}}>
           <RecipeImageComponent
             useThumbnail={true}
@@ -86,6 +101,12 @@ export const RecipeList = (props: Props) => {
             uuid={recipe.images.length > 0 ? recipe.images[0].uuid : undefined} />
         </Surface>
         {renderRecipeTitle(undefined, recipe.title)}
+        {props.multiSelectionModeActive && <View style={{position: 'absolute'}}>
+          <RadioButton
+            value=''
+            status={props.selectedRecipes && props.selectedRecipes.has(recipe.id!) ? 'checked': 'unchecked'}
+            onPress={() => onRecipeClick(recipe)}/>
+        </View>}
       </Pressable>
     );
   };
