@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Option, SelectionPopup} from '../../components/SelectionPopup';
+import {SelectionPopup} from '../../components/SelectionPopup';
+import {Option} from '../../components/SelectionPopupModal';
 import RestAPI, {RecipeGroup} from '../../dao/RestAPI';
 
 
