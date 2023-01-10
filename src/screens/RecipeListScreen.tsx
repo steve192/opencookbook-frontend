@@ -28,6 +28,8 @@ const RecipeListScreen = (props: Props) => {
 
   const [fabOpen, setFabOpen] = useState(false);
 
+  const dispatch = useAppDispatch();
+
 
   const allRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
   const allRecipes = useAppSelector((state) => state.recipes.recipes);
@@ -42,18 +44,25 @@ const RecipeListScreen = (props: Props) => {
     const adjustActionbar = () => {
       if (multiSelectionModeActive) {
         props.navigation.getParent()?.getParent()?.setOptions({
-          title: shownRecipeGroup?.title,
+          title: selectedRecipes.size + ' ' + t('common.selected'),
           headerRight: () => (
             <Appbar.Action
               icon="group"
               color={theme.colors.textOnPrimary}
               onPress={() => setRecipeGroupSelectionOpened(true)} />
           ),
+          headerLeft: () => (
+            <Appbar.Action
+              icon="close"
+              color={theme.colors.textOnPrimary}
+              onPress={() => clearMultiSelectionMode()} />
+          ),
         });
       } else {
         if (shownRecipeGroup !== undefined) {
           props.navigation.getParent()?.getParent()?.setOptions({
             title: shownRecipeGroup?.title,
+            headerLeft: undefined,
             headerRight: () => (
               <Appbar.Action
                 icon="pencil-outline"
@@ -65,6 +74,7 @@ const RecipeListScreen = (props: Props) => {
           props.navigation.getParent()?.getParent()?.setOptions({
             title: t('screens.overview.myRecipes'),
             headerRight: undefined,
+            headerLeft: undefined,
           });
         }
       }
@@ -88,20 +98,26 @@ const RecipeListScreen = (props: Props) => {
     }
   };
 
+  const clearMultiSelectionMode = () => {
+    setRecipeGroupSelectionOpened(false);
+    setSelectedRecipes(new Set());
+    setMultiSelectionModeActive(false);
+  };
+
   const onMoveSelectedRecipesToGroup = (selectedOption: Option) => {
     // TODO: Move recipe objects to selected recipes instead of ids only
     const recipesToMove = allRecipes.filter((recipe) => selectedRecipes.has(recipe.id!) );
     recipesToMove.forEach((recipe) => {
       const recipeDataCopy = {...recipe};
-      if (selectedOption.key === '') {
+      if (selectedOption.key === 'none') {
         recipeDataCopy.recipeGroups = [];
       } else {
         // @ts-ignore
         recipeDataCopy.recipeGroups = [{id: +selectedOption.key}];
       }
-      console.log('updating recipe');
-      useAppDispatch(updateRecipe(recipeDataCopy));
+      dispatch(updateRecipe(recipeDataCopy));
     });
+    clearMultiSelectionMode();
   };
 
   const onRecipeSelected = (selectedRecipe: number) => {

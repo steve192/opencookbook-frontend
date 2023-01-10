@@ -79,7 +79,7 @@ export const RecipeList = (props: Props) => {
 
   const onRecipeClick = (recipe: Recipe) => {
     if (props.multiSelectionModeActive) {
-      props.onRecipeSelected(recipe.id!);
+      props.onRecipeSelected?.(recipe.id!);
       return;
     }
 
@@ -104,6 +104,8 @@ export const RecipeList = (props: Props) => {
         {props.multiSelectionModeActive && <View style={{position: 'absolute'}}>
           <RadioButton
             value=''
+            color={theme.colors.primary}
+            uncheckedColor={theme.colors.primary}
             status={props.selectedRecipes && props.selectedRecipes.has(recipe.id!) ? 'checked': 'unchecked'}
             onPress={() => onRecipeClick(recipe)}/>
         </View>}
