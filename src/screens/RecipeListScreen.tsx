@@ -7,6 +7,7 @@ import {Appbar, FAB, Surface, useTheme} from 'react-native-paper';
 import {RecipeList} from '../components/RecipeList';
 import {Option, SelectionPopupModal} from '../components/SelectionPopupModal';
 import {Recipe} from '../dao/RestAPI';
+import {VibrationUtils} from '../helper/VibrationUtil';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
 import {updateRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
@@ -143,6 +144,7 @@ const RecipeListScreen = (props: Props) => {
             const newSet = new Set<number>();
             newSet.add(firstSelectedRecipe.id!);
             setSelectedRecipes(newSet);
+            VibrationUtils.longPressFeedbackVibration();
           }}
           multiSelectionModeActive={multiSelectionModeActive}
           onRecipeSelected={onRecipeSelected}
