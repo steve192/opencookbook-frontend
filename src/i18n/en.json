@@ -20,7 +20,8 @@
     "delete": "Delete",
     "cancel": "Cancel",
     "more": "More",
-    "email": "E-mail"
+    "email": "E-mail",
+    "selected": "selected"
   },
   "navigation": {
     "screenTitleImportBrowser": "Recipe import browser",

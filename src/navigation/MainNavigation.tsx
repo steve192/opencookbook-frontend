@@ -68,6 +68,7 @@ const MainNavigation = () => {
                   {nav.back ? (
                   <Appbar.BackAction color={theme.colors.textOnPrimary} onPress={() => nav.navigation.goBack()} />
                 ) : null}
+                  {nav.options.headerLeft !== undefined ? nav.options?.headerLeft?.({tintColor: undefined}): null}
                   <Appbar.Content color={theme.colors.textOnPrimary} title={nav.options.title} />
                   {nav.options.headerRight !== undefined ? nav.options?.headerRight?.({tintColor: undefined}): null}
                 </Appbar.Header>

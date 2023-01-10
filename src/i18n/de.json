@@ -20,7 +20,8 @@
     "delete": "Löschen",
     "cancel": "Abbrechen",
     "more": "Mehr",
-    "email": "E-Mail"
+    "email": "E-Mail",
+    "selected": "Ausgewählt"
   },
   "navigation": {
     "screenTitleImportBrowser": "Rezept Import Browser",

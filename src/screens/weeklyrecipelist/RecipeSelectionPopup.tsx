@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Modal, Pressable, StyleSheet, TouchableWithoutFeedback, View} from 'react-native';
+import {Modal, Pressable, TouchableWithoutFeedback, View} from 'react-native';
 import {Button, Caption, Divider, Headline, Surface, TextInput, TouchableRipple} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {RecipeList} from '../../components/RecipeList';
 import {Recipe, RecipeGroup} from '../../dao/RestAPI';
-import CentralStyles from '../../styles/CentralStyles';
+import CentralStyles, {modalStyles} from '../../styles/CentralStyles';
 
 interface Props {
   visible: boolean;
@@ -71,7 +71,7 @@ export const RecipeSelectionPopup = (props: Props) => {
   };
 
   return (
-    <View style={styles.centeredView}>
+    <View style={modalStyles.centeredView}>
       <Modal
         animationType="slide"
         transparent={true}
@@ -81,10 +81,10 @@ export const RecipeSelectionPopup = (props: Props) => {
       >
         <Pressable
           onPress={props.onClose}
-          style={styles.modalBackdrop}>
+          style={modalStyles.modalBackdrop}>
           <>
-            <View style={styles.centeredView}>
-              <Surface style={[styles.modalView]}>
+            <View style={modalStyles.centeredView}>
+              <Surface style={[modalStyles.modalView]}>
                 <TouchableWithoutFeedback>
                   {renderContent()}
                 </TouchableWithoutFeedback>
@@ -96,40 +96,3 @@ export const RecipeSelectionPopup = (props: Props) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-    width: '100%',
-  },
-  modalBackdrop: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalView: {
-    width: '90%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    maxWidth: 600,
-    maxHeight: 800,
-    flex: 1,
-    marginBottom: 10,
-    padding: 10,
-    marginHorizontal: 10,
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-});
