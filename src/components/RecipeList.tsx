@@ -2,7 +2,7 @@ import {MaterialIcons} from '@expo/vector-icons';
 import fuzzy from 'fuzzy';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Pressable, RefreshControl, StyleSheet, View, ViewProps} from 'react-native';
+import {Pressable, RefreshControl, StyleProp, StyleSheet, View, ViewProps, ViewStyle} from 'react-native';
 import {Headline, RadioButton, Searchbar, Surface, Text, useTheme} from 'react-native-paper';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
@@ -87,10 +87,15 @@ export const RecipeList = (props: Props) => {
   };
 
   const createRecipeListItem = (recipe: Recipe) => {
+    const cardIsSelected = props.multiSelectionModeActive && props.multiSelectionModeActive && props.selectedRecipes && props.selectedRecipes.has(recipe.id!);
+    const cardStyles: StyleProp<ViewStyle> = [styles.recipeCard];
+    if (cardIsSelected) {
+      cardStyles.push({backgroundColor: theme.colors.primary});
+    }
     return (
       <Pressable
         key={recipe.id}
-        style={[styles.recipeCard]}
+        style={cardStyles}
         onPress={() => onRecipeClick(recipe)}
         onLongPress={() => props.onMultiSelectionModeToggled?.()}>
 
@@ -106,7 +111,7 @@ export const RecipeList = (props: Props) => {
             value=''
             color={theme.colors.primary}
             uncheckedColor={theme.colors.primary}
-            status={props.selectedRecipes && props.selectedRecipes.has(recipe.id!) ? 'checked': 'unchecked'}
+            status={cardIsSelected ? 'checked': 'unchecked'}
             onPress={() => onRecipeClick(recipe)}/>
         </View>}
       </Pressable>
