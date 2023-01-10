@@ -18,8 +18,9 @@ export const WeeklyRecipeCard = (props: Props) => {
     <View style={styles.borderCard}>
       <Pressable
         style={styles.card}
-        onLongPress={() => setEditMode(!editMode)}
-        onPress={props.onPress}>
+        // onLongPress={() => setEditMode(!editMode)}
+        // onPress={props.on Press}
+      >
         {props.imageUuid && <View style={{height: 80, borderRadius: 16, overflow: 'hidden'}}>
           <RecipeImageComponent
             useThumbnail={true}

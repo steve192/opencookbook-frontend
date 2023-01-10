@@ -4,7 +4,7 @@ import {StackScreenProps} from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
+import {GestureHandlerRootView, LongPressGestureHandler, ScrollView} from 'react-native-gesture-handler';
 import {Divider, IconButton, Subheading, Surface, Text} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import XDate from 'xdate';
@@ -18,7 +18,8 @@ import {useAppSelector} from '../../redux/hooks';
 import CentralStyles from '../../styles/CentralStyles';
 import {RecipeSelectionPopup} from './RecipeSelectionPopup';
 import {WeeklyRecipeCard} from './WeeklyRecipeCard';
-
+import {DraxProvider, DraxScrollView, DraxView} from 'react-native-drax';
+import {Platform} from 'react-native';
 
 type Props =
     CompositeScreenProps<
@@ -94,60 +95,87 @@ export const WeeklyRecipeListScreen = (props: Props) => {
           weekdayDate.setDate(weekdayDate.getDate() + weekdayIndex);
           const existingWeekplanDay = weekplanDays.filter((weekplanDay) => weekplanDay.day === weekdayDate.toString(dateFormat))[0];
           return (
-            <CustomCard key={weekdayIndex} style={{marginVertical: 5}}>
-              <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                <Text style={styles.weekTitle}>{weekday} {weekdayDate.toLocaleDateString()}</Text>
-                <IconButton
-                  icon="plus-circle-outline"
-                  onPress={() => {
-                    setRecipeSelectionVisible(true);
-                    setSelectedWeekplanDay(existingWeekplanDay ? existingWeekplanDay : {day: weekdayDate.toString(dateFormat), recipes: []});
-                  }
-                  } />
-              </View>
-              <SideScroller>
-                {weekplanDays.filter((weekplanDay) => weekplanDay.day === weekdayDate.toString(dateFormat)).map((weekplanDay) => (
-                  weekplanDay.recipes.map((recipe, index) => {
-                    if (recipe.type === 'NORMAL_RECIPE') {
-                      return <WeeklyRecipeCard
-                        key={weekplanDay.day + index}
-                        // @ts-ignore
-                        onPress={() => openRecipe(recipe.id)}
-                        onRemovePress={() => removeRecipeFromWeekplanDay(index, weekplanDay)}
-                        title={recipe.title}
-                        imageUuid={recipe.titleImageUuid} />;
-                    } else if (recipe.type === 'SIMPLE_RECIPE') {
-                      return <WeeklyRecipeCard
-                        key={weekplanDay.day + index}
-                        // @ts-ignore
-                        onRemovePress={() => removeRecipeFromWeekplanDay(recipe.id, weekplanDay)}
-                        title={recipe.title} />;
+            <DraxView
+              key={weekdayIndex}
+              draggable={false}
+              onReceiveDragDrop={({dragged: {payload}}) => {
+                console.log(`received ${payload}`);
+              }}>
+              <CustomCard style={{marginVertical: 5}}>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                  <Text style={styles.weekTitle}>{weekday} {weekdayDate.toLocaleDateString()}</Text>
+                  <IconButton
+                    icon="plus-circle-outline"
+                    onPress={() => {
+                      setRecipeSelectionVisible(true);
+                      setSelectedWeekplanDay(existingWeekplanDay ? existingWeekplanDay : {day: weekdayDate.toString(dateFormat), recipes: []});
                     }
-                  })
-                ))}
-              </SideScroller>
-            </CustomCard>
+                    } />
+                </View>
+                <SideScroller>
+                  {weekplanDays.filter((weekplanDay) => weekplanDay.day === weekdayDate.toString(dateFormat)).map((weekplanDay) => (
+                    weekplanDay.recipes.map((recipe, index) => {
+                      if (recipe.type === 'NORMAL_RECIPE') {
+                        return (
+                          <DraxView key={weekplanDay.day + index}
+                            onDragStart={() => {
+                              console.log('start drag');
+                            }}
+                            draggable={true}
+                            dragPayload="world">
+                            <WeeklyRecipeCard
+                              // @ts-ignore
+                              onPress={() => openRecipe(recipe.id)}
+                              onRemovePress={() => removeRecipeFromWeekplanDay(index, weekplanDay)}
+                              title={recipe.title}
+                              imageUuid={recipe.titleImageUuid} />
+                          </DraxView>
+                        );
+                      } else if (recipe.type === 'SIMPLE_RECIPE') {
+                        return <WeeklyRecipeCard
+                          key={weekplanDay.day + index}
+                          // @ts-ignore
+                          onRemovePress={() => removeRecipeFromWeekplanDay(recipe.id, weekplanDay)}
+                          title={recipe.title} />;
+                      }
+                    })
+                  ))}
+                </SideScroller>
+              </CustomCard>
+            </DraxView>
           );
         });
+  };
+
+  const wrapGuestureHandlerIfNeeded = (children: React.Element) => {
+    /* Needed to make drax work on android */
+    if (Platform.OS === 'web') {
+      return <ScrollView
+        contentContainerStyle={CentralStyles.contentContainer}>{children}</ScrollView>;
+    } else {
+      return <GestureHandlerRootView><DraxScrollView
+        contentContainerStyle={CentralStyles.contentContainer}>{children}</DraxScrollView></GestureHandlerRootView>;
+    }
   };
 
   return (
     <>
       <ChunkView>
         <Surface style={CentralStyles.fullscreen}>
-          <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
-            <Subheading>{t('screens.weekplan.currentWeek')}</Subheading>
-            {renderWeek(getCurrentWeekNumber(now), now.getFullYear())}
-            <Divider style={{marginVertical: 25}}/>
-            <Subheading>{t('screens.weekplan.nextWeek')}</Subheading>
-            {renderWeek(getCurrentWeekNumber(now) + 1, now.getFullYear())}
-            <Divider style={{marginVertical: 25}}/>
-            <Subheading>{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 2}</Subheading>
-            {renderWeek(getCurrentWeekNumber(now) + 2, now.getFullYear())}
-            <Divider style={{marginVertical: 25}}/>
-            <Subheading>{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 3}</Subheading>
-            {renderWeek(getCurrentWeekNumber(now) + 3, now.getFullYear())}
-          </ScrollView>
+          <DraxProvider>
+            {wrapGuestureHandlerIfNeeded(<>
+              <Subheading>{t('screens.weekplan.currentWeek')}</Subheading>
+              {renderWeek(getCurrentWeekNumber(now), now.getFullYear())}
+              <Divider style={{marginVertical: 25}}/>
+              <Subheading>{t('screens.weekplan.nextWeek')}</Subheading>
+              {renderWeek(getCurrentWeekNumber(now) + 1, now.getFullYear())}
+              <Divider style={{marginVertical: 25}}/>
+              <Subheading>{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 2}</Subheading>
+              {renderWeek(getCurrentWeekNumber(now) + 2, now.getFullYear())}
+              <Divider style={{marginVertical: 25}}/>
+              <Subheading>{t('screens.weekplan.week')} {getCurrentWeekNumber(now) + 3}</Subheading>
+              {renderWeek(getCurrentWeekNumber(now) + 3, now.getFullYear())}</>)}
+          </DraxProvider>
         </Surface>
       </ChunkView>
 
