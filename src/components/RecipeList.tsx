@@ -15,7 +15,7 @@ interface Props {
   shownRecipeGroupId: number | undefined
   onRecipeClick: (recipe: Recipe) => void
   onRecipeGroupClick: (recipeGroup: RecipeGroup) => void
-  onMultiSelectionModeToggled?: () => void
+  onMultiSelectionModeToggled?: (recipe: Recipe) => void
   multiSelectionModeActive?: boolean
   selectedRecipes?: Set<number>
   onRecipeSelected?: (selectedRecipe: number) => void
@@ -97,7 +97,7 @@ export const RecipeList = (props: Props) => {
         key={recipe.id}
         style={cardStyles}
         onPress={() => onRecipeClick(recipe)}
-        onLongPress={() => props.onMultiSelectionModeToggled?.()}>
+        onLongPress={() => props.onMultiSelectionModeToggled?.(recipe)}>
 
         <Surface style={{height: 180, borderRadius: 16, overflow: 'hidden'}}>
           <RecipeImageComponent

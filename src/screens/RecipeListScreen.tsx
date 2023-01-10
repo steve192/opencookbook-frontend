@@ -138,7 +138,12 @@ const RecipeListScreen = (props: Props) => {
           shownRecipeGroupId={props.route.params?.shownRecipeGroupId && parseInt(props.route.params.shownRecipeGroupId)}
           onRecipeClick={openRecipe}
           onRecipeGroupClick={(recipeGroup) => props.navigation.push('RecipeListDetailScreen', {shownRecipeGroupId: recipeGroup.id})}
-          onMultiSelectionModeToggled={() => setMultiSelectionModeActive(!multiSelectionModeActive)}
+          onMultiSelectionModeToggled={(firstSelectedRecipe) => {
+            setMultiSelectionModeActive(!multiSelectionModeActive);
+            const newSet = new Set<number>();
+            newSet.add(firstSelectedRecipe.id!);
+            setSelectedRecipes(newSet);
+          }}
           multiSelectionModeActive={multiSelectionModeActive}
           onRecipeSelected={onRecipeSelected}
           selectedRecipes={selectedRecipes} />
