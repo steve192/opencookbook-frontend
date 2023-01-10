@@ -87,7 +87,7 @@ export const RecipeList = (props: Props) => {
   };
 
   const createRecipeListItem = (recipe: Recipe) => {
-    const cardIsSelected = props.multiSelectionModeActive && props.multiSelectionModeActive && props.selectedRecipes && props.selectedRecipes.has(recipe.id!);
+    const cardIsSelected = props.multiSelectionModeActive && props.selectedRecipes && props.selectedRecipes.has(recipe.id!);
     const cardStyles: StyleProp<ViewStyle> = [styles.recipeCard];
     if (cardIsSelected) {
       cardStyles.push({backgroundColor: theme.colors.primary});
