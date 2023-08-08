@@ -26,7 +26,9 @@ export const GuidedCookingScreen = (props: Props) => {
 
   return (
     <Surface style={{flex: 1}} >
-      <ScrollView>
+      <ScrollView
+        style={{backgroundColor: 'red'}}
+        contentContainerStyle={{flex: 1}}>
         <View style={CentralStyles.contentContainer}>
           <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
             {recipe.preparationSteps.map((step, index) =>
@@ -44,7 +46,7 @@ export const GuidedCookingScreen = (props: Props) => {
         <Divider />
         <Spacer height={20} />
         <ViewPager
-          style={{height: '100%'}}
+          style={{flex: 1}}
           selectedIndex={currentStep}
           onIndexChange={setCurrentStep}>
           {recipe.preparationSteps.map((step, index) =>

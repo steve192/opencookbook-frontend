@@ -12,10 +12,6 @@ interface Props {
 export const ViewPager = (props: Props) => {
   const pagerRef = useRef<PagerView>();
 
-  const [contentHeight, setContentHeight] = useState(100);
-
-  console.log(contentHeight);
-
   useEffect(() => {
     pagerRef.current?.setPage(props.selectedIndex);
   }, [props.selectedIndex]);
@@ -25,16 +21,7 @@ export const ViewPager = (props: Props) => {
     overlap
     initialPage={props.selectedIndex}
     onPageSelected={(event) => props.onIndexChange(event.nativeEvent.position)}
-    style={[props.style, {height: contentHeight}]}>
-    {Children.toArray(props.children)?.map((child, index) =>
-      <View
-        key={index}
-        onLayout={(event) => setContentHeight(event.nativeEvent.layout.height)}
-      >
-        {child}
-      </View>)}
-    {/* <>
-      {props.children}
-    </> */}
+    style={[props.style]}>
+    {props.children}
   </PagerView>;
 };
