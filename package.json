@@ -29,7 +29,7 @@
     "@types/xdate": "^0.8.32",
     "axios": "^0.24.0",
     "buffer": "^6.0.3",
-    "expo": "^47.0.0",
+    "expo": "^49.0.11",
     "expo-constants": "~14.0.2",
     "expo-file-system": "~15.1.1",
     "expo-image-picker": "~14.0.2",
