@@ -76,11 +76,11 @@
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.9.1",
     "eas-cli": "^0.49.0",
-    "eas-cli-local-build-plugin": "^0.0.120",
+    "eas-cli-local-build-plugin": "^1.0.44",
     "eslint": "^8.7.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-react": "^7.28.0",
-    "expo-cli": "^5.4.3",
+    "expo-cli": "^6.3.10",
     "typescript": "^4.6.3"
   },
   "private": true
