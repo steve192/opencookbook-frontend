@@ -21,6 +21,10 @@ export const IngredientList = (props: Props) => {
   const {t} = useTranslation('translation');
 
   const getServingMultiplier = () => {
+    if (!props.servings || props.servings < 1) {
+      // If servings are not defined, handle as 1 serving
+      return 1;
+    }
     return props.scaledServings / props.servings;
   };
 
