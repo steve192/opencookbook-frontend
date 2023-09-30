@@ -4,7 +4,7 @@ import fuzzy from 'fuzzy';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
+import {ScrollView} from 'react-native';
 import {Button, Caption, Divider, Surface} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {IngredientList} from '../components/IngredientList';

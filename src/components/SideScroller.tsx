@@ -1,7 +1,7 @@
 import {LinearGradient} from 'expo-linear-gradient';
 import React, {useEffect, useState} from 'react';
 import {LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollViewProps, View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
+import {ScrollView} from 'react-native';
 
 
 export const SideScroller = (props: ScrollViewProps) => {

@@ -3,7 +3,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
+import {ScrollView} from 'react-native';
 import {Appbar, Button, Caption, Divider, useTheme, Text, Surface} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {ChunkView} from '../ChunkView';
