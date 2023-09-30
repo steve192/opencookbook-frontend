@@ -1,6 +1,6 @@
 import React, {ReactNode, useEffect, useState} from 'react';
 import {StyleProp, ViewStyle} from 'react-native';
-import {Swiper, SwiperSlide} from 'swiper/react/swiper-react.js';
+import {Swiper, SwiperSlide} from 'swiper/react';
 import 'swiper/swiper-bundle.css';
 
 interface Props {

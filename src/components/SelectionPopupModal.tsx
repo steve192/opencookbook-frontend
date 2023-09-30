@@ -1,8 +1,7 @@
 import {HeaderHeightContext} from '@react-navigation/elements';
 import React, {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Modal, Pressable, View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
+import {Modal, Pressable, View, ScrollView} from 'react-native';
 import {Divider, List, Surface, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {modalStyles} from '../styles/CentralStyles';
@@ -29,7 +28,7 @@ interface Props {
 
 
 export const SelectionPopupModal = (props: Props) => {
-  const modalInputRef = useRef<typeof TextInput>();
+  const modalInputRef = useRef<typeof TextInput>(null);
   const [value, setValue] = useState<string>('');
 
 

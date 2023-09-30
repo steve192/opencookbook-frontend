@@ -25,11 +25,12 @@ export const RecipeImageViewPager = (props: Props) => {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({base64: true});
-    if (result.cancelled) {
+    if (result.canceled) {
       return;
     }
 
-    await RestAPI.uploadImage(result.uri).then((uuid) => {
+
+    await RestAPI.uploadImage(result.assets[0].uri).then((uuid) => {
       props.onImageAdded?.(uuid);
     }).catch((error) => {
       // TODO: Error handling

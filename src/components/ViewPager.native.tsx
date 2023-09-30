@@ -1,4 +1,4 @@
-import React, {Fragment, ReactNode, useRef, useEffect} from 'react';
+import React, {ReactNode, useEffect, useRef} from 'react';
 import {StyleProp, ViewStyle} from 'react-native';
 import PagerView from 'react-native-pager-view';
 
@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const ViewPager = (props: Props) => {
-  const pagerRef = useRef<PagerView>();
+  const pagerRef = useRef<PagerView>(null);
 
   useEffect(() => {
     pagerRef.current?.setPage(props.selectedIndex);
@@ -21,8 +21,6 @@ export const ViewPager = (props: Props) => {
     initialPage={props.selectedIndex}
     onPageSelected={(event) => props.onIndexChange(event.nativeEvent.position)}
     style={[props.style, {flex: 1}]}>
-    <>
-      {props.children}
-    </>
+    {props.children}
   </PagerView>;
 };

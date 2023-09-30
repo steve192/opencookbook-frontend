@@ -1,10 +1,9 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useKeepAwake} from 'expo-keep-awake';
 import fuzzy from 'fuzzy';
-import React, {useState} from 'react';
+import React, {ReactNode, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
+import {Platform, ScrollView, StyleSheet, View} from 'react-native';
 import {Button, Caption, Divider, Surface} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {IngredientList} from '../components/IngredientList';
@@ -15,6 +14,11 @@ import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
+
+const wrapInScrollviewWhenWeb = (element: ReactNode) => {
+  // Needed as scrollviews + viewpager behafe painfully different on web
+  return Platform.OS === 'web' ? <ScrollView>{element}</ScrollView> : element;
+};
 export const GuidedCookingScreen = (props: Props) => {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [textSize, setTextSize] = useState<number>(15);
@@ -26,61 +30,61 @@ export const GuidedCookingScreen = (props: Props) => {
 
   return (
     <Surface style={{flex: 1}} >
-      <ScrollView>
-        <View style={CentralStyles.contentContainer}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
-            {recipe.preparationSteps.map((step, index) =>
-              <>
-                <TextBullet
-                  selected={index <= currentStep}
-                  onPress={() => setCurrentStep(index)}
-                  value={(index + 1).toString()} />
-                {/* {index < currentStep && <View style={styles.stepConnector}></View>} */}
-              </>,
-            )}
-          </View>
-        </View>
-        <Spacer height={20} />
-        <Divider />
-        <Spacer height={20} />
-        <ViewPager
-          style={{backgroundColor: 'blue'}}
-          selectedIndex={currentStep}
-          onIndexChange={setCurrentStep}>
-          {recipe.preparationSteps.map((step, index) =>
+      {wrapInScrollviewWhenWeb(
+          <>
+            <View style={CentralStyles.contentContainer}>
+              <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+                {recipe.preparationSteps.map((step, index) =>
+                  <>
+                    <TextBullet
+                      selected={index <= currentStep}
+                      onPress={() => setCurrentStep(index)}
+                      value={(index + 1).toString()} />
+                    {/* {index < currentStep && <View style={styles.stepConnector}></View>} */}
+                  </>,
+                )}
+              </View>
+            </View>
+            <Spacer height={20} />
+            <Divider />
+            <Spacer height={20} />
+            <ViewPager
+              selectedIndex={currentStep}
+              onIndexChange={setCurrentStep}>
+              {recipe.preparationSteps.map((step, index) =>
+                <ScrollView
+                  key={index}>
+                  <Surface
+                    style={[CentralStyles.contentContainer, {elevation: 0, marginLeft: 'auto', marginRight: 'auto'}]}
+                  >
+                    <PreparationStepText
+                      style={[styles.preparationStep, {fontSize: textSize}]}
+                      value={step}
+                      ingredients={recipe.neededIngredients} />
+                    <Spacer height={20} />
+                    <Divider />
+                    <Spacer height={20} />
+                    <Caption>{t('screens.guidedCooking.ingredients')}</Caption>
+                    <IngredientList
+                      ingredients={recipe.neededIngredients
+                          .filter((neededIngredient) => isIngredientContainedInText(neededIngredient.ingredient.name, step))}
+                      scaledServings={props.route.params.scaledServings}
+                      servings={recipe.servings}
+                    />
+                    <Divider/>
+                    <IngredientList
+                      greyedOutStyle={true}
+                      ingredients={recipe.neededIngredients
+                          .filter((neededIngredient) => !isIngredientContainedInText(neededIngredient.ingredient.name, step))}
+                      scaledServings={props.route.params.scaledServings}
+                      servings={recipe.servings}
+                    />
+                  </Surface>
+                </ScrollView>,
+              )}
 
-            <Surface
-              key={index}
-              style={[CentralStyles.contentContainer, {elevation: 0, marginLeft: 'auto', marginRight: 'auto'}]}
-
-            >
-              <PreparationStepText
-                style={[styles.preparationStep, {fontSize: textSize}]}
-                value={step}
-                ingredients={recipe.neededIngredients} />
-              <Spacer height={20} />
-              <Divider />
-              <Spacer height={20} />
-              <Caption>{t('screens.guidedCooking.ingredients')}</Caption>
-              <IngredientList
-                ingredients={recipe.neededIngredients
-                    .filter((neededIngredient) => isIngredientContainedInText(neededIngredient.ingredient.name, step))}
-                scaledServings={props.route.params.scaledServings}
-                servings={recipe.servings}
-              />
-              <Divider/>
-              <IngredientList
-                greyedOutStyle={true}
-                ingredients={recipe.neededIngredients
-                    .filter((neededIngredient) => !isIngredientContainedInText(neededIngredient.ingredient.name, step))}
-                scaledServings={props.route.params.scaledServings}
-                servings={recipe.servings}
-              />
-            </Surface>,
-          )}
-
-        </ViewPager>
-      </ScrollView>
+            </ViewPager>
+          </>)}
       <View>
         <Spacer height={20} />
         <Divider />
