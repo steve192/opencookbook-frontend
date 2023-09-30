@@ -6,7 +6,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "eject": "expo eject",
-    "build-web": "expo build:web",
+    "build-web": "expo export:web",
     "publish-expo-production": "eas update --branch production --auto",
     "publish-expo-preview": "eas update --branch preview --auto",
     "publish-preview": "eas update --branch preview --auto",
