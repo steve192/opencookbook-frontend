@@ -6,7 +6,6 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ScrollView} from 'react-native';
 import {Divider, IconButton, Subheading, Surface, Text} from 'react-native-paper';
-import {useDispatch} from 'react-redux';
 import XDate from 'xdate';
 import {ChunkView} from '../../ChunkView';
 import {CustomCard} from '../../components/CustomCard';
@@ -14,7 +13,7 @@ import {SideScroller} from '../../components/SideScroller';
 import {Recipe, WeekplanDay} from '../../dao/RestAPI';
 import {MainNavigationProps, OverviewNavigationProps} from '../../navigation/NavigationRoutes';
 import {fetchWeekplanDays, updateSingleWeekplanDay} from '../../redux/features/weeklyRecipesSlice';
-import {useAppSelector} from '../../redux/hooks';
+import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles from '../../styles/CentralStyles';
 import {RecipeSelectionPopup} from './RecipeSelectionPopup';
 import {WeeklyRecipeCard} from './WeeklyRecipeCard';
@@ -30,7 +29,7 @@ const dateFormat = 'yyyy-MM-dd';
 export const WeeklyRecipeListScreen = (props: Props) => {
   const now = new XDate();
   const {t} = useTranslation('translation');
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [recipeSelectionVisible, setRecipeSelectionVisible] = useState<boolean>(false);
 
@@ -156,7 +155,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
         onClose={() => setRecipeSelectionVisible(false)}
         // @ts-ignore cannot be undefined
         onRecipeSelected={(recipe) => addRecipeToWeekplanDay(recipe, selectedWeekplanDay)}
-        onSimpleRecipeSelected={(text) => addSimpleRecipeToWeekplanDay(text, selectedWeekplanDay)}
+        onSimpleRecipeSelected={(text) => addSimpleRecipeToWeekplanDay(text, selectedWeekplanDay!)}
       />
     </>
   );

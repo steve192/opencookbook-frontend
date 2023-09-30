@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const ViewPager = (props: Props) => {
-  const pagerRef = useRef<PagerView>();
+  const pagerRef = useRef<PagerView>(null);
 
   useEffect(() => {
     pagerRef.current?.setPage(props.selectedIndex);

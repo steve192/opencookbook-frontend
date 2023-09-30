@@ -1,10 +1,9 @@
-import React from 'react';
+import React, {ComponentProps} from 'react';
 import {View} from 'react-native';
 import {IconButton, TextInput, withTheme} from 'react-native-paper';
-import {TextInputProps} from 'react-native-paper/lib/typescript/components/TextInput/TextInput';
 
 
-export const RecipeFormField = withTheme((inputProps: TextInputProps & { onRemovePress: Function }) => {
+export const RecipeFormField = withTheme((inputProps: ComponentProps<typeof TextInput> & { onRemovePress: Function }) => {
   return (
 
     <View style={{alignItems: 'center', flexDirection: 'row'}}>

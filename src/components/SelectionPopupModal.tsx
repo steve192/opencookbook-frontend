@@ -29,7 +29,7 @@ interface Props {
 
 
 export const SelectionPopupModal = (props: Props) => {
-  const modalInputRef = useRef<typeof TextInput>();
+  const modalInputRef = useRef<typeof TextInput>(null);
   const [value, setValue] = useState<string>('');
 
 
