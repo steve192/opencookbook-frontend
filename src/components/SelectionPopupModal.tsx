@@ -5,6 +5,7 @@ import {Modal, Pressable, View, ScrollView} from 'react-native';
 import {Divider, List, Surface, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {modalStyles} from '../styles/CentralStyles';
+import {ChunkView} from '../ChunkView';
 
 
 export interface Option {
@@ -87,13 +88,15 @@ export const SelectionPopupModal = (props: Props) => {
                     <Spacer width={10} />
                   </View>
                   <Divider style={{paddingVertical: 2, marginVertical: 10}} />
-                  <ScrollView keyboardShouldPersistTaps={'handled'}>
-                    {getListItemData().map((data, index) => <List.Item
-                      key={index}
-                      title={data.option.value}
-                      onPress={() => data.option.newlyCreated ? props.onSelection({key: '', value: value, newlyCreated: true}) : props.onSelection(data.option)} />,
-                    )}
-                  </ScrollView>
+                  <ChunkView>
+                    <ScrollView keyboardShouldPersistTaps={'handled'}>
+                      {getListItemData().map((data, index) => <List.Item
+                        key={index}
+                        title={data.option.value}
+                        onPress={() => data.option.newlyCreated ? props.onSelection({key: '', value: value, newlyCreated: true}) : props.onSelection(data.option)} />,
+                      )}
+                    </ScrollView>
+                  </ChunkView>
                 </Surface>
               </View>
             </>}
