@@ -9,11 +9,12 @@ import RestAPI, {Ingredient, IngredientUse} from '../../dao/RestAPI';
 
 interface Props {
     ingredient: IngredientUse
-    onIngredientChange: (newIngredient: IngredientUse) => void
-    onRemovePress: () => void
+    ingredientIndex: number
+    onIngredientChange: (newIngredient: IngredientUse, ingredientIndex: number) => void
+    onRemovePress: (ingredientIndex: number) => void
 }
 
-export const IngredientFormField = (props: Props) => {
+export const IngredientFormField = React.memo(function IngredientFormField(props: Props) {
   const [ingredientQuery, setIngredientQuery] = useState<string>(props.ingredient.ingredient.name);
   const [unit, setUnit] = useState<string>(props.ingredient.unit);
   const [amount, setAmount] = useState<string>(props.ingredient.amount === 0 ? '': String(props.ingredient.amount));
@@ -38,9 +39,9 @@ export const IngredientFormField = (props: Props) => {
   const invokeIngredientUpdate = (ingredientName: string, newAmount: string, newUnit: string) => {
     const existingIngredient = availableIngredients.find((ingredient) => ingredient.name.toLowerCase() === ingredientName.toLowerCase());
     if (existingIngredient) {
-      props.onIngredientChange({ingredient: existingIngredient, amount: newAmount === '' ? 0 : parseFloat(newAmount), unit: newUnit});
+      props.onIngredientChange({ingredient: existingIngredient, amount: newAmount === '' ? 0 : parseFloat(newAmount), unit: newUnit}, props.ingredientIndex);
     } else {
-      props.onIngredientChange({ingredient: {name: ingredientName}, amount: newAmount === '' ? 0 : parseFloat(newAmount), unit: newUnit});
+      props.onIngredientChange({ingredient: {name: ingredientName}, amount: newAmount === '' ? 0 : parseFloat(newAmount), unit: newUnit}, props.ingredientIndex);
     }
   };
 
@@ -108,9 +109,9 @@ export const IngredientFormField = (props: Props) => {
           </View>
           <IconButton
             icon="delete-outline"
-            onPress={() => props.onRemovePress()} />
+            onPress={() => props.onRemovePress(props.ingredientIndex)} />
         </View>
       </View>
     </>
   );
-};
+});

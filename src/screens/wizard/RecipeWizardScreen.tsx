@@ -1,5 +1,5 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useLayoutEffect, useState} from 'react';
+import React, {useCallback, useLayoutEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {Appbar, Button, Caption, Divider, Surface, TextInput, useTheme} from 'react-native-paper';
@@ -83,12 +83,13 @@ const RecipeWizardScreen = (props: Props) => {
     setRecipeData({...recipeData, preparationSteps: preparationStepsCopy});
   };
 
-
-  const removeIngredient = (index: number) => {
-    const ingredientsCopy = [...recipeData.neededIngredients];
-    ingredientsCopy.splice(index, 1);
-    setRecipeData({...recipeData, neededIngredients: ingredientsCopy});
-  };
+  const removeIngredient = useCallback((index: number) => {
+    setRecipeData((previousData) => {
+      const ingredientsCopy = [...previousData.neededIngredients];
+      ingredientsCopy.splice(index, 1);
+      return {...recipeData, neededIngredients: ingredientsCopy};
+    });
+  }, [setRecipeData]);
 
   const addRecipeImage = (uuid: string) => {
     const images = [...recipeData.images];
@@ -106,11 +107,13 @@ const RecipeWizardScreen = (props: Props) => {
     setRecipeData({...recipeData, neededIngredients: ingredientsCopy});
   };
 
-  const changeIngredient = (index: number, ingredient: IngredientUse) => {
-    const ingredientsCopy = [...recipeData.neededIngredients];
-    ingredientsCopy[index] = ingredient;
-    setRecipeData({...recipeData, neededIngredients: ingredientsCopy});
-  };
+  const changeIngredient = useCallback(( ingredient: IngredientUse, index: number) => {
+    setRecipeData((previousData) => {
+      const ingredientsCopy = [...previousData.neededIngredients];
+      ingredientsCopy[index] = ingredient;
+      return {...recipeData, neededIngredients: ingredientsCopy};
+    });
+  }, [setRecipeData]);
 
   const setRecipeGroup = (recipeGroup: RecipeGroup | undefined) => {
     if (!recipeGroup) {
@@ -157,8 +160,9 @@ const RecipeWizardScreen = (props: Props) => {
         <React.Fragment key={ingredientIndex}>
           <IngredientFormField
             ingredient={neededIngredient}
-            onIngredientChange={(ingredient) => changeIngredient(ingredientIndex, ingredient)}
-            onRemovePress={() => removeIngredient(ingredientIndex)} />
+            ingredientIndex={ingredientIndex}
+            onIngredientChange={changeIngredient}
+            onRemovePress={removeIngredient} />
           <Spacer height={10} />
         </React.Fragment>,
       )}
