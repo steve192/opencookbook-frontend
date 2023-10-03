@@ -2,6 +2,7 @@ import {Picker} from '@react-native-picker/picker';
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
+import Constants from 'expo-constants';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, View} from 'react-native';
@@ -91,6 +92,10 @@ export const SettingsScreen = (props: Props) => {
                 onPress={deleteAccount}>
                 {t('screens.settings.deleteAccount')}
               </Button>
+            </View>
+            <Spacer height={20}/>
+            <View>
+              <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>App version: {Constants.expoConfig?.version}</Text>
             </View>
           </ScrollView>
         </View>
