@@ -51,7 +51,6 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
         .then((ingredients) => {
           setAvailableIngredients(
               ingredients,
-              // ingredients.filter(item => item.name.toLowerCase().includes(ingredientQuery.toLowerCase()))
           );
         });
   };
