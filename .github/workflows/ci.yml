@@ -1,8 +1,11 @@
 name: NodeJS with Webpack
 on: 
   push:
-    branches:
-      - main
+    branches: [main]
+    # Publish semver tags as releases.
+    tags: ["v*.*.*"]
+  release:
+    types: [published]
   pull_request:
       types: [opened, synchronize, reopened]
 
@@ -37,6 +40,18 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16.x
+
+      - name: Set version
+        run: |
+          REF_TYPE="${{github.ref_type}}"
+          if [[ "$REF_TYPE" == "tag" ]]; then
+            sudo apt update && sudo apt install jq
+            TAG=${{  github.ref_name }}
+            TAG=${TAG#v}
+            echo $TAG
+            jq '.version = "'"$TAG"'"' "package.json" > temp.json && mv temp.json "package.json"
+            jq '.expo.version = "'"$TAG"'"' "app.json" > apptemp.json && mv apptemp.json "app.json"
+          fi
 
       - name: install dependencies and build
         run: |
@@ -184,6 +199,18 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16.x
+          
+      - name: Set version
+        run: |
+          REF_TYPE="${{github.ref_type}}"
+          if [[ "$REF_TYPE" == "tag" ]]; then
+            sudo apt update && sudo apt install jq
+            TAG=${{  github.ref_name }}
+            TAG=${TAG#v}
+            echo $TAG
+            jq '.version = "'"$TAG"'"' "package.json" > temp.json && mv temp.json "package.json"
+            jq '.expo.version = "'"$TAG"'"' "app.json" > apptemp.json && mv apptemp.json "app.json"
+          fi
 
       - name: Install dependencies
         run: npm ci

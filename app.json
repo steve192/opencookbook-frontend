@@ -7,7 +7,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "androidStatusBar": {
-      // "backgroundColor": "#C2185B",
       "translucent": true
     },
     "splash": {
