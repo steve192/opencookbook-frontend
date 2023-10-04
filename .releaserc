@@ -6,7 +6,7 @@
       {
         "preset": "angular",
         "releaseRules": [
-          { "type": "chore", "scope": "deps", "release": "minor" }
+          { "type": "chore", "scope": "deps", "release": "patch" }
         ]
       }
     ],
