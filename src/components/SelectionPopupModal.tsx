@@ -1,11 +1,11 @@
 import {HeaderHeightContext} from '@react-navigation/elements';
 import React, {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Modal, Pressable, View, ScrollView} from 'react-native';
+import {Modal, Pressable, View} from 'react-native';
 import {Divider, List, Surface, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {modalStyles} from '../styles/CentralStyles';
-import {ChunkView} from '../ChunkView';
+import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 
 
 export interface Option {
@@ -24,7 +24,6 @@ interface Props {
     onClose: () => void;
     placeholder?: string;
     onSelection: (selectedValue: Option) => void;
-
 }
 
 
@@ -65,6 +64,16 @@ export const SelectionPopupModal = (props: Props) => {
     return listItems;
   };
 
+  const dataProvider = new DataProvider((r1, r2) => {
+    return r1.key !== r2.key;
+  }).cloneWithRows(getListItemData());
+
+  const renderRow = (type: string|number, data: ListItemData) => <List.Item
+
+    style={{width: 1000}} // Just enough to fill parent, value does not matter as its cut
+    title={data.option.value}
+    onPress={() => data.option.newlyCreated ? props.onSelection({key: '', value: value, newlyCreated: true}) : props.onSelection(data.option)} />;
+
   return <View style={modalStyles.centeredView}>
     <Modal
       animationType="slide"
@@ -84,19 +93,31 @@ export const SelectionPopupModal = (props: Props) => {
                 <Surface style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, modalStyles.modalView]}>
                   <View
                     style={{flexDirection: 'row', alignContent: 'center'}}>
-                    <TextInput placeholder={props.placeholder} ref={modalInputRef} onChangeText={onSearchInputChange} style={{flex: 1}} value={value} />
+                    <TextInput
+                      placeholder={props.placeholder}
+                      ref={modalInputRef}
+                      onChangeText={onSearchInputChange}
+                      style={{flex: 1}}
+                      value={value} />
                     <Spacer width={10} />
                   </View>
                   <Divider style={{paddingVertical: 2, marginVertical: 10}} />
-                  <ChunkView>
-                    <ScrollView keyboardShouldPersistTaps={'handled'}>
-                      {getListItemData().map((data, index) => <List.Item
-                        key={index}
-                        title={data.option.value}
-                        onPress={() => data.option.newlyCreated ? props.onSelection({key: '', value: value, newlyCreated: true}) : props.onSelection(data.option)} />,
-                      )}
-                    </ScrollView>
-                  </ChunkView>
+                  <RecyclerListView
+                    keyboardShouldPersistTaps={true}
+                    rowRenderer={renderRow}
+                    dataProvider={dataProvider}
+                    forceNonDeterministicRendering={true}
+                    layoutProvider={new LayoutProvider(
+                        (index) => {
+                          return 0; // Does not matter as only single type is used
+                        },
+                        (type, dim, index) => {
+                          dim.width = 1000; // Just enough to fill parent, value does not matter
+                          dim.height = 40; // Does not matter because of nonDeterministicRendering?
+                        },
+                    )}
+                  >
+                  </RecyclerListView>
                 </Surface>
               </View>
             </>}
