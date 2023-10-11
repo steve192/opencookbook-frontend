@@ -55,13 +55,25 @@ export const SelectionPopupModal = (props: Props) => {
 
     filteredItems.sort(sortFunction);
 
-    const listItems: ListItemData[] = value.length > 0 ? [{option: {key: '', value: t('common.createImperative') + ' ' + value, newlyCreated: true}}] : [];
+    let listItems: ListItemData[] = value.length > 0 ? [{option: {key: '', value: t('common.createImperative') + ' ' + value, newlyCreated: true}}] : [];
     if (filteredItems.length > 0) {
       filteredItems.forEach((item) => {
         listItems.push({option: item});
       });
     }
-    return listItems;
+
+    // Filter distinct values (user cannot distinct keys anyhow)
+    const presentKeys: string[] = [];
+    listItems = listItems.filter((item) => {
+      if (presentKeys.indexOf(item.option.value) !== -1) {
+        return false;
+      }
+      presentKeys.push(item.option.value);
+      return true;
+    });
+
+    // Dont show empty values
+    return listItems.filter((item) => item.option.value !== '');
   };
 
   const dataProvider = new DataProvider((r1, r2) => {
