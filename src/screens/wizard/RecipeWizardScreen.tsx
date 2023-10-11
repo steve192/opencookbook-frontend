@@ -229,7 +229,7 @@ const RecipeWizardScreen = (props: Props) => {
               mode='outlined'
               label={t('screens.editRecipe.servings')}
               keyboardType='numeric'
-              value={recipeData.servings?.toString()}
+              value={recipeData.servings === undefined ? "" : recipeData.servings?.toString()}
               // @ts-ignore
               onChangeText={(newText) => setRecipeData({...recipeData, servings: parseInt(newText) ? parseInt(newText) : undefined})} />
             <Divider style={{marginVertical: 10}} />
