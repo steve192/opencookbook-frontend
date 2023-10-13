@@ -81,7 +81,6 @@ export const SelectionPopupModal = (props: Props) => {
   }).cloneWithRows(getListItemData());
 
   const renderRow = (type: string|number, data: ListItemData) => <List.Item
-
     style={{width: 1000}} // Just enough to fill parent, value does not matter as its cut
     title={data.option.value}
     onPress={() => data.option.newlyCreated ? props.onSelection({key: '', value: value, newlyCreated: true}) : props.onSelection(data.option)} />;

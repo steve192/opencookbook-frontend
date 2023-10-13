@@ -23,16 +23,10 @@ const RecipeWizardScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const dispatch = useAppDispatch();
 
-  let existingRecipe: Recipe | undefined;
-  if (props.route.params?.recipeId) {
-    // @ts-ignore never undefined
-    existingRecipe = useAppSelector((state) => state.recipes.recipes.filter((recipe) => recipe.id === props.route.params.recipeId)[0]);
-  } else {
-    existingRecipe = undefined;
-  }
+  const existingRecipe: Recipe | undefined = useAppSelector((state) => state.recipes.recipes.filter((recipe) => recipe.id === props.route.params?.recipeId)?.[0]);
+
   const [recipeData, setRecipeData] = useState<Recipe>(
-        existingRecipe ?
-            existingRecipe :
+      existingRecipe ??
             {
               title: '',
               neededIngredients: [{ingredient: {name: ''}, amount: 0, unit: ''}],
@@ -229,7 +223,7 @@ const RecipeWizardScreen = (props: Props) => {
               mode='outlined'
               label={t('screens.editRecipe.servings')}
               keyboardType='numeric'
-              value={recipeData.servings === undefined ? "" : recipeData.servings?.toString()}
+              value={recipeData.servings === undefined ? '' : recipeData.servings?.toString()}
               // @ts-ignore
               onChangeText={(newText) => setRecipeData({...recipeData, servings: parseInt(newText) ? parseInt(newText) : undefined})} />
             <Divider style={{marginVertical: 10}} />
