@@ -70,7 +70,6 @@
     "@expo/ngrok": "^4.1.0",
     "@types/react": "~18.2.24",
     "@types/react-dom": "~18.0.10",
-    "expo-dev-client": "~2.4.11",
     "@types/react-native-vector-icons": "^6.4.10",
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.9.1",
