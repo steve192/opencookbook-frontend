@@ -64,7 +64,7 @@ export const RecipeImageComponent = (props: Props) => {
     }).start();
   }, [isDragging]);
 
-  const onStartGesture = async (event: GestureResponderEvent, gestureState: PanResponderGestureState ) => {
+  const onStartGesture = (event: GestureResponderEvent, gestureState: PanResponderGestureState ) => {
     if (gestureInProgress.current) {
       return;
     }
