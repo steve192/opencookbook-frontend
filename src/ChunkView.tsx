@@ -4,7 +4,7 @@ import {ActivityIndicator} from 'react-native-paper';
 
 const BATCH_SIZE = 100;
 
-export const ChunkView = ({children}) => {
+export const ChunkView = ({children}: {children: any}) => {
   const [batchIndex, setBatchIndexRaw] = useState(0);
   const focusedRef = useRef(true);
   const batchIndexRef = useRef(1);
@@ -30,7 +30,7 @@ export const ChunkView = ({children}) => {
     childrenChunk = children;
   }
 
-  const setBatchIndex = (index) => {
+  const setBatchIndex = (index: number) => {
     batchIndexRef.current = index;
     setBatchIndexRaw(index);
   };

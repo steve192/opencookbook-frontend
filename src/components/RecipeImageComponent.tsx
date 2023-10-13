@@ -73,16 +73,13 @@ export const RecipeImageComponent = (props: Props) => {
 
     const {touches} = event.nativeEvent;
 
-    return new Promise<void>((resolve) => {
-      imageRef.current?.measure((x, y, width, height, pageX, pageY) => {
-        pinchImagePosition.current.setValue({x: 0, y: 0});
-        pinchImagePosition.current.setOffset({x: pageX, y: pageY});
-        initialImageSize.current = {width: width, height: height};
-        initialTouches.current = touches;
-        gestureInProgress.current = gestureState.stateID;
-        setIsDragging(true);
-        resolve();
-      });
+    imageRef.current?.measure((x, y, width, height, pageX, pageY) => {
+      pinchImagePosition.current.setValue({x: 0, y: 0});
+      pinchImagePosition.current.setOffset({x: pageX, y: pageY});
+      initialImageSize.current = {width: width, height: height};
+      initialTouches.current = touches;
+      gestureInProgress.current = gestureState.stateID;
+      setIsDragging(true);
     });
   };
 
@@ -172,7 +169,7 @@ export const RecipeImageComponent = (props: Props) => {
         return gestureInProgress.current == undefined;
       },
       onPanResponderTerminate: (event, gestureState) => {
-        return onGestureRelease(event, gestureState);
+        onGestureRelease(event, gestureState);
       },
     });
   }, []);
