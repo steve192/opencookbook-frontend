@@ -11,6 +11,15 @@
       }
     ],
     "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          { "path": "app-build.apk/app-android.apk", "label": "App APK" },
+          { "path": "app-build.aab/app-android.aab", "label": "App aab" }
+        ]
+      }
+    ],
     "@semantic-release/github"
   ]
 }
