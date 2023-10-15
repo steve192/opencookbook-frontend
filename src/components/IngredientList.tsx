@@ -47,12 +47,12 @@ export const IngredientList = (props: Props) => {
                 style={{
                   flex: 2,
                   alignSelf: 'stretch',
-                  color: props.greyedOutStyle ? theme.colors.disabled: theme.colors.primary,
+                  color: props.greyedOutStyle ? theme.colors.onSurfaceDisabled: theme.colors.primary,
                   fontWeight: 'bold',
                 }}>{`${ingredient.amount > 0 ? scaleIngredient(ingredient.amount) : ''} ${ingredient.unit}`}
               </Text>
 
-              <Text style={{flex: 4, alignSelf: 'stretch', color: props.greyedOutStyle ? theme.colors.disabled : theme.colors.text}} >{ingredient.ingredient.name}</Text>
+              <Text style={{flex: 4, alignSelf: 'stretch', color: props.greyedOutStyle ? theme.colors.onSurfaceDisabled : theme.colors.onSurface}} >{ingredient.ingredient.name}</Text>
             </View>
           </React.Fragment>,
         )}

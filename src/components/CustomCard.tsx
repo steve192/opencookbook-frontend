@@ -1,13 +1,14 @@
 import React from 'react';
 import {View} from 'react-native';
-import {Colors, Surface} from 'react-native-paper';
+import {Surface, useTheme} from 'react-native-paper';
 
 
 export const CustomCard = (props: React.ComponentPropsWithRef<typeof View> ) => {
+  const theme = useTheme();
   return (
     <Surface style={[{
       borderWidth: 1,
-      borderColor: Colors.grey300,
+      borderColor: theme.colors.outlineVariant,
       padding: 10,
       borderRadius: 5,
       shadowColor: '#000',

@@ -58,7 +58,7 @@ export const SettingsScreen = (props: Props) => {
       <Surface style={[CentralStyles.fullscreen]}>
         <View style={CentralStyles.contentContainer}>
           <ScrollView>
-            <Avatar.Icon style={{alignSelf: 'center', backgroundColor: 'transparent'}} size={100} color={theme.colors.text} icon="server"/>
+            <Avatar.Icon style={{alignSelf: 'center', backgroundColor: 'transparent'}} size={100} color={theme.colors.onSurface} icon="server"/>
             <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{backendUrl}</Text>
             <Spacer height={20} />
             <Button

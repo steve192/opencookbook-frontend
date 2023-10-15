@@ -44,7 +44,7 @@ export const RecipeScreen = (props: Props) => {
       headerRight: () => (
         <Appbar.Action
           icon="pencil-outline"
-          color={theme.colors.textOnPrimary}
+          color={theme.colors.onPrimary}
           onPress={() => props.navigation.navigate('RecipeWizardScreen', {
             editing: true,
             recipeId: displayedRecipe.id,
@@ -112,7 +112,6 @@ export const RecipeScreen = (props: Props) => {
           </View>
         </ScrollView>
       </Surface>
-      <Text/>
     </ChunkView>
   );
 };

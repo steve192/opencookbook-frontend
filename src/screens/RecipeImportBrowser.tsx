@@ -101,9 +101,9 @@ export const RecipeImportBrowser = () => {
 
 
   const buttonColors: {[key in typeof importStatus]: string} = {
-    'not_started': importPossible ? theme.colors.primary : theme.colors.accent,
+    'not_started': importPossible ? theme.colors.primary : theme.colors.primary,
     'failed': theme.colors.error,
-    'pending': theme.colors.accent,
+    'pending': theme.colors.primary,
     'success': theme.colors.primary,
   };
 

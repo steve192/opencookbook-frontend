@@ -49,13 +49,13 @@ const RecipeListScreen = (props: Props) => {
           headerRight: () => (
             <Appbar.Action
               icon="group"
-              color={theme.colors.textOnPrimary}
+              color={theme.colors.onPrimary}
               onPress={() => setRecipeGroupSelectionOpened(true)} />
           ),
           headerLeft: () => (
             <Appbar.Action
               icon="close"
-              color={theme.colors.textOnPrimary}
+              color={theme.colors.onPrimary}
               onPress={() => clearMultiSelectionMode()} />
           ),
         });
@@ -67,7 +67,7 @@ const RecipeListScreen = (props: Props) => {
             headerRight: () => (
               <Appbar.Action
                 icon="pencil-outline"
-                color={theme.colors.textOnPrimary}
+                color={theme.colors.onPrimary}
                 onPress={() => shownRecipeGroup.id && props.navigation.navigate('RecipeGroupEditScreen', {editing: true, recipeGroupId: shownRecipeGroup.id})} />
             ),
           });
@@ -157,7 +157,7 @@ const RecipeListScreen = (props: Props) => {
           fabStyle={{
             backgroundColor: theme.colors.primary,
           }}
-          color={theme.colors.textOnPrimary}
+          color={theme.colors.onPrimary}
           actions={[
             {
               small: false,

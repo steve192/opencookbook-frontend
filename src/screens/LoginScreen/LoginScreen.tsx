@@ -71,7 +71,7 @@ const LoginScreen = ({route, navigation}: Props) => {
     <LoginBackdrop>
       <IconButton
         icon="cog"
-        color={OwnColors.bluishGrey}
+        iconColor={OwnColors.bluishGrey}
         size={20}
         onPress={() => setSettingsModalVisible(true)}
       />

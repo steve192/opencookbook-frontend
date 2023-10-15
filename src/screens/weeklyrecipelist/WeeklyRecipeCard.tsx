@@ -33,7 +33,7 @@ export const WeeklyRecipeCard = (props: Props) => {
       {editMode &&
       <IconButton
         style={{alignSelf: 'center'}}
-        color={theme.colors.error}
+        iconColor={theme.colors.error}
         icon="delete-outline"
         onPress={props.onRemovePress} />}
     </View>

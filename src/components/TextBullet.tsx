@@ -16,7 +16,7 @@ export const TextBullet = (props: Props) => {
         {backgroundColor: theme.colors.primary, borderColor: theme.colors.primary} :
         {borderColor: theme.colors.primary};
 
-  const additionalStylesText = props.selected ? {color: theme.colors.textOnPrimary} : {color: theme.colors.primary};
+  const additionalStylesText = props.selected ? {color: theme.colors.onPrimary} : {color: theme.colors.primary};
 
   return (
     <Pressable

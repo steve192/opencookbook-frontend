@@ -56,7 +56,7 @@ export const SplashScreen = () => {
             alignItems: 'center',
           }}>
             <ActivityIndicator />
-            <Text style={{color: theme.colors.textOnPrimary}}>{statusText}</Text>
+            <Text style={{color: theme.colors.onPrimary}}>{statusText}</Text>
           </View>
         </View>
       </View>

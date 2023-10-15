@@ -146,7 +146,7 @@ export const RecipeList = (props: Props) => {
               padding: 16,
               fontWeight: 'bold',
               position: 'absolute',
-              color: theme.colors.textOnPrimary,
+              color: theme.colors.onPrimary,
             }}>
             {recipeGroup.title}
           </Headline>
@@ -173,8 +173,8 @@ export const RecipeList = (props: Props) => {
 
   const renderNoItemsNotice = () => (
     <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', flex: 1, position: 'absolute'}}>
-      <MaterialIcons name="no-food" size={64} color={theme.colors.disabled} />
-      <Headline style={{padding: 64, color: theme.colors.disabled}}>
+      <MaterialIcons name="no-food" size={64} color={theme.colors.onSurfaceDisabled} />
+      <Headline style={{padding: 64, color: theme.colors.onSurfaceDisabled}}>
         {t('screens.overview.noRecipesMessage')}
       </Headline>
     </View>

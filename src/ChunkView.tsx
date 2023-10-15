@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {InteractionManager, View} from 'react-native';
-import {ActivityIndicator} from 'react-native-paper';
+import {ActivityIndicator, useTheme} from 'react-native-paper';
 
 const BATCH_SIZE = 100;
 
@@ -10,8 +10,10 @@ export const ChunkView = ({children}: {children: any}) => {
   const batchIndexRef = useRef(1);
   const reachedEndRef = useRef(false);
 
+  const theme = useTheme();
+
   const placeholderView = () => (
-    <View style={{alignItems: 'center', justifyContent: 'center', height: '100%'}}>
+    <View style={{alignItems: 'center', justifyContent: 'center', height: '100%', backgroundColor: theme.colors.background}}>
       <View>
         <ActivityIndicator size="large"/>
       </View>

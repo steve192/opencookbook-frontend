@@ -50,7 +50,7 @@ const RecipeWizardScreen = (props: Props) => {
           />
           <Appbar.Action
             icon="content-save-outline"
-            color={theme.colors.textOnPrimary}
+            color={theme.colors.onPrimary}
             onPress={() => saveRecipe()}
           />
         </>

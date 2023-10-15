@@ -1,7 +1,7 @@
 import React, {ReactElement} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Spacer from 'react-spacer';
-import {Colors, ProgressBar, Text} from 'react-native-paper';
+import {MD3Colors, ProgressBar, Text, useTheme} from 'react-native-paper';
 import {View} from 'react-native';
 import CentralStyles from '../styles/CentralStyles';
 
@@ -14,22 +14,25 @@ interface Props {
     pendingContent: string | ReactElement;
 }
 export const SuccessErrorBanner = (props: Props) => {
+
+  const theme = useTheme();
+
   const renderError =
   <>
-    <Icon style={{textAlign: 'center'}} name="exclamation-circle" size={30} color={Colors.red200} />
+    <Icon style={{textAlign: 'center'}} name="exclamation-circle" size={30} color={theme.colors.error} />
     <Spacer height={20}/>
-    <Text style={{fontWeight: 'bold', color: Colors.red200, textAlign: 'center'}}>{props.errorContent}</Text>
+    <Text style={{fontWeight: 'bold', color: theme.colors.error, textAlign: 'center'}}>{props.errorContent}</Text>
   </>;
   const renderSuccess =
   <>
-    <Icon style={{textAlign: 'center'}} name="check-circle" size={30} color={Colors.green200} />
+    <Icon style={{textAlign: 'center'}} name="check-circle" size={30} color={theme.colors.success} />
     <Spacer height={20}/>
-    <Text style={{fontWeight: 'bold', color: Colors.green200, textAlign: 'center'}}>{props.successContent}</Text>
+    <Text style={{fontWeight: 'bold', color: theme.colors.success, textAlign: 'center'}}>{props.successContent}</Text>
   </>;
 
   const renderPending =
     <>
-      <Text style={{fontWeight: 'bold', color: Colors.white, textAlign: 'center'}}>{props.pendingContent}</Text>
+      <Text style={{fontWeight: 'bold', color: MD3Colors.neutral0, textAlign: 'center'}}>{props.pendingContent}</Text>
       <Spacer height={20}/>
       <View style={{maxWidth: 300, width: '100%', alignSelf: 'center', justifyContent: 'center'}}>
         <ProgressBar indeterminate={true} />

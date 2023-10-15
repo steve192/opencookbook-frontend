@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
-import {Colors, IconButton, TextInput} from 'react-native-paper';
+import {IconButton, TextInput, useTheme} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {SelectionPopup} from '../../components/SelectionPopup';
 import RestAPI, {Ingredient, IngredientUse} from '../../dao/RestAPI';
@@ -15,6 +15,7 @@ interface Props {
 }
 
 export const IngredientFormField = React.memo(function IngredientFormField(props: Props) {
+  const theme = useTheme();
   const [ingredientQuery, setIngredientQuery] = useState<string>(props.ingredient.ingredient.name);
   const [unit, setUnit] = useState<string>(props.ingredient.unit);
   const [amount, setAmount] = useState<string>(props.ingredient.amount === 0 ? '': String(props.ingredient.amount));
@@ -76,7 +77,7 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
 
   return (
     <>
-      <View style={{borderWidth: 1, borderColor: Colors.grey50, padding: 10, borderRadius: 16}}>
+      <View style={{borderWidth: 1, borderColor: theme.colors.outline, padding: 10, borderRadius: 16}}>
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <View style={{flex: 1, flexDirection: 'column'}}>
             <View style={{flex: 1, flexDirection: 'row'}}>
