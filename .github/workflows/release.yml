@@ -57,13 +57,13 @@ jobs:
 
 
       - name: 📱 Upload binary
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@master
         with:
           name: app-android
           path: app-build.aab
 
       - name: 📱 Upload binary
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@master
         with:
           name: app-android
           path: app-build.apk
