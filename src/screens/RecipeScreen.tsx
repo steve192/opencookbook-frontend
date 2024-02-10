@@ -13,6 +13,7 @@ import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {fetchSingleRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
+import { useKeepAwake } from 'expo-keep-awake';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
@@ -25,6 +26,8 @@ export const RecipeScreen = (props: Props) => {
   const {t} = useTranslation('translation');
 
   const theme = useTheme();
+
+  useKeepAwake();
 
 
   useEffect(() => {
