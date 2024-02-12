@@ -1,5 +1,4 @@
 // / <reference types="cypress" />
-
 // Welcome to Cypress!
 //
 // This spec file contains a variety of sample tests
@@ -17,7 +16,7 @@ describe('Login form', () => {
   });
 
   it('login page shown', () => {
-    cy.location('pathname').should('equal', '/LoginScreen')
+    cy.location('pathname').should('equal', '/LoginScreen');
+    cy.percySnapshot();
   });
-
 });

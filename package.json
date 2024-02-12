@@ -13,7 +13,8 @@
     "publish-preview": "eas update --branch preview --auto",
     "build-android": "eas build --platform android --profile=production",
     "build-android-dev": "eas build --platform android --profile=development",
-    "build-android-preview": "eas build --platform android --profile=preview"
+    "build-android-preview": "eas build --platform android --profile=preview",
+    "cy:run": "cypress run"
   },
   "dependencies": {
     "@eva-design/eva": "^2.1.1",
@@ -68,6 +69,8 @@
     "@babel/core": "^7.20.0",
     "@expo/dev-tools": "^0.13.152",
     "@expo/ngrok": "^4.1.0",
+    "@percy/cli": "^1.28.0",
+    "@percy/cypress": "^3.1.2",
     "@types/react": "~18.2.24",
     "@types/react-dom": "~18.0.10",
     "@types/react-native-vector-icons": "^6.4.10",
