@@ -78,11 +78,12 @@ const LoginScreen = ({route, navigation}: Props) => {
       <View style={styles.loginContainer}>
         <View style={CentralStyles.smallContentContainer}>
           <Text style={CentralStyles.loginTitle}>CookPal</Text>
-          <TextInput mode="flat" dense={true} value={email} keyboardType='email-address' onChangeText={(text) => setEmail(text)} label="E-Mail" />
+          <TextInput testID='usernameInput' mode="flat" dense={true} value={email} keyboardType='email-address' onChangeText={(text) => setEmail(text)} label="E-Mail" />
           <Spacer height={10} />
-          <PasswordInput password={password} setPassword={setPassword} label={t('screens.login.password')} />
+          <PasswordInput testID='passwordInput' password={password} setPassword={setPassword} label={t('screens.login.password')} />
           <View style={styles.forgotPasswordContainer}>
             <Button
+              testID='forgotPassword'
               color={OwnColors.bluishGrey}
               compact={true}
               uppercase={false}
@@ -92,12 +93,14 @@ const LoginScreen = ({route, navigation}: Props) => {
             </Button>
           </View>
           <Button
+            testID='loginButton'
             mode="contained"
             labelStyle={{fontWeight: 'bold', color: 'white'}}
             style={CentralStyles.elementSpacing}
             onPress={doLogin}>Login</Button>
           {apiErrorMessage && <Text theme={{colors: {text: colors.error}}}>{apiErrorMessage}</Text>}
           <Button
+            testID='fogotPasswordButton'
             color={OwnColors.bluishGrey}
             compact={true}
             uppercase={false}

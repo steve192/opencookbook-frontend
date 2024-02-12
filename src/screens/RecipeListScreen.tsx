@@ -133,7 +133,7 @@ const RecipeListScreen = (props: Props) => {
 
   return (
     <>
-      <Surface style={CentralStyles.fullscreen}>
+      <Surface testID="recipeListScreen" style={CentralStyles.fullscreen}>
         <RecipeList
           // @ts-ignore Route params are sometimes string
           shownRecipeGroupId={props.route.params?.shownRecipeGroupId && parseInt(props.route.params.shownRecipeGroupId)}

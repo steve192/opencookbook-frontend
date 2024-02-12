@@ -18,6 +18,7 @@
   "dependencies": {
     "@eva-design/eva": "^2.1.1",
     "@expo/vector-icons": "^13.0.0",
+    "@expo/webpack-config": "^19.0.0",
     "@react-native-async-storage/async-storage": "1.18.2",
     "@react-native-picker/picker": "2.4.10",
     "@react-navigation/bottom-tabs": "^6.0.9",
@@ -61,8 +62,7 @@
     "react-spacer": "^1.3.0",
     "recyclerlistview": "^4.2.0",
     "swiper": "^8.0.7",
-    "xdate": "^0.8.2",
-    "@expo/webpack-config": "^19.0.0"
+    "xdate": "^0.8.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
@@ -73,6 +73,7 @@
     "@types/react-native-vector-icons": "^6.4.10",
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.9.1",
+    "cypress": "^13.6.4",
     "eas-cli": "^5.4.0",
     "eslint": "^8.7.0",
     "eslint-config-google": "^0.14.0",
