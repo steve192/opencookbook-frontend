@@ -63,6 +63,37 @@ jobs:
           name: web-build
           path: web-build/
 
+  cypress:
+    name: cypress
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # - name: Use Node.js 16.x
+    #   uses: actions/setup-node@v1
+    #   with:
+    #     node-version: 16.x
+    # - name: install dependencies
+    #   run: |
+    #     npm ci
+
+    # - name: Start application
+    #   run: npm run web &
+
+    # - name: Wait for application to start
+    #   run: sleep 30
+
+    # - name: Run Cypress tests
+    #   run: npm run cy:run
+    - name: Cypress run
+      uses: cypress-io/github-action@v6
+      with:
+        start: npm run web
+        command-prefix: percy exec -- npx
+      env:
+        PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
@@ -100,7 +131,9 @@ jobs:
 
   docker:
     name: BuildDocker
-    needs: build-web
+    needs: 
+      - build-web
+      - cypress
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -175,7 +208,9 @@ jobs:
   # Publish everything on main branch to expo (TODO: as soon as semantic versions are introduced, only release to beta release channel)
   expo-publish:
     name: Publish on expo
-    needs: sonarcloud
+    needs: 
+      - sonarcloud
+      - cypress
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' && ( github.ref_type == 'tag' )
     steps:

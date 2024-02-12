@@ -6,6 +6,7 @@ interface Props {
   setPassword: (newPassword: string) => void,
   label: string,
   error?: boolean,
+  testID?: string,
 }
 
 const ICON_INPUT_HIDDEN = 'eye-off';
@@ -31,6 +32,7 @@ export const PasswordInput = (props: Props) => {
 
   return (
     <TextInput
+      testID={props.testID}
       dense={true}
       mode="flat"
       value={props.password}
