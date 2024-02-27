@@ -19,7 +19,6 @@
           { "path": "app-build.aab/app-android.aab", "label": "App aab" }
         ]
       }
-    ],
-    "@semantic-release/github"
+    ]
   ]
 }
