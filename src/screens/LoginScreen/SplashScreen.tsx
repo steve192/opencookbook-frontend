@@ -26,6 +26,7 @@ export const SplashScreen = () => {
           console.log('Dowload update');
           setStatusText('Downloading new app version...');
           await Updates.fetchUpdateAsync();
+          setStatusText('Restarting app...');
           await Updates.reloadAsync();
         }
       } catch (e) {
