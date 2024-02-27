@@ -1,4 +1,5 @@
-import {Recipe} from '../dao/RestAPI';
+import { NavigatorScreenParams } from '@react-navigation/core';
+import { Recipe } from '../dao/RestAPI';
 
 export type BaseNavigatorProps = {
     AccountActivationScreen: { activationId: string}
@@ -11,7 +12,7 @@ export type LoginNavigationProps = {
     RequestPasswordResetScreen: undefined
 }
 export type MainNavigationProps = {
-    OverviewScreen: undefined
+    OverviewScreen: NavigatorScreenParams<OverviewNavigationProps>
     RecipeImportBrowser: undefined
     RecipeWizardScreen: { editing?: boolean, recipeId?: number }
     RecipeScreen: { recipeId: number }
@@ -21,7 +22,7 @@ export type MainNavigationProps = {
 };
 
 export type OverviewNavigationProps = {
-    RecipesListScreen: undefined,
+    RecipesListScreen: NavigatorScreenParams<RecipeScreenNavigation>,
     WeeklyScreen: undefined,
     SettingsScreen: undefined,
 }

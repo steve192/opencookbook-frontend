@@ -75,7 +75,7 @@ export const RecipeList = (props: Props) => {
       // This is used for an initial offset due to the search input field
       // @ts-ignore
     }).cloneWithRows([{}].concat(shownItems));
-  }, [myRecipes, myRecipeGroups, searchString, props.selectedRecipes]);
+  }, [myRecipes, myRecipeGroups, searchString, props.selectedRecipes, props.shownRecipeGroupId]);
 
   const onRecipeClick = (recipe: Recipe) => {
     if (props.multiSelectionModeActive) {
