@@ -17,12 +17,12 @@ interface Props {
 export const IngredientFormField = React.memo(function IngredientFormField(props: Props) {
   const [ingredientQuery, setIngredientQuery] = useState<string>(props.ingredient.ingredient.name);
   const [unit, setUnit] = useState<string>(props.ingredient.unit);
-  const [amount, setAmount] = useState<string>(props.ingredient.amount === 0 ? '': String(props.ingredient.amount));
+  const [amount, setAmount] = useState<string>(props.ingredient.amount === undefined || props.ingredient.amount === null ? '' : String(props.ingredient.amount));
 
   useEffect(() => {
     setIngredientQuery(props.ingredient.ingredient.name);
     setUnit(props.ingredient.unit);
-    setAmount(props.ingredient.amount === 0 ? '': String(props.ingredient.amount));
+    setAmount(props.ingredient.amount === undefined || props.ingredient.amount === null ? '' : String(props.ingredient.amount));
   }, [props.ingredient]);
 
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
@@ -38,10 +38,17 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
 
   const invokeIngredientUpdate = (ingredientName: string, newAmount: string, newUnit: string) => {
     const existingIngredient = availableIngredients.find((ingredient) => ingredient.name.toLowerCase() === ingredientName.toLowerCase());
+
+    let prasedAmount: number | null = parseFloat(newAmount);
+    // Check if its a number
+    if (prasedAmount.toString() !== newAmount || newAmount === '') {
+      prasedAmount = null;
+    }
+
     if (existingIngredient) {
-      props.onIngredientChange({ingredient: existingIngredient, amount: newAmount === '' ? 0 : parseFloat(newAmount), unit: newUnit}, props.ingredientIndex);
+      props.onIngredientChange({ingredient: existingIngredient, amount: prasedAmount, unit: newUnit}, props.ingredientIndex);
     } else {
-      props.onIngredientChange({ingredient: {name: ingredientName}, amount: newAmount === '' ? 0 : parseFloat(newAmount), unit: newUnit}, props.ingredientIndex);
+      props.onIngredientChange({ingredient: {name: ingredientName}, amount: prasedAmount, unit: newUnit}, props.ingredientIndex);
     }
   };
 
@@ -61,7 +68,8 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
     setAmount(text);
 
     const prasedAmount = parseFloat(text);
-    if (prasedAmount.toString() === text) {
+    // Check if its a number
+    if (prasedAmount.toString() === text || text === '') {
       invokeIngredientUpdate(ingredientQuery, text, unit);
     }
   };
@@ -75,43 +83,41 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
   }, []);
 
   return (
-    <>
-      <View style={{borderWidth: 1, borderColor: Colors.grey50, padding: 10, borderRadius: 16}}>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-          <View style={{flex: 1, flexDirection: 'column'}}>
-            <View style={{flex: 1, flexDirection: 'row'}}>
-              <TextInput
-                mode="outlined"
-                style={{width: 100}}
-                keyboardType="numeric"
-                value={(amount ? amount.toString() : '')}
-                label={t('screens.editRecipe.amount')}
-                onChangeText={onAmountChange} />
-              <Spacer width={5} />
-              <SelectionPopup
-                style={{flex: 1}}
-                label={t('screens.editRecipe.unit')}
-                value={unit}
-                options={availableUnits.map((availableUnit, index) => ({key: index.toString(), value: availableUnit}))}
-                onValueChanged={(selectedOption) => setUnit(selectedOption.value)}
-              />
-            </View>
-            <Spacer height={5} />
-            <View style={{justifyContent: 'center', flex: 1}}>
-              <SelectionPopup
-                label={t('screens.editRecipe.ingredient')}
-                value={ingredientQuery}
-                options={availableIngredients.map((ingredient) => ({key: ingredient.id ? ingredient.id.toString() : '', value: ingredient.name}))}
-                onValueChanged={(selectedOption) => setIngredient(selectedOption.value)}
-                allowAdditionalValues={true}
-              />
-            </View>
+    <View style={{borderWidth: 1, borderColor: Colors.grey50, padding: 10, borderRadius: 16}}>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View style={{flex: 1, flexDirection: 'column'}}>
+          <View style={{flex: 1, flexDirection: 'row'}}>
+            <TextInput
+              mode="outlined"
+              style={{width: 100}}
+              keyboardType="numeric"
+              value={(amount !== undefined ? amount.toString() : '')}
+              label={t('screens.editRecipe.amount')}
+              onChangeText={onAmountChange} />
+            <Spacer width={5} />
+            <SelectionPopup
+              style={{flex: 1}}
+              label={t('screens.editRecipe.unit')}
+              value={unit}
+              options={availableUnits.map((availableUnit, index) => ({key: index.toString(), value: availableUnit}))}
+              onValueChanged={(selectedOption) => setUnit(selectedOption.value)}
+            />
           </View>
-          <IconButton
-            icon="delete-outline"
-            onPress={() => props.onRemovePress(props.ingredientIndex)} />
+          <Spacer height={5} />
+          <View style={{justifyContent: 'center', flex: 1}}>
+            <SelectionPopup
+              label={t('screens.editRecipe.ingredient')}
+              value={ingredientQuery}
+              options={availableIngredients.map((ingredient) => ({key: ingredient.id ? ingredient.id.toString() : '', value: ingredient.name}))}
+              onValueChanged={(selectedOption) => setIngredient(selectedOption.value)}
+              allowAdditionalValues={true}
+            />
+          </View>
         </View>
+        <IconButton
+          icon="delete-outline"
+          onPress={() => props.onRemovePress(props.ingredientIndex)} />
       </View>
-    </>
+    </View>
   );
 });
