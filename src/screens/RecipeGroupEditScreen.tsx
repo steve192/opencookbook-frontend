@@ -11,6 +11,7 @@ import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeGroupEditScreen'>;
+
 export const RecipeGroupEditScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const dispatch = useAppDispatch();
@@ -38,7 +39,15 @@ export const RecipeGroupEditScreen = (props: Props) => {
 
   const dispatchDeleteRecipeGroup = () => {
     recipeGroupData.id && dispatch(deleteRecipeGroup(recipeGroupData.id)).then(() => {
-      props.navigation.goBack();
+      props.navigation.navigate('OverviewScreen', {
+        screen: 'RecipesListScreen',
+        params: {
+          screen: 'RecipeListDetailScreen',
+          params: {
+            shownRecipeGroupId: undefined,
+          },
+        },
+      });
     });
   };
 
