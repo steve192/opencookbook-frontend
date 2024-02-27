@@ -81,7 +81,7 @@ const RecipeWizardScreen = (props: Props) => {
     setRecipeData((previousData) => {
       const ingredientsCopy = [...previousData.neededIngredients];
       ingredientsCopy.splice(index, 1);
-      return {...recipeData, neededIngredients: ingredientsCopy};
+      return {...previousData, neededIngredients: ingredientsCopy};
     });
   }, [setRecipeData]);
 
@@ -105,7 +105,7 @@ const RecipeWizardScreen = (props: Props) => {
     setRecipeData((previousData) => {
       const ingredientsCopy = [...previousData.neededIngredients];
       ingredientsCopy[index] = ingredient;
-      return {...recipeData, neededIngredients: ingredientsCopy};
+      return {...previousData, neededIngredients: ingredientsCopy};
     });
   }, [setRecipeData]);
 
