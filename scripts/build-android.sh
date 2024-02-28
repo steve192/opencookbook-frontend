@@ -1,4 +1,5 @@
 #!/bin/sh
+yes | sdkmanager --licenses
 
 npm ci
 # eas build --local \
