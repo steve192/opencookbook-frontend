@@ -6,9 +6,15 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      "channel": "preview",
       "android": {
+        "distribution": "internal",
+        "withoutCredentials": true,
         "buildType": "apk"
-      }
+      },
+      "env": {
+        "EX_UPDATES_NATIVE_DEBUG": "1"
+      },
     },
     "preview": {
       "distribution": "internal",
