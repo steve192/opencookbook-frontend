@@ -21,13 +21,18 @@ export const SplashScreen = () => {
       try {
         setStatusText('Checking for updates...');
         console.log('Update check');
+        await new Promise(r => setTimeout(r, 1000));
         const update = await Updates.checkForUpdateAsync();
+        setStatusText('ok');
         if (update.isAvailable) {
           console.log('Dowload update');
           setStatusText('Downloading new app version...');
           await Updates.fetchUpdateAsync();
+          console.log('Restarting app');
           setStatusText('Restarting app...');
-          await Updates.reloadAsync();
+          Updates.reloadAsync()
+              .then((r) => console.log('Restart triggered', r))
+              .catch((e) => console.error('Restarting failed', e));
         }
       } catch (e) {
         // Ignore error, just start with unupdated version
