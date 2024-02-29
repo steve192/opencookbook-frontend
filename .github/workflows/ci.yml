@@ -110,13 +110,13 @@ jobs:
           context: .
           push: false
           load: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ env.IMAGE_NAME }}:cypresstest
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
-          start: docker run --rm -p 80:80 ${{ steps.meta.outputs.tags }}
+          start: docker run --rm -p 80:80 ${{ env.IMAGE_NAME }}:cypresstest
           command-prefix: percy exec -- npx
           config: baseUrl=http://localhost:80
         env:
@@ -167,13 +167,13 @@ jobs:
           context: .
           push: false
           load: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ${{ env.IMAGE_NAME }}:cypresstest
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: Cypress run
         uses: cypress-io/github-action@v6
         with:
-          start: docker run --rm -p 80:80 ${{ steps.meta.outputs.tags }}
+          start: docker run --rm -p 80:80 ${{ env.IMAGE_NAME }}:cypresstest
           config: baseUrl=http://localhost:80
 
       - name: "Upload Artifact"
