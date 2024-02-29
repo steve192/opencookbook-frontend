@@ -25,7 +25,7 @@ jobs:
       - name: Set version
         run: |
           sudo apt update && sudo apt install jq
-          TAG=${{ steps.next-version-determination.outputs.labels }}
+          TAG=${{ steps.next-version-determination.outputs.NEXT_VERSION }}
           echo $TAG
           jq '.version = "'"$TAG"'"' "package.json" > temp.json && mv temp.json "package.json"
           jq '.expo.version = "'"$TAG"'"' "app.json" > apptemp.json && mv apptemp.json "app.json"
