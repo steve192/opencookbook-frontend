@@ -20,7 +20,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: NEXT_VERSION=$(npx semantic-release@23 -d | grep "The next release version is" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+        run: NEXT_VERSION=$(npx semantic-release@23 --dry-run | grep "The next release version is" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
 
       - name: Set version
         run: |
@@ -31,48 +31,10 @@ jobs:
           jq '.expo.version = "'"$TAG"'"' "app.json" > apptemp.json && mv apptemp.json "app.json"
 
       - name: Build android apk
-        run: docker run -it -e EXPO_TOKEN=$EXPO_TOKEN DEFAULT_API_URL=$DEFAULT_API_URL -v "$(pwd)":/builder ghcr.io/steve192/easbuilder:latest production-apk
+        run: docker run -e EXPO_TOKEN=$EXPO_TOKEN -e DEFAULT_API_URL=$DEFAULT_API_URL -v "$(pwd)":/builder ghcr.io/steve192/easbuilder:latest production-apk
         env:
           DEFAULT_API_URL: https://beta.cookpal.io
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      # - name: 📋 Test project
-      #   run: npm run test
-
-      # - name: 👷 Build app aab
-      #   run: |
-      #     eas build --local \
-      #       --non-interactive \
-      #       --output=./app-build.aab \
-      #       --platform=android \
-      #       --profile=production
-      #     mv app-build.aab/app-android app-build.aab/app-android.aab
-
-      # - name: 👷 Build app apk
-      #   run: |
-      #     eas build --local \
-      #       --non-interactive \
-      #       --output=./app-build.apk \
-      #       --platform=android \
-      #       --profile=production-apk
-      #     mv app-build.apk/app-android app-build.apk/app-android.apk
-
-      # - name: 📱 Upload binary
-      #   uses: actions/upload-artifact@master
-      #   with:
-      #     name: app-android
-      #     path: app-build.aab
-
-      # - name: 📱 Upload binary
-      #   uses: actions/upload-artifact@master
-      #   with:
-      #     name: app-android
-      #     path: app-build.apk
-
-      # - name: Setup Node.js
-      #   uses: actions/setup-node@v4
-      #   with:
-      #     node-version: "lts/*"
 
       - name: Release
         env:

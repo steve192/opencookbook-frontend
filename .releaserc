@@ -15,8 +15,8 @@
       "@semantic-release/github",
       {
         "assets": [
-          { "path": "app-build.apk/app-android.apk", "label": "App APK" },
-          { "path": "app-build.aab/app-android.aab", "label": "App aab" }
+          { "path": "app-build.apk", "label": "App APK" },
+          { "path": "app-build.aab", "label": "App AAB" }
         ]
       }
     ]
