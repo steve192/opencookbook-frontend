@@ -16,29 +16,25 @@ jobs:
           node-version: 20.x
 
       - name: Determine next version
+        id: next-version-determination
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release@23 --dry-run
+        run: NEXT_VERSION=$(npx semantic-release@23 -d | grep "The next release version is" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
 
-      - name: 🏗 Setup java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin' 
-          java-version: '17'
+      - name: Set version
+        run: |
+          sudo apt update && sudo apt install jq
+          TAG=${{ steps.next-version-determination.outputs.labels }}
+          echo $TAG
+          jq '.version = "'"$TAG"'"' "package.json" > temp.json && mv temp.json "package.json"
+          jq '.expo.version = "'"$TAG"'"' "app.json" > apptemp.json && mv apptemp.json "app.json"
 
-      - name: 🏗 Setup Expo and EAS
-        uses: expo/expo-github-action@v7
-        with:
-          token: ${{ secrets.EXPO_TOKEN }}
-          expo-version: latest
-          eas-version: latest
-
-      - name: 🏗 Setup EAS local builds
-        run: npm i --global eas-cli-local-build-plugin
-
-      - name: 📦 Install dependencies
-        run: npm ci
+      - name: Build android apk
+        run: docker run -it -e EXPO_TOKEN=$EXPO_TOKEN DEFAULT_API_URL=$DEFAULT_API_URL -v "$(pwd)":/builder ghcr.io/steve192/easbuilder:latest production-apk
+        env:
+          DEFAULT_API_URL: https://beta.cookpal.io
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
       # - name: 📋 Test project
       #   run: npm run test
@@ -60,7 +56,6 @@ jobs:
       #       --platform=android \
       #       --profile=production-apk
       #     mv app-build.apk/app-android app-build.apk/app-android.apk
-
 
       # - name: 📱 Upload binary
       #   uses: actions/upload-artifact@master
