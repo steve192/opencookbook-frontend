@@ -149,7 +149,7 @@ const RecipeWizardScreen = (props: Props) => {
 
   const renderIngredientsSection = () =>
     <>
-      <Caption>{t('screens.editRecipe.ingredients')}</Caption>
+      <Caption testID='ingredient-list-title'>{t('screens.editRecipe.ingredients')}</Caption>
       {recipeData.neededIngredients.map((neededIngredient, ingredientIndex) =>
         <React.Fragment key={ingredientIndex}>
           <IngredientFormField

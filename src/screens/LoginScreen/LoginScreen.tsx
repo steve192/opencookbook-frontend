@@ -100,7 +100,7 @@ const LoginScreen = ({route, navigation}: Props) => {
             onPress={doLogin}>Login</Button>
           {apiErrorMessage && <Text theme={{colors: {text: colors.error}}}>{apiErrorMessage}</Text>}
           <Button
-            testID='fogotPasswordButton'
+            testID='SignUpButton'
             color={OwnColors.bluishGrey}
             compact={true}
             uppercase={false}
