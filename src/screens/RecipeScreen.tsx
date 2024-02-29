@@ -60,7 +60,7 @@ export const RecipeScreen = (props: Props) => {
 
   const renderIngredientsSection = () =>
     <>
-      <Caption>{t('screens.recipe.ingredients')}</Caption>
+      <Caption testID='ingredient-section-caption'>{t('screens.recipe.ingredients')}</Caption>
       <IngredientList
         ingredients={displayedRecipe.neededIngredients}
         servings={displayedRecipe.servings}
