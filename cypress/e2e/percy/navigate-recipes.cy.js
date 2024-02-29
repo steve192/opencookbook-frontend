@@ -98,7 +98,7 @@ describe('Recipe navigation', () => {
   it('edit recipe', () => {
     cy.visit('/recipe?recipeId=1898');
 
-    cy.wait(1000);
+    cy.get('[data-testid="ingredient-section-caption"]').should('exist');
 
     cy.get('[data-testid="recipe-edit-button"]').click();
     cy.get('[data-testid="ingredient-list-title"]').should('exist');
