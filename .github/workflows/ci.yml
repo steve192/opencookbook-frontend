@@ -65,6 +65,8 @@ jobs:
 
   cypress-percy:
     name: cypress-percy
+    needs:
+      - build-web
     runs-on: ubuntu-latest
     # Run only on main branch
     if: github.event_name != 'pull_request' && ( github.ref_protected == true )
