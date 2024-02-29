@@ -1,0 +1,385 @@
+[
+  {
+    "id": 48,
+    "title": "Hähnchen mit Aprikosen-Curry Sauce",
+    "neededIngredients": [
+      {
+        "createdOn": "2023-10-02T13:05:29.716055Z",
+        "lastChange": "2023-10-02T13:05:29.716055Z",
+        "id": 49,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:29.476241Z",
+          "lastChange": "2023-10-02T13:05:30.645170Z",
+          "id": 39,
+          "name": "Hähnchenbrust",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 2.0,
+        "unit": ""
+      },
+      {
+        "createdOn": "2023-10-02T13:05:29.731346Z",
+        "lastChange": "2023-10-02T13:05:29.731346Z",
+        "id": 50,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:29.492465Z",
+          "lastChange": "2023-10-02T13:05:29.492465Z",
+          "id": 40,
+          "name": "Knoblauchzehe",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 1.0,
+        "unit": ""
+      },
+      {
+        "createdOn": "2023-10-02T13:05:29.737286Z",
+        "lastChange": "2023-10-02T13:05:29.737286Z",
+        "id": 51,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:29.507856Z",
+          "lastChange": "2023-10-02T13:05:29.507856Z",
+          "id": 41,
+          "name": "Reis",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 150.0,
+        "unit": "g"
+      },
+      {
+        "createdOn": "2023-10-02T13:05:29.744753Z",
+        "lastChange": "2023-10-02T13:05:29.744753Z",
+        "id": 52,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:29.530227Z",
+          "lastChange": "2023-10-02T13:05:29.530227Z",
+          "id": 42,
+          "name": "Schalotte",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 1.0,
+        "unit": ""
+      },
+      {
+        "createdOn": "2023-10-02T13:05:29.756705Z",
+        "lastChange": "2023-10-02T13:05:29.756705Z",
+        "id": 53,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:29.546655Z",
+          "lastChange": "2023-10-02T13:05:29.546655Z",
+          "id": 43,
+          "name": "Karotten",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 4.0,
+        "unit": ""
+      },
+      {
+        "createdOn": "2023-10-02T13:05:29.772561Z",
+        "lastChange": "2023-10-02T13:05:29.772561Z",
+        "id": 54,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:29.579352Z",
+          "lastChange": "2023-10-02T13:05:29.579352Z",
+          "id": 44,
+          "name": "Curry",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 4.0,
+        "unit": "g"
+      },
+      {
+        "createdOn": "2023-10-02T13:05:29.781717Z",
+        "lastChange": "2023-10-02T13:05:29.781717Z",
+        "id": 55,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:29.594491Z",
+          "lastChange": "2023-10-02T13:05:29.594491Z",
+          "id": 45,
+          "name": "getrocknete Aprikosen",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 20.0,
+        "unit": "g"
+      },
+      {
+        "createdOn": "2023-10-02T13:05:29.799622Z",
+        "lastChange": "2023-10-02T13:05:29.799622Z",
+        "id": 56,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:29.612688Z",
+          "lastChange": "2023-10-02T13:05:29.612688Z",
+          "id": 46,
+          "name": "Aprikosenchutney",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 50.0,
+        "unit": "g"
+      },
+      {
+        "createdOn": "2024-02-27T18:45:59.020752Z",
+        "lastChange": "2024-02-27T18:46:16.797358Z",
+        "id": 26282,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:43.274100Z",
+          "lastChange": "2023-10-02T13:05:43.274100Z",
+          "id": 1111,
+          "name": "Ei(er)",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": null,
+        "unit": ""
+      },
+      {
+        "createdOn": "2024-02-27T18:45:59.022313Z",
+        "lastChange": "2024-02-27T18:46:16.797502Z",
+        "id": 26332,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:29.579352Z",
+          "lastChange": "2023-10-02T13:05:29.579352Z",
+          "id": 44,
+          "name": "Curry",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 0.5,
+        "unit": "Bündel"
+      },
+      {
+        "createdOn": "2024-02-27T18:45:59.023437Z",
+        "lastChange": "2024-02-27T18:46:16.797604Z",
+        "id": 26382,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:29.579352Z",
+          "lastChange": "2023-10-02T13:05:29.579352Z",
+          "id": 44,
+          "name": "Curry",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 5.0,
+        "unit": ""
+      }
+    ],
+    "preparationSteps": [
+      "Reis mit 300 ml Wasser in einem Topf kochen",
+      "Karotten schälen halbieren und in Streifen schneiden.\nDann mit Öl und Salz in einer Schüssel benetzen\n20 min im Backofen backen\n\n\n\n\nTest\n\n\n\n\nTest\n\n\n\nTest\n\n\n\nTest ",
+      "Hähnchen in einer Pfanne scharf anbraten. Dann aus der Pfanne nehmen und im Backofen fertig garen",
+      "Für die Sauce Schalotte und Knoblauch in feine Würfel schneiden.\nAprikosen in kleine Stückchen schneiden",
+      "Schalotten und Knoblauch in der Pfanne kurz anbraten, dann Wasser Aprikosenchutney, Curry und Butter hinzugeben",
+      "Alles zusammen anrichten"
+    ],
+    "images": [
+      {
+        "createdOn": "2023-10-02T13:05:29.403042Z",
+        "lastChange": "2023-10-02T13:05:29.403042Z",
+        "uuid": "8ab60895-f5ed-4400-a7f1-2a35b085d1e7"
+      },
+      {
+        "createdOn": "2023-10-02T13:05:29.417854Z",
+        "lastChange": "2023-10-02T13:05:29.417854Z",
+        "uuid": "159afa1e-2c5f-4d08-a5c2-686b72f05c49"
+      },
+      {
+        "createdOn": "2023-10-02T13:05:29.431811Z",
+        "lastChange": "2023-10-02T13:05:29.431811Z",
+        "uuid": "7ff334cc-03c3-4a6b-a3c4-e9428247e80a"
+      }
+    ],
+    "servings": 1,
+    "preparationTime": null,
+    "totalTime": null,
+    "recipeType": null,
+    "recipeGroups": [
+      {
+        "id": 2210,
+        "title": "test"
+      }
+    ]
+  },
+  {
+    "id": 3972,
+    "title": "test title",
+    "neededIngredients": [
+      {
+        "createdOn": "2024-02-27T14:25:23.697480Z",
+        "lastChange": "2024-02-27T14:25:23.697480Z",
+        "id": 25782,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:28.959132Z",
+          "lastChange": "2023-10-02T13:05:30.140043Z",
+          "id": 29,
+          "name": "",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 0.0,
+        "unit": ""
+      }
+    ],
+    "preparationSteps": ["test"],
+    "images": [
+      {
+        "createdOn": "2023-10-02T13:05:29.403042Z",
+        "lastChange": "2023-10-02T13:05:29.403042Z",
+        "uuid": "8ab60895-f5ed-4400-a7f1-2a35b085d1e7"
+      },
+      {
+        "createdOn": "2023-10-02T13:05:29.417854Z",
+        "lastChange": "2023-10-02T13:05:29.417854Z",
+        "uuid": "159afa1e-2c5f-4d08-a5c2-686b72f05c49"
+      },
+      {
+        "createdOn": "2023-10-02T13:05:29.431811Z",
+        "lastChange": "2023-10-02T13:05:29.431811Z",
+        "uuid": "7ff334cc-03c3-4a6b-a3c4-e9428247e80a"
+      }
+    ],
+    "servings": 1,
+    "preparationTime": null,
+    "totalTime": null,
+    "recipeType": null,
+    "recipeGroups": []
+  },
+  {
+    "id": 4222,
+    "title": "",
+    "neededIngredients": [
+      {
+        "createdOn": "2024-02-27T14:48:51.211528Z",
+        "lastChange": "2024-02-27T14:48:51.211528Z",
+        "id": 26082,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:29.612688Z",
+          "lastChange": "2023-10-02T13:05:29.612688Z",
+          "id": 46,
+          "name": "Aprikosenchutney",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 3.0,
+        "unit": "Blatt"
+      },
+      {
+        "createdOn": "2024-02-27T14:48:51.212670Z",
+        "lastChange": "2024-02-27T14:48:51.212670Z",
+        "id": 26132,
+        "ingredient": {
+          "createdOn": "2023-10-02T13:05:43.564108Z",
+          "lastChange": "2023-10-02T13:05:44.975408Z",
+          "id": 1144,
+          "name": "El Sesamöl",
+          "owner": {
+            "createdOn": "2023-10-02T13:05:27.788197Z",
+            "lastChange": "2023-10-02T13:05:27.788197Z",
+            "userId": 1,
+            "emailAddress": "1",
+            "activated": true
+          },
+          "publicIngredient": false
+        },
+        "amount": 5.0,
+        "unit": "Bündel"
+      }
+    ],
+    "preparationSteps": ["test"],
+    "images": [
+      {
+        "createdOn": "2023-10-02T13:05:29.403042Z",
+        "lastChange": "2023-10-02T13:05:29.403042Z",
+        "uuid": "8ab60895-f5ed-4400-a7f1-2a35b085d1e7"
+      }
+    ],
+    "servings": 1,
+    "preparationTime": null,
+    "totalTime": null,
+    "recipeType": null,
+    "recipeGroups": []
+  }
+]

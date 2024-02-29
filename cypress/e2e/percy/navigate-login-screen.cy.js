@@ -19,4 +19,18 @@ describe('Login form', () => {
     cy.location('pathname').should('equal', '/LoginScreen');
     cy.percySnapshot();
   });
+
+  it('password reset form', () => {
+    cy.visit('/LoginScreen');
+    cy.get('[data-testid="forgotPassword"]').click();
+    cy.get('[data-testid="password-reset-title"]').should('exist');
+    cy.percySnapshot();
+  });
+
+  it('register form', () => {
+    cy.visit('/LoginScreen');
+    cy.get('[data-testid="SignUpButton"]').click();
+    cy.get('[data-testid="signup-title"]').should('exist');
+    cy.percySnapshot();
+  });
 });

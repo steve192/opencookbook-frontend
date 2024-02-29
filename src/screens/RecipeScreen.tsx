@@ -13,7 +13,7 @@ import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {fetchSingleRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
-import { useKeepAwake } from 'expo-keep-awake';
+import {useKeepAwake} from 'expo-keep-awake';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
@@ -46,6 +46,7 @@ export const RecipeScreen = (props: Props) => {
       title: displayedRecipe ? displayedRecipe.title : 'Loading',
       headerRight: () => (
         <Appbar.Action
+          testID='recipe-edit-button'
           icon="pencil-outline"
           color={theme.colors.textOnPrimary}
           onPress={() => props.navigation.navigate('RecipeWizardScreen', {
@@ -73,7 +74,7 @@ export const RecipeScreen = (props: Props) => {
 
   const renderStepsSection = () => (
     <>
-      <Caption>{t('screens.recipe.preparationSteps')}</Caption>
+      <Caption testID='recipe-prepsteps-title'>{t('screens.recipe.preparationSteps')}</Caption>
       <Spacer height={20} />
       {displayedRecipe && displayedRecipe.preparationSteps.map((preparationStep, index) => (
         <React.Fragment key={index}>
@@ -103,6 +104,7 @@ export const RecipeScreen = (props: Props) => {
 
             <Spacer height={20} />
             <Button
+              testID='guided-cooking-button'
               mode="contained"
               dark={true}
               onPress={() => displayedRecipe && props.navigation.navigate('GuidedCookingScreen', {recipe: displayedRecipe, scaledServings: scaledServings})}>

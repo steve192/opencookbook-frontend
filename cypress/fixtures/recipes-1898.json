@@ -1,0 +1,336 @@
+{
+    "id": 1898,
+    "title": "Spaghetti and Meatballs",
+    "neededIngredients": [
+        {
+            "createdOn": "2023-10-02T13:05:54.731456Z",
+            "lastChange": "2023-10-02T13:05:54.731456Z",
+            "id": 1899,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:34.133059Z",
+                "lastChange": "2023-10-02T13:05:54.581258Z",
+                "id": 323,
+                "name": "Hackfleisch",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 0.0,
+            "unit": ""
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.736681Z",
+            "lastChange": "2023-10-02T13:05:54.736681Z",
+            "id": 1900,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:54.593581Z",
+                "lastChange": "2023-10-02T13:05:54.593581Z",
+                "id": 1893,
+                "name": "Fenchelsamen",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 1.0,
+            "unit": ""
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.739497Z",
+            "lastChange": "2023-10-02T13:05:54.739497Z",
+            "id": 1901,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:31.796174Z",
+                "lastChange": "2023-10-02T13:05:54.718058Z",
+                "id": 134,
+                "name": "Salz",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 1.0,
+            "unit": "TL"
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.742755Z",
+            "lastChange": "2023-10-02T13:05:54.742755Z",
+            "id": 1902,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:54.617879Z",
+                "lastChange": "2023-10-02T13:05:54.617879Z",
+                "id": 1894,
+                "name": "Parmesan",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 0.0,
+            "unit": ""
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.747319Z",
+            "lastChange": "2023-10-02T13:05:54.747319Z",
+            "id": 1903,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:54.630094Z",
+                "lastChange": "2023-10-02T13:05:54.630094Z",
+                "id": 1895,
+                "name": "Paniermehl ",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 0.0,
+            "unit": ""
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.753027Z",
+            "lastChange": "2023-10-02T13:05:54.753027Z",
+            "id": 1904,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:31.731429Z",
+                "lastChange": "2023-10-02T13:05:54.639488Z",
+                "id": 128,
+                "name": "Ei(er)",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 0.0,
+            "unit": ""
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.758597Z",
+            "lastChange": "2023-10-02T13:05:54.758597Z",
+            "id": 1905,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:32.624990Z",
+                "lastChange": "2023-10-02T13:05:54.692512Z",
+                "id": 208,
+                "name": "Knoblauch",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 3.0,
+            "unit": "Zehe/n"
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.764988Z",
+            "lastChange": "2023-10-02T13:05:54.764988Z",
+            "id": 1906,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:31.804643Z",
+                "lastChange": "2023-10-02T13:05:54.658072Z",
+                "id": 135,
+                "name": "Pfeffer",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 0.0,
+            "unit": ""
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.768443Z",
+            "lastChange": "2023-10-02T13:05:54.768443Z",
+            "id": 1907,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:54.665689Z",
+                "lastChange": "2023-10-02T13:05:54.665689Z",
+                "id": 1896,
+                "name": "Mortadella oder Schinken ",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 0.0,
+            "unit": ""
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.771645Z",
+            "lastChange": "2023-10-02T13:05:54.771645Z",
+            "id": 1908,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:53.573622Z",
+                "lastChange": "2023-10-02T13:05:54.674641Z",
+                "id": 1815,
+                "name": "Chiliflocken ",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 0.0,
+            "unit": ""
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.774165Z",
+            "lastChange": "2023-10-02T13:05:54.774165Z",
+            "id": 1909,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:54.682455Z",
+                "lastChange": "2023-10-02T13:05:54.682455Z",
+                "id": 1897,
+                "name": "Tomaten gewürfelt mit Basilikum ",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 0.0,
+            "unit": ""
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.776005Z",
+            "lastChange": "2023-10-02T13:05:54.776005Z",
+            "id": 1910,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:32.624990Z",
+                "lastChange": "2023-10-02T13:05:54.692512Z",
+                "id": 208,
+                "name": "Knoblauch",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 4.0,
+            "unit": "Zehen"
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.779574Z",
+            "lastChange": "2023-10-02T13:05:54.779574Z",
+            "id": 1911,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:34.162740Z",
+                "lastChange": "2023-10-02T13:05:54.700986Z",
+                "id": 325,
+                "name": "Basilikum",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 0.0,
+            "unit": ""
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.783598Z",
+            "lastChange": "2023-10-02T13:05:54.783598Z",
+            "id": 1912,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:34.523965Z",
+                "lastChange": "2023-10-02T13:05:54.708549Z",
+                "id": 353,
+                "name": "Zucker",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 0.0,
+            "unit": ""
+        },
+        {
+            "createdOn": "2023-10-02T13:05:54.786891Z",
+            "lastChange": "2023-10-02T13:05:54.786891Z",
+            "id": 1913,
+            "ingredient": {
+                "createdOn": "2023-10-02T13:05:31.796174Z",
+                "lastChange": "2023-10-02T13:05:54.718058Z",
+                "id": 134,
+                "name": "Salz",
+                "owner": {
+                    "createdOn": "2023-10-02T13:05:27.872746Z",
+                    "lastChange": "2023-10-02T13:05:27.872746Z",
+                    "userId": 2,
+                    "emailAddress": "ruf.stefan94@gmail.com",
+                    "activated": true
+                },
+                "publicIngredient": false
+            },
+            "amount": 0.0,
+            "unit": ""
+        }
+    ],
+    "preparationSteps": [
+        ""
+    ],
+    "images": [
+        {
+            "createdOn": "2023-10-02T13:05:54.567797Z",
+            "lastChange": "2023-10-02T13:05:54.567797Z",
+            "uuid": "f850fd68-d6c0-450c-9716-a6c174b5308b"
+        }
+    ],
+    "servings": 1,
+    "preparationTime": null,
+    "totalTime": null,
+    "recipeType": null,
+    "recipeGroups": []
+}

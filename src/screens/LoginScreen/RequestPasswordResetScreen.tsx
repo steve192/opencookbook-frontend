@@ -43,7 +43,7 @@ export const RequestPasswordResetScreen = (props: Props) => {
         alignItems: 'center'}}>
 
         <View style={CentralStyles.smallContentContainer}>
-          <Text style={CentralStyles.loginTitle}>{t('screens.resetPassword.title')}</Text>
+          <Text testID="password-reset-title" style={CentralStyles.loginTitle}>{t('screens.resetPassword.title')}</Text>
           <TextInput
             dense={true}
             onChangeText={setEmailAddress}

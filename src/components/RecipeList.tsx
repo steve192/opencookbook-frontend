@@ -94,6 +94,7 @@ export const RecipeList = (props: Props) => {
     }
     return (
       <Pressable
+        testID='recipeListItem'
         key={recipe.id}
         style={cardStyles}
         onPress={() => onRecipeClick(recipe)}
@@ -121,6 +122,7 @@ export const RecipeList = (props: Props) => {
     const firstFewGroupRecipes = myRecipes.filter((recipe) => recipe.recipeGroups.find((group) => group.id === recipeGroup.id)).splice(0, 4);
     return (
       <Pressable
+        testID='recipeGroupListItem'
         key={'rg' + recipeGroup.id}
         style={[
           styles.recipeCard,

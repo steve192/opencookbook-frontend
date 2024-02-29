@@ -51,7 +51,7 @@ export const SignupScreen = (props: Props) => {
     <LoginBackdrop>
       <View style={styles.loginContainer}>
         <View style={CentralStyles.smallContentContainer}>
-          <Text style={CentralStyles.loginTitle}>{t('screens.login.register')}</Text>
+          <Text testID="signup-title" style={CentralStyles.loginTitle}>{t('screens.login.register')}</Text>
           <EmailValidationInput
             value={email}
             onChangeText={setEmail}
