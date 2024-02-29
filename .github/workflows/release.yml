@@ -15,20 +15,17 @@ jobs:
         with:
           node-version: 20.x
 
-      - name: Determine next version
-        id: next-version-determination
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: NEXT_VERSION=$(npx semantic-release@23 --dry-run | grep "The next release version is" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
 
       - name: Set version
         run: |
-          sudo apt update && sudo apt install jq
-          TAG=${{ steps.next-version-determination.outputs.NEXT_VERSION }}
-          echo $TAG
-          jq '.version = "'"$TAG"'"' "package.json" > temp.json && mv temp.json "package.json"
-          jq '.expo.version = "'"$TAG"'"' "app.json" > apptemp.json && mv apptemp.json "app.json"
+          sudo apt-get update && sudo apt-get install jq
+          NEXT_VERSION=$(npx semantic-release@23 --dry-run | grep "The next release version is" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
+          echo "Next version is $NEXT_VERSION"
+          jq '.version = "'"$NEXT_VERSION"'"' "package.json" > temp.json && mv temp.json "package.json"
+          jq '.expo.version = "'"$NEXT_VERSION"'"' "app.json" > apptemp.json && mv apptemp.json "app.json"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Build android apk
         run: docker run -e EXPO_TOKEN=$EXPO_TOKEN -e DEFAULT_API_URL=$DEFAULT_API_URL -v "$(pwd)":/builder ghcr.io/steve192/easbuilder:latest production-apk
