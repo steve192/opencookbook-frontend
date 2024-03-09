@@ -28,7 +28,13 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Build android apk
-        run: docker run -e EXPO_TOKEN=$EXPO_TOKEN -e DEFAULT_API_URL=$DEFAULT_API_URL -v "$(pwd)":/builder ghcr.io/steve192/easbuilder:latest production-apk
+        run: docker run -e EXPO_TOKEN=$EXPO_TOKEN -e DEFAULT_API_URL=$DEFAULT_API_URL -v "$(pwd)":/builder ghcr.io/steve192/easbuilder:latest production-apk 
+        env:
+          DEFAULT_API_URL: https://beta.cookpal.io
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build android aab
+        run: docker run -e EXPO_TOKEN=$EXPO_TOKEN -e DEFAULT_API_URL=$DEFAULT_API_URL -v "$(pwd)":/builder ghcr.io/steve192/easbuilder:latest production app-build.aab
         env:
           DEFAULT_API_URL: https://beta.cookpal.io
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
