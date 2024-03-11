@@ -43,7 +43,7 @@ class PromptWithoutStyles extends React.Component<Props, State> {
   }
 
   renderPrompt() {
-    return <Dialog style={CentralStyles.contentContainer} visible={this.state.shown} onDismiss={() => this.setState({shown: false})}>
+    return <Dialog style={[CentralStyles.contentContainer, {width: '90%', paddingBottom: 0}]} visible={this.state.shown} onDismiss={() => this.setState({shown: false})}>
       <Dialog.Title>{this.state.title}</Dialog.Title>
       <Dialog.Content>
         <Paragraph>{this.state.message}</Paragraph>

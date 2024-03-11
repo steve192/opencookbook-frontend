@@ -21,7 +21,12 @@
     "cancel": "Abbrechen",
     "more": "Mehr",
     "email": "E-Mail",
-    "selected": "Ausgewählt"
+    "selected": "Ausgewählt",
+    "offlinemode": "Offlinemodus",
+    "offline": {
+      "notavailable": "Nicht verfügbar wenn du offline bist",
+      "notavailabletitle": "Offline"
+    }
   },
   "navigation": {
     "screenTitleImportBrowser": "Rezept Import Browser",

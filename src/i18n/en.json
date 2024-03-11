@@ -21,7 +21,12 @@
     "cancel": "Cancel",
     "more": "More",
     "email": "E-mail",
-    "selected": "selected"
+    "selected": "selected",
+    "offlinemode": "Offline mode",
+    "offline": {
+      "notavailable": "Not available when you are offline",
+      "notavailabletitle": "Offline"
+    }
   },
   "navigation": {
     "screenTitleImportBrowser": "Recipe import browser",

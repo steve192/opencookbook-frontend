@@ -12,6 +12,7 @@ import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} fr
 import {updateRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
+import {PromptUtil} from '../helper/Prompt';
 
 
 type Props = CompositeScreenProps<
@@ -30,6 +31,8 @@ const RecipeListScreen = (props: Props) => {
   const [fabOpen, setFabOpen] = useState(false);
 
   const dispatch = useAppDispatch();
+
+  const isOnline = useAppSelector((state) => state.settings.isOnline);
 
 
   const allRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
@@ -149,6 +152,7 @@ const RecipeListScreen = (props: Props) => {
           multiSelectionModeActive={multiSelectionModeActive}
           onRecipeSelected={onRecipeSelected}
           selectedRecipes={selectedRecipes} />
+
         <FAB.Group
           icon="plus"
           open={fabOpen}
@@ -163,17 +167,35 @@ const RecipeListScreen = (props: Props) => {
               small: false,
               icon: 'plus',
               label: t('screens.overview.addRecipe'),
-              onPress: () => props.navigation.navigate('RecipeWizardScreen', {}),
+              onPress: () => {
+                if (!isOnline) {
+                  PromptUtil.show({title: t('common.offline.notavailabletitle'), button1: t('common.ok'), message: t('common.offline.notavailable')});
+                  return;
+                }
+                props.navigation.navigate('RecipeWizardScreen', {});
+              },
             },
             {
               icon: 'group',
               label: t('screens.overview.addRecipeGroup'),
-              onPress: () => props.navigation.navigate('RecipeGroupEditScreen', {editing: false}),
+              onPress: () => {
+                if (!isOnline) {
+                  PromptUtil.show({title: t('common.offline.notavailabletitle'), button1: t('common.ok'), message: t('common.offline.notavailable')});
+                  return;
+                }
+                props.navigation.navigate('RecipeGroupEditScreen', {editing: false});
+              },
             },
             {
               icon: 'import',
               label: t('screens.overview.importRecipe'),
-              onPress: () => props.navigation.navigate('ImportScreen', {}),
+              onPress: () => {
+                if (!isOnline) {
+                  PromptUtil.show({title: t('common.offline.notavailabletitle'), button1: t('common.ok'), message: t('common.offline.notavailable')});
+                  return;
+                }
+                props.navigation.navigate('ImportScreen', {});
+              },
             },
           ]}
         />
