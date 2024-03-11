@@ -12,13 +12,9 @@ enableScreens();
 
 export default () => {
   return (
-    <>
-      <Provider store={store}>
-
-        <ReduxWrappedApp />
-
-      </Provider>
-    </>
+    <Provider store={store}>
+      <ReduxWrappedApp />
+    </Provider>
   );
 };
 const paperTheme = {

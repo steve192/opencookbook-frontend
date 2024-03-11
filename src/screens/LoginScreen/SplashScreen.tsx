@@ -1,38 +1,52 @@
 import * as Updates from 'expo-updates';
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {Platform, StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Text, useTheme} from 'react-native-paper';
-import {useDispatch} from 'react-redux';
 import AppPersistence from '../../AppPersistence';
 import RestAPI from '../../dao/RestAPI';
 import {login, logout} from '../../redux/features/authSlice';
-import {changeBackendUrl} from '../../redux/features/settingsSlice';
+import {changeBackendUrl, changeOnlineState} from '../../redux/features/settingsSlice';
 import {LoginBackdrop} from './LoginBackdrop';
+import NetInfo from '@react-native-community/netinfo';
+import {useAppDispatch} from '../../redux/hooks';
 
 
 export const SplashScreen = () => {
   const [statusText, setStatusText] = useState('');
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const theme= useTheme();
 
   useEffect(() => {
     (async () => {
+      NetInfo.addEventListener((state) => {
+        if (Platform.OS === 'android') {
+          dispatch(changeOnlineState(state.isInternetReachable === true));
+        } else {
+          dispatch(changeOnlineState(state.isConnected === true));
+        }
+      });
+
+
       // Check for new app versions
       try {
-        setStatusText('Checking for updates...');
-        console.log('Update check');
-        await new Promise(r => setTimeout(r, 1000));
-        const update = await Updates.checkForUpdateAsync();
-        setStatusText('ok');
-        if (update.isAvailable) {
-          console.log('Dowload update');
-          setStatusText('Downloading new app version...');
-          await Updates.fetchUpdateAsync();
-          console.log('Restarting app');
-          setStatusText('Restarting app...');
-          Updates.reloadAsync()
-              .then((r) => console.log('Restart triggered', r))
-              .catch((e) => console.error('Restarting failed', e));
+        const info = await NetInfo.fetch();
+        if (info.isInternetReachable) {
+          setStatusText('Checking for updates...');
+          console.log('Update check');
+          await new Promise((r) => setTimeout(r, 1000));
+          const update = await Updates.checkForUpdateAsync();
+          setStatusText('ok');
+          if (update.isAvailable) {
+            console.log('Dowload update');
+            setStatusText('Downloading new app version...');
+            await Updates.fetchUpdateAsync();
+            console.log('Restarting app');
+            setStatusText('Restarting app...');
+            await AppPersistence.clearOfflineData();
+            Updates.reloadAsync()
+                .then((r) => console.log('Restart triggered', r))
+                .catch((e) => console.error('Restarting failed', e));
+          }
         }
       } catch (e) {
         // Ignore error, just start with unupdated version

@@ -17,6 +17,7 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles from '../../styles/CentralStyles';
 import {RecipeSelectionPopup} from './RecipeSelectionPopup';
 import {WeeklyRecipeCard} from './WeeklyRecipeCard';
+import { PromptUtil } from '../../helper/Prompt';
 
 
 type Props =
@@ -35,6 +36,8 @@ export const WeeklyRecipeListScreen = (props: Props) => {
 
   const [selectedWeekplanDay, setSelectedWeekplanDay] = useState<WeekplanDay>();
   const weekplanDays = useAppSelector((state) => state.weeklyRecipes.weekplanDays);
+
+  const isOnline = useAppSelector((state) => state.settings.isOnline);
 
   const loadData = () => {
     dispatch(fetchWeekplanDays({
@@ -99,6 +102,10 @@ export const WeeklyRecipeListScreen = (props: Props) => {
                 <IconButton
                   icon="plus-circle-outline"
                   onPress={() => {
+                    if (!isOnline) {
+                      PromptUtil.show({title: t('common.offline.notavailabletitle'), button1: t('common.ok'), message: t('common.offline.notavailable')});
+                      return;
+                    }
                     setRecipeSelectionVisible(true);
                     setSelectedWeekplanDay(existingWeekplanDay ? existingWeekplanDay : {day: weekdayDate.toString(dateFormat), recipes: []});
                   }

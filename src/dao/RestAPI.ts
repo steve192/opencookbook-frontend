@@ -1,4 +1,4 @@
-import axios, {AxiosError, AxiosRequestConfig, AxiosRequestHeaders} from 'axios';
+import axios, {AxiosError, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse} from 'axios';
 import {Buffer} from 'buffer';
 import {Platform} from 'react-native';
 import XDate from 'xdate';
@@ -57,6 +57,10 @@ export interface InstanceInfo {
  * RESTApi for communication with opencookbook backend
  */
 class RestAPI {
+  private static isOnline = true;
+  static setIsOnline(payload: boolean) {
+    RestAPI.isOnline = payload;
+  }
   static async getUserInfo(): Promise<UserInfo> {
     const response = await this.get('/users/self');
     return response?.data;
@@ -425,12 +429,20 @@ class RestAPI {
     }
   }
   private static async get(apiPath: string) {
+    if (!this.isOnline) {
+      const offlineData = await RestAPI.offlineGet(apiPath);
+      if (offlineData) return offlineData;
+    }
     try {
-      return await axios.get(await this.url(apiPath), await this.axiosConfig());
+      const response = await axios.get(await this.url(apiPath), await this.axiosConfig());
+      RestAPI.offlineGetStore(apiPath, response);
+      return response;
     } catch (e) {
       await RestAPI.handleAxiosError(e);
       // Retry after error handling
-      return axios.get(await this.url(apiPath), await this.axiosConfig());
+      const response = await axios.get(await this.url(apiPath), await this.axiosConfig());
+      RestAPI.offlineGetStore(apiPath, response);
+      return response;
     }
   }
 
@@ -455,6 +467,21 @@ class RestAPI {
       throw axiosError;
     }
   }
+
+  private static offlineGetStore(apiPath: string, response: AxiosResponse<any, any>) {
+    if (apiPath === '/recipes') {
+      AppPersistence.storeRecipesOffline(response.data);
+    }
+  }
+
+  private static async offlineGet(apiPath: string) {
+    // Only for offline stuff that is not managed by redux
+    if (apiPath === '/users/self') {
+      return {data: await AppPersistence.getUserInfoOffline()};
+    }
+  }
 }
 
 export default RestAPI;
+
+

@@ -14,6 +14,7 @@ import {fetchSingleRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 import {useKeepAwake} from 'expo-keep-awake';
+import { PromptUtil } from '../helper/Prompt';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
@@ -26,6 +27,8 @@ export const RecipeScreen = (props: Props) => {
   const {t} = useTranslation('translation');
 
   const theme = useTheme();
+
+  const isOnline = useAppSelector((state) => state.settings.isOnline);
 
   useKeepAwake();
 
@@ -49,10 +52,16 @@ export const RecipeScreen = (props: Props) => {
           testID='recipe-edit-button'
           icon="pencil-outline"
           color={theme.colors.textOnPrimary}
-          onPress={() => props.navigation.navigate('RecipeWizardScreen', {
-            editing: true,
-            recipeId: displayedRecipe.id,
-          })} />
+          onPress={() => {
+            if (!isOnline) {
+              PromptUtil.show({title: t('common.offline.notavailabletitle'), button1: t('common.ok'), message: t('common.offline.notavailable')});
+              return;
+            }
+            props.navigation.navigate('RecipeWizardScreen', {
+              editing: true,
+              recipeId: displayedRecipe.id,
+            });
+          }} />
       ),
     });
     displayedRecipe && setScaledServings(displayedRecipe.servings);
