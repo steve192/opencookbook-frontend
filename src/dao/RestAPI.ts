@@ -329,7 +329,7 @@ class RestAPI {
     }
 
 
-    const response = await this.post('/recipes-images', formData);
+    const response = await this.post('/recipes-images', formData, {'Content-Type': 'multipart/form-data'});
     return response?.data.uuid;
   }
   static async getRecipeById(recipeId: number): Promise<Recipe> {
@@ -345,9 +345,10 @@ class RestAPI {
     });
   }
 
-  static async axiosConfig(): Promise<AxiosRequestConfig> {
+  static async axiosConfig(headers?: {[headerName: string]: string}): Promise<AxiosRequestConfig> {
+    const mergedHeaders = {...await this.getAuthHeader(), ...headers};
     return {
-      headers: await this.getAuthHeader(),
+      headers: mergedHeaders,
     };
   }
 
@@ -401,9 +402,9 @@ class RestAPI {
     return await AppPersistence.getBackendURL() + AppPersistence.getApiRoute() + path;
   }
 
-  private static async post(apiPath: string, data: any) {
+  private static async post(apiPath: string, data: any, headers?: {[headerName: string]: string}) {
     try {
-      return await axios.post(await this.url(apiPath), data, await this.axiosConfig());
+      return await axios.post(await this.url(apiPath), data, await this.axiosConfig(headers));
     } catch (e) {
       await RestAPI.handleAxiosError(e);
       // Retry after error handling
