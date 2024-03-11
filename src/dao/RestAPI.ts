@@ -47,7 +47,7 @@ export interface WeekplanDay {
     recipes: WeekplanDayRecipeInfo[]
 }
 export interface UserInfo {
-
+  email: string;
 }
 
 export interface InstanceInfo {
@@ -477,7 +477,10 @@ class RestAPI {
   private static async offlineGet(apiPath: string) {
     // Only for offline stuff that is not managed by redux
     if (apiPath === '/users/self') {
-      return {data: await AppPersistence.getUserInfoOffline()};
+      const userinfo = await AppPersistence.getUserInfoOffline();
+      if (userinfo !== undefined) {
+        return {data: userinfo};
+      }
     }
   }
 }

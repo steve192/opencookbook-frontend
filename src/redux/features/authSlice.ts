@@ -1,4 +1,5 @@
 import {createSlice} from '@reduxjs/toolkit';
+import AppPersistence from '../../AppPersistence';
 
 export interface AuthState {
   loggedIn: boolean
@@ -21,6 +22,7 @@ export const authSlice = createSlice({
     logout: (state) => {
       state.isLoading = false;
       state.loggedIn = false;
+      AppPersistence.clearOfflineData();
     },
   },
 });
