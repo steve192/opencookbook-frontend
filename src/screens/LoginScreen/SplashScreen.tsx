@@ -55,14 +55,19 @@ export const SplashScreen = () => {
       // TODO: Proper management of backend url via redux
       dispatch(changeBackendUrl(await AppPersistence.getBackendURL()));
 
-      try {
-        setStatusText('Logging in...');
-        await RestAPI.getUserInfo();
-        dispatch(login());
-      } catch (e) {
-        console.error('Login failed');
+      setStatusText('Logging in...');
+      RestAPI.getUserInfo().then((userinfo) => {
+        if (userinfo.email) {
+          console.info('got userinfo, logging in');
+          dispatch(login());
+        } else {
+          console.error('invalid userinfo', userinfo);
+          dispatch(logout());
+        }
+      }).catch((error) => {
+        console.error('Login failed', error);
         dispatch(logout());
-      }
+      });
     })();
   }, []);
 

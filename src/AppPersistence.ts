@@ -6,7 +6,7 @@ import {Recipe, RecipeGroup, UserInfo} from './dao/RestAPI';
 
 export default class AppPersistence {
   static async clearOfflineData() {
-    await AsyncStorage.multiRemove(['offline_userinfo', 'offline_recipes']);
+    await AsyncStorage.multiRemove(['offline_userinfo', 'offline_recipes', 'offline_recipegroups', 'offline_userinfo']);
   }
   static async getRecipeGroupsOffline(): Promise<RecipeGroup[]> {
     const recipeGroups = await AsyncStorage.getItem('offline_recipegroups');
@@ -20,9 +20,9 @@ export default class AppPersistence {
     }
     await AsyncStorage.setItem('offline_recipegroups', JSON.stringify(recipeGroups));
   }
-  static async getUserInfoOffline(): Promise<UserInfo> {
+  static async getUserInfoOffline(): Promise<UserInfo|undefined> {
     const storedUserinfo = await AsyncStorage.getItem('offline_userinfo');
-    if (storedUserinfo === null) return [];
+    if (storedUserinfo === null) return undefined;
     return JSON.parse(storedUserinfo);
   }
 
