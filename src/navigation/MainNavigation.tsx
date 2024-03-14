@@ -24,6 +24,7 @@ import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import CentralStyles from '../styles/CentralStyles';
+import { BringExportScreen } from '../screens/BringExportScreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -187,6 +188,11 @@ const MainNavigation = () => {
         component={TermsOfServiceScreen}
         options={{headerShown: true, title: t('screens.login.toc')}}
       />
+      <Stack.Screen
+        name='BringExportScreen'
+        component={BringExportScreen}
+        options={{headerShown: true, title: t('screens.login.toc')}}
+      />
     </Stack.Navigator>
   );
 
@@ -203,6 +209,7 @@ const MainNavigation = () => {
             AccountActivationScreen: 'activateAccount',
             PasswordResetScreen: 'resetPassword',
             TermsOfServiceScreen: 'tos',
+            BringExportScreen: 'bringexport',
             default: {
               screens: {
                 RequestPasswordResetScreen: 'requestResetPassword',

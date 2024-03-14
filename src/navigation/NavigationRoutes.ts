@@ -5,6 +5,7 @@ export type BaseNavigatorProps = {
     AccountActivationScreen: { activationId: string}
     PasswordResetScreen: { id: string}
     TermsOfServiceScreen: undefined
+    BringExportScreen: {exportId: string}
 }
 export type LoginNavigationProps = {
     LoginScreen: undefined

@@ -53,6 +53,12 @@ export interface UserInfo {
 export interface InstanceInfo {
   termsOfService: string;
 }
+
+export interface BringExportData {
+  baseAmount: number;
+  ingredients: string[];
+}
+
 /**
  * RESTApi for communication with opencookbook backend
  */
@@ -81,6 +87,14 @@ class RestAPI {
         }),
       });
     });
+  }
+
+  static async getBringExportData(exportId: string): Promise<BringExportData> {
+    return (await this.get("/bringexport?exportId=" + exportId)).data;
+  }
+
+  static async createBringExport(recipeId: number): Promise<string> {
+    return (await this.post("/bringexport", {recipeId: recipeId})).data.exportId;
   }
 
   static async getInstanceInfo(): Promise<InstanceInfo> {

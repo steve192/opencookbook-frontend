@@ -15,6 +15,7 @@ import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 import {useKeepAwake} from 'expo-keep-awake';
 import { PromptUtil } from '../helper/Prompt';
+import { BringImportButton } from '../components/BringExportButton';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
@@ -119,6 +120,9 @@ export const RecipeScreen = (props: Props) => {
               onPress={() => displayedRecipe && props.navigation.navigate('GuidedCookingScreen', {recipe: displayedRecipe, scaledServings: scaledServings})}>
               {t('screens.recipe.startCookingButton')}
             </Button>
+            <Spacer height={20}/>
+            <BringImportButton recipeId={displayedRecipe.id!} />
+
             <Spacer height={20} />
 
             {displayedRecipe && renderStepsSection()}
