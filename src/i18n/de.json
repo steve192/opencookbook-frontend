@@ -23,6 +23,7 @@
     "email": "E-Mail",
     "selected": "Ausgewählt",
     "offlinemode": "Offlinemodus",
+    "bringimport": "Import zu Bring®",
     "offline": {
       "notavailable": "Nicht verfügbar wenn du offline bist",
       "notavailabletitle": "Offline"

@@ -1,7 +1,7 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {Linking, Platform, View} from 'react-native';
-import {Button} from 'react-native-paper';
+import {Avatar, Button} from 'react-native-paper';
 import RestAPI from '../dao/RestAPI';
 import axios from 'axios';
 import AppPersistence from '../AppPersistence';
@@ -29,6 +29,6 @@ export const BringImportButton = (props: React.ComponentPropsWithRef<typeof View
   };
 
   return (
-    <Button {...props} mode="contained" onPress={() => startBringImport()} >{t('common.bringimport')}</Button>
+    <Button {...props} contentStyle={{height: 42}} style={{width: 400, height: 42}}icon={() => <Avatar.Image size={24} source={require('../../assets/Bring_Logo_big.png')}/>} color="#324047" mode="contained" onPress={() => startBringImport()} >{t('common.bringimport')}</Button>
   );
 };
