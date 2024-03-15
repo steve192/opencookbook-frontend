@@ -10,7 +10,7 @@ export interface SettingsState {
 }
 
 const initialState: SettingsState = {
-  theme: 'light',
+  theme: 'system',
   backendUrl: '',
   isOnline: true,
 };
