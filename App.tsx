@@ -34,7 +34,7 @@ const ReduxWrappedApp = () => {
   } else if (selectedTheme == 'dark') {
     theme = OwnPaperThemeDark;
   } else {
-    theme = OwnPaperThemeDark;
+    theme = colorScheme == 'light' ? OwnPaperTheme : OwnPaperThemeDark;
   }
 
 
