@@ -1,10 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/display-name */
 import React from 'react';
-import {Provider as PaperProvider} from 'react-native-paper';
+import {Provider as PaperProvider, Snackbar} from 'react-native-paper';
 import {enableScreens} from 'react-native-screens';
 import {Provider, useSelector} from 'react-redux';
 import {Prompt} from './src/helper/Prompt';
+import {GlobalSnackbar} from './src/helper/GlobalSnackbar';
 import './src/i18n/config';
 import MainNavigation from './src/navigation/MainNavigation';
 import {RootState, store} from './src/redux/store';
@@ -33,7 +34,7 @@ const ReduxWrappedApp = () => {
   } else if (selectedTheme == 'dark') {
     theme = OwnPaperThemeDark;
   } else {
-    theme = OwnPaperThemeDark;
+    theme = colorScheme == 'light' ? OwnPaperTheme : OwnPaperThemeDark;
   }
 
 
@@ -41,6 +42,7 @@ const ReduxWrappedApp = () => {
     <PaperProvider theme={theme}>
       <MainNavigation />
       <Prompt/>
+      <GlobalSnackbar />
     </PaperProvider>
   );
 };

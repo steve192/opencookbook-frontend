@@ -11,6 +11,7 @@ import {changeBackendUrl, changeOnlineState} from '../../redux/features/settings
 import {useAppDispatch} from '../../redux/hooks';
 import {LoginBackdrop} from './LoginBackdrop';
 import {useAppTheme} from '../../styles/CentralStyles';
+import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 
 
 export const SplashScreen = () => {
@@ -33,27 +34,28 @@ export const SplashScreen = () => {
 
 
       // Check for new app versions
-      try {
-        const info = await NetInfo.fetch();
-        if (info.isInternetReachable) {
-          setStatusText(t('screens.splash.checkingforupdates'));
+      const info = await NetInfo.fetch();
+      if (info.isInternetReachable) {
+        // Do update asynchronously
+        const updateAsync = async () => {
           console.log('Update check');
           await new Promise((r) => setTimeout(r, 1000));
           const update = await Updates.checkForUpdateAsync();
           if (update.isAvailable) {
             console.log('Dowload update');
-            setStatusText(t('screens.splash.downloading'));
             await Updates.fetchUpdateAsync();
             console.log('Restarting app');
-            setStatusText(t('screens.splash.restarting'));
-            await AppPersistence.clearOfflineData();
-            Updates.reloadAsync()
-                .then((r) => console.log('Restart triggered', r))
-                .catch((e) => console.error('Restarting failed', e));
+
+            SnackbarUtil.show({message: t('common.update.restartprompt'), button1: t('common.update.restartbutton'), button1Callback: () => {
+              AppPersistence.clearOfflineData().then(() => {
+                Updates.reloadAsync()
+                    .then((r) => console.log('Restart triggered', r))
+                    .catch((e) => console.error('Restarting failed', e));
+              });
+            }});
           }
-        }
-      } catch (e) {
-        // Ignore error, just start with unupdated version
+        };
+        updateAsync();
       }
 
       // TODO: Proper management of backend url via redux
