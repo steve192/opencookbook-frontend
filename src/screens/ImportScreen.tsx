@@ -3,12 +3,12 @@ import {AxiosError} from 'axios';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Platform, View} from 'react-native';
-import {Button, Caption, HelperText, Text, TextInput, useTheme} from 'react-native-paper';
+import {Button, Caption, HelperText, Surface, Text, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {importRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch} from '../redux/hooks';
-import CentralStyles from '../styles/CentralStyles';
+import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'ImportScreen'>;
@@ -19,7 +19,7 @@ export const ImportScreen = (props: Props) => {
   const [importSuccess, setImportSuccess] = useState<boolean>(false);
 
   const {t} = useTranslation('translation');
-  const theme = useTheme();
+  const theme = useAppTheme();
   const dispatch = useAppDispatch();
 
   const sanatizeUrl = (url: string) => {
@@ -59,12 +59,12 @@ export const ImportScreen = (props: Props) => {
       <Button onPress={() => props.navigation.navigate('RecipeImportBrowser')}>{t('screens.import.startRecipeBrowser')}</Button>
     </>;
   return (
-    <View style={CentralStyles.fullscreen}>
+    <Surface style={CentralStyles.fullscreen}>
       <View style={CentralStyles.contentContainer}>
         <TextInput label={t('screens.import.URLToImport')} value={importURL} onChangeText={setImportURL} />
         <Spacer height={10} />
         <Button
-          color={importError.length > 0 ? theme.colors.error:theme.colors.primary}
+          buttonColor={importError.length > 0 ? theme.colors.error:theme.colors.primary}
           icon={importSuccess ? 'check' : importError.length > 0 ? 'alert-circle-outline' : undefined}
           mode="contained"
           loading={importPending}
@@ -75,20 +75,16 @@ export const ImportScreen = (props: Props) => {
         <View style={{flexDirection: 'row', justifyContent: 'center', alignContent: 'center'}}>
 
           {importError.length > 0 &&
-                        <>
                           <HelperText type='error' >{t('screens.import.importFailed')} {importError}</HelperText>
-                        </>
           }
 
           {importSuccess &&
-                        <>
                           <Text style={{color: theme.colors.success}}>{t('screens.import.importSuccess')}</Text>
-                        </>
           }
         </View>
         {Platform.OS !== 'web' && renderNativeOnlySection()}
       </View>
-    </View>
+    </Surface>
 
   );
 };

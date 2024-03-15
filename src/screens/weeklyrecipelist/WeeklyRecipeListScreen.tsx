@@ -17,7 +17,7 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles from '../../styles/CentralStyles';
 import {RecipeSelectionPopup} from './RecipeSelectionPopup';
 import {WeeklyRecipeCard} from './WeeklyRecipeCard';
-import { PromptUtil } from '../../helper/Prompt';
+import {PromptUtil} from '../../helper/Prompt';
 
 
 type Props =

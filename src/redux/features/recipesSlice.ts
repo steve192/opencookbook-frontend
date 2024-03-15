@@ -51,7 +51,7 @@ export const fetchSingleRecipe = createAsyncThunk<Recipe, number, { state: RootS
       return RestAPI.getRecipeById(recipeId);
     },
 );
-export const fetchMyRecipeGroups = createAsyncThunk<RecipeGroup[], any, {state: RootState}>(
+export const fetchMyRecipeGroups = createAsyncThunk<RecipeGroup[], void, {state: RootState}>(
     'fetchMyRecipeGroups',
     async (_, {getState}): Promise<RecipeGroup[]> => {
       if (!getState().settings.isOnline) {

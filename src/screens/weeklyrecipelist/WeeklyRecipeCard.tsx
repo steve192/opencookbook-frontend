@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
-import {IconButton, Paragraph, useTheme} from 'react-native-paper';
+import {IconButton, Paragraph} from 'react-native-paper';
 import {RecipeImageComponent} from '../../components/RecipeImageComponent';
+import {useAppTheme} from '../../styles/CentralStyles';
 
 
 interface Props {
@@ -13,7 +14,7 @@ interface Props {
 export const WeeklyRecipeCard = (props: Props) => {
   const [editMode, setEditMode] = useState(false);
 
-  const theme = useTheme();
+  const theme = useAppTheme();
   return (
     <View style={styles.borderCard}>
       <Pressable
@@ -33,7 +34,7 @@ export const WeeklyRecipeCard = (props: Props) => {
       {editMode &&
       <IconButton
         style={{alignSelf: 'center'}}
-        color={theme.colors.error}
+        iconColor={theme.colors.error}
         icon="delete-outline"
         onPress={props.onRemovePress} />}
     </View>

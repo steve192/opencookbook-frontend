@@ -1,6 +1,7 @@
 import React from 'react';
 import {Pressable, StyleProp, StyleSheet, ViewStyle} from 'react-native';
-import {useTheme, Text} from 'react-native-paper';
+import {Text} from 'react-native-paper';
+import {useAppTheme} from '../styles/CentralStyles';
 
 
 interface Props {
@@ -10,13 +11,13 @@ interface Props {
     onPress?: () => void
 }
 export const TextBullet = (props: Props) => {
-  const theme = useTheme();
+  const theme = useAppTheme();
 
   const additionalStylesContainer = props.selected ?
         {backgroundColor: theme.colors.primary, borderColor: theme.colors.primary} :
         {borderColor: theme.colors.primary};
 
-  const additionalStylesText = props.selected ? {color: theme.colors.textOnPrimary} : {color: theme.colors.primary};
+  const additionalStylesText = props.selected ? {color: theme.colors.onPrimary} : {color: theme.colors.primary};
 
   return (
     <Pressable

@@ -3,12 +3,12 @@ import fuzzy from 'fuzzy';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, RefreshControl, StyleProp, StyleSheet, View, ViewProps, ViewStyle} from 'react-native';
-import {Headline, RadioButton, Searchbar, Surface, Text, useTheme} from 'react-native-paper';
+import {Headline, RadioButton, Searchbar, Surface, Text} from 'react-native-paper';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {fetchMyRecipeGroups, fetchMyRecipes} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
-import CentralStyles from '../styles/CentralStyles';
+import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 import {RecipeImageComponent} from './RecipeImageComponent';
 
 interface Props {
@@ -30,7 +30,7 @@ export const RecipeList = (props: Props) => {
   const [componentWidth, setComponentWith] = useState<number>(1);
 
   const {t} = useTranslation('translation');
-  const theme = useTheme();
+  const theme = useAppTheme();
 
   const dispatch = useAppDispatch();
   const searchDebounceTimer = useRef<NodeJS.Timeout>();
@@ -148,7 +148,7 @@ export const RecipeList = (props: Props) => {
               padding: 16,
               fontWeight: 'bold',
               position: 'absolute',
-              color: theme.colors.textOnPrimary,
+              color: theme.colors.onPrimary,
             }}>
             {recipeGroup.title}
           </Headline>
@@ -175,8 +175,8 @@ export const RecipeList = (props: Props) => {
 
   const renderNoItemsNotice = () => (
     <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', flex: 1, position: 'absolute'}}>
-      <MaterialIcons name="no-food" size={64} color={theme.colors.disabled} />
-      <Headline style={{padding: 64, color: theme.colors.disabled}}>
+      <MaterialIcons name="no-food" size={64} color={theme.colors.onSurfaceDisabled} />
+      <Headline style={{padding: 64, color: theme.colors.onSurfaceDisabled}}>
         {t('screens.overview.noRecipesMessage')}
       </Headline>
     </View>

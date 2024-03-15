@@ -1,19 +1,18 @@
 import {useFocusEffect} from '@react-navigation/native';
-import {AxiosError} from 'axios';
 import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {BackHandler, View} from 'react-native';
-import {ActivityIndicator, Caption, Divider, Surface, Text, TouchableRipple, useTheme} from 'react-native-paper';
+import {ActivityIndicator, Caption, Divider, Surface, Text, TouchableRipple} from 'react-native-paper';
 import WebView from 'react-native-webview';
 import RestAPI from '../dao/RestAPI';
 import {importRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch} from '../redux/hooks';
-import CentralStyles from '../styles/CentralStyles';
+import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 
 export const RecipeImportBrowser = () => {
   const {t} = useTranslation('translation');
-  const theme = useTheme();
+  const theme = useAppTheme();
   const dispatch = useAppDispatch();
   const webViewRef = useRef<WebView>(null);
 
@@ -100,10 +99,11 @@ export const RecipeImportBrowser = () => {
   };
 
 
+  // eslint-disable-next-line no-unused-vars
   const buttonColors: {[key in typeof importStatus]: string} = {
-    'not_started': importPossible ? theme.colors.primary : theme.colors.accent,
+    'not_started': importPossible ? theme.colors.primary : theme.colors.primary,
     'failed': theme.colors.error,
-    'pending': theme.colors.accent,
+    'pending': theme.colors.primary,
     'success': theme.colors.primary,
   };
 

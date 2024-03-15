@@ -1,21 +1,21 @@
 import {useIsFocused} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useKeepAwake} from 'expo-keep-awake';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, View} from 'react-native';
-import {Appbar, Button, Caption, Divider, Surface, Text, useTheme} from 'react-native-paper';
+import {Appbar, Button, Caption, Divider, Surface, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {ChunkView} from '../ChunkView';
+import {BringImportButton} from '../components/BringExportButton';
 import {IngredientList} from '../components/IngredientList';
 import {RecipeImageViewPager} from '../components/RecipeImageViewPager';
 import {TextBullet} from '../components/TextBullet';
+import {PromptUtil} from '../helper/Prompt';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {fetchSingleRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
-import CentralStyles from '../styles/CentralStyles';
-import {useKeepAwake} from 'expo-keep-awake';
-import {PromptUtil} from '../helper/Prompt';
-import {BringImportButton} from '../components/BringExportButton';
+import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
@@ -27,7 +27,7 @@ export const RecipeScreen = (props: Props) => {
   const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 1);
   const {t} = useTranslation('translation');
 
-  const theme = useTheme();
+  const theme = useAppTheme();
 
   const isOnline = useAppSelector((state) => state.settings.isOnline);
 
@@ -52,7 +52,7 @@ export const RecipeScreen = (props: Props) => {
         <Appbar.Action
           testID='recipe-edit-button'
           icon="pencil-outline"
-          color={theme.colors.textOnPrimary}
+          color={theme.colors.onPrimary}
           onPress={() => {
             if (!isOnline) {
               PromptUtil.show({title: t('common.offline.notavailabletitle'), button1: t('common.ok'), message: t('common.offline.notavailable')});
@@ -131,7 +131,6 @@ export const RecipeScreen = (props: Props) => {
           </View>
         </ScrollView>
       </Surface>
-      <Text/>
     </ChunkView>
   );
 };

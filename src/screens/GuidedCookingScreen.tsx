@@ -21,6 +21,7 @@ const wrapInScrollviewWhenWeb = (element: ReactNode) => {
 };
 export const GuidedCookingScreen = (props: Props) => {
   const [currentStep, setCurrentStep] = useState<number>(0);
+  // eslint-disable-next-line no-unused-vars
   const [textSize, setTextSize] = useState<number>(15);
 
   const {t} = useTranslation('translation');

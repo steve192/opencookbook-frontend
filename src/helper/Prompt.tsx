@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Dialog, Paragraph, withTheme} from 'react-native-paper';
+import {Button, Dialog, MD3Theme, Paragraph, withTheme} from 'react-native-paper';
 import CentralStyles from '../styles/CentralStyles';
 
 interface Options {
@@ -15,7 +15,7 @@ interface State extends Options{
 }
 
 interface Props {
-  theme: ReactNativePaper.Theme
+  theme: MD3Theme
 }
 class PromptWithoutStyles extends React.Component<Props, State> {
   private static component: PromptWithoutStyles;
@@ -54,7 +54,7 @@ class PromptWithoutStyles extends React.Component<Props, State> {
           this.setState({shown: false});
         } }>{this.state.button1}</Button>}
 
-        { this.state.button2 !== undefined && <Button color={this.props.theme.colors.text} onPress={() => {
+        { this.state.button2 !== undefined && <Button color={this.props.theme.colors.onSurface} onPress={() => {
           this.state.button2Callback?.();
           this.setState({shown: false});
         } }>{this.state.button2}</Button> }

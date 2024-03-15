@@ -6,7 +6,7 @@ import Constants from 'expo-constants';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, View} from 'react-native';
-import {Avatar, Button, Caption, Divider, Surface, Text, useTheme} from 'react-native-paper';
+import {Avatar, Button, Caption, Divider, Surface, Text} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
 import AppPersistence from '../AppPersistence';
@@ -17,7 +17,7 @@ import {MainNavigationProps, OverviewNavigationProps} from '../navigation/Naviga
 import {logout} from '../redux/features/authSlice';
 import {changeTheme} from '../redux/features/settingsSlice';
 import {RootState} from '../redux/store';
-import CentralStyles from '../styles/CentralStyles';
+import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 type Props =
     CompositeScreenProps<
@@ -30,7 +30,7 @@ export const SettingsScreen = (props: Props) => {
   const backendUrl = useSelector((state: RootState) => state.settings.backendUrl);
   const dispatch = useDispatch();
   const {t} = useTranslation('translation');
-  const theme = useTheme();
+  const theme = useAppTheme();
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
@@ -54,52 +54,50 @@ export const SettingsScreen = (props: Props) => {
     });
   };
   return (
-    <>
-      <Surface style={[CentralStyles.fullscreen]}>
-        <View style={CentralStyles.contentContainer}>
-          <ScrollView>
-            <Avatar.Icon style={{alignSelf: 'center', backgroundColor: 'transparent'}} size={100} color={theme.colors.text} icon="server"/>
-            <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{backendUrl}</Text>
+    <Surface style={[CentralStyles.fullscreen]}>
+      <View style={CentralStyles.contentContainer}>
+        <ScrollView>
+          <Avatar.Icon style={{alignSelf: 'center', backgroundColor: 'transparent'}} size={100} color={theme.colors.onSurface} icon="server"/>
+          <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{backendUrl}</Text>
+          <Spacer height={20} />
+          <Button
+            mode='outlined'
+            onPress={() => {
+              AppPersistence.setAuthToken('');
+              AppPersistence.setRefreshToken('');
+              dispatch(logout());
+              dispatch(logout());
+            }}>Logout</Button>
+          <Divider style={{marginTop: 10, marginBottom: 10}}/>
+          <Spacer height={20} />
+          <CustomCard>
+            <Caption>{t('screens.settings.theme')}</Caption>
+            <Picker
+              selectedValue={selectedTheme}
+              onValueChange={(value) => dispatch(changeTheme(value))}>
+              <Picker.Item label={t('screens.settings.light')} value="light" />
+              <Picker.Item label={t('screens.settings.dark')} value="dark" />
+            </Picker>
+          </CustomCard>
+          <Spacer height={20} />
+          <View style={{padding: 10, borderWidth: 1, borderRadius: 16, borderColor: 'red'}}>
+            <Caption style={{color: theme.colors.error}}>{t('screens.settings.dangerZone')}</Caption>
             <Spacer height={20} />
             <Button
-              mode='outlined'
-              onPress={() => {
-                AppPersistence.setAuthToken('');
-                AppPersistence.setRefreshToken('');
-                dispatch(logout());
-                dispatch(logout());
-              }}>Logout</Button>
-            <Divider style={{marginTop: 10, marginBottom: 10}}/>
-            <Spacer height={20} />
-            <CustomCard>
-              <Caption>{t('screens.settings.theme')}</Caption>
-              <Picker
-                selectedValue={selectedTheme}
-                onValueChange={(value) => dispatch(changeTheme(value))}>
-                <Picker.Item label={t('screens.settings.light')} value="light" />
-                <Picker.Item label={t('screens.settings.dark')} value="dark" />
-              </Picker>
-            </CustomCard>
-            <Spacer height={20} />
-            <View style={{padding: 10, borderWidth: 1, borderRadius: 16, borderColor: 'red'}}>
-              <Caption style={{color: theme.colors.error}}>{t('screens.settings.dangerZone')}</Caption>
-              <Spacer height={20} />
-              <Button
-                dark={true}
-                icon="alert-circle-outline"
-                mode="contained"
-                color={theme.colors.error}
-                onPress={deleteAccount}>
-                {t('screens.settings.deleteAccount')}
-              </Button>
-            </View>
-            <Spacer height={20}/>
-            <View>
-              <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>App version: {Constants.expoConfig?.version}</Text>
-            </View>
-          </ScrollView>
-        </View>
-      </Surface>
-    </>
+              dark={true}
+              icon="alert-circle-outline"
+              mode="contained"
+              color={theme.colors.error}
+              onPress={deleteAccount}>
+              {t('screens.settings.deleteAccount')}
+            </Button>
+          </View>
+          <Spacer height={20}/>
+          <View>
+            <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>App version: {Constants.expoConfig?.version}</Text>
+          </View>
+        </ScrollView>
+      </View>
+    </Surface>
   );
 };

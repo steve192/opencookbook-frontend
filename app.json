@@ -71,7 +71,9 @@
         {
           "photosPermission": "The app accesses your photos to let you upload them to your recipes."
         }
-      ]
+      ],
+      "expo-localization",
+      "expo-secure-store"
     ]
   }
 }

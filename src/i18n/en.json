@@ -39,6 +39,12 @@
     "screenTitleGuidedCooking": "Guided cooking"
   },
   "screens": {
+    "splash": {
+      "checkingforupdates": "Checking for updates...",
+      "downloading": "Downloading new app version...",
+      "restarting": "Restarting app...",
+      "loggingin": "Logging in.."
+    },
     "importbrowser": {
       "importsecure": "Import",
       "importsecuredescription": "Make sure to be on a recipe",

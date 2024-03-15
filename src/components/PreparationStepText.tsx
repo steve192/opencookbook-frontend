@@ -1,8 +1,9 @@
+import fuzzy from 'fuzzy';
 import React from 'react';
 import {StyleProp, TextStyle, View} from 'react-native';
+import {Text} from 'react-native-paper';
 import {IngredientUse} from '../dao/RestAPI';
-import fuzzy from 'fuzzy';
-import {Text, useTheme} from 'react-native-paper';
+import {useAppTheme} from '../styles/CentralStyles';
 
 interface Props {
     value: string;
@@ -10,7 +11,7 @@ interface Props {
     ingredients: IngredientUse[];
 }
 export const PreparationStepText = (props: Props) => {
-  const theme = useTheme();
+  const theme = useAppTheme();
 
   const ingredientStyle: TextStyle = {
     color: theme.colors.primary,

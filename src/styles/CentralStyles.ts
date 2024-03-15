@@ -1,4 +1,35 @@
 import {StyleSheet} from 'react-native';
+import {MD3DarkTheme, MD3LightTheme, useTheme} from 'react-native-paper';
+
+export const OwnPaperTheme = {
+  ...MD3LightTheme,
+  roundness: 10,
+  colors: {
+    ...MD3LightTheme.colors,
+    primary: '#72B600',
+    accent: '#FFE102',
+    success: '#00FF00',
+    // background: '#FFFFFF',
+    onPrimary: '#FFFFFF',
+  },
+};
+
+export const OwnPaperThemeDark = {
+  ...MD3DarkTheme,
+  roundness: 10,
+  colors: {
+    ...MD3DarkTheme.colors,
+    primary: '#518100',
+    accent: '#C48600',
+    success: '#00FF00',
+    // background: '#000000',
+    onPrimary: '#FFFFFF',
+  }
+}
+
+export type AppTheme = typeof OwnPaperTheme;
+
+export const useAppTheme = () => useTheme<AppTheme>();
 
 export const OwnColors = {
   bluishGrey: '#8f9bb3',
