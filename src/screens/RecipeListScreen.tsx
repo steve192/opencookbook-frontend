@@ -3,16 +3,16 @@ import {CompositeScreenProps} from '@react-navigation/native';
 import {StackScreenProps} from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Appbar, FAB, Surface, useTheme} from 'react-native-paper';
+import {Appbar, FAB, Surface} from 'react-native-paper';
 import {RecipeList} from '../components/RecipeList';
 import {Option, SelectionPopupModal} from '../components/SelectionPopupModal';
 import {Recipe} from '../dao/RestAPI';
+import {PromptUtil} from '../helper/Prompt';
 import {VibrationUtils} from '../helper/VibrationUtil';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
 import {updateRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
-import CentralStyles from '../styles/CentralStyles';
-import {PromptUtil} from '../helper/Prompt';
+import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 
 type Props = CompositeScreenProps<
@@ -25,7 +25,7 @@ type Props = CompositeScreenProps<
 
 
 const RecipeListScreen = (props: Props) => {
-  const theme = useTheme();
+  const theme = useAppTheme();
   const {t} = useTranslation('translation');
 
   const [fabOpen, setFabOpen] = useState(false);
@@ -52,13 +52,13 @@ const RecipeListScreen = (props: Props) => {
           headerRight: () => (
             <Appbar.Action
               icon="group"
-              color={theme.colors.textOnPrimary}
+              color={theme.colors.onPrimary}
               onPress={() => setRecipeGroupSelectionOpened(true)} />
           ),
           headerLeft: () => (
             <Appbar.Action
               icon="close"
-              color={theme.colors.textOnPrimary}
+              color={theme.colors.onPrimary}
               onPress={() => clearMultiSelectionMode()} />
           ),
         });
@@ -70,7 +70,7 @@ const RecipeListScreen = (props: Props) => {
             headerRight: () => (
               <Appbar.Action
                 icon="pencil-outline"
-                color={theme.colors.textOnPrimary}
+                color={theme.colors.onPrimary}
                 onPress={() => shownRecipeGroup.id && props.navigation.navigate('RecipeGroupEditScreen', {editing: true, recipeGroupId: shownRecipeGroup.id})} />
             ),
           });
@@ -161,10 +161,10 @@ const RecipeListScreen = (props: Props) => {
           fabStyle={{
             backgroundColor: theme.colors.primary,
           }}
-          color={theme.colors.textOnPrimary}
+          color={theme.colors.onPrimary}
           actions={[
             {
-              small: false,
+              size: 'medium',
               icon: 'plus',
               label: t('screens.overview.addRecipe'),
               onPress: () => {

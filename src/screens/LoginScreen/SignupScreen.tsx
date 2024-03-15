@@ -3,14 +3,14 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
-import {Button, Checkbox, Colors, Text, useTheme} from 'react-native-paper';
+import {Button, Checkbox, MD3Colors, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {EmailValidationInput} from '../../components/EmailValidationInput';
 import {PasswordValidationInput} from '../../components/PasswordValidationInput';
 import RestAPI from '../../dao/RestAPI';
 import {PromptUtil} from '../../helper/Prompt';
 import {BaseNavigatorProps, LoginNavigationProps} from '../../navigation/NavigationRoutes';
-import CentralStyles from '../../styles/CentralStyles';
+import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
 
 type Props = CompositeScreenProps<
@@ -27,7 +27,7 @@ export const SignupScreen = (props: Props) => {
 
 
   const {t} = useTranslation('translation');
-  const {colors} = useTheme();
+  const {colors} = useAppTheme();
 
 
   const register = () => {
@@ -88,7 +88,7 @@ export const SignupScreen = (props: Props) => {
             disabled={allFieldsOk ? false : true}
             style={CentralStyles.elementSpacing}
             onPress={register}>{t('screens.login.register')}</Button>
-          <Text style={{fontWeight: 'bold', color: Colors.red200, textAlign: 'center'}}>{apiErrorMessage}</Text>
+          <Text style={{fontWeight: 'bold', color: MD3Colors.error0, textAlign: 'center'}}>{apiErrorMessage}</Text>
         </View>
       </View>
     </LoginBackdrop>

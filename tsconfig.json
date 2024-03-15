@@ -20,5 +20,5 @@
   ],
   "files": [
     "@types/react-native-paper-extensions/index.d.ts"
-  ]
+  ],
 }

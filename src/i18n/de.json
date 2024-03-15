@@ -39,6 +39,12 @@
     "screenTitleGuidedCooking": "Kochmodus"
   },
   "screens": {
+    "splash": {
+      "checkingforupdates": "Prüfe auf updates...",
+      "downloading": "Lädt neue App Version...",
+      "restarting": "App wird neu gestartet...",
+      "loggingin": "Einloggen.."
+    },
     "importbrowser": {
       "importsecure": "Importieren",
       "importsecuredescription": "Achte darauf auf einem Rezept zu sein",
@@ -104,6 +110,7 @@
     },
     "settings": {
       "screenTitle": "Einstellungen",
+      "system": "Systemeinstellung",
       "theme": "Theme",
       "light": "Hell",
       "dark": "Dunkel",

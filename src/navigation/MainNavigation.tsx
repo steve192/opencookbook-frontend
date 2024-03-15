@@ -5,7 +5,7 @@ import {createURL} from 'expo-linking';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {KeyboardAvoidingView, Platform} from 'react-native';
-import {Appbar, useTheme, withTheme} from 'react-native-paper';
+import {Appbar, withTheme} from 'react-native-paper';
 import {useAppSelector} from '../redux/hooks';
 import {AccountActivationScreen} from '../screens/AccountActivationScreen';
 import {GuidedCookingScreen} from '../screens/GuidedCookingScreen';
@@ -23,7 +23,7 @@ import {SettingsScreen} from '../screens/SettingsScreen';
 import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
-import CentralStyles from '../styles/CentralStyles';
+import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 
 const Stack = createNativeStackNavigator();
@@ -33,7 +33,7 @@ const MainNavigation = () => {
   const isLoading = useAppSelector((state) => state.auth.isLoading);
 
   const {t} = useTranslation('translation');
-  const theme = useTheme();
+  const theme = useAppTheme();
 
   const LoginStackNavigation = () => (
     <Stack.Navigator>
@@ -62,13 +62,14 @@ const MainNavigation = () => {
         <Stack.Navigator
           screenOptions={{
             header: (nav) => (
-              <Appbar.Header>
+              <Appbar.Header style={{backgroundColor: theme.colors.primary}}>
                 {nav.back ? (
-                  <Appbar.BackAction color={theme.colors.textOnPrimary} onPress={() => nav.navigation.goBack()} />
+                  <Appbar.BackAction color={theme.colors.onPrimary} onPress={() => nav.navigation.goBack()} />
                   ) : null}
-                {nav.options.headerLeft !== undefined ? nav.options?.headerLeft?.({tintColor: undefined}): null}
-                <Appbar.Content color={theme.colors.textOnPrimary} title={nav.options.title} />
-                {nav.options.headerRight !== undefined ? nav.options?.headerRight?.({tintColor: undefined}): null}
+                {nav.options.headerLeft !== undefined ? nav.options?.headerLeft?.({tintColor: undefined, canGoBack: false}): null}
+                <Appbar.Content color={theme.colors.onPrimary} title={nav.options.title} />
+                {/* TODO: Use canGoback*/}
+                {nav.options.headerRight !== undefined ? nav.options?.headerRight?.({tintColor: undefined, canGoBack: false}): null}
               </Appbar.Header>
             ),
           }}>
@@ -128,6 +129,10 @@ const MainNavigation = () => {
         backBehavior="history"
         labeled={true}
         activeColor={theme.colors.primary}
+        inactiveColor={theme.colors.onSurface}
+        activeIndicatorStyle={{
+          backgroundColor: 'rgba(0,0,0,0)',
+        }}
         barStyle={{
           backgroundColor: theme.colors.surface,
         }}

@@ -13,7 +13,7 @@ export const resources = {
   },
 } as const;
 
-const locale = Localization.locale.split('-')[0];
+const locale = Localization.locale.split('-')[0] ?? 'en';
 
 console.debug('Detected locale', locale);
 i18n.use(initReactI18next).init({

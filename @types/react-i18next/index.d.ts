@@ -1,14 +1,10 @@
 import 'react-i18next';
-import { resources } from '../../src/i18n/config';
+import {resources} from '../../src/i18n/config';
+import {resources, defaultNS} from './i18n';
 
-// declare module 'react-i18next' {
-//   type DefaultResources = typeof resources['en'];
-//   interface Resources extends DefaultResources {}
-// }
-
-declare module 'react-i18next' {
+declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: typeof defaultNS;
     resources: typeof resources['en'];
-  };
-};
+  }
+}

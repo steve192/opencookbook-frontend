@@ -2,7 +2,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useLayoutEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Appbar, Button, Caption, Divider, Surface, TextInput, useTheme} from 'react-native-paper';
+import {Appbar, Button, Caption, Divider, Surface, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {ChunkView} from '../../ChunkView';
 import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
@@ -10,7 +10,7 @@ import {IngredientUse, Recipe, RecipeGroup} from '../../dao/RestAPI';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {createRecipe, deleteRecipe, updateRecipe} from '../../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
-import CentralStyles from '../../styles/CentralStyles';
+import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
 import {IngredientFormField} from './IngredientFromField';
 import {RecipeFormField} from './PreparationStepFormField';
 import {RecipeGroupFormField} from './RecipeGroupFormField';
@@ -18,7 +18,7 @@ import {RecipeGroupFormField} from './RecipeGroupFormField';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeWizardScreen'>;
 const RecipeWizardScreen = (props: Props) => {
-  const theme = useTheme();
+  const theme = useAppTheme();
 
   const {t} = useTranslation('translation');
   const dispatch = useAppDispatch();
@@ -50,7 +50,7 @@ const RecipeWizardScreen = (props: Props) => {
           />
           <Appbar.Action
             icon="content-save-outline"
-            color={theme.colors.textOnPrimary}
+            color={theme.colors.onPrimary}
             onPress={() => saveRecipe()}
           />
         </>
@@ -213,6 +213,7 @@ const RecipeWizardScreen = (props: Props) => {
             <TextInput
               label={t('screens.editRecipe.title')}
               value={recipeData.title}
+              mode="outlined"
               onChangeText={(newText) => setRecipeData({...recipeData, title: newText})}
               placeholder="Name" />
             <Divider style={{marginVertical: 10}} />

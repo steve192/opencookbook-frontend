@@ -29,6 +29,12 @@ export const BringImportButton = (props: React.ComponentPropsWithRef<typeof View
   };
 
   return (
-    <Button {...props} contentStyle={{height: 42}} style={[{width: 400, height: 42}, props.style]}icon={() => <Avatar.Image size={24} source={require('../../assets/Bring_Logo_big.png')}/>} color="#324047" mode="contained" onPress={() => startBringImport()} >{t('common.bringimport')}</Button>
+    <Button {...props}
+      contentStyle={{height: 42}}
+      style={[{width: 400, height: 42}, props.style]}
+      icon={() => <Avatar.Image size={24} source={require('../../assets/Bring_Logo_big.png')}/>}
+      buttonColor="#324047"
+      mode="elevated"
+      onPress={() => startBringImport()} >{t('common.bringimport')}</Button>
   );
 };

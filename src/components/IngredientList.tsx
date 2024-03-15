@@ -1,9 +1,10 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
-import {Divider, IconButton, Text, useTheme} from 'react-native-paper';
+import {Divider, IconButton, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {IngredientUse} from '../dao/RestAPI';
+import {useAppTheme} from '../styles/CentralStyles';
 
 
 interface Props {
@@ -17,7 +18,7 @@ interface Props {
 
 
 export const IngredientList = (props: Props) => {
-  const theme = useTheme();
+  const theme = useAppTheme();
   const {t} = useTranslation('translation');
 
   const getServingMultiplier = () => {
@@ -47,12 +48,12 @@ export const IngredientList = (props: Props) => {
                 style={{
                   flex: 2,
                   alignSelf: 'stretch',
-                  color: props.greyedOutStyle ? theme.colors.disabled: theme.colors.primary,
+                  color: props.greyedOutStyle ? theme.colors.onSurfaceDisabled: theme.colors.primary,
                   fontWeight: 'bold',
                 }}>{`${ingredient.amount > 0 ? scaleIngredient(ingredient.amount) : ''} ${ingredient.unit}`}
               </Text>
 
-              <Text style={{flex: 4, alignSelf: 'stretch', color: props.greyedOutStyle ? theme.colors.disabled : theme.colors.text}} >{ingredient.ingredient.name}</Text>
+              <Text style={{flex: 4, alignSelf: 'stretch', color: props.greyedOutStyle ? theme.colors.onSurfaceDisabled : theme.colors.onSurface}} >{ingredient.ingredient.name}</Text>
             </View>
           </React.Fragment>,
         )}

@@ -2,20 +2,20 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
-import {Button, Caption, Divider, Surface, TextInput, useTheme} from 'react-native-paper';
+import {Button, Caption, Divider, Surface, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {RecipeGroup} from '../dao/RestAPI';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {createRecipeGroup, deleteRecipeGroup, updateRecipeGroup} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
-import CentralStyles from '../styles/CentralStyles';
+import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeGroupEditScreen'>;
 
 export const RecipeGroupEditScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const dispatch = useAppDispatch();
-  const theme = useTheme();
+  const theme = useAppTheme();
 
   const existingRecipe = useAppSelector((store) => store.recipes.recipeGroups.filter((group) => group.id === props.route.params.recipeGroupId))[0];
 
@@ -55,7 +55,7 @@ export const RecipeGroupEditScreen = (props: Props) => {
     <>
       <Divider style={{marginVertical: 10}}/>
       <Button
-        color={theme.colors.error}
+        buttonColor={theme.colors.error}
         onPress={dispatchDeleteRecipeGroup}>{t('common.delete')}</Button>
     </>;
 

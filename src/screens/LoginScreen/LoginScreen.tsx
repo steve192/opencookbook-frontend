@@ -4,16 +4,16 @@ import Constants from 'expo-constants';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
+import {Button, Card, IconButton, Modal, Text, TextInput} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import Spacer from 'react-spacer';
 import AppPersistence from '../../AppPersistence';
+import {PasswordInput} from '../../components/PasswordInput';
 import RestAPI from '../../dao/RestAPI';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import {login} from '../../redux/features/authSlice';
-import CentralStyles, {OwnColors} from '../../styles/CentralStyles';
+import CentralStyles, {OwnColors, useAppTheme} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
-import {Button, Card, IconButton, Modal, Text, TextInput, useTheme} from 'react-native-paper';
-import {PasswordInput} from '../../components/PasswordInput';
 
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'LoginScreen'>;
@@ -28,13 +28,14 @@ const LoginScreen = ({route, navigation}: Props) => {
   const dispatch = useDispatch();
 
   const {t} = useTranslation('translation');
-  const {colors} = useTheme();
+  const {colors} = useAppTheme();
 
   const doLogin = () => {
     RestAPI.authenticate(email, password).then(() => {
       dispatch(login());
     }).catch((error: AxiosError) => {
-      if (error.response?.status === 401 && error.response.data.userActive === false) {
+      // @ts-ignore
+      if (error.response?.status === 401 && error?.response?.data?.userActive === false) {
         setApiErrorMessage(t('screens.login.inactiveaccount'));
       } else if (error.response?.status === 401) {
         setApiErrorMessage(t('screens.login.invaliduserpass'));
@@ -71,7 +72,7 @@ const LoginScreen = ({route, navigation}: Props) => {
     <LoginBackdrop>
       <IconButton
         icon="cog"
-        color={OwnColors.bluishGrey}
+        iconColor={OwnColors.bluishGrey}
         size={20}
         onPress={() => setSettingsModalVisible(true)}
       />
@@ -84,7 +85,7 @@ const LoginScreen = ({route, navigation}: Props) => {
           <View style={styles.forgotPasswordContainer}>
             <Button
               testID='forgotPassword'
-              color={OwnColors.bluishGrey}
+              textColor={OwnColors.bluishGrey}
               compact={true}
               uppercase={false}
               labelStyle={{fontWeight: 'bold'}}
@@ -101,7 +102,7 @@ const LoginScreen = ({route, navigation}: Props) => {
           {apiErrorMessage && <Text theme={{colors: {text: colors.error}}}>{apiErrorMessage}</Text>}
           <Button
             testID='SignUpButton'
-            color={OwnColors.bluishGrey}
+            textColor={OwnColors.bluishGrey}
             compact={true}
             uppercase={false}
             labelStyle={{fontWeight: 'bold'}}

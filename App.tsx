@@ -1,12 +1,15 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/display-name */
 import React from 'react';
-import {Colors, DarkTheme, DefaultTheme, Provider as PaperProvider} from 'react-native-paper';
+import {Provider as PaperProvider} from 'react-native-paper';
 import {enableScreens} from 'react-native-screens';
 import {Provider, useSelector} from 'react-redux';
 import {Prompt} from './src/helper/Prompt';
 import './src/i18n/config';
 import MainNavigation from './src/navigation/MainNavigation';
 import {RootState, store} from './src/redux/store';
+import {OwnPaperTheme, OwnPaperThemeDark} from './src/styles/CentralStyles';
+import {useColorScheme} from 'react-native';
 
 enableScreens();
 
@@ -17,38 +20,25 @@ export default () => {
     </Provider>
   );
 };
-const paperTheme = {
-  ...DefaultTheme,
-  roundness: 10,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: '#72B600',
-    accent: '#FFE102',
-    background: '#FFFFFF',
-    textOnPrimary: Colors.white,
-  },
-
-};
 
 
 const ReduxWrappedApp = () => {
   const selectedTheme = useSelector((state: RootState) => state.settings.theme);
+  const colorScheme = useColorScheme();
+
+  let theme;
+
+  if (selectedTheme == 'light') {
+    theme = OwnPaperTheme;
+  } else if (selectedTheme == 'dark') {
+    theme = OwnPaperThemeDark;
+  } else {
+    theme = OwnPaperThemeDark;
+  }
 
 
-  const darkPaperTheme = {
-    ...DarkTheme,
-    roundness: 10,
-    colors: {
-      ...DarkTheme.colors,
-      primary: '#72B600',
-      accent: '#FFE102',
-      background: '#000000',
-      success: '#72B600',
-      textOnPrimary: Colors.white,
-    },
-  };
   return (
-    <PaperProvider theme={selectedTheme === 'light' ? paperTheme : darkPaperTheme}>
+    <PaperProvider theme={theme}>
       <MainNavigation />
       <Prompt/>
     </PaperProvider>
