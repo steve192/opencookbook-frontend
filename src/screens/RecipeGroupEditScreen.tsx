@@ -55,7 +55,7 @@ export const RecipeGroupEditScreen = (props: Props) => {
     <>
       <Divider style={{marginVertical: 10}}/>
       <Button
-        color={theme.colors.error}
+        buttonColor={theme.colors.error}
         onPress={dispatchDeleteRecipeGroup}>{t('common.delete')}</Button>
     </>;
 

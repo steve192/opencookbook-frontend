@@ -87,7 +87,7 @@ export const SettingsScreen = (props: Props) => {
               dark={true}
               icon="alert-circle-outline"
               mode="contained"
-              color={theme.colors.error}
+              buttonColor={theme.colors.error}
               onPress={deleteAccount}>
               {t('screens.settings.deleteAccount')}
             </Button>

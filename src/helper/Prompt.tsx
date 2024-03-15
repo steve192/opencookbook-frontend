@@ -49,12 +49,12 @@ class PromptWithoutStyles extends React.Component<Props, State> {
         <Paragraph>{this.state.message}</Paragraph>
       </Dialog.Content>
       <Dialog.Actions>
-        {this.state.button1 !== undefined && <Button color={this.props.theme.colors.error} onPress={() => {
+        {this.state.button1 !== undefined && <Button buttonColor={this.props.theme.colors.error} onPress={() => {
           this.state.button1Callback?.();
           this.setState({shown: false});
         } }>{this.state.button1}</Button>}
 
-        { this.state.button2 !== undefined && <Button color={this.props.theme.colors.onSurface} onPress={() => {
+        { this.state.button2 !== undefined && <Button buttonColor={this.props.theme.colors.onSurface} onPress={() => {
           this.state.button2Callback?.();
           this.setState({shown: false});
         } }>{this.state.button2}</Button> }

@@ -101,7 +101,7 @@ export const RecipeImportBrowser = () => {
 
   // eslint-disable-next-line no-unused-vars
   const buttonColors: {[key in typeof importStatus]: string} = {
-    'not_started': importPossible ? theme.colors.primary : theme.colors.primary,
+    'not_started': importPossible ? theme.colors.primary : theme.colors.accent,
     'failed': theme.colors.error,
     'pending': theme.colors.primary,
     'success': theme.colors.primary,
