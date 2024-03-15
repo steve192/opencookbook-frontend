@@ -121,9 +121,9 @@ export const RecipeScreen = (props: Props) => {
               {t('screens.recipe.startCookingButton')}
             </Button>
             <Spacer height={20}/>
-            <View style={{alignItems: "center"}}>
-              <BringImportButton recipeId={displayedRecipe.id!} />
-            </View>
+            {displayedRecipe?.id && <View style={{alignItems: 'center'}}>
+              <BringImportButton recipeId={displayedRecipe.id} />
+            </View>}
             <Spacer height={20} />
 
             {displayedRecipe && renderStepsSection()}
