@@ -67,7 +67,14 @@ class PromptWithoutStyles extends React.Component<Props, State> {
   }
 
   public static show(options: Options) {
-    this.component.setState({...options, shown: true});
+    this.component.setState({title: options.title,
+      button1: options.button1,
+      button1Callback: options.button1Callback,
+      button2: options.button2,
+      button2Callback: options.button2Callback,
+      message: options.message,
+      shown: true,
+    });
   }
 }
 export const PromptUtil = {
