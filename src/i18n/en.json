@@ -9,6 +9,10 @@
     "sunday": "Sunday"
   },
   "common": {
+    "update": {
+      "restartprompt": "A new app version is available. Restart?",
+      "restartbutton": "Restart now"
+    },
     "or": "or",
     "save": "Save",
     "unknownerror": "Unknown error occured",
