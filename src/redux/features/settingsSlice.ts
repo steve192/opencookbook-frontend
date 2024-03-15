@@ -2,7 +2,7 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import RestAPI from '../../dao/RestAPI';
 
 
-type themes = 'light' | 'dark';
+type themes = 'light' | 'dark' | 'system';
 export interface SettingsState {
     theme: themes;
     backendUrl: string;

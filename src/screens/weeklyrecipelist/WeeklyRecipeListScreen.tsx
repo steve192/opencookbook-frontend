@@ -126,7 +126,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
                       return <WeeklyRecipeCard
                         key={weekplanDay.day + index}
                         // @ts-ignore
-                        onRemovePress={() => removeRecipeFromWeekplanDay(recipe.id, weekplanDay)}
+                        onRemovePress={() => removeRecipeFromWeekplanDay(index, weekplanDay)}
                         title={recipe.title} />;
                     }
                   })

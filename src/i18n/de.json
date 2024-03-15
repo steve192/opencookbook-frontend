@@ -110,6 +110,7 @@
     },
     "settings": {
       "screenTitle": "Einstellungen",
+      "system": "Systemeinstellung",
       "theme": "Theme",
       "light": "Hell",
       "dark": "Dunkel",

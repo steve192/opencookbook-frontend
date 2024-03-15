@@ -111,6 +111,7 @@
     "settings": {
       "screenTitle": "Settings",
       "theme": "Theme",
+      "system": "System setting",
       "light": "Light",
       "dark": "Dark",
       "dangerZone": "Danger zone",

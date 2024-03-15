@@ -75,6 +75,7 @@ export const SettingsScreen = (props: Props) => {
             <Picker
               selectedValue={selectedTheme}
               onValueChange={(value) => dispatch(changeTheme(value))}>
+              <Picker.Item label={t('screens.settings.system')} value="system" />
               <Picker.Item label={t('screens.settings.light')} value="light" />
               <Picker.Item label={t('screens.settings.dark')} value="dark" />
             </Picker>
