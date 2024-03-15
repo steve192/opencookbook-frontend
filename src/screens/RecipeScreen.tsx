@@ -120,9 +120,9 @@ export const RecipeScreen = (props: Props) => {
               onPress={() => displayedRecipe && props.navigation.navigate('GuidedCookingScreen', {recipe: displayedRecipe, scaledServings: scaledServings})}>
               {t('screens.recipe.startCookingButton')}
             </Button>
-            <Spacer height={20}/>
+            <Spacer height={30}/>
             {displayedRecipe?.id && <View style={{alignItems: 'center'}}>
-              <BringImportButton recipeId={displayedRecipe.id} />
+              <BringImportButton style={{maxWidth: '90%'}}recipeId={displayedRecipe.id} />
             </View>}
             <Spacer height={20} />
 
