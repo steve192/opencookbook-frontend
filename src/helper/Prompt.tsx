@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Dialog, MD3Colors, MD3Theme, Paragraph, withTheme} from 'react-native-paper';
+import {Button, Dialog, MD3Theme, Paragraph, withTheme} from 'react-native-paper';
 import CentralStyles from '../styles/CentralStyles';
 
 interface Options {
