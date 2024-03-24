@@ -31,7 +31,7 @@ export const SuccessErrorBanner = (props: Props) => {
 
   const renderPending =
     <>
-      <Text style={{fontWeight: 'bold', color: MD3Colors.neutral0, textAlign: 'center'}}>{props.pendingContent}</Text>
+      <Text style={{fontWeight: 'bold', color: MD3Colors.neutralVariant100, textAlign: 'center'}}>{props.pendingContent}</Text>
       <Spacer height={20}/>
       <View style={{maxWidth: 300, width: '100%', alignSelf: 'center', justifyContent: 'center'}}>
         <ProgressBar indeterminate={true} />
