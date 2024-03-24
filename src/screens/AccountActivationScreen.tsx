@@ -25,6 +25,7 @@ export const AccountActivationScreen = (props: Props) => {
     RestAPI.activateAccount(props.route.params.activationId).then(() => {
       setActivationSuccess(true);
       dispatch(login());
+      props.navigation.navigate('default');
     }).catch(() => {
       setActivationError(true);
     });
