@@ -4,7 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {SuccessErrorBanner} from '../components/SuccessErrorBanner';
 import RestAPI from '../dao/RestAPI';
 import {BaseNavigatorProps} from '../navigation/NavigationRoutes';
-import {login} from '../redux/features/authSlice';
+import {login, logout} from '../redux/features/authSlice';
 import {useAppDispatch} from '../redux/hooks';
 import {LoginBackdrop} from './LoginScreen/LoginBackdrop';
 
@@ -14,6 +14,7 @@ export const AccountActivationScreen = (props: Props) => {
   const [activationError, setActivationError] = useState(false);
   const [activationSuccess, setActivationSuccess] = useState(false);
 
+
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -22,13 +23,30 @@ export const AccountActivationScreen = (props: Props) => {
       return;
     }
 
-    RestAPI.activateAccount(props.route.params.activationId).then(() => {
-      setActivationSuccess(true);
-      dispatch(login());
-      props.navigation.navigate('default');
-    }).catch(() => {
-      setActivationError(true);
-    });
+    const activationTimer = setTimeout(() => {
+      RestAPI.activateAccount(props.route.params.activationId).then(() => {
+        setActivationSuccess(true);
+        dispatch(login());
+        props.navigation.navigate('default');
+      }).catch(() => {
+        // Sometimes when this sceeen is accessed via deep links, the activity is mounted twice.
+        // In this case the activation link is already expired. Check if the user is logged in
+
+        RestAPI.getUserInfo().then((userinfo) => {
+          if (userinfo.email) {
+            console.info('got userinfo, logging in');
+            dispatch(login());
+            props.navigation.navigate('default');
+          }
+        }).catch((error) => {
+          console.error('Login failed', error);
+          dispatch(logout());
+          setActivationError(true);
+        });
+      });
+    }, 1000);
+
+    return (() => clearTimeout(activationTimer));
   }, [props.route.params.activationId]);
 
   return (

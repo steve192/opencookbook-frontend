@@ -68,7 +68,7 @@ export const SignupScreen = (props: Props) => {
             <Checkbox
               status={termsAccepted ? 'checked' : 'unchecked'}
               color={colors.primary}
-              uncheckedColor={colors.surface}
+              uncheckedColor={MD3Colors.neutralVariant100}
               onPress={() => setTermsAccepted(!termsAccepted)} />
             <Text
               onPress={() => setTermsAccepted(!termsAccepted)}
