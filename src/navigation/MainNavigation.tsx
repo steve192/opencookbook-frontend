@@ -24,6 +24,7 @@ import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
+import { RecipeOCRImportScreen } from '../screens/RecipeOCRImportScreen';
 import NetInfo from '@react-native-community/netinfo';
 import * as Updates from 'expo-updates';
 import {changeOnlineState} from '../redux/features/settingsSlice';
@@ -146,6 +147,13 @@ const MainNavigation = () => {
             component={ImportScreen}
             options={{
               title: t('navigation.screenTitleImport'),
+            }}
+          />
+          <Stack.Screen
+            name="RecipeOCRImportScreen"
+            component={RecipeOCRImportScreen}
+            options={{
+              title: t('navigation.screenTitleOCRImport'),
             }}
           />
           <Stack.Screen

@@ -57,6 +57,7 @@ export const ImportScreen = (props: Props) => {
       <Caption style={{textAlign: 'center'}}>{t('common.or')}</Caption>
       <Spacer height={80} />
       <Button onPress={() => props.navigation.navigate('RecipeImportBrowser')}>{t('screens.import.startRecipeBrowser')}</Button>
+      <Button onPress={() => props.navigation.navigate('RecipeOCRImportScreen')}>{t('screens.import.startOcrImport')}</Button>
     </>;
   return (
     <Surface style={CentralStyles.fullscreen}>
