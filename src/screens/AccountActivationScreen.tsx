@@ -1,16 +1,20 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {SuccessErrorBanner} from '../components/SuccessErrorBanner';
 import RestAPI from '../dao/RestAPI';
 import {BaseNavigatorProps} from '../navigation/NavigationRoutes';
+import {login} from '../redux/features/authSlice';
+import {useAppDispatch} from '../redux/hooks';
 import {LoginBackdrop} from './LoginScreen/LoginBackdrop';
-import {SuccessErrorBanner} from '../components/SuccessErrorBanner';
 
 type Props = NativeStackScreenProps<BaseNavigatorProps, 'AccountActivationScreen'>;
 export const AccountActivationScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const [activationError, setActivationError] = useState(false);
   const [activationSuccess, setActivationSuccess] = useState(false);
+
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!props.route.params?.activationId) {
@@ -20,6 +24,7 @@ export const AccountActivationScreen = (props: Props) => {
 
     RestAPI.activateAccount(props.route.params.activationId).then(() => {
       setActivationSuccess(true);
+      dispatch(login());
     }).catch(() => {
       setActivationError(true);
     });

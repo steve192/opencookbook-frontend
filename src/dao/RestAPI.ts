@@ -387,7 +387,10 @@ class RestAPI {
   }
 
   static async activateAccount(activationId: string) {
-    await axios.get(await this.url('/users/activate?activationId=' + activationId));
+    const response = await axios.get(await this.url('/users/activate?activationId=' + activationId));
+
+    AppPersistence.setAuthToken(response.data.token);
+    AppPersistence.setRefreshToken(response.data.refreshToken);
   }
 
   static async requestPasswordReset(emailAddress: string) {
