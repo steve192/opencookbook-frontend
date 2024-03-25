@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Pressable, StyleProp, View, ViewStyle} from 'react-native';
 import {TextInput} from 'react-native-paper';
 import {Option, SelectionPopupModal} from './SelectionPopupModal';
@@ -17,6 +17,8 @@ interface Props {
 
 export const SelectionPopup = (props: Props) => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+
+  const textbox = useRef<typeof TextInput>(null);
 
 
   const openModal = () => {
@@ -37,9 +39,16 @@ export const SelectionPopup = (props: Props) => {
         onPress={() => openModal()}>
         <View pointerEvents="none">
           <TextInput
+            ref={textbox}
             label={props.label}
-            disabled={true}
+            // disabled={true}
             mode="outlined"
+            onFocus={() => {
+              // @ts-ignore Works on html elements (web), but probaply does not on android / ios
+              textbox.current?.blur();
+              // @ts-ignore see above
+              textbox.current?.blur && openModal();
+            } }
             placeholder={props.placeholder}
             value={props.value}/>
         </View>
