@@ -98,7 +98,6 @@ export const SelectionPopupModal = (props: Props) => {
         style={modalStyles.modalBackdrop}>
         <HeaderHeightContext.Consumer>
           {(headerHeight) => headerHeight &&
-            <>
               <View style={modalStyles.centeredView}>
                 {/* headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
                 <Surface style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, modalStyles.modalView]}>
@@ -113,7 +112,7 @@ export const SelectionPopupModal = (props: Props) => {
                     <Spacer width={10} />
                   </View>
                   <Divider style={{paddingVertical: 2, marginVertical: 10}} />
-                  <RecyclerListView
+                  {dataProvider.getSize() > 0 && <RecyclerListView
                     keyboardShouldPersistTaps={true}
                     rowRenderer={renderRow}
                     dataProvider={dataProvider}
@@ -128,10 +127,10 @@ export const SelectionPopupModal = (props: Props) => {
                         },
                     )}
                   >
-                  </RecyclerListView>
+                  </RecyclerListView>}
                 </Surface>
               </View>
-            </>}
+          }
         </HeaderHeightContext.Consumer>
       </Pressable>
     </Modal>
