@@ -30,7 +30,7 @@ COPY scripts/build-android.sh /usr/local/bin/build-android
 RUN git config --global --add safe.directory /builder
 
 ENV ANDROID_HOME /usr/lib/android-sdk
-RUN sdkmanager --install "build-tools;23.0.0" "ndk-bundle;r23" "ndk;23.1.7779620" "platforms;android-23" "tools;23.0.5"
+RUN sdkmanager --install "build-tools;23.0.0" "ndk-bundle;r23" "ndk;23.1.7779620" "ndk;25.1.8937393" "platforms;android-23" "tools;23.0.5"
 RUN yes | sdkmanager --licenses
 
 
