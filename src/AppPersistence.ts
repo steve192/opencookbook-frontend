@@ -57,7 +57,12 @@ export default class AppPersistence {
     if (Platform.OS === 'web') {
       return AsyncStorage.getItem('authToken');
     }
-    return SecureStore.getItemAsync('authToken');
+    try {
+      return await SecureStore.getItemAsync('authToken');
+    } catch (e) {
+      console.error('Error getting auth token from secure store', e);
+      return null;
+    }
   }
 
 
@@ -73,14 +78,23 @@ export default class AppPersistence {
     if (Platform.OS === 'web') {
       return AsyncStorage.getItem('refreshToken');
     }
-    return SecureStore.getItemAsync('refreshToken');
+    try {
+      return await SecureStore.getItemAsync('refreshToken');
+    } catch (e) {
+      console.error('Error getting refresh token from secure store', e);
+      return null;
+    }
   }
 
 
   static async getBackendURL(): Promise<string> {
     let backendUrl = undefined;
     if (Platform.OS !== 'web') {
-      backendUrl = await SecureStore.getItemAsync('backendUrl');
+      try {
+        backendUrl = await SecureStore.getItemAsync('backendUrl');
+      } catch (e) {
+        console.error('Error getting backend url', e);
+      }
     } else {
       backendUrl = await AsyncStorage.getItem('backendUrl');
     }
@@ -88,12 +102,17 @@ export default class AppPersistence {
       // Default backend url if not set
       backendUrl = Constants.manifest?.extra?.defaultApiUrl ? Constants.expoConfig?.extra?.defaultApiUrl : 'https://beta.cookpal.io';
     }
+    console.log('Backend url is' + backendUrl);
     return backendUrl;
   }
 
   static async setBackendURL(url: string) {
     if (Platform.OS === 'web') {
-      await AsyncStorage.setItem('backendUrl', url);
+      try {
+        await AsyncStorage.setItem('backendUrl', url);
+      } catch (e) {
+        console.error('Error saving backend url', e);
+      }
       return;
     }
     await SecureStore.setItemAsync('backendUrl', url);

@@ -2,11 +2,11 @@ import {createMaterialBottomTabNavigator} from '@react-navigation/material-botto
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createURL} from 'expo-linking';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {KeyboardAvoidingView, Platform} from 'react-native';
 import {Appbar, withTheme} from 'react-native-paper';
-import {useAppSelector} from '../redux/hooks';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {AccountActivationScreen} from '../screens/AccountActivationScreen';
 import {GuidedCookingScreen} from '../screens/GuidedCookingScreen';
 import {ImportScreen} from '../screens/ImportScreen';
@@ -24,6 +24,11 @@ import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
+import NetInfo from '@react-native-community/netinfo';
+import * as Updates from 'expo-updates';
+import {changeOnlineState} from '../redux/features/settingsSlice';
+import {SnackbarUtil} from '../helper/GlobalSnackbar';
+import AppPersistence from '../AppPersistence';
 
 
 const Stack = createNativeStackNavigator();
@@ -31,9 +36,57 @@ const BottomTab = createMaterialBottomTabNavigator();
 const MainNavigation = () => {
   const loggedIn = useAppSelector((state) => state.auth.loggedIn);
   const isLoading = useAppSelector((state) => state.auth.isLoading);
+  const dispatch = useAppDispatch();
+
+  const [initializersRun, setInitializersRun] = useState(false);
 
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
+
+  useEffect(() => {
+    if (!initializersRun) {
+      return;
+    }
+    setInitializersRun(true);
+
+    (async () => {
+      NetInfo.addEventListener((state) => {
+        if (Platform.OS === 'android') {
+          dispatch(changeOnlineState(state.isInternetReachable === true));
+        } else {
+          dispatch(changeOnlineState(state.isConnected === true));
+        }
+      });
+
+
+      // Check for new app versions
+      const info = await NetInfo.fetch();
+      if (info.isInternetReachable) {
+      // Do update asynchronously
+        const updateAsync = async () => {
+          console.log('Update check');
+          await new Promise((r) => setTimeout(r, 1000));
+          const update = await Updates.checkForUpdateAsync();
+          if (update.isAvailable) {
+            console.log('Dowload update');
+            await Updates.fetchUpdateAsync();
+            console.log('Restarting app');
+
+            SnackbarUtil.show({message: t('common.update.restartprompt'), button1: t('common.update.restartbutton'), button1Callback: () => {
+              AppPersistence.clearOfflineData().then(() => {
+                Updates.reloadAsync()
+                    .then((r) => console.log('Restart triggered', r))
+                    .catch((e) => console.error('Restarting failed', e));
+              });
+            }});
+          } else {
+            console.log('No updates available');
+          }
+        };
+        updateAsync();
+      }
+    })();
+  }, []);
 
   const LoginStackNavigation = () => (
     <Stack.Navigator>

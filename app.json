@@ -60,7 +60,7 @@
         "WRITE_EXTERNAL_STORAGE",
         "ACCESS_NETWORK_STATE"
       ],
-      "versionCode": 27
+      "versionCode": 29
     },
     "web": {
       "favicon": "./assets/icon.png"

@@ -1,5 +1,3 @@
-import NetInfo from '@react-native-community/netinfo';
-import * as Updates from 'expo-updates';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Platform, StyleSheet, View} from 'react-native';
@@ -9,10 +7,9 @@ import RestAPI from '../../dao/RestAPI';
 import {login, logout} from '../../redux/features/authSlice';
 import {changeBackendUrl, changeOnlineState} from '../../redux/features/settingsSlice';
 import {useAppDispatch} from '../../redux/hooks';
-import {LoginBackdrop} from './LoginBackdrop';
 import {useAppTheme} from '../../styles/CentralStyles';
-import {SnackbarUtil} from '../../helper/GlobalSnackbar';
-
+import {LoginBackdrop} from './LoginBackdrop';
+import NetInfo from '@react-native-community/netinfo';
 
 export const SplashScreen = () => {
   const [statusText, setStatusText] = useState('');
@@ -24,44 +21,21 @@ export const SplashScreen = () => {
 
   useEffect(() => {
     (async () => {
-      NetInfo.addEventListener((state) => {
-        if (Platform.OS === 'android') {
-          dispatch(changeOnlineState(state.isInternetReachable === true));
-        } else {
-          dispatch(changeOnlineState(state.isConnected === true));
-        }
-      });
+      const state = await NetInfo.fetch();
 
-
-      // Check for new app versions
-      const info = await NetInfo.fetch();
-      if (info.isInternetReachable) {
-        // Do update asynchronously
-        const updateAsync = async () => {
-          console.log('Update check');
-          await new Promise((r) => setTimeout(r, 1000));
-          const update = await Updates.checkForUpdateAsync();
-          if (update.isAvailable) {
-            console.log('Dowload update');
-            await Updates.fetchUpdateAsync();
-            console.log('Restarting app');
-
-            SnackbarUtil.show({message: t('common.update.restartprompt'), button1: t('common.update.restartbutton'), button1Callback: () => {
-              AppPersistence.clearOfflineData().then(() => {
-                Updates.reloadAsync()
-                    .then((r) => console.log('Restart triggered', r))
-                    .catch((e) => console.error('Restarting failed', e));
-              });
-            }});
-          }
-        };
-        updateAsync();
+      if (Platform.OS === 'android') {
+        dispatch(changeOnlineState(state.isInternetReachable === true));
+      } else {
+        dispatch(changeOnlineState(state.isConnected === true));
       }
 
+
+      console.log('Setting backend url');
       // TODO: Proper management of backend url via redux
       dispatch(changeBackendUrl(await AppPersistence.getBackendURL()));
 
       setStatusText(t('screens.splash.loggingin'));
+      console.log('Getting userinfo');
       RestAPI.getUserInfo().then((userinfo) => {
         if (userinfo.email) {
           console.info('got userinfo, logging in');
