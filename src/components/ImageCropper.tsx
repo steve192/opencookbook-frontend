@@ -87,6 +87,8 @@ export const ImageCropper = (props: Props) => {
     transform: leftTopAnimation.current.getTranslateTransform(),
   };
 
+  console.log(animatedStyle);
+
   const leftTopStyle = [
     {
       position: 'absolute',
@@ -98,7 +100,7 @@ export const ImageCropper = (props: Props) => {
       opacity: 1,
     },
     animatedStyle,,
-    leftTopAnimation.current.getLayout()
+    leftTopAnimation.current.getLayout(),
   ];
 
   return (
