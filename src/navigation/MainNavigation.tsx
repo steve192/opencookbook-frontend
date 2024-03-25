@@ -44,7 +44,7 @@ const MainNavigation = () => {
   const theme = useAppTheme();
 
   useEffect(() => {
-    if (!initializersRun) {
+    if (initializersRun) {
       return;
     }
     setInitializersRun(true);
