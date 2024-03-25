@@ -69,6 +69,7 @@ class RestAPI {
   }
   static async getUserInfo(): Promise<UserInfo> {
     const response = await this.get('/users/self');
+    AppPersistence.storeUserInfoOffline(response.data);
     return response?.data;
   }
   static async setWeekplanRecipes(date: string, recipes: WeekplanDayRecipeInfo[]): Promise<WeekplanDay> {
