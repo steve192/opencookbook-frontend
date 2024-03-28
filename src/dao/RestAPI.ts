@@ -59,10 +59,45 @@ export interface BringExportData {
   ingredients: string[];
 }
 
+export interface LineBox {
+  content: string;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+}
 /**
  * RESTApi for communication with opencookbook backend
  */
 class RestAPI {
+  static async getOCRStatus(processId: string): Promise<{status: string, result?: LineBox[]}> {
+    const url = await this.url('/ocr-image?process=' + processId);
+    const response = await axios.get(url, {headers: {
+      'Authorization': 'Bearer b8t2xdwWdTtZoovnAZAN7tB9q4t7S3j3obX4vewGMkikAjqYbU3wAyfWnpMumGzt'}});
+
+    return response.data;
+  }
+  static async ocrImage(imageUri: string, points: { x: number; y: number; }[]): Promise<string> {
+    const formData = new FormData();
+
+    // Android and ios file:/// uris must be passed to form data in a strange undocumented format
+    // Converting to blob etc does not work..
+    const filename = imageUri.split('/').pop();
+
+    // @ts-ignore
+    const extArr = /\.(\w+)$/.exec(filename);
+    // @ts-ignore
+    const type = 'image/' + extArr[1];
+    // @ts-ignore
+    formData.append('image', {uri: imageUri, name: filename, type});
+
+    const url = await this.url('/ocr-image?regionPoints=' + encodeURIComponent(JSON.stringify(points)));
+    const response = await axios.post(url, formData, {headers: {
+      'Content-Type': 'multipart/form-data',
+      'Authorization': 'Bearer b8t2xdwWdTtZoovnAZAN7tB9q4t7S3j3obX4vewGMkikAjqYbU3wAyfWnpMumGzt'}});
+    return response.data.process;
+  }
+
   private static isOnline = true;
   static setIsOnline(payload: boolean) {
     RestAPI.isOnline = payload;

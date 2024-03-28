@@ -1,11 +1,17 @@
-import React, {ComponentProps, useState} from 'react';
-import {GestureResponderEvent, PanResponder} from 'react-native';
+import React, {ComponentProps, useEffect, useState} from 'react';
+import {GestureResponderEvent, LayoutRectangle, PanResponder} from 'react-native';
 import Reanimated, {interpolate, useAnimatedProps, useSharedValue, withRepeat, withTiming} from 'react-native-reanimated';
 import Svg, {Circle, ClipPath, Defs, G, Image, Line, Mask, Polygon, Rect} from 'react-native-svg';
 import CentralStyles from '../styles/CentralStyles';
+import {CameraCapturedPicture} from 'expo-camera';
 
 interface Props {
-    source: ComponentProps<typeof Image>['source'];
+    source: CameraCapturedPicture;
+    onPointsChange: (
+      point1: {x: number, y:number},
+      point2: {x: number, y:number},
+      point3: {x: number, y:number},
+      point4: {x: number, y:number}) => void
 }
 
 const ReanimatedCircle = Reanimated.createAnimatedComponent(Circle);
@@ -13,6 +19,8 @@ const ReanimatedLine = Reanimated.createAnimatedComponent(Line);
 const ReanimatedPolygon = Reanimated.createAnimatedComponent(Polygon);
 
 export const ImageCropper = (props: Props) => {
+  const [imageLayout, setImageLayout] = useState<LayoutRectangle>();
+
   const leftTopAnimation = useSharedValue({x: 50, y: 50});
   const rightTopAnimation = useSharedValue({x: 50, y: 100});
   const leftBottomAnimation = useSharedValue({x: 100, y: 50});
@@ -30,10 +38,15 @@ export const ImageCropper = (props: Props) => {
       corner: undefined,
     });
 
+  useEffect(() => {
+    // TODO: Enable and check what crashes
+    // sendPointsChanged();
+  }, [imageLayout]);
+
   const onGestureMove = (gestureEvent: GestureResponderEvent) => {
     if (currentDragging.corner === 'leftTop') {
-      leftTopAnimation.value = withTiming( {x: gestureEvent.nativeEvent.pageX - currentDragging.startPageX + currentDragging.startX, y: gestureEvent.nativeEvent.pageY - currentDragging.startPageY + currentDragging.startY});
-      // leftTopAnimation.value = {x: gestureEvent.nativeEvent.pageX - currentDragging.startPageX + currentDragging.startX, y: gestureEvent.nativeEvent.pageY - currentDragging.startPageY + currentDragging.startY};
+      // leftTopAnimation.value = withTiming( {x: gestureEvent.nativeEvent.pageX - currentDragging.startPageX + currentDragging.startX, y: gestureEvent.nativeEvent.pageY - currentDragging.startPageY + currentDragging.startY});
+      leftTopAnimation.value = {x: gestureEvent.nativeEvent.pageX - currentDragging.startPageX + currentDragging.startX, y: gestureEvent.nativeEvent.pageY - currentDragging.startPageY + currentDragging.startY};
     } else if (currentDragging.corner === 'rightTop') {
       rightTopAnimation.value = {x: gestureEvent.nativeEvent.pageX - currentDragging.startPageX + currentDragging.startX, y: gestureEvent.nativeEvent.pageY - currentDragging.startPageY + currentDragging.startY};
     } else if (currentDragging.corner === 'leftBottom') {
@@ -43,8 +56,30 @@ export const ImageCropper = (props: Props) => {
     }
   };
 
+  const sendPointsChanged = () => {
+    props.onPointsChange(
+        {
+          x: interpolate(leftTopAnimation.value.x - imageLayout!.x, [0, imageLayout!.width], [0, props.source.width]),
+          y: interpolate(leftTopAnimation.value.y - imageLayout!.y, [0, imageLayout!.height], [0, props.source.height]),
+        },
+        {
+          x: interpolate(rightTopAnimation.value.x - imageLayout!.x, [0, imageLayout!.width], [0, props.source.width]),
+          y: interpolate(rightTopAnimation.value.y - imageLayout!.y, [0, imageLayout!.height], [0, props.source.height]),
+        },
+        {
+          x: interpolate(rightBottomAnimation.value.x - imageLayout!.x, [0, imageLayout!.width], [0, props.source.width]),
+          y: interpolate(rightBottomAnimation.value.y - imageLayout!.y, [0, imageLayout!.height], [0, props.source.height]),
+        },
+        {
+          x: interpolate(leftBottomAnimation.value.x - imageLayout!.x, [0, imageLayout!.width], [0, props.source.width]),
+          y: interpolate(leftBottomAnimation.value.y - imageLayout!.y, [0, imageLayout!.height], [0, props.source.height]),
+        },
+    );
+  };
+
   const onGestureRelease = (gestureEvent: GestureResponderEvent) => {
     setCurrentDragging({...currentDragging, corner: undefined});
+    sendPointsChanged();
   };
 
   const isWithinBoundsOfLeftTop = (gestureEvent: GestureResponderEvent) => {
@@ -181,14 +216,6 @@ export const ImageCropper = (props: Props) => {
 
   return (
     <>
-      {/* <TouchableWithoutFeedback>
-          <Animated.Image style={leftTopStyle} source={require('../../assets/placeholder.png')}/>
-        </TouchableWithoutFeedback> */}
-      {/* <TouchableOpacity {...gestureHandler.panHandlers}
-          style={{position: 'absolute', backgroundColor: 'grey', width: 25, height: 25, borderRadius: 20, top: leftTop.y, left: leftTop.x}}/> */}
-      {/* <TouchableOpacity style={{position: 'absolute', backgroundColor: 'grey', width: 25, height: 25, borderRadius: 20, top: rightTop.y, left: rightTop.x}}/>
-        <TouchableOpacity style={{position: 'absolute', backgroundColor: 'grey', width: 25, height: 25, borderRadius: 20, top: leftBottom.y, left: leftBottom.x}}/>
-      <TouchableOpacity style={{position: 'absolute', backgroundColor: 'grey', width: 25, height: 25, borderRadius: 20, top: rightBottom.y, left: rightBottom.x}}/> */}
       <Svg>
         <Defs>
           <Mask id="mask1">
@@ -203,6 +230,28 @@ export const ImageCropper = (props: Props) => {
         </Defs>
 
         <Image
+          onLayout={(layoutEvent) => {
+            const layout = layoutEvent.nativeEvent.layout;
+            setImageLayout(layout);
+            const border = 50;
+            leftTopAnimation.value = {
+              x: layout.x + border,
+              y: layout.y + border,
+            };
+            rightTopAnimation.value = {
+              x: layout.x + layout.width - border,
+              y: layout.y + border,
+            };
+
+            rightBottomAnimation.value = {
+              x: layout.x + layout.width - border,
+              y: layout.y + layout.height - border,
+            };
+            leftBottomAnimation.value = {
+              x: layout.x+ border,
+              y: layout.y + layout.height - border,
+            };
+          }}
           x="0"
           y="0"
           width="100%"
