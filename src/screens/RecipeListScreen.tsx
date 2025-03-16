@@ -1,6 +1,4 @@
-import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
-import {CompositeScreenProps} from '@react-navigation/native';
-import {StackScreenProps} from '@react-navigation/stack';
+import {useLocalSearchParams, useNavigation, useRouter} from 'expo-router';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Appbar, FAB, Surface} from 'react-native-paper';
@@ -9,22 +7,12 @@ import {Option, SelectionPopupModal} from '../components/SelectionPopupModal';
 import {Recipe} from '../dao/RestAPI';
 import {PromptUtil} from '../helper/Prompt';
 import {VibrationUtils} from '../helper/VibrationUtil';
-import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
 import {updateRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 
-type Props = CompositeScreenProps<
-  StackScreenProps<RecipeScreenNavigation, 'RecipeListDetailScreen'>,
-  CompositeScreenProps<
-    StackScreenProps<MainNavigationProps, 'OverviewScreen'>,
-    BottomTabScreenProps<OverviewNavigationProps, 'RecipesListScreen'>
-  >
->;
-
-
-const RecipeListScreen = (props: Props) => {
+const RecipeListScreen = () => {
   const theme = useAppTheme();
   const {t} = useTranslation('translation');
 
@@ -37,17 +25,27 @@ const RecipeListScreen = (props: Props) => {
 
   const allRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
   const allRecipes = useAppSelector((state) => state.recipes.recipes);
-  const shownRecipeGroup = useAppSelector((state) => state.recipes.recipeGroups.filter((recipeGroup) => recipeGroup.id == props.route.params?.shownRecipeGroupId)[0]);
+
+  const searchParams = useLocalSearchParams<'/(main)/(overview)', {test: string}>();
+  // TODO
+  // const shownRecipeGroup = useAppSelector((state) => state.recipes.recipeGroups.filter((recipeGroup) => recipeGroup.id == props.route.params?.shownRecipeGroupId)[0]);
+  const shownRecipeGroup = undefined;
+
 
   const [selectedRecipes, setSelectedRecipes] = useState(new Set<number>());
   const [multiSelectionModeActive, setMultiSelectionModeActive] = useState(false);
 
   const [recipeGroupSelectionOpened, setRecipeGroupSelectionOpened] = useState(false);
 
+  const navigation = useNavigation();
+  const router = useRouter();
+
+  router.push({pathname: '/(main)/(overview)', params: {shownRecipeGroupdId: 'ds'}});
+
   useEffect(() => {
     const adjustActionbar = () => {
       if (multiSelectionModeActive) {
-        props.navigation.getParent()?.getParent()?.setOptions({
+        navigation.getParent()?.getParent()?.setOptions({
           title: selectedRecipes.size + ' ' + t('common.selected'),
           headerRight: () => (
             <Appbar.Action
@@ -64,18 +62,18 @@ const RecipeListScreen = (props: Props) => {
         });
       } else {
         if (shownRecipeGroup !== undefined) {
-          props.navigation.getParent()?.getParent()?.setOptions({
+          navigation.getParent()?.getParent()?.setOptions({
             title: shownRecipeGroup?.title,
             headerLeft: undefined,
             headerRight: () => (
               <Appbar.Action
                 icon="pencil-outline"
                 color={theme.colors.onPrimary}
-                onPress={() => shownRecipeGroup.id && props.navigation.navigate('RecipeGroupEditScreen', {editing: true, recipeGroupId: shownRecipeGroup.id})} />
+                onPress={() => shownRecipeGroup.id && router.navigate('RecipeGroupEditScreen', {editing: true, recipeGroupId: shownRecipeGroup.id})} />
             ),
           });
         } else {
-          props.navigation.getParent()?.getParent()?.setOptions({
+          navigation.getParent()?.getParent()?.setOptions({
             title: t('screens.overview.myRecipes'),
             headerRight: undefined,
             headerLeft: undefined,
@@ -84,8 +82,8 @@ const RecipeListScreen = (props: Props) => {
       }
     };
     adjustActionbar();
-    return props.navigation.addListener('focus', adjustActionbar);
-  }, [props.navigation, shownRecipeGroup, multiSelectionModeActive, selectedRecipes]);
+    return navigation.addListener('focus', adjustActionbar);
+  }, [navigation, shownRecipeGroup, multiSelectionModeActive, selectedRecipes]);
 
   const getRecipeGroupOptions = () => {
     // The key for "no group selected". Can be anything that will never exist in the real ids
@@ -96,7 +94,7 @@ const RecipeListScreen = (props: Props) => {
 
   const openRecipe = (recipe: Recipe) => {
     if (recipe.id) {
-      props.navigation.push('RecipeScreen', {
+      router.push('RecipeScreen', {
         recipeId: recipe.id,
       });
     }
@@ -139,9 +137,11 @@ const RecipeListScreen = (props: Props) => {
       <Surface testID="recipeListScreen" style={CentralStyles.fullscreen}>
         <RecipeList
           // @ts-ignore Route params are sometimes string
-          shownRecipeGroupId={props.route.params?.shownRecipeGroupId && parseInt(props.route.params.shownRecipeGroupId)}
+          // TODO
+          // shownRecipeGroupId={props.route.params?.shownRecipeGroupId && parseInt(props.route.params.shownRecipeGroupId)}
+          shownRecipeGroupId={undefined}
           onRecipeClick={openRecipe}
-          onRecipeGroupClick={(recipeGroup) => props.navigation.push('RecipeListDetailScreen', {shownRecipeGroupId: recipeGroup.id})}
+          onRecipeGroupClick={(recipeGroup) => router.push('RecipeListDetailScreen', {shownRecipeGroupId: recipeGroup.id})}
           onMultiSelectionModeToggled={(firstSelectedRecipe) => {
             setMultiSelectionModeActive(!multiSelectionModeActive);
             const newSet = new Set<number>();
@@ -172,7 +172,7 @@ const RecipeListScreen = (props: Props) => {
                   PromptUtil.show({title: t('common.offline.notavailabletitle'), button1: t('common.ok'), message: t('common.offline.notavailable')});
                   return;
                 }
-                props.navigation.navigate('RecipeWizardScreen', {});
+                router.navigate('RecipeWizardScreen', {});
               },
             },
             {
@@ -183,7 +183,7 @@ const RecipeListScreen = (props: Props) => {
                   PromptUtil.show({title: t('common.offline.notavailabletitle'), button1: t('common.ok'), message: t('common.offline.notavailable')});
                   return;
                 }
-                props.navigation.navigate('RecipeGroupEditScreen', {editing: false});
+                router.navigate('RecipeGroupEditScreen', {editing: false});
               },
             },
             {
@@ -194,7 +194,7 @@ const RecipeListScreen = (props: Props) => {
                   PromptUtil.show({title: t('common.offline.notavailabletitle'), button1: t('common.ok'), message: t('common.offline.notavailable')});
                   return;
                 }
-                props.navigation.navigate('ImportScreen', {});
+                router.navigate('ImportScreen', {});
               },
             },
           ]}

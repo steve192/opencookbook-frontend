@@ -1,8 +1,6 @@
 import {Picker} from '@react-native-picker/picker';
-import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
-import {CompositeScreenProps} from '@react-navigation/native';
-import {StackScreenProps} from '@react-navigation/stack';
 import Constants from 'expo-constants';
+import {useNavigation} from 'expo-router';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, View} from 'react-native';
@@ -13,33 +11,29 @@ import AppPersistence from '../AppPersistence';
 import {CustomCard} from '../components/CustomCard';
 import RestAPI from '../dao/RestAPI';
 import {PromptUtil} from '../helper/Prompt';
-import {MainNavigationProps, OverviewNavigationProps} from '../navigation/NavigationRoutes';
 import {logout} from '../redux/features/authSlice';
 import {changeTheme} from '../redux/features/settingsSlice';
 import {RootState} from '../redux/store';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
-type Props =
-    CompositeScreenProps<
-        StackScreenProps<MainNavigationProps, 'OverviewScreen'>,
-        BottomTabScreenProps<OverviewNavigationProps, 'SettingsScreen'>
-    >;
 
-export const SettingsScreen = (props: Props) => {
+export const SettingsScreen = () => {
   const selectedTheme = useSelector((state: RootState) => state.settings.theme);
   const backendUrl = useSelector((state: RootState) => state.settings.backendUrl);
   const dispatch = useDispatch();
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
 
+  const navigation = useNavigation();
+
   useEffect(() => {
-    return props.navigation.addListener('focus', () => {
-      props.navigation.getParent()?.setOptions({
+    return navigation.addListener('focus', () => {
+      navigation.getParent()?.setOptions({
         title: t('screens.settings.screenTitle'),
         headerRight: undefined,
       });
     });
-  }, [props.navigation]);
+  }, [navigation]);
 
   const deleteAccount = () => {
     PromptUtil.show({

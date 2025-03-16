@@ -1,6 +1,6 @@
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AxiosError} from 'axios';
 import Constants from 'expo-constants';
+import {useRouter} from 'expo-router';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
@@ -10,20 +10,19 @@ import Spacer from 'react-spacer';
 import AppPersistence from '../../AppPersistence';
 import {PasswordInput} from '../../components/PasswordInput';
 import RestAPI from '../../dao/RestAPI';
-import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import {login} from '../../redux/features/authSlice';
 import CentralStyles, {OwnColors, useAppTheme} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
 
 
-type Props = NativeStackScreenProps<LoginNavigationProps, 'LoginScreen'>;
-
-const LoginScreen = ({route, navigation}: Props) => {
+const LoginScreen = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [settingsModalVisible, setSettingsModalVisible] = useState<boolean>(false);
   const [serverUrl, setServerUrl] = useState<string>('');
   const [apiErrorMessage, setApiErrorMessage] = useState<string>();
+
+  const router = useRouter();
 
   const dispatch = useDispatch();
 
@@ -89,7 +88,7 @@ const LoginScreen = ({route, navigation}: Props) => {
               compact={true}
               uppercase={false}
               labelStyle={{fontWeight: 'bold'}}
-              onPress={() => navigation.navigate('RequestPasswordResetScreen')}>
+              onPress={() => router.navigate('/requestResetPassword')}>
               {t('screens.login.forgotPassword')}
             </Button>
           </View>
@@ -106,7 +105,7 @@ const LoginScreen = ({route, navigation}: Props) => {
             compact={true}
             uppercase={false}
             labelStyle={{fontWeight: 'bold'}}
-            onPress={() => navigation.navigate('SignupScreen')}
+            onPress={() => router.navigate('/signup')}
           >
             {t('screens.login.createAccount')}
           </Button>

@@ -1,6 +1,5 @@
 import React from 'react';
 import {ImageBackground, KeyboardAvoidingView, Platform, StyleSheet, View} from 'react-native';
-import {SafeAreaInsetsContext} from 'react-native-safe-area-context';
 import CentralStyles from '../../styles/CentralStyles';
 
 
@@ -15,9 +14,6 @@ export const LoginBackdrop = (props: {children:React.ReactNode}) => {
         source={require('../../../assets/login-screen.jpg')}>
         <View style={{backgroundColor: 'rgba(0, 0, 0, 0.45)', position: 'absolute', top: 0, left: 0, right: 0, bottom: 0}}>
           <>
-            <SafeAreaInsetsContext.Consumer>
-              {(insets) => insets && <View style={{paddingTop: insets.top}} />}
-            </SafeAreaInsetsContext.Consumer>
             {props.children}
           </>
         </View>

@@ -9,6 +9,9 @@
     "androidStatusBar": {
       "translucent": true
     },
+    "experiments": {
+      "typedRoutes": true
+    },
     "splash": {
       "image": "./assets/login-screen.png",
       "resizeMode": "cover",

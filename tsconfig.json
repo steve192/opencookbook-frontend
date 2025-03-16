@@ -16,9 +16,11 @@
   "extends": "expo/tsconfig.base",
   "include": [
     "src",
-    "@types"
+    "@types",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
   ],
   "files": [
     "@types/react-native-paper-extensions/index.d.ts"
-  ],
+  ]
 }

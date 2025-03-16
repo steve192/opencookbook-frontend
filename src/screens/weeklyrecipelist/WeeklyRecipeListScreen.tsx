@@ -18,16 +18,11 @@ import CentralStyles from '../../styles/CentralStyles';
 import {RecipeSelectionPopup} from './RecipeSelectionPopup';
 import {WeeklyRecipeCard} from './WeeklyRecipeCard';
 import {PromptUtil} from '../../helper/Prompt';
+import { useNavigation, useRouter } from 'expo-router';
 
-
-type Props =
-    CompositeScreenProps<
-        StackScreenProps<MainNavigationProps, 'OverviewScreen'>,
-        BottomTabScreenProps<OverviewNavigationProps, 'WeeklyScreen'>
-    >;
 
 const dateFormat = 'yyyy-MM-dd';
-export const WeeklyRecipeListScreen = (props: Props) => {
+export const WeeklyRecipeListScreen = () => {
   const now = new XDate();
   const {t} = useTranslation('translation');
   const dispatch = useAppDispatch();
@@ -39,6 +34,9 @@ export const WeeklyRecipeListScreen = (props: Props) => {
 
   const isOnline = useAppSelector((state) => state.settings.isOnline);
 
+  const navigation = useNavigation();
+  const router = useRouter();
+
   const loadData = () => {
     dispatch(fetchWeekplanDays({
       from: getDateOfISOWeek(getCurrentWeekNumber(now), now.getFullYear()),
@@ -48,13 +46,13 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   useEffect(loadData, []);
 
   useEffect(() => {
-    return props.navigation.addListener('focus', () => {
-      props.navigation.getParent()?.setOptions({
+    return navigation.addListener('focus', () => {
+      navigation.getParent()?.setOptions({
         title: t('screens.weekplan.screenTitle'),
         headerRight: undefined,
       });
     });
-  }, [props.navigation]);
+  }, [navigation]);
 
   const addRecipeToWeekplanDay = (recipe: Recipe, weekplanDay: WeekplanDay) => {
     const newWeekplanDay = {...weekplanDay, recipes: [...weekplanDay.recipes]};
@@ -78,7 +76,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   };
 
   const openRecipe = (recipeId: number) => {
-    props.navigation.navigate('RecipeScreen', {recipeId});
+    router.push('RecipeScreen', {recipeId});
   };
 
   const renderWeek = (weekNumber: number, year: number) => {

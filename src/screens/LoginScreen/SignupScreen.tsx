@@ -1,5 +1,4 @@
-import {CompositeScreenProps} from '@react-navigation/core';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {Router} from 'expo-router';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
@@ -9,14 +8,10 @@ import {EmailValidationInput} from '../../components/EmailValidationInput';
 import {PasswordValidationInput} from '../../components/PasswordValidationInput';
 import RestAPI from '../../dao/RestAPI';
 import {PromptUtil} from '../../helper/Prompt';
-import {BaseNavigatorProps, LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
 
-type Props = CompositeScreenProps<
-NativeStackScreenProps<LoginNavigationProps, 'SignupScreen'>,
-NativeStackScreenProps<BaseNavigatorProps, 'TermsOfServiceScreen'>
->
+type Props = {router: Router}
 export const SignupScreen = (props: Props) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -33,7 +28,7 @@ export const SignupScreen = (props: Props) => {
   const register = () => {
     RestAPI.registerUser(email, password).then(() => {
       setApiErrorMessage('');
-      props.navigation.goBack();
+      props.router.back();
       PromptUtil.show({
         button2: t('common.ok'),
         message: t('screens.login.activationpending'),
@@ -75,7 +70,7 @@ export const SignupScreen = (props: Props) => {
               style={{paddingLeft: 10, color: 'white'}}>
               {t('screens.login.acceptTOC')}{' '}
               <Text
-                onPress={() => props.navigation.navigate('TermsOfServiceScreen')}
+                onPress={() => props.router.navigate('/tos')}
                 style={{color: colors.primary}}>
                 {t('screens.login.toc')}
               </Text>

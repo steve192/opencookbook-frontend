@@ -1,13 +1,10 @@
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
-import {Platform} from 'react-native';
+import {Platform, ScrollView} from 'react-native';
 import {StaticHtmlViewer} from '../components/StaticHtmlViewer';
 import RestAPI from '../dao/RestAPI';
-import {BaseNavigatorProps} from '../navigation/NavigationRoutes';
 
 
-type Props = NativeStackScreenProps<BaseNavigatorProps, 'TermsOfServiceScreen'>;
-export const TermsOfServiceScreen = (props: Props) => {
+export const TermsOfServiceScreen = () => {
   const [tos, setTos] = useState('');
 
   useEffect(() => {
@@ -16,10 +13,10 @@ export const TermsOfServiceScreen = (props: Props) => {
     });
   }, []);
 
-
-  if (Platform.OS === 'web') {
-    return <div dangerouslySetInnerHTML={{__html: tos}} />;
-  } else {
-    return <StaticHtmlViewer html={tos}/>;
-  }
+  return <ScrollView>
+    {(Platform.OS === 'web') ?
+      <div dangerouslySetInnerHTML={{__html: tos}} /> :
+      <StaticHtmlViewer html={tos}/>
+    }
+  </ScrollView>;
 };
