@@ -1,7 +1,7 @@
 #docker build -f Dockerfile.builder . -t easbuilder
 #docker run -it -e EXPO_TOKEN= -v "$(pwd)":/builder easbuilder <eas profile for building>
 
-FROM ubuntu:latest
+FROM ubuntu:22.04
 
 RUN echo '\
 Acquire::Retries "100";\
@@ -30,13 +30,17 @@ COPY scripts/build-android.sh /usr/local/bin/build-android
 RUN git config --global --add safe.directory /builder
 
 ENV ANDROID_HOME /usr/lib/android-sdk
-RUN sdkmanager --install "build-tools;23.0.0" "ndk-bundle;r23" "ndk;23.1.7779620" "ndk;25.1.8937393" "platforms;android-23" "tools;23.0.5"
-RUN yes | sdkmanager --licenses
+RUN sdkmanager --install "build-tools;29.0.3" "ndk-bundle;r26" "ndk;26.1.10909125" "platforms;android-35" "tools;26.1.1"
+# RUN yes | sdkmanager --licenses
 
 
 RUN mkdir /builder
 WORKDIR /builder
 
+# EAS clones the repository internally, this fails if the repository is not considered as safe
+RUN git config --global --add safe.directory /builder/.git
+
 ENV EXPO_TOKEN ""
 
 ENTRYPOINT ["/usr/local/bin/build-android"]
+

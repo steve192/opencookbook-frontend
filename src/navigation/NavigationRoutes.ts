@@ -1,5 +1,5 @@
-import { NavigatorScreenParams } from '@react-navigation/core';
-import { Recipe } from '../dao/RestAPI';
+import {NavigatorScreenParams} from '@react-navigation/core';
+import {Recipe} from '../dao/RestAPI';
 
 export type BaseNavigatorProps = {
     AccountActivationScreen: { activationId: string}

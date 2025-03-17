@@ -14,11 +14,20 @@
       },
       "env": {
         "EX_UPDATES_NATIVE_DEBUG": "1"
-      },
+      }
     },
     "preview": {
       "distribution": "internal",
       "channel": "preview"
+    },
+    "preview-apk": {
+      "distribution": "internal",
+      "channel": "preview",
+      "android": {
+        "distribution": "internal",
+        "withoutCredentials": true,
+        "buildType": "apk"
+      }
     },
     "production": {
       "channel": "production"

@@ -4,7 +4,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createURL} from 'expo-linking';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {KeyboardAvoidingView, Platform} from 'react-native';
+import {Platform} from 'react-native';
 import {Appbar, withTheme} from 'react-native-paper';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {AccountActivationScreen} from '../screens/AccountActivationScreen';
@@ -29,6 +29,8 @@ import * as Updates from 'expo-updates';
 import {changeOnlineState} from '../redux/features/settingsSlice';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import AppPersistence from '../AppPersistence';
+import {StatusBar} from 'expo-status-bar';
+import {KeyboardAvoidingView} from 'react-native-keyboard-controller';
 
 
 const Stack = createNativeStackNavigator();
@@ -89,88 +91,92 @@ const MainNavigation = () => {
   }, []);
 
   const LoginStackNavigation = () => (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="LoginScreen"
-        component={LoginScreen}
-        options={{headerShown: false}} />
-      <Stack.Screen
-        name="SignupScreen"
-        component={SignupScreen}
-        options={{headerShown: false}} />
-      <Stack.Screen
-        name='RequestPasswordResetScreen'
-        component={RequestPasswordResetScreen}
-        options={{headerShown: false}}
-      />
-    </Stack.Navigator>
+    <>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="LoginScreen"
+          component={LoginScreen}
+          options={{headerShown: false}} />
+        <Stack.Screen
+          name="SignupScreen"
+          component={SignupScreen}
+          options={{headerShown: false}} />
+        <Stack.Screen
+          name='RequestPasswordResetScreen'
+          component={RequestPasswordResetScreen}
+          options={{headerShown: false}}
+        />
+      </Stack.Navigator>
+    </>
   );
 
   const MainStackNavigation = () => {
     return (
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={CentralStyles.fullscreen}
-      >
-        <Stack.Navigator
-          screenOptions={{
-            header: (nav) => (
-              <Appbar.Header style={{backgroundColor: theme.colors.primary}}>
-                {nav.back ? (
+      <>
+        <KeyboardAvoidingView
+          // behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={CentralStyles.fullscreen}
+        >
+          <Stack.Navigator
+            screenOptions={{
+              header: (nav) => (
+                <Appbar.Header style={{backgroundColor: theme.colors.primary}}>
+                  {nav.back ? (
                   <Appbar.BackAction color={theme.colors.onPrimary} onPress={() => nav.navigation.goBack()} />
-                  ) : null}
-                {nav.options.headerLeft !== undefined ? nav.options?.headerLeft?.({tintColor: undefined, canGoBack: false}): null}
-                <Appbar.Content color={theme.colors.onPrimary} title={nav.options.title} />
-                {/* TODO: Use canGoback*/}
-                {nav.options.headerRight !== undefined ? nav.options?.headerRight?.({tintColor: undefined, canGoBack: false}): null}
-              </Appbar.Header>
-            ),
-          }}>
-          <Stack.Screen
-            name="OverviewScreen"
-            component={BottomTabNavigation}
-          />
-          <Stack.Screen
-            name="RecipeWizardScreen"
-            component={RecipeWizardScreen}
-          />
-          <Stack.Screen
-            name="RecipeImportBrowser"
-            component={RecipeImportBrowser}
-            options={{
-              title: t('navigation.screenTitleImportBrowser'),
-            }}
-          />
-          <Stack.Screen
-            name="ImportScreen"
-            component={ImportScreen}
-            options={{
-              title: t('navigation.screenTitleImport'),
-            }}
-          />
-          <Stack.Screen
-            name="RecipeGroupEditScreen"
-            component={RecipeGroupEditScreen}
-            options={{
-              title: t('navigation.screenTitleCreateRecipeGroup'),
-            }}
-          />
-          <Stack.Screen
-            name="GuidedCookingScreen"
-            component={GuidedCookingScreen}
-            options={{
-              title: t('navigation.screenTitleGuidedCooking'),
-            }}
-          />
-          <Stack.Screen
-            name="RecipeScreen"
-            component={RecipeScreen}
+                ) : null}
+                  {nav.options.headerLeft !== undefined ? nav.options?.headerLeft?.({tintColor: undefined, canGoBack: false}): null}
+                  <Appbar.Content color={theme.colors.onPrimary} title={nav.options.title} />
+                  {/* TODO: Use canGoback*/}
+                  {nav.options.headerRight !== undefined ? nav.options?.headerRight?.({tintColor: undefined, canGoBack: false}): null}
+                </Appbar.Header>
+              ),
+            }}>
+            <Stack.Screen
+              name="OverviewScreen"
+              component={BottomTabNavigation}
+            />
+            <Stack.Screen
+              name="RecipeWizardScreen"
+              component={RecipeWizardScreen}
+            />
+            <Stack.Screen
+              name="RecipeImportBrowser"
+              component={RecipeImportBrowser}
+              options={{
+                title: t('navigation.screenTitleImportBrowser'),
+              }}
+            />
+            <Stack.Screen
+              name="ImportScreen"
+              component={ImportScreen}
+              options={{
+                title: t('navigation.screenTitleImport'),
+              }}
+            />
+            <Stack.Screen
+              name="RecipeGroupEditScreen"
+              component={RecipeGroupEditScreen}
+              options={{
+                title: t('navigation.screenTitleCreateRecipeGroup'),
+              }}
+            />
+            <Stack.Screen
+              name="GuidedCookingScreen"
+              component={GuidedCookingScreen}
+              options={{
+                title: t('navigation.screenTitleGuidedCooking'),
+              }}
+            />
+            <Stack.Screen
+              name="RecipeScreen"
+              component={RecipeScreen}
             // options={
-            //     { headerTransparent: true, headerStyle: {} }
-            // }
-          />
-        </Stack.Navigator>
-      </KeyboardAvoidingView>
+              //     { headerTransparent: true, headerStyle: {} }
+              // }
+            />
+          </Stack.Navigator>
+        </KeyboardAvoidingView>
+      </>
     );
   };
 
@@ -226,26 +232,29 @@ const MainNavigation = () => {
 
   const BaseNavigator = () => (
     // This basically is an interceptor before the linking is resolved in the "normal" stack ("default" route)
-    <Stack.Navigator
-      screenOptions={{headerShown: false}}>
-      <Stack.Screen
-        name='default'
-        component={authentificationNavigator}
-      />
-      <Stack.Screen
-        name='AccountActivationScreen'
-        component={AccountActivationScreen}
-      />
-      <Stack.Screen
-        name='PasswordResetScreen'
-        component={PasswordResetScreen}
-      />
-      <Stack.Screen
-        name='TermsOfServiceScreen'
-        component={TermsOfServiceScreen}
-        options={{headerShown: true, title: t('screens.login.toc')}}
-      />
-    </Stack.Navigator>
+    <>
+      <StatusBar translucent={true}/>
+      <Stack.Navigator
+        screenOptions={{headerShown: false}}>
+        <Stack.Screen
+          name='default'
+          component={authentificationNavigator}
+        />
+        <Stack.Screen
+          name='AccountActivationScreen'
+          component={AccountActivationScreen}
+        />
+        <Stack.Screen
+          name='PasswordResetScreen'
+          component={PasswordResetScreen}
+        />
+        <Stack.Screen
+          name='TermsOfServiceScreen'
+          component={TermsOfServiceScreen}
+          options={{headerShown: true, title: t('screens.login.toc')}}
+        />
+      </Stack.Navigator>
+    </>
   );
 
   const authentificationNavigator = () => (

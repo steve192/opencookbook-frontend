@@ -14,7 +14,7 @@ build-web:
     - npm run build-web
   artifacts:
     paths:
-      - web-build/
+      - dist/
 
 sonarqube:
   stage: test
