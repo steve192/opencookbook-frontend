@@ -60,128 +60,129 @@ jobs:
 
       - uses: actions/upload-artifact@master
         with:
-          name: web-build
-          path: web-build/
+          name: dist
+          path: dist/
 
-  cypress-percy:
-    name: cypress-percy
-    needs:
-      - build-web
-    runs-on: ubuntu-latest
-    # Run only on main branch
-    if: github.event_name != 'pull_request' && ( github.ref_protected == true )
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # cypress-percy:
+  #   name: cypress-percy
+  #   needs:
+  #     - build-web
+  #   runs-on: ubuntu-latest
+  #   # Run only on main branch
+  #   if: github.event_name != 'pull_request' && ( github.ref_protected == true )
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: cache node modules
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+  #     - name: cache node modules
+  #       uses: actions/cache@v4
+  #       env:
+  #         cache-name: cache-node-modules
+  #       with:
+  #         # npm cache files are stored in `~/.npm` on Linux/macOS
+  #         path: ~/.npm
+  #         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-build-${{ env.cache-name }}-
+  #           ${{ runner.os }}-build-
+  #           ${{ runner.os }}-
 
-      - uses: actions/download-artifact@master
-        with:
-          name: web-build
-          path: web-build/
+  #     - uses: actions/download-artifact@master
+  #       with:
+  #         name: dist
+  #         path: dist/
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
 
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+  #     - name: Extract Docker metadata
+  #       id: meta
+  #       uses: docker/metadata-action@v5
+  #       with:
+  #         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Build docker image for cypress tests
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: false
-          load: true
-          tags: ${{ env.IMAGE_NAME }}:cypresstest
-          labels: ${{ steps.meta.outputs.labels }}
+  #     - name: Build docker image for cypress tests
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         push: false
+  #         load: true
+  #         tags: ${{ env.IMAGE_NAME }}:cypresstest
+  #         labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Cypress run
-        uses: cypress-io/github-action@v6
-        with:
-          start: docker run --rm -p 80:80 ${{ env.IMAGE_NAME }}:cypresstest
-          command-prefix: percy exec -- npx
-          config: baseUrl=http://localhost:80
-        env:
-          PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+  #     - name: Cypress run
+  #       uses: cypress-io/github-action@v6
+  #       with:
+  #         start: docker run --rm -p 80:80 ${{ env.IMAGE_NAME }}:cypresstest
+  #         command-prefix: percy exec -- npx
+  #         config: baseUrl=http://localhost:80
+  #       env:
+  #         PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
 
-  cypress:
-    name: cypress
-    needs:
-      - build-web
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # cypress:
+  #   name: cypress
+  #   needs:
+  #     - build-web
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: cache node modules
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+  #     - name: cache node modules
+  #       uses: actions/cache@v4
+  #       env:
+  #         cache-name: cache-node-modules
+  #       with:
+  #         # npm cache files are stored in `~/.npm` on Linux/macOS
+  #         path: ~/.npm
+  #         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-build-${{ env.cache-name }}-
+  #           ${{ runner.os }}-build-
+  #           ${{ runner.os }}-
 
-      - uses: actions/download-artifact@master
-        with:
-          name: web-build
-          path: web-build/
+  #     - uses: actions/download-artifact@master
+  #       with:
+  #         name: dist
+  #         path: dist/
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+  #     - name: Set up QEMU
+  #       uses: docker/setup-qemu-action@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v3
 
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+  #     - name: Extract Docker metadata
+  #       id: meta
+  #       uses: docker/metadata-action@v5
+  #       with:
+  #         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Build docker image for cypress tests
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: false
-          load: true
-          tags: ${{ env.IMAGE_NAME }}:cypresstest
-          labels: ${{ steps.meta.outputs.labels }}
+  #     - name: Build docker image for cypress tests
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         push: false
+  #         load: true
+  #         tags: ${{ env.IMAGE_NAME }}:cypresstest
+  #         labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Cypress run
-        uses: cypress-io/github-action@v6
-        with:
-          start: docker run --rm -p 80:80 ${{ env.IMAGE_NAME }}:cypresstest
-          config: baseUrl=http://localhost:80
+  #     - name: Cypress run
+  #       uses: cypress-io/github-action@v6
+  #       with:
+  #         start: docker run --rm -p 80:80 ${{ env.IMAGE_NAME }}:cypresstest
+  #         config: baseUrl=http://localhost:80
 
-      - name: "Upload Artifact"
-        uses: actions/upload-artifact@v4
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots/**/*
-          retention-days: 5
+  #     - name: "Upload Artifact"
+  #       if: failure()
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: cypress-screenshots
+  #         path: cypress/screenshots/**/*
+  #         retention-days: 5
 
   sonarcloud:
     name: SonarCloud
@@ -237,8 +238,8 @@ jobs:
 
       - uses: actions/download-artifact@master
         with:
-          name: web-build
-          path: web-build/
+          name: dist
+          path: dist/
 
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer

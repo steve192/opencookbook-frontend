@@ -100,7 +100,7 @@ export default class AppPersistence {
     }
     if (!backendUrl) {
       // Default backend url if not set
-      backendUrl = Constants.manifest?.extra?.defaultApiUrl ? Constants.expoConfig?.extra?.defaultApiUrl : 'https://beta.cookpal.io';
+      backendUrl = Constants.expoConfig?.extra?.defaultApiUrl ? Constants.expoConfig?.extra?.defaultApiUrl : 'https://beta.cookpal.io';
     }
     console.log('Backend url is' + backendUrl);
     return backendUrl;

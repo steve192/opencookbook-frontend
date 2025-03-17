@@ -1,13 +1,13 @@
 import React from 'react';
-import {ImageBackground, KeyboardAvoidingView, Platform, StyleSheet, View} from 'react-native';
+import {ImageBackground, StyleSheet, View} from 'react-native';
 import {SafeAreaInsetsContext} from 'react-native-safe-area-context';
 import CentralStyles from '../../styles/CentralStyles';
+import {KeyboardAvoidingView} from 'react-native-keyboard-controller';
 
 
 export const LoginBackdrop = (props: {children:React.ReactNode}) => {
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={CentralStyles.fullscreen}
     >
       <ImageBackground

@@ -177,7 +177,7 @@ const RecipeWizardScreen = (props: Props) => {
             multiline={true}
             numberOfLines={5}
             value={recipeData.preparationSteps[preparationStepIndex]}
-            onChangeText={(newText) => changePreparationStep(newText, preparationStepIndex)}
+            onChangeText={(newText: string) => changePreparationStep(newText, preparationStepIndex)}
             placeholder={t('screens.editRecipe.preparationStepPlaceholder')} />
           <Spacer height={5} />
         </React.Fragment>,

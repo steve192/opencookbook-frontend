@@ -24,8 +24,8 @@ export const OwnPaperThemeDark = {
     success: '#00FF00',
     // background: '#000000',
     onPrimary: '#FFFFFF',
-  }
-}
+  },
+};
 
 export type AppTheme = typeof OwnPaperTheme;
 

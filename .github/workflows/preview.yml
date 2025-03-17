@@ -41,8 +41,8 @@ jobs:
 
       - uses: actions/upload-artifact@master
         with:
-          name: web-build
-          path: web-build/
+          name: dist
+          path: dist/
 
   docker:
     name: BuildDocker
@@ -61,8 +61,8 @@ jobs:
 
       - uses: actions/download-artifact@master
         with:
-          name: web-build
-          path: web-build/
+          name: dist
+          path: dist/
 
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
