@@ -155,7 +155,9 @@
       "servings": "Portionen",
       "startCookingButton": "Kochen beginnen",
       "ingredients": "Zutaten",
-      "preparationSteps": "Zubereitungsschritte"
+      "preparationSteps": "Zubereitungsschritte",
+      "recipeSource": "Import-Quelle",
+      "importedFrom": "Importiert von"
     },
     "guidedCooking": {
       "screenTitle": "Kochansicht",
