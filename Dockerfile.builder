@@ -1,7 +1,7 @@
 #docker build -f Dockerfile.builder . -t easbuilder
 #docker run -it -e EXPO_TOKEN= -v "$(pwd)":/builder easbuilder <eas profile for building>
 
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 RUN echo '\
 Acquire::Retries "100";\
