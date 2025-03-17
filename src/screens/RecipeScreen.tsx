@@ -3,8 +3,8 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useKeepAwake} from 'expo-keep-awake';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, View} from 'react-native';
-import {Appbar, Button, Caption, Divider, Surface, Text} from 'react-native-paper';
+import {Linking, ScrollView, View} from 'react-native';
+import {Appbar, Button, Caption, Chip, Divider, Surface, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {ChunkView} from '../ChunkView';
 import {BringImportButton} from '../components/BringExportButton';
@@ -17,6 +17,9 @@ import {fetchSingleRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
+const getDomain = (url: string) => {
+  return url.replace('http://', '').replace('https://', '').split(/[/?#]/)[0];
+};
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
 export const RecipeScreen = (props: Props) => {
@@ -109,6 +112,20 @@ export const RecipeScreen = (props: Props) => {
             style={{height: 320}}
             images={displayedRecipe ? displayedRecipe?.images : []}
           />
+          {displayedRecipe?.recipeSource &&
+               <>
+                 <Spacer height={20}/>
+                 <View style={{alignItems: 'center'}}>
+                   <Chip
+                     onPress={() => {
+                       Linking.openURL(displayedRecipe.recipeSource!);
+                     }}
+                   >
+                     <Text>{t('screens.recipe.importedFrom')} <Text style={{color: theme.colors.primary}}>{getDomain(displayedRecipe.recipeSource)}</Text></Text>
+                   </Chip>
+                 </View>
+                 <Spacer height={20}/>
+               </>}
           <View style={[CentralStyles.contentContainer, {flex: 1}]} >
             {displayedRecipe && renderIngredientsSection()}
 
