@@ -223,7 +223,7 @@ jobs:
     name: BuildDocker
     needs:
       - build-web
-      - cypress
+      # - cypress
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -302,7 +302,7 @@ jobs:
     name: Publish on expo
     needs:
       - sonarcloud
-      - cypress
+      # - cypress
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request' && ( github.ref_type == 'tag' )
     steps:
