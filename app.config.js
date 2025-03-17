@@ -6,6 +6,18 @@ export default ({config}) => {
                 currentdate.getHours() + ':' +
                 currentdate.getMinutes() + ':' +
                 currentdate.getSeconds();
+
+  // Set the Android package name based on the build profile
+  const buildProfile = process.env.EAS_BUILD_PROFILE;
+  if (buildProfile === 'production') {
+    // config.android.package = 'com.sterul.opencookbook';
+  } else if (buildProfile === 'development') {
+    config.name = 'Cookpal (devclient)';
+    config.android.package = 'com.sterul.opencookbook.dev';
+  } else if (buildProfile === 'preview') {
+    config.name = 'Cookpal (preview)';
+    config.android.package = 'com.sterul.opencookbook.preview';
+  }
   return {
     ...config,
     extra: {
