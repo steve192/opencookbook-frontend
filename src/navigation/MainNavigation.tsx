@@ -231,58 +231,60 @@ const MainNavigation = () => {
   );
 
   const BaseNavigator = () => (
-    // This basically is an interceptor before the linking is resolved in the "normal" stack ("default" route)
-    <>
-      <StatusBar translucent={true}/>
-      <Stack.Navigator
-        screenOptions={{headerShown: false}}>
-        <Stack.Screen
-          name='default'
-          component={authentificationNavigator}
-        />
-        <Stack.Screen
-          name='AccountActivationScreen'
-          component={AccountActivationScreen}
-        />
-        <Stack.Screen
-          name='PasswordResetScreen'
-          component={PasswordResetScreen}
-        />
-        <Stack.Screen
-          name='TermsOfServiceScreen'
-          component={TermsOfServiceScreen}
-          options={{headerShown: true, title: t('screens.login.toc')}}
-        />
-      </Stack.Navigator>
-    </>
+    isLoading ? <SplashScreen /> :
+        <Stack.Navigator
+          screenOptions={{headerShown: false}}>
+          <Stack.Screen
+            name='default'
+            component={authentificationNavigator}
+          />
+          <Stack.Screen
+            name='AccountActivationScreen'
+            component={AccountActivationScreen}
+          />
+          <Stack.Screen
+            name='PasswordResetScreen'
+            component={PasswordResetScreen}
+          />
+          <Stack.Screen
+            name='TermsOfServiceScreen'
+            component={TermsOfServiceScreen}
+            options={{headerShown: true, title: t('screens.login.toc')}}
+          />
+        </Stack.Navigator>
   );
 
   const authentificationNavigator = () => (
-    isLoading ? <SplashScreen /> : loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />
+    loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />
   );
 
   return (
-    <NavigationContainer
-      linking={{
-        prefixes: [createURL('/'), 'https://beta.cookpal.io/'],
-        config: {
-          screens: {
-            AccountActivationScreen: 'activateAccount',
-            PasswordResetScreen: 'resetPassword',
-            TermsOfServiceScreen: 'tos',
-            default: {
-              screens: {
-                RequestPasswordResetScreen: 'requestResetPassword',
-                RecipeScreen: 'recipe',
-                RecipeWizardScreen: 'editRecipe',
-                ImportScreen: 'import',
-                OverviewScreen: {
-                  screens: {
-                    SettingsScreen: 'settings',
-                    WeeklyScreen: 'weekly',
-                    RecipesListScreen: {
-                      screens: {
-                        RecipeListDetailScreen: 'myRecipes',
+    <>
+      <StatusBar translucent={true}/>
+      <NavigationContainer
+        linking={{
+          prefixes: [createURL('/'), 'https://beta.cookpal.io/'],
+          config: {
+            screens: {
+              AccountActivationScreen: 'activateAccount',
+              PasswordResetScreen: 'resetPassword',
+              TermsOfServiceScreen: 'tos',
+              default: {
+                screens: {
+                  LoginScreen: 'login',
+                  SignupScreen: 'signup',
+                  RequestPasswordResetScreen: 'requestResetPassword',
+                  RecipeScreen: 'recipe',
+                  RecipeWizardScreen: 'editRecipe',
+                  ImportScreen: 'import',
+                  OverviewScreen: {
+                    screens: {
+                      SettingsScreen: 'settings',
+                      WeeklyScreen: 'weekly',
+                      RecipesListScreen: {
+                        screens: {
+                          RecipeListDetailScreen: 'myRecipes',
+                        },
                       },
                     },
                   },
@@ -290,11 +292,11 @@ const MainNavigation = () => {
               },
             },
           },
-        },
-      }}
-    >
-      <BaseNavigator/>
-    </NavigationContainer>
+        }}
+      >
+        <BaseNavigator/>
+      </NavigationContainer>
+    </>
   );
 };
 
