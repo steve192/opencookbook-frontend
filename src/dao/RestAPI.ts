@@ -28,6 +28,7 @@ export interface Recipe {
     servings: number;
     recipeGroups: RecipeGroup[];
     type: string
+    recipeSource?: string;
 }
 
 export interface RecipeGroup {

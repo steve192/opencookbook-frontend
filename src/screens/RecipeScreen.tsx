@@ -4,7 +4,7 @@ import {useKeepAwake} from 'expo-keep-awake';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, View} from 'react-native';
-import {Appbar, Button, Caption, Divider, Surface, Text} from 'react-native-paper';
+import {Appbar, Button, Caption, Divider, Surface, Text, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {ChunkView} from '../ChunkView';
 import {BringImportButton} from '../components/BringExportButton';
@@ -125,7 +125,8 @@ export const RecipeScreen = (props: Props) => {
               <BringImportButton style={{maxWidth: '90%'}}recipeId={displayedRecipe.id} />
             </View>}
             <Spacer height={20} />
-
+            {displayedRecipe.recipeSource &&
+              <TextInput />}
             {displayedRecipe && renderStepsSection()}
 
           </View>
