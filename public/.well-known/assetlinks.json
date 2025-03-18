@@ -1,11 +1,11 @@
 [
-    {
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "com.sterul.opencookbook",
-        "sha256_cert_fingerprints":
-          ["95:F4:6B:C9:0D:07:AE:27:2F:B6:8A:9D:55:4A:1A:53:23:FE:60:EB:8A:0C:9E:89:9F:44:26:E5:BE:D5:09:41"]
-      }
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.sterul.opencookbook",
+      "sha256_cert_fingerprints":
+        ["95:F4:6B:C9:0D:07:AE:27:2F:B6:8A:9D:55:4A:1A:53:23:FE:60:EB:8A:0C:9E:89:9F:44:26:E5:BE:D5:09:41"]
     }
-  ]
+  }
+]

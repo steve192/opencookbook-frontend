@@ -60,6 +60,7 @@ jobs:
 
       - uses: actions/upload-artifact@master
         with:
+          include-hidden-files: true
           name: dist
           path: dist/
 
