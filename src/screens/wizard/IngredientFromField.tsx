@@ -65,6 +65,11 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
         });
   };
 
+  const onUnitChange = (newUnit: string) => {
+    setUnit(newUnit);
+    invokeIngredientUpdate(ingredientQuery, amount, newUnit);
+  };
+
   const onAmountChange = (text: string) => {
     text = text.replace(',', '.');
     setAmount(text);
@@ -102,7 +107,7 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
               label={t('screens.editRecipe.unit')}
               value={unit}
               options={availableUnits.map((availableUnit, index) => ({key: index.toString(), value: availableUnit}))}
-              onValueChanged={(selectedOption) => setUnit(selectedOption.value)}
+              onValueChanged={(selectedOption) => onUnitChange(selectedOption.value)}
             />
           </View>
           <Spacer height={5} />
