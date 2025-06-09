@@ -1,7 +1,7 @@
 import {useIsFocused} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useKeepAwake} from 'expo-keep-awake';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Linking, ScrollView, View} from 'react-native';
 import {Appbar, Button, Caption, Chip, Divider, Surface, Text} from 'react-native-paper';
@@ -13,7 +13,7 @@ import {RecipeImageViewPager} from '../components/RecipeImageViewPager';
 import {TextBullet} from '../components/TextBullet';
 import {PromptUtil} from '../helper/Prompt';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
-import {fetchSingleRecipe} from '../redux/features/recipesSlice';
+import {fetchSingleRecipe, recipesSlice} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
@@ -71,6 +71,15 @@ export const RecipeScreen = (props: Props) => {
     displayedRecipe && setScaledServings(displayedRecipe.servings);
   }, [displayedRecipe]);
 
+  const calculateNutrients = useMemo(() => {
+    return {
+      energy: displayedRecipe?.neededIngredients.reduce((sum, ingredientUse) => sum + (ingredientUse.ingredient.nutrientsEnergy || 0) * (ingredientUse.amount || 0) / (displayedRecipe.servings), 0),
+      fat: displayedRecipe?.neededIngredients.reduce((sum, ingredientUse) => sum + (ingredientUse.ingredient.nutrientsFat || 0) * (ingredientUse.amount || 0) / (displayedRecipe.servings), 0) || 0,
+      protein: displayedRecipe?.neededIngredients.reduce((sum, ingredientUse) => sum + (ingredientUse.ingredient.nutrientsProtein || 0) * (ingredientUse.amount || 0) / (displayedRecipe.servings), 0) || 0,
+      carbohydrates: displayedRecipe?.neededIngredients.reduce((sum, ingredientUse) => sum + (ingredientUse.ingredient.nutrientsCarbohydrates || 0) * (ingredientUse.amount || 0) / (displayedRecipe.servings), 0) || 0,
+    };
+  }, [displayedRecipe]);
+
   const renderIngredientsSection = () =>
     <>
       <Caption testID='ingredient-section-caption'>{t('screens.recipe.ingredients')}</Caption>
@@ -81,6 +90,19 @@ export const RecipeScreen = (props: Props) => {
         enableServingScaling={true}
         onServingScaleChange={setScaledServings}
       />
+
+{/* TODO: Add density factor to ingredients and factors in amounts to calculate per gram */}
+      {/* <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+        <Caption style={{alignSelf: 'center'}}>{t('screens.recipe.nutrients-label')}</Caption>
+        <Spacer width={10} />
+        <Chip icon="" compact={true} textStyle={{fontSize: 10}}>{ calculateNutrients.energy} kcal</Chip>
+        <Spacer width={10} />
+        <Chip icon="" compact={true} textStyle={{fontSize: 10}}>{ calculateNutrients.fat} {t('screens.recipe.carbohydrates')}</Chip>
+        <Spacer width={10} />
+        <Chip icon="" compact={true} textStyle={{fontSize: 10}}>{ calculateNutrients.fat} {t('screens.recipe.fat')}</Chip>
+        <Spacer width={10} />
+        <Chip icon="" compact={true} textStyle={{fontSize: 10}}>{ calculateNutrients.protein} {t('screens.recipe.protein')}</Chip>
+      </View> */}
     </>
   ;
 

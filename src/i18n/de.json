@@ -157,7 +157,12 @@
       "ingredients": "Zutaten",
       "preparationSteps": "Zubereitungsschritte",
       "recipeSource": "Import-Quelle",
-      "importedFrom": "Importiert von"
+      "importedFrom": "Importiert von",
+      "fat": "Fett",
+      "carbohydrates": "Kohlenhydrate",
+      "protein": "Protein",
+      "energy": "kcal",
+      "nutrients-label": "pro Portion"
     },
     "guidedCooking": {
       "screenTitle": "Kochansicht",

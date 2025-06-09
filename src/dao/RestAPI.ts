@@ -6,8 +6,15 @@ import AppPersistence from '../AppPersistence';
 
 
 export interface Ingredient {
-    id?: number
-    name: string
+    id?: number;
+    name: string;
+    nutrientsEnergy?: number;
+    nutrientsCarbohydrates?: number;
+    nutrientsFat: number;
+    nutrientsProtein?: number;
+    nutrientsSalt?: number;
+    nutrientsSaturatedFat?: number;
+    nutrientsSugar?: number;
 }
 
 export interface IngredientUse {

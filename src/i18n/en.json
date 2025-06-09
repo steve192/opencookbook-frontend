@@ -157,7 +157,12 @@
       "ingredients": "Ingredients",
       "preparationSteps": "Preparation steps",
       "recipeSource": "Import-source",
-      "importedFrom": "Imported from"
+      "importedFrom": "Imported from",
+      "fat": "Fat",
+      "carbohydrates": "Carbs",
+      "protein": "Protein",
+      "energy": "kcal",
+      "nutrients-label": "per serving",
     },
     "guidedCooking": {
       "screenTitle": "Guided cooking",
