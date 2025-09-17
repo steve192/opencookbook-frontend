@@ -34,10 +34,10 @@ export const RecipeImportBrowser = () => {
           return true;
         };
 
-        BackHandler.addEventListener('hardwareBackPress', onBackPress);
+        const handler = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
         return () =>
-          BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+          handler.remove();
       }, []),
   );
 
