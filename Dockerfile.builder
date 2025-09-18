@@ -14,25 +14,39 @@ Debug::Acquire::https "true";\
 ' > /etc/apt/apt.conf.d/99custom
 
 RUN apt-get update && \
-    apt-get install -y openjdk-17-jdk android-sdk android-sdk-platform-23 sdkmanager curl git && \
+    apt-get install -y openjdk-17-jdk curl git unzip && \
     apt-get clean
 
-
-# Install Node.js 20.x
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+# Install Node.js 22.x (latest LTS)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
     apt-get install -y nodejs && \
     apt-get clean
 
-RUN npm i --global eas-cli-local-build-plugin expo-cli eas-cli
+# Install Android SDK directly from Google
+ENV ANDROID_HOME /opt/android-sdk
+ENV PATH $PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
+
+RUN mkdir -p $ANDROID_HOME/cmdline-tools && \
+    curl -o /tmp/commandlinetools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip && \
+    unzip /tmp/commandlinetools.zip -d $ANDROID_HOME/cmdline-tools && \
+    mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest && \
+    rm /tmp/commandlinetools.zip
+
+# Install modern CLI tools (expo-cli is deprecated)
+RUN npm i --global eas-cli-local-build-plugin @expo/cli eas-cli
 
 COPY scripts/build-android.sh /usr/local/bin/build-android
 
 RUN git config --global --add safe.directory /builder
 
-ENV ANDROID_HOME /usr/lib/android-sdk
-RUN sdkmanager --install "build-tools;29.0.3" "ndk-bundle;r26" "ndk;26.1.10909125" "platforms;android-35" "tools;26.1.1"
+# Install updated build tools, NDK, and platforms for React Native 0.79 / Expo SDK 53
+RUN sdkmanager --install \
+    "build-tools;34.0.0" \
+    "ndk;27.0.12077973" \
+    "platforms;android-34" \
+    "platform-tools" \
+    "cmdline-tools;latest"
 # RUN yes | sdkmanager --licenses
-
 
 RUN mkdir /builder
 WORKDIR /builder
