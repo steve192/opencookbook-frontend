@@ -1,4 +1,4 @@
-FROM nginx:1.29.3
+FROM nginx:1.29.4
 
 RUN chown nginx:nginx /etc/nginx -R && \
     chown nginx:nginx /var/cache/nginx -R && \
