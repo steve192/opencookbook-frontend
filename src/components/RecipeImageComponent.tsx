@@ -12,7 +12,10 @@ interface Props {
     blurredMode?: boolean
     zoomable?: boolean
 }
-export const RecipeImageComponent = (props: Props) => {
+// Memoized so that scroll-induced parent re-renders don't re-create the gesture
+// handlers / fire a new fetch for already-loaded thumbnails. Props are flat
+// primitives so the default shallow comparison is sufficient.
+export const RecipeImageComponent = React.memo(function RecipeImageComponent(props: Props) {
   const selector = !props.uuid ?
       () => undefined :
       props.useThumbnail ?
@@ -254,7 +257,7 @@ export const RecipeImageComponent = (props: Props) => {
       { isDragging && overlayImage }
     </>
   );
-};
+});
 
 
 const styles = StyleSheet.create({

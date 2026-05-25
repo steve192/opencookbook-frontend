@@ -1,9 +1,9 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AxiosError} from 'axios';
 import Constants from 'expo-constants';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, TextInput as RNTextInput, View} from 'react-native';
 import {Button, Card, IconButton, Modal, Text, TextInput} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import Spacer from 'react-spacer';
@@ -24,6 +24,9 @@ const LoginScreen = ({route, navigation}: Props) => {
   const [settingsModalVisible, setSettingsModalVisible] = useState<boolean>(false);
   const [serverUrl, setServerUrl] = useState<string>('');
   const [apiErrorMessage, setApiErrorMessage] = useState<string>();
+  const [loginPending, setLoginPending] = useState<boolean>(false);
+
+  const passwordInputRef = useRef<RNTextInput>(null);
 
   const dispatch = useDispatch();
 
@@ -31,6 +34,11 @@ const LoginScreen = ({route, navigation}: Props) => {
   const {colors} = useAppTheme();
 
   const doLogin = () => {
+    if (loginPending || !email || !password) {
+      return;
+    }
+    setLoginPending(true);
+    setApiErrorMessage(undefined);
     RestAPI.authenticate(email, password).then(() => {
       dispatch(login());
     }).catch((error: AxiosError) => {
@@ -42,7 +50,7 @@ const LoginScreen = ({route, navigation}: Props) => {
       } else {
         setApiErrorMessage(t('common.unknownerror'));
       }
-    });
+    }).finally(() => setLoginPending(false));
   };
 
   useEffect(() => {
@@ -79,9 +87,30 @@ const LoginScreen = ({route, navigation}: Props) => {
       <View style={styles.loginContainer}>
         <View style={CentralStyles.smallContentContainer}>
           <Text style={CentralStyles.loginTitle}>CookPal</Text>
-          <TextInput testID='usernameInput' mode="flat" dense={true} value={email} keyboardType='email-address' onChangeText={(text) => setEmail(text)} label="E-Mail" />
+          <TextInput
+            testID='usernameInput'
+            mode="flat"
+            dense={true}
+            value={email}
+            keyboardType='email-address'
+            autoCapitalize='none'
+            autoComplete='email'
+            autoCorrect={false}
+            returnKeyType='next'
+            submitBehavior='submit'
+            onSubmitEditing={() => passwordInputRef.current?.focus()}
+            onChangeText={setEmail}
+            label="E-Mail" />
           <Spacer height={10} />
-          <PasswordInput testID='passwordInput' password={password} setPassword={setPassword} label={t('screens.login.password')} />
+          <PasswordInput
+            ref={passwordInputRef}
+            testID='passwordInput'
+            password={password}
+            setPassword={setPassword}
+            label={t('screens.login.password')}
+            returnKeyType='go'
+            onSubmitEditing={doLogin}
+          />
           <View style={styles.forgotPasswordContainer}>
             <Button
               testID='forgotPassword'
@@ -98,6 +127,8 @@ const LoginScreen = ({route, navigation}: Props) => {
             mode="contained"
             labelStyle={{fontWeight: 'bold', color: 'white'}}
             style={CentralStyles.elementSpacing}
+            loading={loginPending}
+            disabled={loginPending || !email || !password}
             onPress={doLogin}>Login</Button>
           {apiErrorMessage && <Text theme={{colors: {text: colors.error}}}>{apiErrorMessage}</Text>}
           <Button
