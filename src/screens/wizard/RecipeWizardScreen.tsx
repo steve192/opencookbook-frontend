@@ -7,6 +7,7 @@ import Spacer from 'react-spacer';
 import {ChunkView} from '../../ChunkView';
 import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
 import {IngredientUse, Recipe, RecipeGroup} from '../../dao/RestAPI';
+import {PromptUtil} from '../../helper/Prompt';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {createRecipe, deleteRecipe, updateRecipe} from '../../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
@@ -118,26 +119,25 @@ const RecipeWizardScreen = (props: Props) => {
   };
 
 
+  const [savePending, setSavePending] = useState(false);
+
   const saveRecipe = () => {
+    if (savePending) return;
+    setSavePending(true);
     const recipeDataCopy = {...recipeData};
     if (!recipeDataCopy.recipeGroups[0] || recipeDataCopy.recipeGroups[0].title === '') {
       // As long as there are no multiple groups
       recipeDataCopy.recipeGroups = [];
     }
-    if (props.route.params.editing) {
-      dispatch(updateRecipe(recipeDataCopy)).then(() => {
-        // TODO: Error handling
-        props.navigation.goBack();
-      });
-    } else {
-      dispatch(createRecipe(recipeDataCopy)).then(() => {
-        // TODO: Error handling
-        props.navigation.goBack();
-      });
-    }
+    const action = props.route.params.editing
+      ? updateRecipe(recipeDataCopy)
+      : createRecipe(recipeDataCopy);
+    dispatch(action).then(() => {
+      props.navigation.goBack();
+    }).finally(() => setSavePending(false));
   };
 
-  const onDeleteRecipe = () => {
+  const performDelete = () => {
     if (props.route.params.editing) {
       dispatch(deleteRecipe(recipeData)).then(() => {
         props.navigation.goBack();
@@ -145,6 +145,30 @@ const RecipeWizardScreen = (props: Props) => {
     } else {
       props.navigation.goBack();
     }
+  };
+
+  // Always confirm before destroying a recipe — the old behaviour was a single
+  // tap on the trash icon with no safety net.
+  const onDeleteRecipe = () => {
+    if (!props.route.params.editing) {
+      // For an unsaved recipe "delete" just means discard; still confirm so the
+      // user doesn't accidentally lose work they've typed in.
+      PromptUtil.show({
+        title: t('screens.editRecipe.discardTitle'),
+        message: t('screens.editRecipe.discardMessage'),
+        button1: t('common.delete'),
+        button1Callback: performDelete,
+        button2: t('common.cancel'),
+      });
+      return;
+    }
+    PromptUtil.show({
+      title: t('screens.editRecipe.deleteTitle'),
+      message: t('screens.editRecipe.deleteMessage'),
+      button1: t('common.delete'),
+      button1Callback: performDelete,
+      button2: t('common.cancel'),
+    });
   };
 
   const renderIngredientsSection = () =>
@@ -236,7 +260,9 @@ const RecipeWizardScreen = (props: Props) => {
             mode="contained"
             contentStyle={{height: 50}}
             theme={{roundness: 0}}
-            onPress={() => saveRecipe()}>{props.route.params?.editing ? t('common.save'): t('common.create')}</Button>
+            loading={savePending}
+            disabled={savePending || recipeData.title.trim().length === 0}
+            onPress={saveRecipe}>{props.route.params?.editing ? t('common.save'): t('common.create')}</Button>
         </ScrollView>
       </ChunkView>
     </Surface>

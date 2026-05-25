@@ -1,8 +1,8 @@
 import {CompositeScreenProps} from '@react-navigation/core';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, TextInput as RNTextInput, View} from 'react-native';
 import {Button, Checkbox, MD3Colors, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {EmailValidationInput} from '../../components/EmailValidationInput';
@@ -24,15 +24,23 @@ export const SignupScreen = (props: Props) => {
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   const [emailOk, setEmailValid] = useState(false);
   const [passwordOk, setPasswordOk] = useState(false);
+  const [registerPending, setRegisterPending] = useState(false);
 
+  const emailRef = useRef<RNTextInput>(null);
+  const passwordSectionRef = useRef<{focus: () => void}>(null);
 
   const {t} = useTranslation('translation');
   const {colors} = useAppTheme();
 
+  const allFieldsOk = passwordOk && password && emailOk && termsAccepted;
 
   const register = () => {
+    if (registerPending || !allFieldsOk) {
+      return;
+    }
+    setRegisterPending(true);
+    setApiErrorMessage('');
     RestAPI.registerUser(email, password).then(() => {
-      setApiErrorMessage('');
       props.navigation.goBack();
       PromptUtil.show({
         button2: t('common.ok'),
@@ -41,11 +49,9 @@ export const SignupScreen = (props: Props) => {
       });
     }).catch((error: Error) => {
       setApiErrorMessage(error.toString());
-    });
+    }).finally(() => setRegisterPending(false));
   };
 
-
-  const allFieldsOk = passwordOk && password && emailOk && termsAccepted;
 
   return (
     <LoginBackdrop>
@@ -53,14 +59,21 @@ export const SignupScreen = (props: Props) => {
         <View style={CentralStyles.smallContentContainer}>
           <Text testID="signup-title" style={CentralStyles.loginTitle}>{t('screens.login.register')}</Text>
           <EmailValidationInput
+            ref={emailRef}
             value={email}
             onChangeText={setEmail}
             onValidityChange={setEmailValid}
+            returnKeyType='next'
+            submitBehavior='submit'
+            onSubmitEditing={() => passwordSectionRef.current?.focus()}
           />
           <Spacer height={20} />
           <PasswordValidationInput
+            ref={passwordSectionRef}
             onValidityChange={setPasswordOk}
             onPasswordChange={setPassword}
+            confirmReturnKeyType='go'
+            onSubmitConfirm={register}
           />
 
           <Spacer height={20} />
@@ -85,10 +98,13 @@ export const SignupScreen = (props: Props) => {
           <Button
             mode="contained"
             theme={{dark: true}}
-            disabled={allFieldsOk ? false : true}
+            disabled={!allFieldsOk || registerPending}
+            loading={registerPending}
             style={CentralStyles.elementSpacing}
             onPress={register}>{t('screens.login.register')}</Button>
-          <Text style={{fontWeight: 'bold', color: MD3Colors.error0, textAlign: 'center'}}>{apiErrorMessage}</Text>
+          {!!apiErrorMessage &&
+            <Text style={{fontWeight: 'bold', color: MD3Colors.error0, textAlign: 'center'}}>{apiErrorMessage}</Text>
+          }
         </View>
       </View>
     </LoginBackdrop>
