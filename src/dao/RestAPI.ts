@@ -1,4 +1,4 @@
-import axios, {AxiosError, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse} from 'axios';
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {Buffer} from 'buffer';
 import {Platform} from 'react-native';
 import XDate from 'xdate';
@@ -364,7 +364,7 @@ class RestAPI {
     };
   }
 
-  static async getAuthHeader(): Promise<AxiosRequestHeaders> {
+  static async getAuthHeader(): Promise<Record<string, string>> {
     const token = await AppPersistence.getAuthToken();
     return {'Authorization': 'Bearer ' + token};
   }

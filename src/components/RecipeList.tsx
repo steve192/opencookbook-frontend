@@ -33,7 +33,7 @@ export const RecipeList = (props: Props) => {
   const theme = useAppTheme();
 
   const dispatch = useAppDispatch();
-  const searchDebounceTimer = useRef<NodeJS.Timeout>();
+  const searchDebounceTimer = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const refreshData = () => {
     dispatch(fetchMyRecipes());
@@ -158,7 +158,7 @@ export const RecipeList = (props: Props) => {
     );
   };
 
-  const renderItem = (type: string | number, data: Recipe | RecipeGroup): JSX.Element => {
+  const renderItem = (type: string | number, data: Recipe | RecipeGroup): React.JSX.Element => {
     if (data.type === 'Recipe') {
       return createRecipeListItem(data as Recipe);
     } else if (data.type === 'RecipeGroup') {

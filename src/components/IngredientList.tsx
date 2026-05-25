@@ -50,7 +50,7 @@ export const IngredientList = (props: Props) => {
                   alignSelf: 'stretch',
                   color: props.greyedOutStyle ? theme.colors.onSurfaceDisabled: theme.colors.primary,
                   fontWeight: 'bold',
-                }}>{`${ingredient.amount > 0 ? scaleIngredient(ingredient.amount) : ''} ${ingredient.unit}`}
+                }}>{`${ingredient.amount && ingredient.amount > 0 ? scaleIngredient(ingredient.amount) : ''} ${ingredient.unit}`}
               </Text>
 
               <Text style={{flex: 4, alignSelf: 'stretch', color: props.greyedOutStyle ? theme.colors.onSurfaceDisabled : theme.colors.onSurface}} >{ingredient.ingredient.name}</Text>
