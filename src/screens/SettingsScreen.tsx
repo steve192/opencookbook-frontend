@@ -1,5 +1,5 @@
 import {Picker} from '@react-native-picker/picker';
-import {MaterialBottomTabScreenProps} from '@react-navigation/material-bottom-tabs';
+import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import Constants from 'expo-constants';
@@ -21,7 +21,7 @@ import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 type Props =
     CompositeScreenProps<
-        MaterialBottomTabScreenProps<OverviewNavigationProps, 'SettingsScreen'>,
+        BottomTabScreenProps<OverviewNavigationProps, 'SettingsScreen'>,
         NativeStackScreenProps<MainNavigationProps, 'OverviewScreen'>
     >;
 

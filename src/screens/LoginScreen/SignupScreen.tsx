@@ -1,4 +1,4 @@
-import {CompositeScreenProps} from '@react-navigation/core';
+import {CompositeScreenProps} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -27,7 +27,7 @@ export const SignupScreen = (props: Props) => {
   const [registerPending, setRegisterPending] = useState(false);
 
   const emailRef = useRef<RNTextInput>(null);
-  const passwordSectionRef = useRef<{focus: () => void}>(null);
+  const passwordSectionRef = useRef<{focus:() => void}>(null);
 
   const {t} = useTranslation('translation');
   const {colors} = useAppTheme();

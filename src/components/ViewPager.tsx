@@ -1,5 +1,5 @@
 import React, {ReactNode, useEffect, useState} from 'react';
-import {StyleProp, ViewStyle} from 'react-native';
+import {StyleProp, StyleSheet, ViewStyle} from 'react-native';
 import {Swiper, SwiperSlide} from 'swiper/react';
 import 'swiper/swiper-bundle.css';
 
@@ -36,10 +36,21 @@ export const ViewPager = (props: Props) => {
     </SwiperSlide>
   ));
 
+  // Swiper is a DOM component: it forwards `style` straight onto a <div>, which
+  // needs a single plain object. Handing React DOM the React Native array form
+  // makes it walk the array's numeric indices and assign them onto
+  // CSSStyleDeclaration, which throws. Flattening first is what bridges the two
+  // style models -- and it collapses `undefined` entries, so callers that pass
+  // no style are handled too.
+  const containerStyle = StyleSheet.flatten<ViewStyle>([
+    {height: '100%', width: '100%', zIndex: -1},
+    props.style,
+  ]) as React.CSSProperties;
+
   return (
     <Swiper
       onSwiper={setSwiperInstance}
-      style={[{height: '100%', width: '100%', zIndex: -1}, props.style] as any}
+      style={containerStyle}
       slidesPerView={1}
       spaceBetween={0}
       onSlideChange={(swiper) => {

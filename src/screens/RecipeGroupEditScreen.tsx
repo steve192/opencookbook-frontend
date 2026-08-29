@@ -36,9 +36,9 @@ export const RecipeGroupEditScreen = (props: Props) => {
   const saveRecipeGroup = () => {
     if (!canSave) return;
     setPending(true);
-    const action = existingRecipeGroup
-      ? updateRecipeGroup(recipeGroupData)
-      : createRecipeGroup(recipeGroupData);
+    const action = existingRecipeGroup ?
+      updateRecipeGroup(recipeGroupData) :
+      createRecipeGroup(recipeGroupData);
     dispatch(action).finally(() => {
       setPending(false);
       props.navigation.goBack();

@@ -1,4 +1,4 @@
-import {NavigatorScreenParams} from '@react-navigation/core';
+import {NavigatorScreenParams} from '@react-navigation/native';
 import {Recipe} from '../dao/RestAPI';
 
 export type BaseNavigatorProps = {

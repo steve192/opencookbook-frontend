@@ -1,4 +1,4 @@
-import {MaterialBottomTabScreenProps} from '@react-navigation/material-bottom-tabs';
+import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect, useState} from 'react';
@@ -18,7 +18,7 @@ import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 type Props = CompositeScreenProps<
   NativeStackScreenProps<RecipeScreenNavigation, 'RecipeListDetailScreen'>,
   CompositeScreenProps<
-    MaterialBottomTabScreenProps<OverviewNavigationProps, 'RecipesListScreen'>,
+    BottomTabScreenProps<OverviewNavigationProps, 'RecipesListScreen'>,
     NativeStackScreenProps<MainNavigationProps, 'OverviewScreen'>
   >
 >;

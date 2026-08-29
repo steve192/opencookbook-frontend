@@ -1,5 +1,6 @@
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 import NetInfo from '@react-native-community/netinfo';
-import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
+import {BottomTabNavigationOptions, createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createURL} from 'expo-linking';
@@ -9,7 +10,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Platform} from 'react-native';
 import {KeyboardAvoidingView} from 'react-native-keyboard-controller';
-import {Appbar, withTheme} from 'react-native-paper';
+import {Appbar} from 'react-native-paper';
 import AppPersistence from '../AppPersistence';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {changeOnlineState} from '../redux/features/settingsSlice';
@@ -46,7 +47,7 @@ const BaseStack = createNativeStackNavigator<BaseNavigatorProps>();
 const LoginStack = createNativeStackNavigator<LoginNavigationProps>();
 const MainStack = createNativeStackNavigator<MainNavigationProps>();
 const RecipeStack = createNativeStackNavigator<RecipeScreenNavigation>();
-const BottomTab = createMaterialBottomTabNavigator<OverviewNavigationProps>();
+const BottomTab = createBottomTabNavigator<OverviewNavigationProps>();
 
 
 const LoginStackNavigation = () => (
@@ -77,42 +78,59 @@ const RecipeStackNavigation = () => (
 );
 
 
-const BottomTabNavigation = withTheme(() => {
+// Every tab repeats the same icon render-prop shape. Factoring it out keeps the
+// navigator declarative and puts the sizing/tinting decision in one place. The
+// renderer signature is derived from the navigator's own option type, so it
+// stays correct if React Navigation changes what it passes in.
+type MaterialCommunityIconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+type TabBarIconRenderer = NonNullable<BottomTabNavigationOptions['tabBarIcon']>;
+
+const tabBarIcon = (name: MaterialCommunityIconName): TabBarIconRenderer =>
+  function TabBarIcon({color, size}) {
+    return <MaterialCommunityIcons name={name} color={color} size={size} />;
+  };
+
+const BottomTabNavigation = () => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
   return (
     <BottomTab.Navigator
       backBehavior="history"
-      labeled={true}
-      activeColor={theme.colors.primary}
-      inactiveColor={theme.colors.onSurface}
-      activeIndicatorStyle={{backgroundColor: 'rgba(0,0,0,0)'}}
-      barStyle={{backgroundColor: theme.colors.surface}}
+      screenOptions={{
+        // The surrounding native stack already renders the Paper Appbar; the
+        // tab navigator must not add a second header of its own.
+        headerShown: false,
+        tabBarLabelPosition: 'below-icon',
+        tabBarHideOnKeyboard: true,
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.onSurface,
+        tabBarStyle: {backgroundColor: theme.colors.surface},
+      }}
     >
       <BottomTab.Screen
         name="RecipesListScreen"
         component={RecipeStackNavigation}
         options={{
           title: t('screens.overview.myRecipes'),
-          tabBarIcon: 'home',
+          tabBarIcon: tabBarIcon('home'),
         }} />
       <BottomTab.Screen
         name="WeeklyScreen"
         component={WeeklyRecipeListScreen}
         options={{
           title: t('screens.weekplan.screenTitle'),
-          tabBarIcon: 'calendar',
+          tabBarIcon: tabBarIcon('calendar'),
         }} />
       <BottomTab.Screen
         name="SettingsScreen"
         component={SettingsScreen}
         options={{
           title: t('screens.settings.screenTitle'),
-          tabBarIcon: 'cog-off-outline',
+          tabBarIcon: tabBarIcon('cog-off-outline'),
         }} />
     </BottomTab.Navigator>
   );
-});
+};
 
 
 const MainStackNavigation = () => {
@@ -261,7 +279,7 @@ const MainNavigation = () => {
 
   return (
     <>
-      <StatusBar translucent={true}/>
+      <StatusBar />
       <NavigationContainer
         linking={{
           prefixes: [createURL('/'), 'https://beta.cookpal.io/'],

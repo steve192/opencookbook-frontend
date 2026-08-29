@@ -1,6 +1,6 @@
 import {MaterialIcons} from '@expo/vector-icons';
 import fuzzy from 'fuzzy';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, RefreshControl, StyleProp, StyleSheet, View, ViewProps, ViewStyle} from 'react-native';
 import {Badge, Headline, RadioButton, Searchbar, Surface, Text} from 'react-native-paper';
@@ -33,14 +33,18 @@ export const RecipeList = (props: Props) => {
   const theme = useAppTheme();
 
   const dispatch = useAppDispatch();
-  const searchDebounceTimer = useRef<NodeJS.Timeout | undefined>(undefined);
+  const searchDebounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const refreshData = () => {
     dispatch(fetchMyRecipes());
     dispatch(fetchMyRecipeGroups());
 
     // Clear the search debounce timer, to avoid state changes on unmounted component
-    return () => searchDebounceTimer.current && clearTimeout(searchDebounceTimer.current);
+    return () => {
+      if (searchDebounceTimer.current) {
+        clearTimeout(searchDebounceTimer.current);
+      }
+    };
   };
   useEffect(refreshData, []);
 

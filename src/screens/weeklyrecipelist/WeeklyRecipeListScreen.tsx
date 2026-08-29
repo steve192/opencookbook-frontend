@@ -1,4 +1,4 @@
-import {MaterialBottomTabScreenProps} from '@react-navigation/material-bottom-tabs';
+import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
@@ -22,7 +22,7 @@ import {PromptUtil} from '../../helper/Prompt';
 
 type Props =
     CompositeScreenProps<
-        MaterialBottomTabScreenProps<OverviewNavigationProps, 'WeeklyScreen'>,
+        BottomTabScreenProps<OverviewNavigationProps, 'WeeklyScreen'>,
         NativeStackScreenProps<MainNavigationProps, 'OverviewScreen'>
     >;
 

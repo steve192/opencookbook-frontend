@@ -129,9 +129,9 @@ const RecipeWizardScreen = (props: Props) => {
       // As long as there are no multiple groups
       recipeDataCopy.recipeGroups = [];
     }
-    const action = props.route.params.editing
-      ? updateRecipe(recipeDataCopy)
-      : createRecipe(recipeDataCopy);
+    const action = props.route.params.editing ?
+      updateRecipe(recipeDataCopy) :
+      createRecipe(recipeDataCopy);
     dispatch(action).then(() => {
       props.navigation.goBack();
     }).finally(() => setSavePending(false));

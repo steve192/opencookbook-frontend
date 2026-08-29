@@ -38,9 +38,9 @@ export const RecipeSelectionPopup = (props: Props) => {
               <Appbar.BackAction onPress={() => setShownRecipeGroup(undefined)} />
             )}
             <Appbar.Content
-              title={shownRecipeGroup
-                ? shownRecipeGroup.title
-                : t('screens.recipeselectionpopup.normal')} />
+              title={shownRecipeGroup ?
+                shownRecipeGroup.title :
+                t('screens.recipeselectionpopup.normal')} />
           </Appbar.Header>
           <RecipeList
             shownRecipeGroupId={shownRecipeGroup?.id}

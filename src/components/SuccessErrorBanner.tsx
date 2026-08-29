@@ -1,7 +1,7 @@
+import {FontAwesome} from '@expo/vector-icons';
 import React, {ReactElement} from 'react';
 import {View} from 'react-native';
 import {MD3Colors, ProgressBar, Text} from 'react-native-paper';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import Spacer from 'react-spacer';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
@@ -18,13 +18,13 @@ export const SuccessErrorBanner = (props: Props) => {
 
   const renderError =
   <>
-    <Icon style={{textAlign: 'center'}} name="exclamation-circle" size={30} color={theme.colors.error} />
+    <FontAwesome style={{textAlign: 'center'}} name="exclamation-circle" size={30} color={theme.colors.error} />
     <Spacer height={20}/>
     <Text style={{fontWeight: 'bold', color: theme.colors.error, textAlign: 'center'}}>{props.errorContent}</Text>
   </>;
   const renderSuccess =
   <>
-    <Icon style={{textAlign: 'center'}} name="check-circle" size={30} color={theme.colors.success} />
+    <FontAwesome style={{textAlign: 'center'}} name="check-circle" size={30} color={theme.colors.success} />
     <Spacer height={20}/>
     <Text style={{fontWeight: 'bold', color: theme.colors.success, textAlign: 'center'}}>{props.successContent}</Text>
   </>;

@@ -126,13 +126,6 @@ const isIngredientContainedInText = (ingredient:string, text:string) => {
   return false;
 };
 
-const cleanupIngredientName = (name: string) => {
-  let newName = name.toLowerCase();
-  newName = newName.replace(/\([^)]*\)/, '');
-  newName = newName.replace(/,.*/, '');
-  return newName;
-};
-
 const styles = StyleSheet.create({
   stepConnector: {
     backgroundColor: 'green',

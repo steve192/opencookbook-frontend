@@ -15,7 +15,7 @@ interface Props {
 
 // Expose `.focus()` so a parent (e.g. SignupScreen's email field) can move focus
 // here on Enter without having to know about the two underlying inputs.
-export const PasswordValidationInput = forwardRef<{focus: () => void}, Props>((props, ref) => {
+export const PasswordValidationInput = forwardRef<{focus:() => void}, Props>((props, ref) => {
   const passwordRef = useRef<RNTextInput>(null);
   const confirmRef = useRef<RNTextInput>(null);
 
