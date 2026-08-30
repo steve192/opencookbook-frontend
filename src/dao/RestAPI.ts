@@ -27,14 +27,14 @@ export interface Recipe {
     images: RecipeImage[];
     servings: number;
     recipeGroups: RecipeGroup[];
-    type: string
+    type: 'Recipe'
     recipeSource?: string;
 }
 
 export interface RecipeGroup {
     id?: number;
     title: string;
-    type: string
+    type: 'RecipeGroup'
 }
 
 export interface WeekplanDayRecipeInfo {

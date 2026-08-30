@@ -290,8 +290,7 @@ export const recipesSlice = createSlice({
         })
         .addCase(importRecipe.fulfilled, (state, action) => {
           state.pendingRequests--;
-          state.recipeGroups.push(action.payload);
-          AppPersistence.storeRecipeGroupsOffline(state.recipeGroups);
+          state.recipes.push(action.payload);
           AppPersistence.storeRecipesOffline(state.recipes);
         })
         .addCase(importRecipe.rejected, (state, action) => {

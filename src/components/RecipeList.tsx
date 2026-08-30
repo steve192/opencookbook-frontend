@@ -172,9 +172,9 @@ export const RecipeList = (props: Props) => {
 
   const renderItem = (type: string | number, data: Recipe | RecipeGroup): React.JSX.Element => {
     if (data.type === 'Recipe') {
-      return createRecipeListItem(data as Recipe);
+      return createRecipeListItem(data);
     } else if (data.type === 'RecipeGroup') {
-      return createRecipeGroupListItem(data as RecipeGroup);
+      return createRecipeGroupListItem(data);
     }
     return <View></View>;
   };

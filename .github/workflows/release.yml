@@ -56,6 +56,14 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      # semantic-release's dry run skips the prepare step, so bump_versions.py is
+      # not invoked here - but @semantic-release/exec resolves its config up
+      # front, and splex sets Python up in this job too. Cheap insurance.
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
       - name: Run semantic-release dry run
         id: semantic
         uses: cycjimmy/semantic-release-action@v6.0.0

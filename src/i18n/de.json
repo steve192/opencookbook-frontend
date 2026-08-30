@@ -29,6 +29,7 @@
     "offlinemode": "Offlinemodus",
     "bringimport": "Import zu Bring®",
     "bringimportfailed": "Import zu Bring® fehlgeschlagen. Bitte erneut versuchen",
+    "noRecipeGroup": "Keine Gruppe",
     "offline": {
       "notavailable": "Nicht verfügbar wenn du offline bist",
       "notavailabletitle": "Offline"

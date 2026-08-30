@@ -3,6 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {SelectionPopup} from '../../components/SelectionPopup';
 import {Option} from '../../components/SelectionPopupModal';
 import RestAPI, {RecipeGroup} from '../../dao/RestAPI';
+import {findRecipeGroupByOption, toRecipeGroupOptions} from '../../helper/recipeGroups';
 
 
 interface Props {
@@ -20,13 +21,8 @@ export const RecipeGroupFormField = (props: Props) => {
       // Newly created
       props.onRecipeGroupChange({title: option.value, type: 'RecipeGroup'});
     } else {
-      const existingGroup = availableGroups.find((group) => group.id?.toString() === option.key);
-      if (existingGroup) {
-        props.onRecipeGroupChange(existingGroup);
-      } else {
-        // No group selected
-        props.onRecipeGroupChange(undefined);
-      }
+      // Resolves to undefined for the "no group" entry
+      props.onRecipeGroupChange(findRecipeGroupByOption(availableGroups, option));
     }
   };
 
@@ -38,14 +34,6 @@ export const RecipeGroupFormField = (props: Props) => {
         });
   };
 
-  const getOptions = () => {
-    // The key for "no group selected". Can be anything that will never exist in the real ids
-    let groups: Option[] = [{key: 'none', value: 'No group'}];
-    groups = [...groups, ...availableGroups.map((group) => ({key: group.id ? group.id.toString() : '', value: group.title}))];
-    return groups;
-  };
-
-
   useEffect(queryGroups, []);
 
   return (
@@ -54,7 +42,7 @@ export const RecipeGroupFormField = (props: Props) => {
         label={t('screens.editRecipe.searchOrCreateRecipeGroup')}
         value={props.recipeGroup ? props.recipeGroup.title : ''}
         onValueChanged={setRecipeGroup}
-        options={getOptions()}
+        options={toRecipeGroupOptions(availableGroups, t('common.noRecipeGroup'))}
         allowAdditionalValues={true}
       />
     </>

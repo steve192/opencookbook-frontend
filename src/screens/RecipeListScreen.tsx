@@ -8,6 +8,7 @@ import {RecipeList} from '../components/RecipeList';
 import {Option, SelectionPopupModal} from '../components/SelectionPopupModal';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {PromptUtil} from '../helper/Prompt';
+import {findRecipeGroupByOption, moveRecipesToGroup, toRecipeGroupOptions} from '../helper/recipeGroups';
 import {VibrationUtils} from '../helper/VibrationUtil';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
 import {updateRecipe} from '../redux/features/recipesSlice';
@@ -98,13 +99,6 @@ const RecipeListScreen = (props: Props) => {
     return props.navigation.addListener('focus', adjustActionbar);
   }, [props.navigation, shownRecipeGroup, multiSelectionModeActive, selectedRecipes]);
 
-  const getRecipeGroupOptions = () => {
-    // The key for "no group selected". Can be anything that will never exist in the real ids
-    let groups: Option[] = [{key: 'none', value: 'No group'}];
-    groups = [...groups, ...allRecipeGroups.map((group) => ({key: group.id ? group.id.toString() : '', value: group.title}))];
-    return groups;
-  };
-
   // Memoize so RecipeList can React.memo its rows without busting on every parent
   // re-render (which the searchbar, multi-select state, etc. trigger).
   const openRecipe = useCallback((recipe: Recipe) => {
@@ -126,18 +120,11 @@ const RecipeListScreen = (props: Props) => {
   }, []);
 
   const onMoveSelectedRecipesToGroup = (selectedOption: Option) => {
-    // TODO: Move recipe objects to selected recipes instead of ids only
-    const recipesToMove = allRecipes.filter((recipe) => selectedRecipes.has(recipe.id!) );
-    recipesToMove.forEach((recipe) => {
-      const recipeDataCopy = {...recipe};
-      if (selectedOption.key === 'none') {
-        recipeDataCopy.recipeGroups = [];
-      } else {
-        // @ts-ignore
-        recipeDataCopy.recipeGroups = [{id: +selectedOption.key}];
-      }
-      dispatch(updateRecipe(recipeDataCopy));
-    });
+    const recipesToMove = allRecipes.filter((recipe) => recipe.id !== undefined && selectedRecipes.has(recipe.id));
+    const targetGroup = findRecipeGroupByOption(allRecipeGroups, selectedOption);
+
+    moveRecipesToGroup(recipesToMove, targetGroup)
+        .forEach((movedRecipe) => dispatch(updateRecipe(movedRecipe)));
     clearMultiSelectionMode();
   };
 
@@ -224,7 +211,7 @@ const RecipeListScreen = (props: Props) => {
       </Surface>
       {recipeGroupSelectionOpened && <SelectionPopupModal
         modalVisible={recipeGroupSelectionOpened}
-        options={getRecipeGroupOptions()}
+        options={toRecipeGroupOptions(allRecipeGroups, t('common.noRecipeGroup'))}
         onClose={() => setRecipeGroupSelectionOpened(false)}
         onSelection={onMoveSelectedRecipesToGroup} /> }
     </>
