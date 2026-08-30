@@ -79,7 +79,15 @@ export const RecipeList = (props: Props) => {
       // This is used for an initial offset due to the search input field
       // @ts-ignore
     }).cloneWithRows([{}].concat(shownItems));
-  }, [myRecipes, myRecipeGroups, searchString, props.selectedRecipes, props.shownRecipeGroupId]);
+  }, [myRecipes, myRecipeGroups, searchString, props.shownRecipeGroupId]);
+
+  // Which recipes are selected is not part of the row data, so rowHasChanged (which only
+  // compares ids) cannot see it. RecyclerListView repaints its rows for exactly this case
+  // when the extended state changes identity.
+  const selectionState = useMemo(
+      () => ({multiSelectionModeActive: props.multiSelectionModeActive, selectedRecipes: props.selectedRecipes}),
+      [props.multiSelectionModeActive, props.selectedRecipes],
+  );
 
   const onRecipeClick = (recipe: Recipe) => {
     if (props.multiSelectionModeActive) {
@@ -204,9 +212,16 @@ export const RecipeList = (props: Props) => {
     }, 500);
   };
 
-  let numberOfColumns = Math.ceil(componentWidth / 300);
-  numberOfColumns = numberOfColumns > 4 ? 4 : numberOfColumns;
-  const _layoutProvider = LayoutUtil.getLayoutProvider(componentWidth, numberOfColumns);
+  const numberOfColumns = Math.min(4, Math.ceil(componentWidth / 300));
+
+  // Handed a layout provider it has not seen before, RecyclerListView rebuilds its layout
+  // and re-anchors the scroll offset to the top edge of the first visible row. Building one
+  // per render therefore snapped the list to a row boundary on every state change, which
+  // showed up as a jump when entering multi selection mode while scrolled mid row.
+  const layoutProvider = useMemo(
+      () => LayoutUtil.getLayoutProvider(componentWidth, numberOfColumns),
+      [componentWidth, numberOfColumns],
+  );
 
   const showNoItemsNotice = !(getShownItems().length > 0 && numberOfColumns !== 0 && componentWidth > 10);
 
@@ -221,8 +236,9 @@ export const RecipeList = (props: Props) => {
       <RecyclerListView
         style={{flex: 1}}
         suppressBoundedSizeException={true}
-        layoutProvider={_layoutProvider}
+        layoutProvider={layoutProvider}
         dataProvider={dataProvider}
+        extendedState={selectionState}
         renderAheadOffset={1000}
         canChangeSize={true}
         // applyWindowCorrection={(offsetX, offsetY, windowCorrection) => ({
