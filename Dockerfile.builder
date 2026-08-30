@@ -29,7 +29,9 @@ Debug::Acquire::https "true";\
 ' > /etc/apt/apt.conf.d/99custom && \
     apt-get update && \
     apt-get install -y openjdk-17-jdk curl git unzip && \
-    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    # Must track .nvmrc's major: the lockfile is written by the npm that
+    # ships with that Node, and an older npm's `npm ci` rejects it.
+    curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
     apt-get install -y nodejs && \
     apt-get clean
 
@@ -71,14 +73,26 @@ COPY . /tmp/app
 # Install JS deps, generate the native Android project, and compile native
 # sources to populate Gradle's Maven/Kotlin/NDK caches. We deliberately stop
 # before dex/R8/APK packaging - those are the disk-heavy steps and they produce
-# build-specific outputs that do not help future builds. `|| true` keeps the
-# image build resilient against a source error in the current app.
-RUN cd /tmp/app && \
-    npm ci && \
-    npx expo prebuild --platform android --no-install && \
-    cd android && \
-    ./gradlew --no-daemon compileReleaseSources || true && \
-    cd / && rm -rf /tmp/app
+# build-specific outputs that do not help future builds.
+#
+# Only the Gradle step is allowed to fail: a warm cache is a nice-to-have, so a
+# compile error in the current source should not block the image. `npm ci` and
+# `prebuild` failing are real errors and must stop the build here - note that
+# `&&`/`||` share precedence in sh, so a trailing `|| true` on one long chain
+# would swallow *every* failure and yield an image with no cache at all.
+#
+# The cache directories are created up front so the COPY in the final stage
+# still resolves when Gradle bailed out before writing anything.
+RUN set -eu; \
+    mkdir -p /root/.gradle/caches /root/.gradle/wrapper /root/.npm; \
+    cd /tmp/app; \
+    npm ci; \
+    npx expo prebuild --platform android --no-install; \
+    cd android; \
+    ./gradlew --no-daemon compileReleaseSources \
+      || echo "WARNING: prewarm Gradle build failed; shipping a partial cache"; \
+    cd /; \
+    rm -rf /tmp/app
 
 # ============================================================================
 # Stage 3: final image - base + caches only, no source
