@@ -28,6 +28,7 @@
     "selected": "selected",
     "offlinemode": "Offline mode",
     "bringimport": "Import in Bring®",
+    "bringimportfailed": "Import to Bring® failed. Please try again",
     "offline": {
       "notavailable": "Not available when you are offline",
       "notavailabletitle": "Offline"
