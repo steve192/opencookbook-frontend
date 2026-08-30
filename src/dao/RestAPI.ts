@@ -266,27 +266,6 @@ class RestAPI {
     return {...response?.data, type: 'Recipe'};
   }
 
-  private static dataURItoBlob(dataURI: string) {
-    // convert base64/URLEncoded data component to raw binary data held in a string
-    let byteString;
-    if (dataURI.split(',')[0].indexOf('base64') >= 0) {
-      byteString = atob(dataURI.split(',')[1]);
-    } else {
-      byteString = unescape(dataURI.split(',')[1]);
-    }
-
-    // separate out the mime component
-    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-
-    // write the bytes of the string to a typed array
-    const ia = new Uint8Array(byteString.length);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
-    }
-
-    return new Blob([ia], {type: mimeString});
-  }
-
 
   static async getThumbnailImageAsDataURI(uuid: string): Promise<string> {
     try {
@@ -324,9 +303,11 @@ class RestAPI {
   static async uploadImage(uri: string): Promise<string> {
     const formData = new FormData();
     if (Platform.OS === 'web') {
-      // Web has data uris instead of file uris
-      const blob = this.dataURItoBlob(uri);
-      formData.append('image', blob);
+      // The picker hands out a blob: url on web (older versions handed out a data: uri).
+      // fetch reads the bytes back for either shape, and carries the mime type the file was
+      // picked with, so nothing here has to know how the uri was built.
+      const blob = await (await fetch(uri)).blob();
+      formData.append('image', blob, 'image');
     } else {
       // Android and ios file:/// uris must be passed to form data in a strange undocumented format
       // Converting to blob etc does not work..
