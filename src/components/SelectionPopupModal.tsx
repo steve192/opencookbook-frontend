@@ -4,7 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {Modal, Pressable, TextInput as RNTextInput, View} from 'react-native';
 import {Divider, List, Surface, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {modalStyles} from '../styles/CentralStyles';
+import CentralStyles, {modalStyles} from '../styles/CentralStyles';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 
 
@@ -93,12 +93,14 @@ export const SelectionPopupModal = (props: Props) => {
       onShow={() => modalInputRef.current?.focus()}
       onRequestClose={() => props.onClose()}
     >
-      <Pressable
-        onPress={() => props.onClose()}
-        style={modalStyles.modalBackdrop}>
+      <View style={CentralStyles.fullscreen}>
+        <Pressable
+          onPress={() => props.onClose()}
+          style={modalStyles.modalBackdrop} />
         <HeaderHeightContext.Consumer>
           {(headerHeight) => headerHeight &&
-              <View style={modalStyles.centeredView}>
+              // box-none lets presses in the margins around the popup reach the backdrop
+              <View style={modalStyles.centeredView} pointerEvents="box-none">
                 {/* headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
                 <Surface style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, modalStyles.modalView]}>
                   <View
@@ -132,7 +134,7 @@ export const SelectionPopupModal = (props: Props) => {
               </View>
           }
         </HeaderHeightContext.Consumer>
-      </Pressable>
+      </View>
     </Modal>
   </View>;
 };

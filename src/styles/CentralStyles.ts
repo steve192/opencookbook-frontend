@@ -81,6 +81,10 @@ export const modalStyles = StyleSheet.create({
     marginTop: 22,
     width: '100%',
   },
+  // Render this as a sibling placed *before* the popup content, never as its parent.
+  // On native the deepest view wins the touch responder, so wrapping the content works
+  // there, but on web the click bubbles up the dom and closes the popup as soon as
+  // anything inside it is touched - the search field, for instance.
   modalBackdrop: {
     width: '100%',
     height: '100%',

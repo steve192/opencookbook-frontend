@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Modal, Pressable, TouchableWithoutFeedback, View} from 'react-native';
+import {Modal, Pressable, View} from 'react-native';
 import {Appbar, Button, Caption, Divider, Headline, Surface, TextInput, TouchableRipple} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {RecipeList} from '../../components/RecipeList';
@@ -96,19 +96,17 @@ export const RecipeSelectionPopup = (props: Props) => {
         visible={props.visible}
         onRequestClose={props.onClose}
       >
-        <Pressable
-          onPress={props.onClose}
-          style={modalStyles.modalBackdrop}>
-          <>
-            <View style={modalStyles.centeredView}>
-              <Surface style={[modalStyles.modalView]}>
-                <TouchableWithoutFeedback>
-                  {renderContent()}
-                </TouchableWithoutFeedback>
-              </Surface>
-            </View>
-          </>
-        </Pressable>
+        <View style={CentralStyles.fullscreen}>
+          <Pressable
+            onPress={props.onClose}
+            style={modalStyles.modalBackdrop} />
+          {/* box-none lets presses in the margins around the popup reach the backdrop */}
+          <View style={modalStyles.centeredView} pointerEvents="box-none">
+            <Surface style={[modalStyles.modalView]}>
+              {renderContent()}
+            </Surface>
+          </View>
+        </View>
       </Modal>
     </View>
   );
