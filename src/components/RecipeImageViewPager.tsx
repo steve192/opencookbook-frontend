@@ -1,14 +1,21 @@
 import * as ImagePicker from 'expo-image-picker';
 import React, {useEffect, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Image, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import {Avatar, IconButton, Text} from 'react-native-paper';
 import RestAPI, {RecipeImage} from '../dao/RestAPI';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
+import {PromptUtil} from '../helper/Prompt';
+import {TITLE_IMAGE_INDEX, moveImage} from '../helper/recipeImages';
 import {RecipeImageComponent} from './RecipeImageComponent';
 import {ViewPager} from './ViewPager';
 
 interface Props {
     onImageAdded?: (uuid: string) => void,
+    /** Called with the image the user chose to remove. Only reachable when allowEdit is set. */
+    onImageRemoved?: (uuid: string) => void,
+    /** Called with the images in their new order. Only reachable when allowEdit is set. */
+    onImagesReordered?: (images: RecipeImage[]) => void,
     images: RecipeImage[],
     allowEdit?: boolean,
     style: StyleProp<ViewStyle>
@@ -16,6 +23,8 @@ interface Props {
 
 export const RecipeImageViewPager = (props: Props) => {
   const [shownImageIndex, setShownImageIndex] = useState<number>(0);
+
+  const {t} = useTranslation('translation');
 
   // Clamp the active index when the image list changes (e.g. delete, swap, or
   // navigate to a different recipe).  Without this the indicator can read
@@ -46,8 +55,36 @@ export const RecipeImageViewPager = (props: Props) => {
       props.onImageAdded?.(uuid);
     } catch (error) {
       console.error('Error uploading image', error);
-      SnackbarUtil.show({message: 'Error uploading picture'});
+      SnackbarUtil.show({message: t('screens.editRecipe.imageUploadFailed')});
     }
+  };
+
+  // Only unlinks the image here. The recipe still has to be saved for it to be gone, so
+  // abandoning the form leaves the image on the recipe it still belongs to.
+  const removeShownImage = () => {
+    const shownImage = props.images[shownImageIndex];
+    if (!shownImage) {
+      return;
+    }
+
+    PromptUtil.show({
+      title: t('screens.editRecipe.deleteImageTitle'),
+      message: t('screens.editRecipe.deleteImageMessage'),
+      button1: t('common.delete'),
+      button1Callback: () => props.onImageRemoved?.(shownImage.uuid),
+      button2: t('common.cancel'),
+    });
+  };
+
+  // Keeps the pager on the image that was moved, so repeated presses walk it along
+  const moveShownImage = (offset: number) => {
+    const reordered = moveImage(props.images, shownImageIndex, offset);
+    if (reordered === props.images) {
+      return;
+    }
+
+    props.onImagesReordered?.(reordered);
+    setShownImageIndex(shownImageIndex + offset);
   };
 
   return (
@@ -91,18 +128,50 @@ export const RecipeImageViewPager = (props: Props) => {
       }
 
       {props.allowEdit &&
-        <IconButton
-          testID='recipe-image-viewpager-add'
-          onPress={selectImage}
-          style={styles.imageButton}
-          icon="camera-outline"
-        />
+        <View style={styles.editButtonRow}>
+          {hasImages && <>
+            <IconButton
+              testID='recipe-image-viewpager-move-back'
+              onPress={() => moveShownImage(-1)}
+              disabled={!showBackward}
+              style={styles.imageButton}
+              icon="arrow-left-bold"
+            />
+            <IconButton
+              testID='recipe-image-viewpager-move-forward'
+              onPress={() => moveShownImage(1)}
+              disabled={!showForward}
+              style={styles.imageButton}
+              icon="arrow-right-bold"
+            />
+            <IconButton
+              testID='recipe-image-viewpager-remove'
+              onPress={removeShownImage}
+              style={styles.imageButton}
+              icon="delete-outline"
+            />
+          </>}
+          <IconButton
+            testID='recipe-image-viewpager-add'
+            onPress={selectImage}
+            style={styles.imageButton}
+            icon="camera-outline"
+          />
+        </View>
+      }
+
+      {props.allowEdit && hasImages && shownImageIndex === TITLE_IMAGE_INDEX &&
+        <Text
+          testID='recipe-image-viewpager-title-image'
+          style={[styles.badge, styles.titleImageBadge]}>
+          {t('screens.editRecipe.titleImage')}
+        </Text>
       }
 
       {hasImages &&
         <Text
           testID='recipe-image-viewpager-indicator'
-          style={styles.indexIndicator}>
+          style={[styles.badge, styles.indexIndicator]}>
           {shownImageIndex + 1} / {props.images.length}
         </Text>
       }
@@ -125,10 +194,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     height: '100%',
   },
-  indexIndicator: {
+  badge: {
     position: 'absolute',
-    bottom: 10,
-    left: 10,
     color: 'white',
     backgroundColor: 'rgba(0,0,0,0.3)',
     borderRadius: 16,
@@ -136,23 +203,35 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
     fontSize: 13,
   },
+  indexIndicator: {
+    bottom: 10,
+    left: 10,
+  },
+  titleImageBadge: {
+    top: 10,
+    left: 10,
+  },
   recipeImageContainer: {
     alignSelf: 'center',
     width: '100%',
     height: '100%',
     backgroundColor: 'rgb(161, 161, 161)',
   },
-  imageButton: {
+  // One row so the buttons lay themselves out instead of each carrying its own offset
+  editButtonRow: {
     position: 'absolute',
-    alignSelf: 'flex-end',
     bottom: 16,
     right: 16,
+    flexDirection: 'row',
+  },
+  imageButton: {
     width: 48,
     height: 48,
     borderRadius: 24,
     borderWidth: 1,
     borderStyle: 'solid',
     borderColor: 'grey',
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   recipeImage: {
     width: '100%',

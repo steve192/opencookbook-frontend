@@ -161,7 +161,11 @@
       "deleteTitle": "Rezept löschen?",
       "deleteMessage": "Das Rezept wird endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
       "discardTitle": "Rezept verwerfen?",
-      "discardMessage": "Deine Änderungen gehen verloren."
+      "discardMessage": "Deine Änderungen gehen verloren.",
+      "deleteImageTitle": "Bild entfernen?",
+      "deleteImageMessage": "Das Bild wird beim Speichern aus diesem Rezept entfernt.",
+      "imageUploadFailed": "Das Bild konnte nicht hochgeladen werden. Bitte erneut versuchen",
+      "titleImage": "Titelbild"
     },
     "createGroup": {
       "groupName": "Gruppen Name",

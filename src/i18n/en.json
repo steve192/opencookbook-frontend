@@ -161,7 +161,11 @@
       "deleteTitle": "Delete recipe?",
       "deleteMessage": "This recipe will be permanently deleted. This cannot be undone.",
       "discardTitle": "Discard recipe?",
-      "discardMessage": "Your changes will be lost."
+      "discardMessage": "Your changes will be lost.",
+      "deleteImageTitle": "Remove image?",
+      "deleteImageMessage": "The image will be removed from this recipe when you save it.",
+      "imageUploadFailed": "The image could not be uploaded. Please try again",
+      "titleImage": "Title image"
     },
     "createGroup": {
       "groupName": "Group name",

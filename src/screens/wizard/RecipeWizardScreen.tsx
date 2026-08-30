@@ -6,7 +6,7 @@ import {Appbar, Button, Caption, Divider, Surface, TextInput} from 'react-native
 import Spacer from 'react-spacer';
 import {ChunkView} from '../../ChunkView';
 import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
-import {IngredientUse, Recipe, RecipeGroup} from '../../dao/RestAPI';
+import {IngredientUse, Recipe, RecipeGroup, RecipeImage} from '../../dao/RestAPI';
 import {PromptUtil} from '../../helper/Prompt';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {createRecipe, deleteRecipe, updateRecipe} from '../../redux/features/recipesSlice';
@@ -87,9 +87,20 @@ const RecipeWizardScreen = (props: Props) => {
   }, [setRecipeData]);
 
   const addRecipeImage = (uuid: string) => {
-    const images = [...recipeData.images];
-    images.push({uuid});
-    setRecipeData({...recipeData, images: images});
+    setRecipeData((previousData) => ({...previousData, images: [...previousData.images, {uuid}]}));
+  };
+
+  const reorderRecipeImages = (images: RecipeImage[]) => {
+    setRecipeData((previousData) => ({...previousData, images}));
+  };
+
+  // Unlinking is enough: the server drops the image from the recipe on save and its
+  // deletion job collects images that no recipe references any more.
+  const removeRecipeImage = (uuid: string) => {
+    setRecipeData((previousData) => ({
+      ...previousData,
+      images: previousData.images.filter((image) => image.uuid !== uuid),
+    }));
   };
 
   const addIngredient = () => {
@@ -229,6 +240,8 @@ const RecipeWizardScreen = (props: Props) => {
           <RecipeImageViewPager
             style={{height: 320}}
             onImageAdded={addRecipeImage}
+            onImageRemoved={removeRecipeImage}
+            onImagesReordered={reorderRecipeImages}
             images={recipeData.images}
             allowEdit={true}
           />
