@@ -44,7 +44,12 @@
     "tabSettings": "EINSTELLUNGEN",
     "screenTitleImport": "Rezept importieren",
     "screenTitleCreateRecipeGroup": "Rezeptgruppe erstellen",
-    "screenTitleGuidedCooking": "Kochmodus"
+    "screenTitleEditRecipeGroup": "Rezeptgruppe bearbeiten",
+    "screenTitleGuidedCooking": "Kochmodus",
+    "screenTitleLogin": "Anmelden",
+    "screenTitleSignup": "Konto erstellen",
+    "screenTitleRequestPasswordReset": "Passwort vergessen",
+    "screenTitleAccountActivation": "Kontoaktivierung"
   },
   "screens": {
     "splash": {
@@ -165,6 +170,7 @@
     },
     "recipe": {
       "servings": "Portionen",
+      "loading": "Rezept wird geladen...",
       "startCookingButton": "Kochen beginnen",
       "ingredients": "Zutaten",
       "preparationSteps": "Zubereitungsschritte",

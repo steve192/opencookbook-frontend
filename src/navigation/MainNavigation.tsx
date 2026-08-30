@@ -3,6 +3,7 @@ import NetInfo from '@react-native-community/netinfo';
 import {BottomTabNavigationOptions, createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import Constants from 'expo-constants';
 import {createURL} from 'expo-linking';
 import {StatusBar} from 'expo-status-bar';
 import * as Updates from 'expo-updates';
@@ -49,33 +50,41 @@ const MainStack = createNativeStackNavigator<MainNavigationProps>();
 const RecipeStack = createNativeStackNavigator<RecipeScreenNavigation>();
 const BottomTab = createBottomTabNavigator<OverviewNavigationProps>();
 
-
-const LoginStackNavigation = () => (
-  <LoginStack.Navigator>
-    <LoginStack.Screen
-      name="LoginScreen"
-      component={LoginScreen}
-      options={{headerShown: false}} />
-    <LoginStack.Screen
-      name="SignupScreen"
-      component={SignupScreen}
-      options={{headerShown: false}} />
-    <LoginStack.Screen
-      name='RequestPasswordResetScreen'
-      component={RequestPasswordResetScreen}
-      options={{headerShown: false}} />
-  </LoginStack.Navigator>
-);
+const APP_NAME = Constants.expoConfig?.name ?? 'CookPal';
 
 
-const RecipeStackNavigation = () => (
-  <RecipeStack.Navigator>
-    <RecipeStack.Screen
-      name="RecipeListDetailScreen"
-      component={RecipeListScreen}
-      options={{headerShown: false}} />
-  </RecipeStack.Navigator>
-);
+const LoginStackNavigation = () => {
+  const {t} = useTranslation('translation');
+  return (
+    <LoginStack.Navigator>
+      <LoginStack.Screen
+        name="LoginScreen"
+        component={LoginScreen}
+        options={{headerShown: false, title: t('navigation.screenTitleLogin')}} />
+      <LoginStack.Screen
+        name="SignupScreen"
+        component={SignupScreen}
+        options={{headerShown: false, title: t('navigation.screenTitleSignup')}} />
+      <LoginStack.Screen
+        name='RequestPasswordResetScreen'
+        component={RequestPasswordResetScreen}
+        options={{headerShown: false, title: t('navigation.screenTitleRequestPasswordReset')}} />
+    </LoginStack.Navigator>
+  );
+};
+
+
+const RecipeStackNavigation = () => {
+  const {t} = useTranslation('translation');
+  return (
+    <RecipeStack.Navigator>
+      <RecipeStack.Screen
+        name="RecipeListDetailScreen"
+        component={RecipeListScreen}
+        options={{headerShown: false, title: t('screens.overview.myRecipes')}} />
+    </RecipeStack.Navigator>
+  );
+};
 
 
 // Every tab repeats the same icon render-prop shape. Factoring it out keeps the
@@ -156,10 +165,12 @@ const MainStackNavigation = () => {
         <MainStack.Screen
           name="OverviewScreen"
           component={BottomTabNavigation}
+          options={{title: t('screens.overview.myRecipes')}}
         />
         <MainStack.Screen
           name="RecipeWizardScreen"
           component={RecipeWizardScreen}
+          options={{title: t('screens.editRecipe.screenTitleCreate')}}
         />
         <MainStack.Screen
           name="RecipeImportBrowser"
@@ -174,7 +185,11 @@ const MainStackNavigation = () => {
         <MainStack.Screen
           name="RecipeGroupEditScreen"
           component={RecipeGroupEditScreen}
-          options={{title: t('navigation.screenTitleCreateRecipeGroup')}}
+          options={({route}) => ({
+            title: route.params?.editing ?
+              t('navigation.screenTitleEditRecipeGroup') :
+              t('navigation.screenTitleCreateRecipeGroup'),
+          })}
         />
         <MainStack.Screen
           name="GuidedCookingScreen"
@@ -184,6 +199,7 @@ const MainStackNavigation = () => {
         <MainStack.Screen
           name="RecipeScreen"
           component={RecipeScreen}
+          options={{title: t('screens.recipe.loading')}}
         />
       </MainStack.Navigator>
     </KeyboardAvoidingView>
@@ -264,10 +280,12 @@ const MainNavigation = () => {
         <BaseStack.Screen
           name='AccountActivationScreen'
           component={AccountActivationScreen}
+          options={{title: t('navigation.screenTitleAccountActivation')}}
         />
         <BaseStack.Screen
           name='PasswordResetScreen'
           component={PasswordResetScreen}
+          options={{title: t('screens.resetPassword.title')}}
         />
         <BaseStack.Screen
           name='TermsOfServiceScreen'
@@ -281,6 +299,12 @@ const MainNavigation = () => {
     <>
       <StatusBar />
       <NavigationContainer
+        // Without a formatter the browser tab falls back to the route name, which puts
+        // technical screen names like "RecipeListDetailScreen" in front of the user
+        // whenever a screen has no title of its own yet.
+        documentTitle={{
+          formatter: (options) => options?.title ? `${options.title} - ${APP_NAME}` : APP_NAME,
+        }}
         linking={{
           prefixes: [createURL('/'), 'https://beta.cookpal.io/'],
           config: {

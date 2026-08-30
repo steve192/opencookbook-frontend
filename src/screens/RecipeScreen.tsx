@@ -50,7 +50,7 @@ export const RecipeScreen = (props: Props) => {
 
   useEffect(() => {
     props.navigation.setOptions({
-      title: displayedRecipe ? displayedRecipe.title : 'Loading',
+      title: displayedRecipe ? displayedRecipe.title : t('screens.recipe.loading'),
       headerRight: () => (
         <Appbar.Action
           testID='recipe-edit-button'
