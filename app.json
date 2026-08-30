@@ -3,10 +3,10 @@
     "name": "CookPal",
     "slug": "opencookbook",
     "scheme": "cookpal",
-    "version": "1.8.1",
+    "version": "1.8.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "runtimeVersion": "36.0.0",
+    "runtimeVersion": "37.0.0",
     "updates": {
       "enabled": true,
       "fallbackToCacheTimeout": 20000,
@@ -55,7 +55,7 @@
         "WRITE_EXTERNAL_STORAGE",
         "ACCESS_NETWORK_STATE"
       ],
-      "versionCode": 36
+      "versionCode": 37
     },
     "web": {
       "favicon": "./assets/icon.png"
