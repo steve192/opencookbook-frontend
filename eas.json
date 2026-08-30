@@ -18,7 +18,10 @@
     },
     "preview": {
       "distribution": "internal",
-      "channel": "preview"
+      "channel": "preview",
+      "env": {
+        "DEFAULT_API_URL": "https://preview.cookpal.io"
+      }
     },
     "preview-apk": {
       "distribution": "internal",
@@ -27,15 +30,24 @@
         "distribution": "internal",
         "withoutCredentials": true,
         "buildType": "apk"
+      },
+      "env": {
+        "DEFAULT_API_URL": "https://preview.cookpal.io"
       }
     },
     "production": {
-      "channel": "production"
+      "channel": "production",
+      "env": {
+        "DEFAULT_API_URL": "https://beta.cookpal.io"
+      }
     },
     "production-apk": {
       "channel": "production",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "DEFAULT_API_URL": "https://beta.cookpal.io"
       }
     }
   },
