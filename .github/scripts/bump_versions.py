@@ -8,9 +8,14 @@ uploaded binary, so it is bumped only when a native build is actually produced
 -- signalled by COOKPAL_BUMP_NATIVE, which the release workflow sets from the
 native fingerprint comparison.
 
-``expo.runtimeVersion`` is deliberately not touched: it uses Expo's
-``fingerprint`` policy, so Expo derives it from the native project itself and
-OTA updates land only on binaries they are actually compatible with.
+``expo.runtimeVersion`` is an explicit string bumped in lockstep with
+``versionCode``: an OTA update may only be delivered to a binary built from the
+same native code, so both move together whenever a native build is produced.
+
+The ``fingerprint`` policy would express this automatically, but it cannot be
+used here: ``eas build --local`` fingerprints the project before prebuild and
+the build environment fingerprints it afterwards, once ``android/`` exists, so
+the two never agree and the build aborts with a runtime version mismatch.
 """
 import argparse
 import json
@@ -21,6 +26,7 @@ from pathlib import Path
 
 
 SEMVER_RE = re.compile(r"^(\d+)\.(\d+)\.(\d+)$")
+NATIVE_RUNTIME_VERSION_RE = re.compile(r"^(\d+)\.0\.0$")
 
 
 def parse_semver(value: str) -> tuple[int, int, int]:
@@ -28,6 +34,15 @@ def parse_semver(value: str) -> tuple[int, int, int]:
     if not match:
         raise ValueError(f"Invalid semver: {value}")
     return int(match.group(1)), int(match.group(2)), int(match.group(3))
+
+
+def parse_native_runtime_version(value: str) -> int:
+    match = NATIVE_RUNTIME_VERSION_RE.match(value.strip())
+    if not match:
+        raise ValueError(
+            f"Invalid runtimeVersion: {value}. Expected format '<integer>.0.0'"
+        )
+    return int(match.group(1))
 
 
 def bump(version: str, bump_type: str) -> str:
@@ -65,7 +80,18 @@ def update_app_json(version: str, bump_native: bool) -> None:
         if not isinstance(version_code, int):
             raise ValueError("Missing integer expo.android.versionCode in app.json")
 
-        android_config["versionCode"] = version_code + 1
+        runtime_version = data["expo"].get("runtimeVersion")
+        if not isinstance(runtime_version, str):
+            raise ValueError("Missing string expo.runtimeVersion in app.json")
+
+        # Taking the max keeps the two in lockstep even if one was edited by
+        # hand, so an OTA update can never target a binary it predates.
+        next_native_number = max(
+            version_code,
+            parse_native_runtime_version(runtime_version),
+        ) + 1
+        android_config["versionCode"] = next_native_number
+        data["expo"]["runtimeVersion"] = f"{next_native_number}.0.0"
 
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 

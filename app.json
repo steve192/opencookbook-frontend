@@ -6,9 +6,7 @@
     "version": "1.8.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "runtimeVersion": {
-      "policy": "fingerprint"
-    },
+    "runtimeVersion": "36.0.0",
     "updates": {
       "enabled": true,
       "fallbackToCacheTimeout": 20000,
