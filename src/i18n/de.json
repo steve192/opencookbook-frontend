@@ -31,7 +31,9 @@
     "offline": {
       "notavailable": "Nicht verfügbar wenn du offline bist",
       "notavailabletitle": "Offline"
-    }
+    },
+    "appVersion": "Version {{version}}",
+    "appVersionWithBuild": "Version {{version}} (Build {{build}})"
   },
   "navigation": {
     "screenTitleImportBrowser": "Rezept Import Browser",

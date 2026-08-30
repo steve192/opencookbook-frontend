@@ -1,69 +1,398 @@
 name: Release
-on: workflow_dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_android_build:
+        description: "Force building AAB + APK even if the native fingerprint did not change"
+        type: boolean
+        default: false
+      skip_default_branch_ci_check:
+        description: "Skip verifying that the release commit already has a successful CI run"
+        type: boolean
+        default: false
+  workflow_call:
+    inputs:
+      force_android_build:
+        description: "Force building AAB + APK even if the native fingerprint did not change"
+        type: boolean
+        default: false
+      skip_default_branch_ci_check:
+        description: "Skip verifying that the release commit already has a successful CI run"
+        type: boolean
+        default: false
+    secrets:
+      EXPO_TOKEN:
+        required: false
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+  pull-requests: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  # The production app talks to the beta.cookpal.io backend.
+  DEFAULT_API_URL: https://beta.cookpal.io
+
 jobs:
-  release:
-    name: Release
+  semantic-preview:
+    name: Semantic release preview
     runs-on: ubuntu-latest
+    outputs:
+      published: ${{ steps.semantic.outputs.new_release_published }}
+      version: ${{ steps.semantic.outputs.new_release_version }}
+      tag: ${{ steps.semantic.outputs.new_release_git_tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - name: 🏗 Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          node-version: 20.x
+          node-version-file: .nvmrc
 
+      - name: Run semantic-release dry run
+        id: semantic
+        uses: cycjimmy/semantic-release-action@v6.0.0
+        with:
+          dry_run: true
+          semantic_version: 23
+          branches: main
+          extra_plugins: |
+            @semantic-release/exec@6
+            @semantic-release/git@10
+            conventional-changelog-conventionalcommits@7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set version
+  verify-default-branch-ci:
+    name: Verify default branch CI
+    needs: semantic-preview
+    # The job runs whenever there is something to publish. The actual
+    # verification steps are gated by ``skip_default_branch_ci_check`` so that
+    # downstream jobs (which `needs:` this one) see a ``success`` result instead
+    # of a ``skipped`` result when verification is bypassed - GitHub
+    # cascade-skips dependents of a skipped job by default, so skipping the job
+    # itself would silently skip the entire release.
+    if: needs.semantic-preview.outputs.published == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip verification (called from CI itself)
+        if: inputs.skip_default_branch_ci_check
+        # The CI workflow calls this reusable workflow as one of its jobs, so
+        # when this flag is set the calling workflow IS the CI run we would
+        # otherwise have to wait for. Querying the API here would never find a
+        # completed successful run for $GITHUB_SHA, because the run that called
+        # us is still in_progress.
         run: |
-          sudo apt-get update && sudo apt-get install jq
-          echo "Running semantic-release dry-run to determine next version..."
-          
-          # Capture semantic-release output for debugging
-          SEMANTIC_OUTPUT=$(npx semantic-release@23 --dry-run 2>&1) || {
-            echo "ERROR: semantic-release failed with exit code $?"
-            echo "=== SEMANTIC-RELEASE OUTPUT ==="
-            echo "$SEMANTIC_OUTPUT"
-            echo "=== END SEMANTIC-RELEASE OUTPUT ==="
-            exit 1
-          }
-          
-          echo "=== SEMANTIC-RELEASE OUTPUT ==="
-          echo "$SEMANTIC_OUTPUT"
-          echo "=== END SEMANTIC-RELEASE OUTPUT ==="
-          
-          # Extract version from output
-          NEXT_VERSION=$(echo "$SEMANTIC_OUTPUT" | grep "The next release version is" | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+')
-          
-          if [ -z "$NEXT_VERSION" ]; then
-            echo "ERROR: Could not extract version from semantic-release output"
-            echo "Looking for line containing 'The next release version is'"
+          echo "Bypassed: the calling workflow is the CI run for $GITHUB_SHA."
+
+      - name: Confirm release commit matches default branch head
+        if: ${{ !inputs.skip_default_branch_ci_check }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          DEFAULT_BRANCH_SHA=$(curl -fsSL \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/branches/$DEFAULT_BRANCH" | jq -r '.commit.sha')
+
+          echo "Release workflow SHA: $GITHUB_SHA"
+          echo "Default branch SHA:  $DEFAULT_BRANCH_SHA"
+
+          if [ "$GITHUB_SHA" != "$DEFAULT_BRANCH_SHA" ]; then
+            echo "Release workflow is not running on the current default branch head"
             exit 1
           fi
-          
-          echo "Next version is $NEXT_VERSION"
-          jq '.version = "'"$NEXT_VERSION"'"' "package.json" > temp.json && mv temp.json "package.json"
-          jq '.expo.version = "'"$NEXT_VERSION"'"' "app.json" > apptemp.json && mv apptemp.json "app.json"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Build android apk
-        run: docker run -e EXPO_TOKEN=$EXPO_TOKEN -e DEFAULT_API_URL=$DEFAULT_API_URL -v "$(pwd)":/builder ghcr.io/steve192/easbuilder:latest production-apk 
+      - name: Confirm CI succeeded for release commit
+        if: ${{ !inputs.skip_default_branch_ci_check }}
         env:
-          DEFAULT_API_URL: https://beta.cookpal.io
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          # ``head_sha`` filters server-side to runs for this exact commit;
+          # ``status=success`` filters to runs whose CONCLUSION is success (the
+          # endpoint's ``status`` parameter accepts either status or conclusion
+          # values, but does NOT accept a ``conclusion`` key - unknown query
+          # params are silently dropped, which would let a failed completed run
+          # sneak through if we used ``status=completed`` alone).
+          SUCCESSFUL_RUN_ID=$(curl -fsSL \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?branch=$DEFAULT_BRANCH&head_sha=$GITHUB_SHA&status=success&per_page=5" \
+            | jq -r '.workflow_runs[0].id // empty')
+
+          if [ -z "$SUCCESSFUL_RUN_ID" ]; then
+            echo "No successful CI workflow run found for commit $GITHUB_SHA on $DEFAULT_BRANCH"
+            exit 1
+          fi
+
+          echo "Found successful CI workflow run: $SUCCESSFUL_RUN_ID"
+
+  check-fingerprint:
+    name: Check native fingerprint
+    needs: [semantic-preview, verify-default-branch-ci]
+    if: needs.semantic-preview.outputs.published == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.compare.outputs.changed }}
+    steps:
+      - name: Checkout release commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Compute current fingerprint
+        id: current
+        run: |
+          HASH=$(npx @expo/fingerprint fingerprint:generate --platform android | jq -r '.hash')
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+
+      - name: Find previous release tag
+        id: prev-tag
+        run: |
+          PREV=$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || echo '')
+          echo "tag=$PREV" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout previous tag
+        if: steps.prev-tag.outputs.tag != ''
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.prev-tag.outputs.tag }}
+          path: prev-release
+
+      - name: Install previous dependencies
+        if: steps.prev-tag.outputs.tag != ''
+        working-directory: prev-release
+        run: npm ci
+
+      - name: Compute previous fingerprint
+        id: previous
+        if: steps.prev-tag.outputs.tag != ''
+        working-directory: prev-release
+        run: |
+          HASH=$(npx @expo/fingerprint fingerprint:generate --platform android | jq -r '.hash')
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+
+      - name: Compare fingerprints
+        id: compare
+        run: |
+          CURRENT="${{ steps.current.outputs.hash }}"
+          PREVIOUS="${{ steps.previous.outputs.hash }}"
+          echo "Current fingerprint:  $CURRENT"
+          echo "Previous fingerprint: $PREVIOUS"
+          if [ -z "$PREVIOUS" ] || [ "$CURRENT" != "$PREVIOUS" ]; then
+            echo "Fingerprint changed or no previous release - native build required"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Fingerprint unchanged - skipping native build"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  tag:
+    name: Create tag and GitHub release
+    needs: [semantic-preview, verify-default-branch-ci, check-fingerprint]
+    if: needs.semantic-preview.outputs.published == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      # @semantic-release/github comments on the released PRs/issues, which
+      # needs pull-requests + issues write. A job-level permissions block sets
+      # every unlisted scope to none, so these must be listed explicitly.
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      # semantic-release's prepareCmd shells out to bump_versions.py.
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Run semantic-release
+        uses: cycjimmy/semantic-release-action@v6.0.0
+        with:
+          semantic_version: 23
+          branches: main
+          extra_plugins: |
+            @semantic-release/exec@6
+            @semantic-release/git@10
+            conventional-changelog-conventionalcommits@7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COOKPAL_BUMP_NATIVE: ${{ needs.check-fingerprint.outputs.changed }}
+
+  publish-docker:
+    name: Publish Docker
+    needs: [semantic-preview, tag]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.semantic-preview.outputs.tag }}
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      # The image copies a prebuilt dist/, so the bundle has to exist first.
+      - name: Build web bundle
+        run: npm run build-web
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log into ghcr.io
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.semantic-preview.outputs.tag }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.semantic-preview.outputs.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha,scope=app
+          cache-to: type=gha,scope=app,mode=max
+
+  publish-expo-update:
+    name: Publish Expo Update
+    needs: [semantic-preview, tag]
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.semantic-preview.outputs.tag }}
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Publish Expo update
+        if: ${{ env.EXPO_TOKEN != '' }}
+        run: npm run publish-expo-production
+
+  build-android:
+    name: Build Android (AAB + APK)
+    needs: [semantic-preview, tag, publish-docker, publish-expo-update, check-fingerprint]
+    if: needs.check-fingerprint.outputs.changed == 'true' || inputs.force_android_build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: read
+    steps:
+      # ubuntu-latest only ships with ~14 GB free disk. Pulling the prewarmed
+      # builder image plus running two Android builds back-to-back blows past
+      # that, so reclaim ~30 GB by removing preinstalled tooling we don't need.
+      - name: Free runner disk
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # main
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          swap-storage: false
+
+      - name: Checkout tag
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.semantic-preview.outputs.tag }}
+
+      - name: Log into ghcr.io
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Android AAB
+        env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          RELEASE_VERSION: ${{ needs.semantic-preview.outputs.version }}
+        run: |
+          docker run \
+            -e EXPO_TOKEN="$EXPO_TOKEN" \
+            -e DEFAULT_API_URL="$DEFAULT_API_URL" \
+            -v "$(pwd)":/builder \
+            ghcr.io/steve192/cookpal-easbuilder:latest \
+            production "cookpal-${RELEASE_VERSION}.aab"
 
-      # - name: Build android aab
-      #   run: docker run -e EXPO_TOKEN=$EXPO_TOKEN -e DEFAULT_API_URL=$DEFAULT_API_URL -v "$(pwd)":/builder ghcr.io/steve192/easbuilder:latest production app-build.aab
-      #   env:
-      #     DEFAULT_API_URL: https://beta.cookpal.io
-      #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      # Reclaim disk between the two builds - the AAB build leaves Gradle
+      # intermediates inside its container layer (a few GB) which would
+      # otherwise stack with the APK build's working space.
+      - name: Reclaim disk between builds
+        run: docker system prune -af --volumes
 
-      - name: Release
+      - name: Build Android APK
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release@23
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          RELEASE_VERSION: ${{ needs.semantic-preview.outputs.version }}
+        run: |
+          docker run \
+            -e EXPO_TOKEN="$EXPO_TOKEN" \
+            -e DEFAULT_API_URL="$DEFAULT_API_URL" \
+            -v "$(pwd)":/builder \
+            ghcr.io/steve192/cookpal-easbuilder:latest \
+            production-apk "cookpal-${RELEASE_VERSION}.apk"
+
+      - name: Attach AAB and APK to GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.semantic-preview.outputs.tag }}
+          files: |
+            cookpal-${{ needs.semantic-preview.outputs.version }}.aab
+            cookpal-${{ needs.semantic-preview.outputs.version }}.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  note-skipped-android-build:
+    name: Note skipped Android build in release
+    needs: [semantic-preview, tag, check-fingerprint]
+    if: needs.check-fingerprint.outputs.changed == 'false' && !inputs.force_android_build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Append note to GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.semantic-preview.outputs.tag }}
+          append_body: true
+          body: |
+
+            ---
+            _No Android release produced - no native dependency changes detected since the previous release. The existing APK/AAB remains compatible; updates are delivered to installed apps via Expo OTA._
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

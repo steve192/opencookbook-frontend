@@ -1,0 +1,57 @@
+name: Build & Test
+
+# Reusable validation suite: dependency audit, types, lint, unit tests, the web
+# bundle, and a no-push Docker build. Called by ci.yml (for pushes / PRs) and by
+# expo-sdk-update.yml (against its update branch) so the validation logic lives
+# in one place.
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Git ref to check out and validate. Empty = the triggering ref."
+        type: string
+        required: false
+        default: ""
+
+jobs:
+  app:
+    name: App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Expo dependency check
+        run: npx expo-doctor
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Tests
+        run: npm test
+
+      - name: Build web
+        run: npm run build-web
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v4
+
+      # The image copies the prebuilt dist/ produced above, so this runs in the
+      # same job rather than shuttling the bundle through an artifact.
+      - name: Build Docker image (no push)
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          tags: cookpal-ci:${{ github.sha }}
+          cache-from: type=gha,scope=app
+          cache-to: type=gha,scope=app,mode=max

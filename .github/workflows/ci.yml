@@ -1,350 +1,129 @@
-name: Build and publish
+name: CI
+
 on:
   push:
-    branches: [main]
-    # Publish semver tags as releases.
-    tags: ["v*.*.*"]
-  release:
-    types: [published]
+    branches:
+      - "**"
   pull_request:
     types: [opened, synchronize, reopened]
+  # Lets the expo-sdk-update workflow kick off a main CI run after it merges,
+  # so the release-eligibility check + auto-release run even though a
+  # GITHUB_TOKEN merge does not emit a push event.
+  workflow_dispatch:
 
-env:
-  # Use docker.io for Docker Hub if empty
-  REGISTRY: ghcr.io
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}
+# Cancel superseded runs per ref, except on main where a cancelled run could
+# abort an in-flight auto-release.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  packages: read
 
 jobs:
-  build-web:
-    name: BuildWeb
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-      - name: cache node modules
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+  build-test:
+    name: Build & Test
+    uses: ./.github/workflows/build-test.yml
 
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-
-      - name: Set version
-        run: |
-          REF_TYPE="${{github.ref_type}}"
-          if [[ "$REF_TYPE" == "tag" ]]; then
-            sudo apt update && sudo apt install jq
-            TAG=${{  github.ref_name }}
-            TAG=${TAG#v}
-            echo $TAG
-            jq '.version = "'"$TAG"'"' "package.json" > temp.json && mv temp.json "package.json"
-            jq '.expo.version = "'"$TAG"'"' "app.json" > apptemp.json && mv apptemp.json "app.json"
-          fi
-
-      - name: install dependencies and build
-        run: |
-          npm ci
-          npm run build-web
-
-      - uses: actions/upload-artifact@master
-        with:
-          include-hidden-files: true
-          name: dist
-          path: dist/
-
-  # cypress-percy:
-  #   name: cypress-percy
-  #   needs:
-  #     - build-web
-  #   runs-on: ubuntu-latest
-  #   # Run only on main branch
-  #   if: github.event_name != 'pull_request' && ( github.ref_protected == true )
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: cache node modules
-  #       uses: actions/cache@v4
-  #       env:
-  #         cache-name: cache-node-modules
-  #       with:
-  #         # npm cache files are stored in `~/.npm` on Linux/macOS
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-build-${{ env.cache-name }}-
-  #           ${{ runner.os }}-build-
-  #           ${{ runner.os }}-
-
-  #     - uses: actions/download-artifact@master
-  #       with:
-  #         name: dist
-  #         path: dist/
-
-  #     - name: Set up QEMU
-  #       uses: docker/setup-qemu-action@v3
-
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
-
-  #     - name: Extract Docker metadata
-  #       id: meta
-  #       uses: docker/metadata-action@v5
-  #       with:
-  #         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-  #     - name: Build docker image for cypress tests
-  #       uses: docker/build-push-action@v5
-  #       with:
-  #         context: .
-  #         push: false
-  #         load: true
-  #         tags: ${{ env.IMAGE_NAME }}:cypresstest
-  #         labels: ${{ steps.meta.outputs.labels }}
-
-  #     - name: Cypress run
-  #       uses: cypress-io/github-action@v6
-  #       with:
-  #         start: docker run --rm -p 80:80 ${{ env.IMAGE_NAME }}:cypresstest
-  #         command-prefix: percy exec -- npx
-  #         config: baseUrl=http://localhost:80
-  #       env:
-  #         PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
-
-  # cypress:
-  #   name: cypress
-  #   needs:
-  #     - build-web
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: cache node modules
-  #       uses: actions/cache@v4
-  #       env:
-  #         cache-name: cache-node-modules
-  #       with:
-  #         # npm cache files are stored in `~/.npm` on Linux/macOS
-  #         path: ~/.npm
-  #         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-build-${{ env.cache-name }}-
-  #           ${{ runner.os }}-build-
-  #           ${{ runner.os }}-
-
-  #     - uses: actions/download-artifact@master
-  #       with:
-  #         name: dist
-  #         path: dist/
-
-  #     - name: Set up QEMU
-  #       uses: docker/setup-qemu-action@v3
-
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v3
-
-  #     - name: Extract Docker metadata
-  #       id: meta
-  #       uses: docker/metadata-action@v5
-  #       with:
-  #         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-  #     - name: Build docker image for cypress tests
-  #       uses: docker/build-push-action@v5
-  #       with:
-  #         context: .
-  #         push: false
-  #         load: true
-  #         tags: ${{ env.IMAGE_NAME }}:cypresstest
-  #         labels: ${{ steps.meta.outputs.labels }}
-
-  #     - name: Cypress run
-  #       uses: cypress-io/github-action@v6
-  #       with:
-  #         start: docker run --rm -p 80:80 ${{ env.IMAGE_NAME }}:cypresstest
-  #         config: baseUrl=http://localhost:80
-
-  #     - name: "Upload Artifact"
-  #       if: failure()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: cypress-screenshots
-  #         path: cypress/screenshots/**/*
-  #         retention-days: 5
-
-  sonarcloud:
+  sonar:
     name: SonarCloud
+    needs: build-test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v7
         with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
-      - name: cache node modules
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+          # Shallow clones should be disabled for a better relevancy of analysis.
+          fetch-depth: 0
 
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
+      - name: Setup
+        uses: ./.github/actions/setup
 
-      - name: install dependencies
-        run: |
-          npm ci
+      - name: Run tests with coverage
+        run: npm run test:coverage
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        uses: SonarSource/sonarcloud-github-action@v5
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  docker:
-    name: BuildDocker
-    needs:
-      - build-web
-      # - cypress
+  renovate-release-check:
+    name: Evaluate Renovate-only commits
+    needs: build-test
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
-      id-token: write
-
+    if: github.ref == 'refs/heads/main'
+    outputs:
+      should_release: ${{ steps.evaluate.outputs.should_release }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@master
+        uses: actions/checkout@v7
         with:
-          name: dist
-          path: dist/
+          fetch-depth: 0
 
-      # Install the cosign tool except on PR
-      # https://github.com/sigstore/cosign-installer
-      #- name: Install cosign
-      #  if: github.event_name != 'pull_request' && ( github.ref_protected == true || github.ref_type == 'tag' )
-      #  uses: sigstore/cosign-installer@1e95c1de343b5b0c23352d6417ee3e48d5bcd422
-      #  with:
-      #    cosign-release: "v1.4.0"
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # Login against a Docker registry except on PR
-      # https://github.com/docker/login-action
-      - name: Log into registry ${{ env.REGISTRY }}
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      # Extract metadata (tags, labels) for Docker
-      # https://github.com/docker/metadata-action
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      # Build and push Docker image with Buildx (don't push on PR)
-      # https://github.com/docker/build-push-action
-      - name: Build and push Docker image
-        id: build-and-push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: ${{ github.event_name != 'pull_request' && ( github.ref_protected == true || github.ref_type == 'tag' ) }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-      # Sign the resulting Docker image digest except on PRs.
-      # This will only write to the public Rekor transparency log when the Docker
-      # repository is public to avoid leaking data.  If you would like to publish
-      # transparency data even for private images, pass --force to cosign below.
-      # https://github.com/sigstore/cosign
-      #- name: Sign the published Docker image
-      #  if: ${{ github.event_name != 'pull_request' && ( github.ref_protected == true || github.ref_type == 'tag' ) }}
-      #  env:
-      #    COSIGN_EXPERIMENTAL: "true"
-      #  # This step uses the identity token to provision an ephemeral certificate
-      #  # against the sigstore community Fulcio instance.
-      #  run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
-
-  # Publish everything on main branch to expo (TODO: as soon as semantic versions are introduced, only release to beta release channel)
-  expo-publish:
-    name: Publish on expo
-    needs:
-      - sonarcloud
-      # - cypress
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' && ( github.ref_type == 'tag' )
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: cache node modules
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-node-modules
-        with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - name: Use Node.js 20.x
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-
-      - name: Set version
+      - name: Determine eligibility
+        id: evaluate
         run: |
-          REF_TYPE="${{github.ref_type}}"
-          if [[ "$REF_TYPE" == "tag" ]]; then
-            sudo apt update && sudo apt install jq
-            TAG=${{  github.ref_name }}
-            TAG=${TAG#v}
-            echo $TAG
-            jq '.version = "'"$TAG"'"' "package.json" > temp.json && mv temp.json "package.json"
-            jq '.expo.version = "'"$TAG"'"' "app.json" > apptemp.json && mv apptemp.json "app.json"
+          last_tag=$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || echo '')
+          if [ -z "$last_tag" ]; then
+            echo "No previous release tag found. Skipping automatic release."
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
-      - name: Install dependencies
-        run: npm ci
+          if git merge-base --is-ancestor "$last_tag" HEAD; then
+            :
+          else
+            echo "Last tag $last_tag not an ancestor of HEAD; skipping automatic release."
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
 
-      - name: publish to expo beta
-        run: npm run publish-expo-production
-        env:
-          DEFAULT_API_URL: https://beta.cookpal.io
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          commit_range="${last_tag}..HEAD"
+          commit_list=$(git rev-list "$commit_range")
+          if [ -z "$commit_list" ]; then
+            echo "No commits since $last_tag. Skipping automatic release."
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          commit_info=$(git log "$commit_range" --pretty='%an|%ae|%s')
+          should_release=true
+          while IFS='|' read -r author email subject; do
+            [ -z "$author" ] && continue
+            lower=$(printf '%s %s' "$author" "$email" | tr '[:upper:]' '[:lower:]')
+            if [[ "$lower" == *renovate* ]]; then
+              continue
+            fi
+            # Squash merges from the expo-sdk-update workflow carry the PR
+            # author, not a bot identity, so match them by commit subject.
+            if [[ "$subject" == "fix(deps): update expo sdk packages"* ]]; then
+              continue
+            fi
+            echo "Found non-dependency-bot commit from $author <$email>. Release will be skipped."
+            should_release=false
+            break
+          done <<< "$commit_info"
+
+          echo "should_release=$should_release" >> "$GITHUB_OUTPUT"
+
+  auto-release:
+    name: Auto release
+    needs: renovate-release-check
+    if: needs.renovate-release-check.outputs.should_release == 'true'
+    uses: ./.github/workflows/release.yml
+    with:
+      # The calling workflow IS the CI run that release.yml would otherwise
+      # have to verify, so wait-on-yourself is impossible. See the
+      # verify-default-branch-ci job in release.yml for details.
+      skip_default_branch_ci_check: true
+    permissions:
+      actions: read
+      contents: write
+      issues: write
+      pull-requests: write
+      packages: write
+    secrets: inherit

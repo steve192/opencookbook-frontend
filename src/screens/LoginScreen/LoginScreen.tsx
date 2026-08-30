@@ -1,6 +1,5 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {AxiosError} from 'axios';
-import Constants from 'expo-constants';
 import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, TextInput as RNTextInput, View} from 'react-native';
@@ -10,6 +9,7 @@ import Spacer from 'react-spacer';
 import AppPersistence from '../../AppPersistence';
 import {PasswordInput} from '../../components/PasswordInput';
 import RestAPI from '../../dao/RestAPI';
+import {resolveAppVersion} from '../../helper/appVersion';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import {login} from '../../redux/features/authSlice';
 import CentralStyles, {OwnColors, useAppTheme} from '../../styles/CentralStyles';
@@ -56,6 +56,18 @@ const LoginScreen = ({route, navigation}: Props) => {
   useEffect(() => {
     AppPersistence.getBackendURL().then(setServerUrl);
   }, []);
+
+  // Translated here rather than in the helper so the app's typed translation
+  // keys stay checked at the call site.
+  const versionLabel = () => {
+    const {version, build} = resolveAppVersion();
+    if (!version) {
+      return '';
+    }
+    return build ?
+      t('common.appVersionWithBuild', {version, build}) :
+      t('common.appVersion', {version});
+  };
 
   const settingsModal = (
     <Modal
@@ -143,7 +155,7 @@ const LoginScreen = ({route, navigation}: Props) => {
           </Button>
         </View>
       </View>
-      <Text style={styles.footer}>{Constants.expoConfig?.version} @ {Constants.expoConfig?.extra?.buildTime}</Text>
+      <Text style={styles.footer}>{versionLabel()}</Text>
       {settingsModal}
     </LoginBackdrop>
   );

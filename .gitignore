@@ -10,7 +10,15 @@ npm-debug.*
 web-build/
 dist/
 
+# Continuous Native Generation output (expo prebuild / eas build --local)
+android/
+ios/
+
 # macOS
 .DS_Store
 
 .vscode/.react
+
+# Test + coverage output
+test-results/
+coverage/
