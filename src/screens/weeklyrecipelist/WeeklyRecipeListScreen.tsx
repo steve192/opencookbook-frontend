@@ -1,6 +1,6 @@
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
-import {StackScreenProps} from '@react-navigation/stack';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
@@ -22,8 +22,8 @@ import {PromptUtil} from '../../helper/Prompt';
 
 type Props =
     CompositeScreenProps<
-        StackScreenProps<MainNavigationProps, 'OverviewScreen'>,
-        BottomTabScreenProps<OverviewNavigationProps, 'WeeklyScreen'>
+        BottomTabScreenProps<OverviewNavigationProps, 'WeeklyScreen'>,
+        NativeStackScreenProps<MainNavigationProps, 'OverviewScreen'>
     >;
 
 const dateFormat = 'yyyy-MM-dd';

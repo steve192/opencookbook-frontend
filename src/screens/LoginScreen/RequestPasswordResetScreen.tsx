@@ -2,29 +2,36 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
+import {Button, Text} from 'react-native-paper';
+import Spacer from 'react-spacer';
+import {EmailValidationInput} from '../../components/EmailValidationInput';
+import {SuccessErrorBanner} from '../../components/SuccessErrorBanner';
 import RestAPI from '../../dao/RestAPI';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
-import {Button, Text, TextInput} from 'react-native-paper';
-import Spacer from 'react-spacer';
-import {SuccessErrorBanner} from '../../components/SuccessErrorBanner';
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'RequestPasswordResetScreen'>;
 export const RequestPasswordResetScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const [emailAddress, setEmailAddress] = useState('');
+  const [emailValid, setEmailValid] = useState(false);
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [pending, setPending] = useState(false);
 
   const resetPassword = () => {
+    if (pending || !emailValid) {
+      return;
+    }
+    setPending(true);
+    setError(false);
     RestAPI.requestPasswordReset(emailAddress).then(() => {
       setSuccess(true);
-      setError(false);
     }).catch(() => {
       setError(true);
       setSuccess(false);
-    });
+    }).finally(() => setPending(false));
   };
 
   return (
@@ -44,13 +51,17 @@ export const RequestPasswordResetScreen = (props: Props) => {
 
         <View style={CentralStyles.smallContentContainer}>
           <Text testID="password-reset-title" style={CentralStyles.loginTitle}>{t('screens.resetPassword.title')}</Text>
-          <TextInput
-            dense={true}
+          <EmailValidationInput
+            value={emailAddress}
             onChangeText={setEmailAddress}
-            label={t('common.email')}/>
+            onValidityChange={setEmailValid}
+            returnKeyType='go'
+            onSubmitEditing={resetPassword} />
           <Spacer height={20}/>
           <Button
             mode='contained'
+            loading={pending}
+            disabled={pending || !emailValid}
             onPress={resetPassword}
           >{t('screens.resetPassword.resetPasswordButton')}</Button>
         </View>
@@ -58,4 +69,3 @@ export const RequestPasswordResetScreen = (props: Props) => {
     </LoginBackdrop>
   );
 };
-

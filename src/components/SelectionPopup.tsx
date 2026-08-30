@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Pressable, StyleProp, View, ViewStyle} from 'react-native';
+import {Pressable, StyleProp, TextInput as RNTextInput, View, ViewStyle} from 'react-native';
 import {TextInput} from 'react-native-paper';
 import {Option, SelectionPopupModal} from './SelectionPopupModal';
 
@@ -18,7 +18,9 @@ interface Props {
 export const SelectionPopup = (props: Props) => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  const textbox = useRef<typeof TextInput>(null);
+  // Paper TextInput's ref typing intersects RNTextInput & TextInputHandles, which is
+  // not satisfiable on its own — use the wider RNTextInput type Paper actually forwards to.
+  const textbox = useRef<RNTextInput>(null);
 
 
   const openModal = () => {
@@ -41,14 +43,11 @@ export const SelectionPopup = (props: Props) => {
           <TextInput
             ref={textbox}
             label={props.label}
-            // disabled={true}
             mode="outlined"
             onFocus={() => {
-              // @ts-ignore Works on html elements (web), but probaply does not on android / ios
               textbox.current?.blur();
-              // @ts-ignore see above
-              textbox.current?.blur && openModal();
-            } }
+              openModal();
+            }}
             placeholder={props.placeholder}
             value={props.value}/>
         </View>

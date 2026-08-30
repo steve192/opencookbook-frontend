@@ -1,5 +1,5 @@
 import React, {ReactNode, useEffect, useState} from 'react';
-import {StyleProp, ViewStyle} from 'react-native';
+import {StyleProp, StyleSheet, ViewStyle} from 'react-native';
 import {Swiper, SwiperSlide} from 'swiper/react';
 import 'swiper/swiper-bundle.css';
 
@@ -12,36 +12,52 @@ interface Props {
 
 
 export const ViewPager = (props: Props) => {
-  let slides = [];
-
   const [swiperInstance, setSwiperInstance] = useState<any>();
 
   useEffect(() => {
-    swiperInstance?.slideTo(props.selectedIndex);
-  }, [props.selectedIndex]);
+    if (!swiperInstance) {
+      return;
+    }
+    // Guard against swipe -> onSlideChange -> onIndexChange -> setState -> effect
+    // -> slideTo loops when the parent's selectedIndex is already in sync.
+    if (swiperInstance.activeIndex !== props.selectedIndex) {
+      swiperInstance.slideTo(props.selectedIndex);
+    }
+  }, [props.selectedIndex, swiperInstance]);
 
+  // toArray already assigns stable .key values (".0", ".1", ...) and reuses any
+  // explicit keys the caller passed on the child, so we just propagate those
+  // instead of fabricating index-based keys here.
+  const slides = React.Children.toArray(props.children).map((child) => (
+    <SwiperSlide
+      key={React.isValidElement(child) && child.key != null ? child.key : undefined}
+      style={{height: '100%', width: '100%', overflow: 'hidden'}}>
+      {child}
+    </SwiperSlide>
+  ));
 
-  if (Array.isArray(props.children)) {
-    slides = props.children.map((child, index) =>
-      <SwiperSlide
-        key={index}
-        style={{height: '100%', width: '100%', overflow: 'hidden'}}>
-        {child}
-      </SwiperSlide>);
-  } else {
-    slides.push(<SwiperSlide
-      style={{height: '100%'}}>
-      {props.children}
-    </SwiperSlide>);
-  }
+  // Swiper is a DOM component: it forwards `style` straight onto a <div>, which
+  // needs a single plain object. Handing React DOM the React Native array form
+  // makes it walk the array's numeric indices and assign them onto
+  // CSSStyleDeclaration, which throws. Flattening first is what bridges the two
+  // style models -- and it collapses `undefined` entries, so callers that pass
+  // no style are handled too.
+  const containerStyle = StyleSheet.flatten<ViewStyle>([
+    {height: '100%', width: '100%', zIndex: -1},
+    props.style,
+  ]) as React.CSSProperties;
+
   return (
     <Swiper
-      id="swiper"
-      onSwiper={(swiper) => setSwiperInstance(swiper)}
-      style={{height: '100%', width: '100%', zIndex: -1}}
+      onSwiper={setSwiperInstance}
+      style={containerStyle}
       slidesPerView={1}
       spaceBetween={0}
-      onSlideChange={(swiper) => props.onIndexChange(swiper.activeIndex)}
+      onSlideChange={(swiper) => {
+        if (swiper.activeIndex !== props.selectedIndex) {
+          props.onIndexChange(swiper.activeIndex);
+        }
+      }}
     >
       {slides}
     </Swiper>

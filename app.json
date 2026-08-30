@@ -9,11 +9,6 @@
     "androidStatusBar": {
       "translucent": true
     },
-    "splash": {
-      "image": "./assets/login-screen.png",
-      "resizeMode": "cover",
-      "backgroundColor": "#295700"
-    },
     "runtimeVersion": {
       "policy": "sdkVersion"
     },
@@ -72,8 +67,18 @@
           "photosPermission": "The app accesses your photos to let you upload them to your recipes."
         }
       ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/login-screen.png",
+          "resizeMode": "cover",
+          "backgroundColor": "#295700"
+        }
+      ],
+      "expo-font",
       "expo-localization",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-status-bar"
     ]
   }
 }

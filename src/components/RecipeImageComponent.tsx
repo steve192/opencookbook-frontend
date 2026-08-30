@@ -12,7 +12,10 @@ interface Props {
     blurredMode?: boolean
     zoomable?: boolean
 }
-export const RecipeImageComponent = (props: Props) => {
+// Memoized so that scroll-induced parent re-renders don't re-create the gesture
+// handlers / fire a new fetch for already-loaded thumbnails. Props are flat
+// primitives so the default shallow comparison is sufficient.
+export const RecipeImageComponent = React.memo(function RecipeImageComponent(props: Props) {
   const selector = !props.uuid ?
       () => undefined :
       props.useThumbnail ?
@@ -26,9 +29,9 @@ export const RecipeImageComponent = (props: Props) => {
 
   const [isDragging, setIsDragging] = useState(false);
 
-  const gestureInProgress = useRef<number>();
-  const initialTouches = useRef<NativeTouchEvent[]>();
-  const initialImageSize = useRef<{width: number, height:number}>();
+  const gestureInProgress = useRef<number | undefined>(undefined);
+  const initialTouches = useRef<NativeTouchEvent[] | undefined>(undefined);
+  const initialImageSize = useRef<{width: number, height: number} | undefined>(undefined);
   const imageRef = useRef<Image>(null);
 
   const pinchImagePosition = useRef(new Animated.ValueXY());
@@ -196,18 +199,18 @@ export const RecipeImageComponent = (props: Props) => {
   let overlayImage;
   if (isDragging) {
     const animatedStyle = {
-      transform: pinchImagePosition.current.getTranslateTransform(),
+      transform: [
+        ...pinchImagePosition.current.getTranslateTransform(),
+        {scale: scaleValue.current},
+      ],
     };
-    animatedStyle.transform.push({
-      scale: scaleValue.current,
-    });
 
     const imageStyle = [
       {
-        position: 'absolute',
+        position: 'absolute' as const,
         zIndex: 10,
-        // These were saved when the touching started
-        // This is not determed via onLayout since the images can be off screen (pagerview) when onLayout is called
+        // Saved when touching started. We avoid onLayout since images can be off-screen
+        // (pager view) when onLayout fires.
         width: initialImageSize.current?.width,
         height: initialImageSize.current?.height,
         opacity: 1,
@@ -254,7 +257,7 @@ export const RecipeImageComponent = (props: Props) => {
       { isDragging && overlayImage }
     </>
   );
-};
+});
 
 
 const styles = StyleSheet.create({

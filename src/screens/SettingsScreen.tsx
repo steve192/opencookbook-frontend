@@ -1,7 +1,7 @@
 import {Picker} from '@react-native-picker/picker';
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
-import {StackScreenProps} from '@react-navigation/stack';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import Constants from 'expo-constants';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
@@ -21,8 +21,8 @@ import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 type Props =
     CompositeScreenProps<
-        StackScreenProps<MainNavigationProps, 'OverviewScreen'>,
-        BottomTabScreenProps<OverviewNavigationProps, 'SettingsScreen'>
+        BottomTabScreenProps<OverviewNavigationProps, 'SettingsScreen'>,
+        NativeStackScreenProps<MainNavigationProps, 'OverviewScreen'>
     >;
 
 export const SettingsScreen = (props: Props) => {
@@ -53,6 +53,23 @@ export const SettingsScreen = (props: Props) => {
       button2: t('common.cancel'),
     });
   };
+
+  const performLogout = () => {
+    AppPersistence.setAuthToken('');
+    AppPersistence.setRefreshToken('');
+    dispatch(logout());
+  };
+
+  const onLogoutPress = () => {
+    PromptUtil.show({
+      title: t('screens.settings.logoutTitle'),
+      message: t('screens.settings.logoutMessage'),
+      button1: t('common.ok'),
+      button1Callback: performLogout,
+      button2: t('common.cancel'),
+    });
+  };
+
   return (
     <Surface style={[CentralStyles.fullscreen]}>
       <View style={CentralStyles.contentContainer}>
@@ -62,12 +79,7 @@ export const SettingsScreen = (props: Props) => {
           <Spacer height={20} />
           <Button
             mode='outlined'
-            onPress={() => {
-              AppPersistence.setAuthToken('');
-              AppPersistence.setRefreshToken('');
-              dispatch(logout());
-              dispatch(logout());
-            }}>Logout</Button>
+            onPress={onLogoutPress}>Logout</Button>
           <Divider style={{marginTop: 10, marginBottom: 10}}/>
           <Spacer height={20} />
           <CustomCard>

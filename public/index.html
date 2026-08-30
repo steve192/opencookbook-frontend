@@ -27,10 +27,24 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker
-            .register('/sw.js')
+          // `sw.js` is emitted by `workbox generateSW` during `npm run build-web`,
+          // so it only exists in a production export. The dev server answers
+          // unknown paths with index.html, and registering that as a worker fails
+          // with an "unsupported MIME type ('text/html')" SecurityError. Check
+          // what we actually got back before registering, rather than assuming.
+          fetch('/sw.js', {method: 'HEAD'})
+            .then(response => {
+              const contentType = response.headers.get('content-type') || '';
+              if (!response.ok || !contentType.includes('javascript')) {
+                console.info('No service worker in this build, skipping registration.');
+                return null;
+              }
+              return navigator.serviceWorker.register('/sw.js');
+            })
             .then(registration => {
-              console.log('Service Worker registered with scope:', registration.scope);
+              if (registration) {
+                console.log('Service Worker registered with scope:', registration.scope);
+              }
             })
             .catch(error => {
               console.error('Service Worker registration failed:', error);

@@ -38,7 +38,7 @@ class SnackbarWithoutStyles extends React.Component<Props, State> {
         label: this.state.button1,
         onPress: this.state.button1Callback,
         buttonColor: this.props.theme.colors.primary,
-        textColor: this.props.theme.colors.onPrimary
+        textColor: this.props.theme.colors.onPrimary,
       }: undefined}>
       {this.state.message}
     </Snackbar>;

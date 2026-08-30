@@ -1,12 +1,12 @@
 import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
-import {StackScreenProps} from '@react-navigation/stack';
-import React, {useEffect, useState} from 'react';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Appbar, FAB, Surface} from 'react-native-paper';
 import {RecipeList} from '../components/RecipeList';
 import {Option, SelectionPopupModal} from '../components/SelectionPopupModal';
-import {Recipe} from '../dao/RestAPI';
+import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {PromptUtil} from '../helper/Prompt';
 import {VibrationUtils} from '../helper/VibrationUtil';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
@@ -16,10 +16,10 @@ import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 
 type Props = CompositeScreenProps<
-  StackScreenProps<RecipeScreenNavigation, 'RecipeListDetailScreen'>,
+  NativeStackScreenProps<RecipeScreenNavigation, 'RecipeListDetailScreen'>,
   CompositeScreenProps<
-    StackScreenProps<MainNavigationProps, 'OverviewScreen'>,
-    BottomTabScreenProps<OverviewNavigationProps, 'RecipesListScreen'>
+    BottomTabScreenProps<OverviewNavigationProps, 'RecipesListScreen'>,
+    NativeStackScreenProps<MainNavigationProps, 'OverviewScreen'>
   >
 >;
 
@@ -45,9 +45,14 @@ const RecipeListScreen = (props: Props) => {
   const [recipeGroupSelectionOpened, setRecipeGroupSelectionOpened] = useState(false);
 
   useEffect(() => {
+    // The header is rendered by the MainStack (two parents up from the inner
+    // RecipeStack), so we reach across navigators to update it. Walking up via
+    // getParent twice is fragile but mirrors how the rest of this app does it.
+    const mainStackNav = props.navigation.getParent()?.getParent();
+
     const adjustActionbar = () => {
       if (multiSelectionModeActive) {
-        props.navigation.getParent()?.getParent()?.setOptions({
+        mainStackNav?.setOptions({
           title: selectedRecipes.size + ' ' + t('common.selected'),
           headerRight: () => (
             <Appbar.Action
@@ -59,28 +64,34 @@ const RecipeListScreen = (props: Props) => {
             <Appbar.Action
               icon="close"
               color={theme.colors.onPrimary}
-              onPress={() => clearMultiSelectionMode()} />
+              onPress={clearMultiSelectionMode} />
+          ),
+        });
+      } else if (shownRecipeGroup !== undefined) {
+        // Inside a group: surface a back button that exits the group view. Without
+        // this the only way out is the system back gesture/button, since the inner
+        // RecipeStack has its header hidden and the outer header's nav.back is
+        // false at this depth.
+        mainStackNav?.setOptions({
+          title: shownRecipeGroup.title,
+          headerLeft: () => (
+            <Appbar.BackAction
+              color={theme.colors.onPrimary}
+              onPress={() => props.navigation.goBack()} />
+          ),
+          headerRight: () => (
+            <Appbar.Action
+              icon="pencil-outline"
+              color={theme.colors.onPrimary}
+              onPress={() => shownRecipeGroup.id && props.navigation.navigate('RecipeGroupEditScreen', {editing: true, recipeGroupId: shownRecipeGroup.id})} />
           ),
         });
       } else {
-        if (shownRecipeGroup !== undefined) {
-          props.navigation.getParent()?.getParent()?.setOptions({
-            title: shownRecipeGroup?.title,
-            headerLeft: undefined,
-            headerRight: () => (
-              <Appbar.Action
-                icon="pencil-outline"
-                color={theme.colors.onPrimary}
-                onPress={() => shownRecipeGroup.id && props.navigation.navigate('RecipeGroupEditScreen', {editing: true, recipeGroupId: shownRecipeGroup.id})} />
-            ),
-          });
-        } else {
-          props.navigation.getParent()?.getParent()?.setOptions({
-            title: t('screens.overview.myRecipes'),
-            headerRight: undefined,
-            headerLeft: undefined,
-          });
-        }
+        mainStackNav?.setOptions({
+          title: t('screens.overview.myRecipes'),
+          headerLeft: undefined,
+          headerRight: undefined,
+        });
       }
     };
     adjustActionbar();
@@ -94,19 +105,25 @@ const RecipeListScreen = (props: Props) => {
     return groups;
   };
 
-  const openRecipe = (recipe: Recipe) => {
+  // Memoize so RecipeList can React.memo its rows without busting on every parent
+  // re-render (which the searchbar, multi-select state, etc. trigger).
+  const openRecipe = useCallback((recipe: Recipe) => {
     if (recipe.id) {
       props.navigation.push('RecipeScreen', {
         recipeId: recipe.id,
       });
     }
-  };
+  }, [props.navigation]);
 
-  const clearMultiSelectionMode = () => {
+  const openRecipeGroup = useCallback((recipeGroup: RecipeGroup) => {
+    props.navigation.push('RecipeListDetailScreen', {shownRecipeGroupId: recipeGroup.id});
+  }, [props.navigation]);
+
+  const clearMultiSelectionMode = useCallback(() => {
     setRecipeGroupSelectionOpened(false);
     setSelectedRecipes(new Set());
     setMultiSelectionModeActive(false);
-  };
+  }, []);
 
   const onMoveSelectedRecipesToGroup = (selectedOption: Option) => {
     // TODO: Move recipe objects to selected recipes instead of ids only
@@ -138,10 +155,15 @@ const RecipeListScreen = (props: Props) => {
     <>
       <Surface testID="recipeListScreen" style={CentralStyles.fullscreen}>
         <RecipeList
-          // @ts-ignore Route params are sometimes string
-          shownRecipeGroupId={props.route.params?.shownRecipeGroupId && parseInt(props.route.params.shownRecipeGroupId)}
+          // Route params coming from deep links are strings; from in-app
+          // navigation they're numbers. Coerce once here.
+          shownRecipeGroupId={(() => {
+            const raw = props.route.params?.shownRecipeGroupId;
+            if (raw == null) return undefined;
+            return typeof raw === 'string' ? parseInt(raw, 10) : raw;
+          })()}
           onRecipeClick={openRecipe}
-          onRecipeGroupClick={(recipeGroup) => props.navigation.push('RecipeListDetailScreen', {shownRecipeGroupId: recipeGroup.id})}
+          onRecipeGroupClick={openRecipeGroup}
           onMultiSelectionModeToggled={(firstSelectedRecipe) => {
             setMultiSelectionModeActive(!multiSelectionModeActive);
             const newSet = new Set<number>();

@@ -5,6 +5,7 @@ import {View} from 'react-native';
 import {Button, Caption, Divider, Surface, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {RecipeGroup} from '../dao/RestAPI';
+import {PromptUtil} from '../helper/Prompt';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {createRecipeGroup, deleteRecipeGroup, updateRecipeGroup} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
@@ -17,56 +18,88 @@ export const RecipeGroupEditScreen = (props: Props) => {
   const dispatch = useAppDispatch();
   const theme = useAppTheme();
 
-  const existingRecipe = useAppSelector((store) => store.recipes.recipeGroups.filter((group) => group.id === props.route.params.recipeGroupId))[0];
+  const existingRecipeGroup = useAppSelector(
+      (store) => store.recipes.recipeGroups.filter((group) => group.id === props.route.params.recipeGroupId),
+  )[0];
 
   const [recipeGroupData, setRecipeGroupData] = useState<RecipeGroup>(
-      existingRecipe ?
-      existingRecipe :
-            {
-              title: '',
-              type: 'RecipeGroup',
-            },
+      existingRecipeGroup ?
+        existingRecipeGroup :
+        {title: '', type: 'RecipeGroup'},
   );
 
+  const [pending, setPending] = useState(false);
+
+  const trimmedTitle = recipeGroupData.title.trim();
+  const canSave = !pending && trimmedTitle.length > 0;
+
   const saveRecipeGroup = () => {
-    if ( !existingRecipe) {
-      dispatch(createRecipeGroup(recipeGroupData));
-    } else {
-      dispatch(updateRecipeGroup(recipeGroupData));
-    }
-    props.navigation.goBack();
+    if (!canSave) return;
+    setPending(true);
+    const action = existingRecipeGroup ?
+      updateRecipeGroup(recipeGroupData) :
+      createRecipeGroup(recipeGroupData);
+    dispatch(action).finally(() => {
+      setPending(false);
+      props.navigation.goBack();
+    });
   };
 
-  const dispatchDeleteRecipeGroup = () => {
-    recipeGroupData.id && dispatch(deleteRecipeGroup(recipeGroupData.id)).then(() => {
+  const performDelete = () => {
+    if (!recipeGroupData.id) return;
+    dispatch(deleteRecipeGroup(recipeGroupData.id)).then(() => {
+      // After deleting, leave the (now-stale) group view and land back on the
+      // top-level "My recipes" list.
       props.navigation.navigate('OverviewScreen', {
         screen: 'RecipesListScreen',
         params: {
           screen: 'RecipeListDetailScreen',
-          params: {
-            shownRecipeGroupId: undefined,
-          },
+          params: {shownRecipeGroupId: undefined},
         },
       });
     });
   };
 
-  const renderDeletionButton = () =>
+  const onDeletePress = () => {
+    PromptUtil.show({
+      title: t('screens.createGroup.deleteTitle'),
+      message: t('screens.createGroup.deleteMessage'),
+      button1: t('common.delete'),
+      button1Callback: performDelete,
+      button2: t('common.cancel'),
+    });
+  };
+
+  const renderDeletionButton = () => (
     <>
       <Divider style={{marginVertical: 10}}/>
       <Button
         buttonColor={theme.colors.error}
-        onPress={dispatchDeleteRecipeGroup}>{t('common.delete')}</Button>
-    </>;
+        onPress={onDeletePress}>{t('common.delete')}</Button>
+    </>
+  );
 
   return (
     <Surface style={CentralStyles.fullscreen}>
       <View style={CentralStyles.contentContainer}>
         <Caption>{t('screens.createGroup.groupName')}</Caption>
-        <TextInput mode="flat" dense={true} value={recipeGroupData.title} onChangeText={(newText) => setRecipeGroupData({...recipeGroupData, title: newText})} />
+        <TextInput
+          mode="flat"
+          dense={true}
+          autoFocus={!existingRecipeGroup}
+          value={recipeGroupData.title}
+          onChangeText={(newText) => setRecipeGroupData({...recipeGroupData, title: newText})}
+          returnKeyType='go'
+          onSubmitEditing={saveRecipeGroup} />
         <Spacer height={10} />
-        <Button mode='contained' onPress={saveRecipeGroup}>{existingRecipe ? t('common.save'): t('common.create')}</Button>
-        {existingRecipe ? renderDeletionButton() : null}
+        <Button
+          mode='contained'
+          loading={pending}
+          disabled={!canSave}
+          onPress={saveRecipeGroup}>
+          {existingRecipeGroup ? t('common.save') : t('common.create')}
+        </Button>
+        {existingRecipeGroup ? renderDeletionButton() : null}
       </View>
     </Surface>
   );

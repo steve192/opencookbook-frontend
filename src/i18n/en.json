@@ -120,7 +120,9 @@
       "dark": "Dark",
       "dangerZone": "Danger zone",
       "deleteAccount": "Delete account",
-      "deleteAccountConfirmationQuestion": "Do you really want to delete your account and all your recipes? This action is effective immidiately and cannot be undone"
+      "deleteAccountConfirmationQuestion": "Do you really want to delete your account and all your recipes? This action is effective immidiately and cannot be undone",
+      "logoutTitle": "Log out?",
+      "logoutMessage": "You'll need to enter your credentials again to use the app."
     },
     "import": {
       "notSupported": "The website is unfortunately not supported yet",
@@ -146,10 +148,16 @@
       "recipeGroups": "Recipe groups",
       "searchOrCreateUnit": "Search or create unit",
       "searchOrCreateIngredients": "Search or create ingredients",
-      "searchOrCreateRecipeGroup": "Search or create recipe group"
+      "searchOrCreateRecipeGroup": "Search or create recipe group",
+      "deleteTitle": "Delete recipe?",
+      "deleteMessage": "This recipe will be permanently deleted. This cannot be undone.",
+      "discardTitle": "Discard recipe?",
+      "discardMessage": "Your changes will be lost."
     },
     "createGroup": {
-      "groupName": "Group name"
+      "groupName": "Group name",
+      "deleteTitle": "Delete recipe group?",
+      "deleteMessage": "The group will be deleted. Recipes inside it stay, but become ungrouped."
     },
     "recipe": {
       "servings": "Servings",

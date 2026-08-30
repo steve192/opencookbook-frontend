@@ -1,11 +1,19 @@
-import {createMaterialBottomTabNavigator} from '@react-navigation/material-bottom-tabs';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import NetInfo from '@react-native-community/netinfo';
+import {BottomTabNavigationOptions, createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createURL} from 'expo-linking';
-import React, {useEffect, useState} from 'react';
+import {StatusBar} from 'expo-status-bar';
+import * as Updates from 'expo-updates';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Platform} from 'react-native';
-import {Appbar, withTheme} from 'react-native-paper';
+import {KeyboardAvoidingView} from 'react-native-keyboard-controller';
+import {Appbar} from 'react-native-paper';
+import AppPersistence from '../AppPersistence';
+import {SnackbarUtil} from '../helper/GlobalSnackbar';
+import {changeOnlineState} from '../redux/features/settingsSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {AccountActivationScreen} from '../screens/AccountActivationScreen';
 import {GuidedCookingScreen} from '../screens/GuidedCookingScreen';
@@ -24,17 +32,165 @@ import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
-import NetInfo from '@react-native-community/netinfo';
-import * as Updates from 'expo-updates';
-import {changeOnlineState} from '../redux/features/settingsSlice';
-import {SnackbarUtil} from '../helper/GlobalSnackbar';
-import AppPersistence from '../AppPersistence';
-import {StatusBar} from 'expo-status-bar';
-import {KeyboardAvoidingView} from 'react-native-keyboard-controller';
+import {
+  BaseNavigatorProps,
+  LoginNavigationProps,
+  MainNavigationProps,
+  OverviewNavigationProps,
+  RecipeScreenNavigation,
+} from './NavigationRoutes';
+
+// One typed navigator instance per stack — keeps the param-list -> screen-component
+// type relationships intact (createNativeStackNavigator<...> defaults to ParamListBase
+// which forces components to be FunctionComponent<{}>).
+const BaseStack = createNativeStackNavigator<BaseNavigatorProps>();
+const LoginStack = createNativeStackNavigator<LoginNavigationProps>();
+const MainStack = createNativeStackNavigator<MainNavigationProps>();
+const RecipeStack = createNativeStackNavigator<RecipeScreenNavigation>();
+const BottomTab = createBottomTabNavigator<OverviewNavigationProps>();
 
 
-const Stack = createNativeStackNavigator();
-const BottomTab = createMaterialBottomTabNavigator();
+const LoginStackNavigation = () => (
+  <LoginStack.Navigator>
+    <LoginStack.Screen
+      name="LoginScreen"
+      component={LoginScreen}
+      options={{headerShown: false}} />
+    <LoginStack.Screen
+      name="SignupScreen"
+      component={SignupScreen}
+      options={{headerShown: false}} />
+    <LoginStack.Screen
+      name='RequestPasswordResetScreen'
+      component={RequestPasswordResetScreen}
+      options={{headerShown: false}} />
+  </LoginStack.Navigator>
+);
+
+
+const RecipeStackNavigation = () => (
+  <RecipeStack.Navigator>
+    <RecipeStack.Screen
+      name="RecipeListDetailScreen"
+      component={RecipeListScreen}
+      options={{headerShown: false}} />
+  </RecipeStack.Navigator>
+);
+
+
+// Every tab repeats the same icon render-prop shape. Factoring it out keeps the
+// navigator declarative and puts the sizing/tinting decision in one place. The
+// renderer signature is derived from the navigator's own option type, so it
+// stays correct if React Navigation changes what it passes in.
+type MaterialCommunityIconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+type TabBarIconRenderer = NonNullable<BottomTabNavigationOptions['tabBarIcon']>;
+
+const tabBarIcon = (name: MaterialCommunityIconName): TabBarIconRenderer =>
+  function TabBarIcon({color, size}) {
+    return <MaterialCommunityIcons name={name} color={color} size={size} />;
+  };
+
+const BottomTabNavigation = () => {
+  const {t} = useTranslation('translation');
+  const theme = useAppTheme();
+  return (
+    <BottomTab.Navigator
+      backBehavior="history"
+      screenOptions={{
+        // The surrounding native stack already renders the Paper Appbar; the
+        // tab navigator must not add a second header of its own.
+        headerShown: false,
+        tabBarLabelPosition: 'below-icon',
+        tabBarHideOnKeyboard: true,
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.onSurface,
+        tabBarStyle: {backgroundColor: theme.colors.surface},
+      }}
+    >
+      <BottomTab.Screen
+        name="RecipesListScreen"
+        component={RecipeStackNavigation}
+        options={{
+          title: t('screens.overview.myRecipes'),
+          tabBarIcon: tabBarIcon('home'),
+        }} />
+      <BottomTab.Screen
+        name="WeeklyScreen"
+        component={WeeklyRecipeListScreen}
+        options={{
+          title: t('screens.weekplan.screenTitle'),
+          tabBarIcon: tabBarIcon('calendar'),
+        }} />
+      <BottomTab.Screen
+        name="SettingsScreen"
+        component={SettingsScreen}
+        options={{
+          title: t('screens.settings.screenTitle'),
+          tabBarIcon: tabBarIcon('cog-off-outline'),
+        }} />
+    </BottomTab.Navigator>
+  );
+};
+
+
+const MainStackNavigation = () => {
+  const {t} = useTranslation('translation');
+  const theme = useAppTheme();
+  return (
+    <KeyboardAvoidingView style={CentralStyles.fullscreen}>
+      <MainStack.Navigator
+        screenOptions={{
+          header: (nav) => (
+            <Appbar.Header style={{backgroundColor: theme.colors.primary}}>
+              {nav.back ? (
+                <Appbar.BackAction
+                  color={theme.colors.onPrimary}
+                  onPress={() => nav.navigation.goBack()} />
+              ) : null}
+              {nav.options.headerLeft?.({tintColor: undefined, canGoBack: false})}
+              <Appbar.Content color={theme.colors.onPrimary} title={nav.options.title} />
+              {nav.options.headerRight?.({tintColor: undefined, canGoBack: false})}
+            </Appbar.Header>
+          ),
+        }}>
+        <MainStack.Screen
+          name="OverviewScreen"
+          component={BottomTabNavigation}
+        />
+        <MainStack.Screen
+          name="RecipeWizardScreen"
+          component={RecipeWizardScreen}
+        />
+        <MainStack.Screen
+          name="RecipeImportBrowser"
+          component={RecipeImportBrowser}
+          options={{title: t('navigation.screenTitleImportBrowser')}}
+        />
+        <MainStack.Screen
+          name="ImportScreen"
+          component={ImportScreen}
+          options={{title: t('navigation.screenTitleImport')}}
+        />
+        <MainStack.Screen
+          name="RecipeGroupEditScreen"
+          component={RecipeGroupEditScreen}
+          options={{title: t('navigation.screenTitleCreateRecipeGroup')}}
+        />
+        <MainStack.Screen
+          name="GuidedCookingScreen"
+          component={GuidedCookingScreen}
+          options={{title: t('navigation.screenTitleGuidedCooking')}}
+        />
+        <MainStack.Screen
+          name="RecipeScreen"
+          component={RecipeScreen}
+        />
+      </MainStack.Navigator>
+    </KeyboardAvoidingView>
+  );
+};
+
+
 const MainNavigation = () => {
   const loggedIn = useAppSelector((state) => state.auth.loggedIn);
   const isLoading = useAppSelector((state) => state.auth.isLoading);
@@ -43,7 +199,6 @@ const MainNavigation = () => {
   const [initializersRun, setInitializersRun] = useState(false);
 
   const {t} = useTranslation('translation');
-  const theme = useAppTheme();
 
   useEffect(() => {
     if (initializersRun) {
@@ -60,27 +215,29 @@ const MainNavigation = () => {
         }
       });
 
-
       // Check for new app versions
       const info = await NetInfo.fetch();
       if (info.isInternetReachable) {
-      // Do update asynchronously
         const updateAsync = async () => {
           console.log('Update check');
           await new Promise((r) => setTimeout(r, 1000));
           const update = await Updates.checkForUpdateAsync();
           if (update.isAvailable) {
-            console.log('Dowload update');
+            console.log('Download update');
             await Updates.fetchUpdateAsync();
             console.log('Restarting app');
 
-            SnackbarUtil.show({message: t('common.update.restartprompt'), button1: t('common.update.restartbutton'), button1Callback: () => {
-              AppPersistence.clearOfflineData().then(() => {
-                Updates.reloadAsync()
-                    .then((r) => console.log('Restart triggered', r))
-                    .catch((e) => console.error('Restarting failed', e));
-              });
-            }});
+            SnackbarUtil.show({
+              message: t('common.update.restartprompt'),
+              button1: t('common.update.restartbutton'),
+              button1Callback: () => {
+                AppPersistence.clearOfflineData().then(() => {
+                  Updates.reloadAsync()
+                      .then((r) => console.log('Restart triggered', r))
+                      .catch((e) => console.error('Restarting failed', e));
+                });
+              },
+            });
           } else {
             console.log('No updates available');
           }
@@ -90,177 +247,39 @@ const MainNavigation = () => {
     })();
   }, []);
 
-  const LoginStackNavigation = () => (
-    <>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="LoginScreen"
-          component={LoginScreen}
-          options={{headerShown: false}} />
-        <Stack.Screen
-          name="SignupScreen"
-          component={SignupScreen}
-          options={{headerShown: false}} />
-        <Stack.Screen
-          name='RequestPasswordResetScreen'
-          component={RequestPasswordResetScreen}
-          options={{headerShown: false}}
-        />
-      </Stack.Navigator>
-    </>
-  );
-
-  const MainStackNavigation = () => {
-    return (
-      <>
-        <KeyboardAvoidingView
-          // behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={CentralStyles.fullscreen}
-        >
-          <Stack.Navigator
-            screenOptions={{
-              header: (nav) => (
-                <Appbar.Header style={{backgroundColor: theme.colors.primary}}>
-                  {nav.back ? (
-                  <Appbar.BackAction color={theme.colors.onPrimary} onPress={() => nav.navigation.goBack()} />
-                ) : null}
-                  {nav.options.headerLeft !== undefined ? nav.options?.headerLeft?.({tintColor: undefined, canGoBack: false}): null}
-                  <Appbar.Content color={theme.colors.onPrimary} title={nav.options.title} />
-                  {/* TODO: Use canGoback*/}
-                  {nav.options.headerRight !== undefined ? nav.options?.headerRight?.({tintColor: undefined, canGoBack: false}): null}
-                </Appbar.Header>
-              ),
-            }}>
-            <Stack.Screen
-              name="OverviewScreen"
-              component={BottomTabNavigation}
-            />
-            <Stack.Screen
-              name="RecipeWizardScreen"
-              component={RecipeWizardScreen}
-            />
-            <Stack.Screen
-              name="RecipeImportBrowser"
-              component={RecipeImportBrowser}
-              options={{
-                title: t('navigation.screenTitleImportBrowser'),
-              }}
-            />
-            <Stack.Screen
-              name="ImportScreen"
-              component={ImportScreen}
-              options={{
-                title: t('navigation.screenTitleImport'),
-              }}
-            />
-            <Stack.Screen
-              name="RecipeGroupEditScreen"
-              component={RecipeGroupEditScreen}
-              options={{
-                title: t('navigation.screenTitleCreateRecipeGroup'),
-              }}
-            />
-            <Stack.Screen
-              name="GuidedCookingScreen"
-              component={GuidedCookingScreen}
-              options={{
-                title: t('navigation.screenTitleGuidedCooking'),
-              }}
-            />
-            <Stack.Screen
-              name="RecipeScreen"
-              component={RecipeScreen}
-            // options={
-              //     { headerTransparent: true, headerStyle: {} }
-              // }
-            />
-          </Stack.Navigator>
-        </KeyboardAvoidingView>
-      </>
-    );
-  };
-
-
-  const BottomTabNavigation = withTheme(() => {
-    return (
-
-      <BottomTab.Navigator
-        backBehavior="history"
-        labeled={true}
-        activeColor={theme.colors.primary}
-        inactiveColor={theme.colors.onSurface}
-        activeIndicatorStyle={{
-          backgroundColor: 'rgba(0,0,0,0)',
-        }}
-        barStyle={{
-          backgroundColor: theme.colors.surface,
-        }}
-      >
-        <BottomTab.Screen
-          name="RecipesListScreen"
-          component={recipeScrenNavigation}
-          options={{
-            title: t('screens.overview.myRecipes'),
-            tabBarIcon: 'home',
-          }} />
-        <BottomTab.Screen
-          name="WeeklyScreen"
-          component={WeeklyRecipeListScreen}
-          options={{
-            title: t('screens.weekplan.screenTitle'),
-            tabBarIcon: 'calendar',
-          }} />
-        <BottomTab.Screen
-          name="SettingsScreen"
-          component={SettingsScreen}
-          options={{title: t('screens.settings.screenTitle'),
-            tabBarIcon: 'cog-off-outline',
-          }} />
-
-      </BottomTab.Navigator>
-    );
-  });
-
-  const recipeScrenNavigation = () => (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="RecipeListDetailScreen"
-        component={RecipeListScreen}
-        options={{headerShown: false}} />
-    </Stack.Navigator>
+  // Render either the main-app stack or the login flow under a single "default"
+  // base screen, so deep-link routes resolve against the right stack at runtime.
+  const AuthenticationNavigator = useCallback(
+      () => (loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />),
+      [loggedIn],
   );
 
   const BaseNavigator = () => (
     isLoading ? <SplashScreen /> :
-        <Stack.Navigator
-          screenOptions={{headerShown: false}}>
-          <Stack.Screen
-            name='default'
-            component={authentificationNavigator}
-          />
-          <Stack.Screen
-            name='AccountActivationScreen'
-            component={AccountActivationScreen}
-          />
-          <Stack.Screen
-            name='PasswordResetScreen'
-            component={PasswordResetScreen}
-          />
-          <Stack.Screen
-            name='TermsOfServiceScreen'
-            component={TermsOfServiceScreen}
-            options={{headerShown: true, title: t('screens.login.toc')}}
-          />
-        </Stack.Navigator>
-  );
-
-  const authentificationNavigator = () => (
-    loggedIn ? <MainStackNavigation /> : <LoginStackNavigation />
+      <BaseStack.Navigator screenOptions={{headerShown: false}}>
+        <BaseStack.Screen
+          name='default'
+          component={AuthenticationNavigator}
+        />
+        <BaseStack.Screen
+          name='AccountActivationScreen'
+          component={AccountActivationScreen}
+        />
+        <BaseStack.Screen
+          name='PasswordResetScreen'
+          component={PasswordResetScreen}
+        />
+        <BaseStack.Screen
+          name='TermsOfServiceScreen'
+          component={TermsOfServiceScreen}
+          options={{headerShown: true, title: t('screens.login.toc')}}
+        />
+      </BaseStack.Navigator>
   );
 
   return (
     <>
-      <StatusBar translucent={true}/>
+      <StatusBar />
       <NavigationContainer
         linking={{
           prefixes: [createURL('/'), 'https://beta.cookpal.io/'],
@@ -291,7 +310,9 @@ const MainNavigation = () => {
                 },
               },
             },
-          },
+          // The linking config mixes BaseNavigatorProps + nested stack routes; the
+          // generated PathConfig type doesn't model that union, so cast to any here.
+          } as any,
         }}
       >
         <BaseNavigator/>

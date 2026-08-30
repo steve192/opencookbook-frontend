@@ -3,7 +3,7 @@ import fuzzy from 'fuzzy';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, RefreshControl, StyleProp, StyleSheet, View, ViewProps, ViewStyle} from 'react-native';
-import {Headline, RadioButton, Searchbar, Surface, Text} from 'react-native-paper';
+import {Badge, Headline, RadioButton, Searchbar, Surface, Text} from 'react-native-paper';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {fetchMyRecipeGroups, fetchMyRecipes} from '../redux/features/recipesSlice';
@@ -33,14 +33,18 @@ export const RecipeList = (props: Props) => {
   const theme = useAppTheme();
 
   const dispatch = useAppDispatch();
-  const searchDebounceTimer = useRef<NodeJS.Timeout>();
+  const searchDebounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const refreshData = () => {
     dispatch(fetchMyRecipes());
     dispatch(fetchMyRecipeGroups());
 
     // Clear the search debounce timer, to avoid state changes on unmounted component
-    return () => searchDebounceTimer.current && clearTimeout(searchDebounceTimer.current);
+    return () => {
+      if (searchDebounceTimer.current) {
+        clearTimeout(searchDebounceTimer.current);
+      }
+    };
   };
   useEffect(refreshData, []);
 
@@ -118,8 +122,16 @@ export const RecipeList = (props: Props) => {
       </Pressable>
     );
   };
+  // Show one blurred cover image per group plus a count badge instead of rendering
+  // up to four blurred thumbnails. On lower-end Android devices the old layout
+  // queued 4 base64 image fetches and 4 simultaneous Image#blurRadius effects per
+  // group card, which dominated scroll cost on the "My recipes" list.
   const createRecipeGroupListItem = (recipeGroup: RecipeGroup) => {
-    const firstFewGroupRecipes = myRecipes.filter((recipe) => recipe.recipeGroups.find((group) => group.id === recipeGroup.id)).splice(0, 4);
+    const groupRecipes = myRecipes.filter(
+        (recipe) => recipe.recipeGroups.some((g) => g.id === recipeGroup.id),
+    );
+    const coverImageUuid = groupRecipes.find((r) => r.images.length > 0)?.images[0]?.uuid;
+
     return (
       <Pressable
         testID='recipeGroupListItem'
@@ -133,32 +145,32 @@ export const RecipeList = (props: Props) => {
             overflow: 'hidden',
           }]}
         onPress={() => props.onRecipeGroupClick(recipeGroup)}>
-        <Surface style={{flex: 1, height: '100%', flexWrap: 'wrap'}}>
-          {firstFewGroupRecipes.map((recipe) =>
-            <RecipeImageComponent
-              blurredMode={true}
-              key={recipe.id}
-              forceFitScaling={true}
-              uuid={recipe.images.length > 0 ? recipe.images[0].uuid : undefined} />,
-          )}
+        <Surface style={{flex: 1, height: '100%'}}>
+          <RecipeImageComponent
+            blurredMode={true}
+            forceFitScaling={true}
+            useThumbnail={true}
+            uuid={coverImageUuid} />
         </Surface>
-        <View style={{backgroundColor: 'rgba(0,0,0,0.3)', position: 'absolute', width: '100%', height: '100%'}} >
+        <View style={styles.groupOverlay}>
           <Headline
             style={{
               padding: 16,
               fontWeight: 'bold',
-              position: 'absolute',
               color: theme.colors.onPrimary,
+              flex: 1,
             }}>
             {recipeGroup.title}
           </Headline>
+          {groupRecipes.length > 0 &&
+            <Badge style={styles.groupCountBadge}>{groupRecipes.length}</Badge>
+          }
         </View>
       </Pressable>
-
     );
   };
 
-  const renderItem = (type: string | number, data: Recipe | RecipeGroup): JSX.Element => {
+  const renderItem = (type: string | number, data: Recipe | RecipeGroup): React.JSX.Element => {
     if (data.type === 'Recipe') {
       return createRecipeListItem(data as Recipe);
     } else if (data.type === 'RecipeGroup') {
@@ -266,6 +278,17 @@ const styles = StyleSheet.create({
   recipeGroupCard: {
     margin: 1,
     flex: 1,
+  },
+  groupOverlay: {
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  groupCountBadge: {
+    margin: 12,
   },
   cardcontainer: {
     flex: 1,

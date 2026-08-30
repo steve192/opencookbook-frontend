@@ -120,7 +120,9 @@
       "dark": "Dunkel",
       "dangerZone": "Gefahrenzone",
       "deleteAccount": "Account löschen",
-      "deleteAccountConfirmationQuestion": "Willst du wirklich deinen Account und alle deine Rezepte löscnen? Diese Aktion ist sofort wirksam und kann nicht rückgängig gemacht werden"
+      "deleteAccountConfirmationQuestion": "Willst du wirklich deinen Account und alle deine Rezepte löscnen? Diese Aktion ist sofort wirksam und kann nicht rückgängig gemacht werden",
+      "logoutTitle": "Abmelden?",
+      "logoutMessage": "Du musst dich erneut anmelden, um die App zu nutzen."
     },
     "import": {
       "notSupported": "Die Webseite wird leider noch nicht unterstüzt",
@@ -146,10 +148,16 @@
       "recipeGroups": "Rezeptgruppen",
       "searchOrCreateUnit": "Einheit suchen oder Erstellen",
       "searchOrCreateIngredients": "Zutat suchen oder erstellen",
-      "searchOrCreateRecipeGroup": "Rezeptgruppe suchen oder erstellen"
+      "searchOrCreateRecipeGroup": "Rezeptgruppe suchen oder erstellen",
+      "deleteTitle": "Rezept löschen?",
+      "deleteMessage": "Das Rezept wird endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "discardTitle": "Rezept verwerfen?",
+      "discardMessage": "Deine Änderungen gehen verloren."
     },
     "createGroup": {
-      "groupName": "Gruppen Name"
+      "groupName": "Gruppen Name",
+      "deleteTitle": "Rezeptgruppe löschen?",
+      "deleteMessage": "Die Gruppe wird gelöscht. Rezepte darin bleiben erhalten, sind dann aber nicht mehr gruppiert."
     },
     "recipe": {
       "servings": "Portionen",

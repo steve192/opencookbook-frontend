@@ -33,12 +33,15 @@ export const PreparationStepText = (props: Props) => {
 
   return (
     <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-      {props.value.split(' ').map((word) =>
-                isIngredient(word) ?
-                    <Text style={[props.style, ingredientStyle]}>{word} </Text> :
-                    <Text style={props.style}>{word} </Text>,
-      )
-      }
+      {props.value.split(' ').map((word, index) => (
+        // The words come from splitting one static string, so the index is a
+        // stable identity here; the word alone is not (it can repeat).
+        <Text
+          key={`${index}-${word}`}
+          style={isIngredient(word) ? [props.style, ingredientStyle] : props.style}>
+          {word}{' '}
+        </Text>
+      ))}
     </View>
   );
 };

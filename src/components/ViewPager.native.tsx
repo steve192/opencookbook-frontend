@@ -16,11 +16,13 @@ export const ViewPager = (props: Props) => {
     pagerRef.current?.setPage(props.selectedIndex);
   }, [props.selectedIndex]);
 
-  return <PagerView
-    ref={pagerRef}
-    initialPage={props.selectedIndex}
-    onPageSelected={(event) => props.onIndexChange(event.nativeEvent.position)}
-    style={[props.style, {flex: 1}]}>
-    {props.children}
-  </PagerView>;
+  return (
+    <PagerView
+      ref={pagerRef}
+      initialPage={props.selectedIndex}
+      onPageSelected={(event) => props.onIndexChange(event.nativeEvent.position)}
+      style={[props.style, {flex: 1}]}>
+      {props.children}
+    </PagerView>
+  );
 };
