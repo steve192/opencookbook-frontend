@@ -3,7 +3,7 @@ import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
 import {CompositeScreenProps} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import Constants from 'expo-constants';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, View} from 'react-native';
 import {Avatar, Button, Caption, Divider, Surface, Text} from 'react-native-paper';
@@ -12,6 +12,7 @@ import Spacer from 'react-spacer';
 import AppPersistence from '../AppPersistence';
 import {CustomCard} from '../components/CustomCard';
 import RestAPI from '../dao/RestAPI';
+import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {PromptUtil} from '../helper/Prompt';
 import {MainNavigationProps, OverviewNavigationProps} from '../navigation/NavigationRoutes';
 import {logout} from '../redux/features/authSlice';
@@ -31,6 +32,16 @@ export const SettingsScreen = (props: Props) => {
   const dispatch = useDispatch();
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
+
+  // Needed to address the password reset. Falls back to the offline copy stored at login.
+  const [emailAddress, setEmailAddress] = useState('');
+  const [passwordResetPending, setPasswordResetPending] = useState(false);
+
+  useEffect(() => {
+    RestAPI.getUserInfo()
+        .then((userInfo) => setEmailAddress(userInfo?.email ?? ''))
+        .catch(() => setEmailAddress(''));
+  }, []);
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
@@ -60,6 +71,26 @@ export const SettingsScreen = (props: Props) => {
     dispatch(logout());
   };
 
+  // Reuses the reset flow rather than adding a second way to set a password: the user proves
+  // they own the mailbox, and the app never handles the old or the new password itself.
+  const sendPasswordResetLink = () => {
+    setPasswordResetPending(true);
+    RestAPI.requestPasswordReset(emailAddress)
+        .then(() => SnackbarUtil.show({message: t('screens.settings.changePasswordSent')}))
+        .catch(() => SnackbarUtil.show({message: t('screens.settings.changePasswordFailed')}))
+        .finally(() => setPasswordResetPending(false));
+  };
+
+  const onChangePasswordPress = () => {
+    PromptUtil.show({
+      title: t('screens.settings.changePasswordTitle'),
+      message: t('screens.settings.changePasswordMessage', {email: emailAddress}),
+      button1: t('common.ok'),
+      button1Callback: sendPasswordResetLink,
+      button2: t('common.cancel'),
+    });
+  };
+
   const onLogoutPress = () => {
     PromptUtil.show({
       title: t('screens.settings.logoutTitle'),
@@ -76,10 +107,21 @@ export const SettingsScreen = (props: Props) => {
         <ScrollView>
           <Avatar.Icon style={{alignSelf: 'center', backgroundColor: 'transparent'}} size={100} color={theme.colors.onSurface} icon="server"/>
           <Text style={{alignSelf: 'center', fontWeight: 'bold'}}>{backendUrl}</Text>
+          {emailAddress.length > 0 &&
+            <Text style={{alignSelf: 'center'}}>{emailAddress}</Text>
+          }
           <Spacer height={20} />
           <Button
             mode='outlined'
-            onPress={onLogoutPress}>Logout</Button>
+            icon="lock-reset"
+            loading={passwordResetPending}
+            // Without an address there is nothing to send the link to
+            disabled={passwordResetPending || emailAddress.length === 0}
+            onPress={onChangePasswordPress}>{t('screens.settings.changePassword')}</Button>
+          <Spacer height={10} />
+          <Button
+            mode='outlined'
+            onPress={onLogoutPress}>{t('screens.settings.logout')}</Button>
           <Divider style={{marginTop: 10, marginBottom: 10}}/>
           <Spacer height={20} />
           <CustomCard>

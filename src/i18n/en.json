@@ -131,7 +131,13 @@
       "deleteAccount": "Delete account",
       "deleteAccountConfirmationQuestion": "Do you really want to delete your account and all your recipes? This action is effective immidiately and cannot be undone",
       "logoutTitle": "Log out?",
-      "logoutMessage": "You'll need to enter your credentials again to use the app."
+      "logoutMessage": "You'll need to enter your credentials again to use the app.",
+      "logout": "Log out",
+      "changePassword": "Change password",
+      "changePasswordTitle": "Change password?",
+      "changePasswordMessage": "A link to set a new password will be sent to {{email}}.",
+      "changePasswordSent": "Link sent. Please check your inbox to set a new password",
+      "changePasswordFailed": "The link could not be sent. Please try again"
     },
     "import": {
       "notSupported": "The website is unfortunately not supported yet",
