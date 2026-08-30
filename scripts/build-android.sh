@@ -1,4 +1,6 @@
 #!/bin/sh
+set -e
+
 yes | sdkmanager --licenses
 
 if [ -n "$2" ]; then
@@ -7,15 +9,11 @@ else
     output_file="app-build.apk"
 fi
 
-npm ci
-# eas build --local \
-#     --non-interactive \
-#     --output=./app-build.apk \
-#     --platform=android \
-#     --profile=production-apk
+cd /builder
 
+npm ci
 eas build --local \
     --non-interactive \
-    --output=./$output_file \
+    --output="./$output_file" \
     --platform=android \
-    --profile=$1
+    --profile="$1"

@@ -1,0 +1,100 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits"
+  ],
+  "timezone": "UTC",
+  "dependencyDashboard": true,
+  "rangeStrategy": "pin",
+  "minimumReleaseAge": "7 days",
+  "platformAutomerge": true,
+  "automergeType": "branch",
+  "labels": [
+    "dependencies"
+  ],
+  "packageRules": [
+    {
+      "description": "Safely automerge patch and digest updates",
+      "matchUpdateTypes": [
+        "patch",
+        "digest"
+      ],
+      "automerge": true
+    },
+    {
+      "description": "Never automerge major updates",
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false
+    },
+    {
+      "description": "Expo SDK-managed packages - versions are dictated by the installed Expo SDK (see expo/bundledNativeModules.json), so Renovate must not touch them; the expo-sdk-update workflow keeps them current instead",
+      "matchManagers": [
+        "npm"
+      ],
+      "matchPackageNames": [
+        "expo",
+        "expo-*",
+        "@expo/*",
+        "react",
+        "react-dom",
+        "react-native",
+        "react-native-web",
+        "react-native-gesture-handler",
+        "react-native-keyboard-controller",
+        "react-native-pager-view",
+        "react-native-reanimated",
+        "react-native-safe-area-context",
+        "react-native-screens",
+        "react-native-webview",
+        "react-native-worklets",
+        "@react-native-async-storage/async-storage",
+        "@react-native-community/netinfo",
+        "@react-native-picker/picker",
+        "@babel/core",
+        "babel-preset-expo",
+        "typescript",
+        "@types/react",
+        "@types/react-dom"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Other npm minor/patch updates - one PR per package so a single failure doesn't block the rest",
+      "matchManagers": [
+        "npm"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "automerge": true
+    },
+    {
+      "description": "Docker base images (nginx runtime + Android builder)",
+      "matchManagers": [
+        "dockerfile"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "docker-base-images",
+      "automerge": true
+    },
+    {
+      "description": "GitHub Actions workflow dependencies",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "github-actions",
+      "automerge": true
+    }
+  ]
+}

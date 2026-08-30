@@ -1,0 +1,14 @@
+.git
+.github
+node_modules
+.expo
+.expo-shared
+android
+ios
+coverage
+test-results
+cypress
+.idea
+.vscode
+# NOTE: dist/ is intentionally NOT ignored - Dockerfile copies the prebuilt
+# web bundle from it.

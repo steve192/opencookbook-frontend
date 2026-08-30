@@ -1,0 +1,130 @@
+name: Expo SDK Update
+
+# Keeps Expo SDK-managed packages on the versions currently recommended by the
+# installed SDK (what `npx expo-doctor` checks against). Renovate is disabled
+# for these packages in renovate.json because it does not know the SDK's version
+# constraints.
+#
+# `npx expo install --fix` only aligns packages to the *installed* SDK, so it
+# never crosses a major SDK boundary on its own.
+#
+# Flow: prepare the update and open a PR -> validate it with the shared
+# build-test workflow -> merge and trigger a main CI run. Validation runs in
+# this workflow (not on the PR) because a PR opened with the default
+# GITHUB_TOKEN does not start its own workflow run; reusing build-test.yml keeps
+# it identical to the CI validation without duplicating steps.
+
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: expo-sdk-update
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    name: Prepare update
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup
+        uses: ./.github/actions/setup
+
+      - name: Snapshot current versions
+        run: cp package.json "$RUNNER_TEMP/package.before.json"
+
+      - name: Update to SDK-recommended versions
+        run: npx expo install --fix
+
+      - name: Pin updated packages to exact versions
+        run: |
+          # expo install --fix writes tilde ranges. Pin them to the exact
+          # lockfile version for deterministic builds, but ONLY for packages
+          # expo actually changed - leave unrelated ranges (Renovate-managed,
+          # e.g. non-SDK react-native-* libs) untouched so this PR contains
+          # only the SDK update.
+          node <<'EOF'
+          const fs = require('fs');
+          const before = JSON.parse(fs.readFileSync(`${process.env.RUNNER_TEMP}/package.before.json`, 'utf8'));
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const lock = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'));
+          for (const section of ['dependencies', 'devDependencies']) {
+            for (const [name, range] of Object.entries(pkg[section] ?? {})) {
+              if (range === before[section]?.[name]) continue; // expo did not touch it
+              if (!/^[~^]/.test(range)) continue;              // already exact
+              const installed = lock.packages[`node_modules/${name}`]?.version;
+              if (installed) pkg[section][name] = installed;
+            }
+          }
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          EOF
+          npm install --package-lock-only
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet -- package.json package-lock.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No Expo SDK package updates available."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create or update pull request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          add-paths: |
+            package.json
+            package-lock.json
+          commit-message: "fix(deps): update expo sdk packages"
+          title: "fix(deps): update expo sdk packages"
+          body: |
+            Automated in-SDK update of Expo-managed packages via `npx expo install --fix`,
+            with all version ranges pinned to exact versions.
+
+            Validated by the Expo SDK Update workflow (shared build-test suite);
+            merged automatically once those checks pass.
+          branch: expo-sdk-updates
+          delete-branch: true
+          labels: dependencies
+
+  validate:
+    name: Validate
+    needs: prepare
+    if: needs.prepare.outputs.changed == 'true'
+    uses: ./.github/workflows/build-test.yml
+    with:
+      ref: expo-sdk-updates
+
+  merge:
+    name: Merge and release
+    needs: [prepare, validate]
+    if: needs.prepare.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Merge PR
+        run: gh pr merge expo-sdk-updates --squash --delete-branch -R "$REPO"
+
+      # A GITHUB_TOKEN merge does not emit a push event, so CI would not run on
+      # main and auto-release would never fire. workflow_dispatch is exempt from
+      # that anti-recursion rule, so dispatching it explicitly does start a run.
+      - name: Trigger main CI for release evaluation
+        run: gh workflow run ci.yml --ref main -R "$REPO"

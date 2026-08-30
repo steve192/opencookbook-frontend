@@ -3,14 +3,11 @@
     "name": "CookPal",
     "slug": "opencookbook",
     "scheme": "cookpal",
-    "version": "1.6.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "androidStatusBar": {
-      "translucent": true
-    },
     "runtimeVersion": {
-      "policy": "sdkVersion"
+      "policy": "fingerprint"
     },
     "updates": {
       "enabled": true,
@@ -55,7 +52,7 @@
         "WRITE_EXTERNAL_STORAGE",
         "ACCESS_NETWORK_STATE"
       ],
-      "versionCode": 33
+      "versionCode": 34
     },
     "web": {
       "favicon": "./assets/icon.png"
