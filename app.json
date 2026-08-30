@@ -3,7 +3,7 @@
     "name": "CookPal",
     "slug": "opencookbook",
     "scheme": "cookpal",
-    "version": "2.0.0",
+    "version": "1.8.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "runtimeVersion": {
@@ -15,7 +15,9 @@
       "checkAutomatically": "ON_ERROR_RECOVERY",
       "url": "https://u.expo.dev/1d5a474b-fc28-458a-a1e4-c9b4468bbfff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "buildNumber": "0.0.1",
@@ -38,7 +40,10 @@
               "pathPrefix": "/"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ],
       "adaptiveIcon": {
@@ -52,7 +57,7 @@
         "WRITE_EXTERNAL_STORAGE",
         "ACCESS_NETWORK_STATE"
       ],
-      "versionCode": 34
+      "versionCode": 35
     },
     "web": {
       "favicon": "./assets/icon.png"
