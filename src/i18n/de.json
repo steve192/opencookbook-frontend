@@ -73,7 +73,8 @@
       "forward": "Vorwärts",
       "reload": "Neu laden",
       "openRecipe": "Rezept öffnen",
-      "retry": "Erneut versuchen"
+      "retry": "Erneut versuchen",
+      "home": "Zurück zur Suche"
     },
     "recipeselectionpopup": {
       "simplerecipeinput": "Was gibt es zu essen?",

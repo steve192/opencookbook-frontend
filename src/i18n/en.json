@@ -73,7 +73,8 @@
       "forward": "Forward",
       "reload": "Reload",
       "openRecipe": "Open recipe",
-      "retry": "Try again"
+      "retry": "Try again",
+      "home": "Back to search"
     },
     "recipeselectionpopup": {
       "simplerecipeinput": "What's for dinner?",

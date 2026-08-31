@@ -16,7 +16,12 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeImportBrowser'>;
 
 type ImportStatus = 'not_started' | 'pending' | 'failed' | 'success';
 
-const START_PAGE = 'https://google.com';
+/**
+ * Google shows its consent wall on nearly every visit from a web view, which is the first
+ * thing anyone importing a recipe had to click through. DuckDuckGo asks for no consent at
+ * all, so the search page is simply a search page.
+ */
+const START_PAGE = 'https://duckduckgo.com/';
 
 const hostOf = (url: string): string => {
   const match = /^https?:\/\/([^/?#]+)/.exec(url);
@@ -75,6 +80,17 @@ export const RecipeImportBrowser = (props: Props) => {
     // Leaving the page the result belongs to invalidates that result
     setImportStatus('not_started');
     setImportedRecipe(undefined);
+  };
+
+  /**
+   * Sends the browser back to the search page.
+   *
+   * Done from inside the page rather than by changing the source: the ref exposes no way to
+   * load a url, and setting the source back to a value it already holds is not a change, so
+   * nothing would happen.
+   */
+  const goToSearch = () => {
+    webViewRef.current?.injectJavaScript(`window.location.href = ${JSON.stringify(START_PAGE)}; true;`);
   };
 
   const startImport = () => {
@@ -158,6 +174,12 @@ export const RecipeImportBrowser = (props: Props) => {
           size={20}
           accessibilityLabel={t('screens.importbrowser.reload')}
           onPress={() => webViewRef.current?.reload()} />
+        {/* A way back to the search once you have followed a recipe several sites deep */}
+        <IconButton
+          icon="magnify"
+          size={20}
+          accessibilityLabel={t('screens.importbrowser.home')}
+          onPress={goToSearch} />
       </View>
       <ProgressBar
         progress={loadProgress}
