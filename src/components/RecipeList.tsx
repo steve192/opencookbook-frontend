@@ -72,8 +72,12 @@ export const RecipeList = (props: Props) => {
       shownItems = getShownItems();
     }
 
+    // A group and a recipe can carry the same id, and while searching both kinds
+    // share one list. Comparing ids alone let RecyclerListView reuse a group tile
+    // for a recipe row (and the other way round), so the type has to be part of
+    // the comparison.
     return new DataProvider((item1, item2) => {
-      return item1.id !== item2.id;
+      return item1.type !== item2.type || item1.id !== item2.id || item1.title !== item2.title;
 
       // Empty object as first item.
       // This is used for an initial offset due to the search input field

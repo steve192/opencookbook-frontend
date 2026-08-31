@@ -35,7 +35,8 @@
       "notavailabletitle": "Offline"
     },
     "appVersion": "Version {{version}}",
-    "appVersionWithBuild": "Version {{version}} (Build {{build}})"
+    "appVersionWithBuild": "Version {{version}} (Build {{build}})",
+    "undo": "Rückgängig"
   },
   "navigation": {
     "screenTitleImportBrowser": "Rezept Import Browser",
@@ -81,7 +82,10 @@
       "simple": "Spontanes Essen",
       "simpledescription": "Füge einen spontanten Plan für ein Rezept hinzu für welches du noch kein Rezept angelegt hast",
       "normal": "Rezept",
-      "normaldescription": "Füge eines deiner gespeicherten Rezepte hinzu"
+      "normaldescription": "Füge eines deiner gespeicherten Rezepte hinzu",
+      "title": "Zum Plan hinzufügen",
+      "close": "Schließen",
+      "back": "Zurück"
     },
     "resetPassword": {
       "unknownErrorSendingRequest": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es in ein paar Minuten noch einmal",
@@ -211,7 +215,23 @@
       "screenTitle": "Wochenplan",
       "currentWeek": "Aktuelle Woche",
       "nextWeek": "Nächste Woche",
-      "week": "Woche"
+      "week": "Woche",
+      "thisWeek": "Diese Woche",
+      "lastWeek": "Letzte Woche",
+      "weekNumber": "Woche {{number}}",
+      "previousWeek": "Vorherige Woche",
+      "today": "Heute",
+      "backToThisWeek": "Zurück zu dieser Woche",
+      "addMeal": "Essen hinzufügen",
+      "removeMeal": "Aus dem Plan entfernen",
+      "mealRemoved": "Aus dem Plan entfernt",
+      "noMealsPlanned": "Nichts geplant",
+      "mealsPlanned_one": "{{count}} Essen",
+      "mealsPlanned_other": "{{count}} Essen",
+      "print": "Diese Woche drucken",
+      "printFailed": "Drucken fehlgeschlagen",
+      "moveMealUp": "Nach oben",
+      "moveMealDown": "Nach unten"
     }
   }
 }

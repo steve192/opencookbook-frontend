@@ -38,10 +38,22 @@ export interface RecipeGroup {
 }
 
 export interface WeekplanDayRecipeInfo {
-    id: number | string;
+    // A meal that has not been sent to the server yet has neither an id nor an image
+    id?: number | string;
     title: string;
     type: 'SIMPLE_RECIPE' | 'NORMAL_RECIPE'
-    titleImageUuid: string;
+    titleImageUuid?: string;
+}
+
+/**
+ * What the weekplan endpoint accepts when a day is written back. It is a subset
+ * of what it returns: the title of a saved recipe is resolved server side, and
+ * only a spontaneous meal carries one of its own.
+ */
+export interface WeekplanDayRecipeRequest {
+    id?: number | string;
+    type: 'SIMPLE_RECIPE' | 'NORMAL_RECIPE'
+    title?: string;
 }
 export interface WeekplanDay {
     day: string,
@@ -73,7 +85,7 @@ class RestAPI {
     AppPersistence.storeUserInfoOffline(response.data);
     return response?.data;
   }
-  static async setWeekplanRecipes(date: string, recipes: WeekplanDayRecipeInfo[]): Promise<WeekplanDay> {
+  static async setWeekplanRecipes(date: string, recipes: WeekplanDayRecipeRequest[]): Promise<WeekplanDay> {
     const response = await this.put(`/weekplan/${date}`, {recipes: recipes});
     return response?.data;
   }

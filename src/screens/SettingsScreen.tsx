@@ -47,6 +47,9 @@ export const SettingsScreen = (props: Props) => {
     return props.navigation.addListener('focus', () => {
       props.navigation.getParent()?.setOptions({
         title: t('screens.settings.screenTitle'),
+        // Clearing both sides: the recipe list leaves a back action in the
+        // shared header when it is showing a group, and it belongs to that tab.
+        headerLeft: undefined,
         headerRight: undefined,
       });
     });

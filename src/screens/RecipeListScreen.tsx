@@ -7,8 +7,8 @@ import {Appbar, FAB, Surface} from 'react-native-paper';
 import {RecipeList} from '../components/RecipeList';
 import {Option, SelectionPopupModal} from '../components/SelectionPopupModal';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
-import {PromptUtil} from '../helper/Prompt';
 import {findRecipeGroupByOption, moveRecipesToGroup, toRecipeGroupOptions} from '../helper/recipeGroups';
+import {useOnlineGuard} from '../helper/useOnlineGuard';
 import {VibrationUtils} from '../helper/VibrationUtil';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
 import {updateRecipe} from '../redux/features/recipesSlice';
@@ -33,7 +33,7 @@ const RecipeListScreen = (props: Props) => {
 
   const dispatch = useAppDispatch();
 
-  const isOnline = useAppSelector((state) => state.settings.isOnline);
+  const requireOnline = useOnlineGuard();
 
 
   const allRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
@@ -177,8 +177,7 @@ const RecipeListScreen = (props: Props) => {
               icon: 'plus',
               label: t('screens.overview.addRecipe'),
               onPress: () => {
-                if (!isOnline) {
-                  PromptUtil.show({title: t('common.offline.notavailabletitle'), button1: t('common.ok'), message: t('common.offline.notavailable')});
+                if (!requireOnline()) {
                   return;
                 }
                 props.navigation.navigate('RecipeWizardScreen', {});
@@ -188,8 +187,7 @@ const RecipeListScreen = (props: Props) => {
               icon: 'group',
               label: t('screens.overview.addRecipeGroup'),
               onPress: () => {
-                if (!isOnline) {
-                  PromptUtil.show({title: t('common.offline.notavailabletitle'), button1: t('common.ok'), message: t('common.offline.notavailable')});
+                if (!requireOnline()) {
                   return;
                 }
                 props.navigation.navigate('RecipeGroupEditScreen', {editing: false});
@@ -199,8 +197,7 @@ const RecipeListScreen = (props: Props) => {
               icon: 'import',
               label: t('screens.overview.importRecipe'),
               onPress: () => {
-                if (!isOnline) {
-                  PromptUtil.show({title: t('common.offline.notavailabletitle'), button1: t('common.ok'), message: t('common.offline.notavailable')});
+                if (!requireOnline()) {
                   return;
                 }
                 props.navigation.navigate('ImportScreen', {});

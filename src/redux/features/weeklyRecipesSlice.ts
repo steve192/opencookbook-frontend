@@ -1,5 +1,17 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import RestAPI, {WeekplanDay} from '../../dao/RestAPI';
+import RestAPI, {WeekplanDay, WeekplanDayRecipeInfo, WeekplanDayRecipeRequest} from '../../dao/RestAPI';
+
+/**
+ * Reduces a stored meal to what the endpoint expects. A saved recipe is
+ * referenced by id alone, a spontaneous meal carries its own title.
+ *
+ * @param {WeekplanDayRecipeInfo} meal meal as it is held in the store
+ * @return {WeekplanDayRecipeRequest} the payload for the weekplan endpoint
+ */
+const toRequestMeal = (meal: WeekplanDayRecipeInfo): WeekplanDayRecipeRequest =>
+  meal.type === 'NORMAL_RECIPE' ?
+    {id: meal.id, type: meal.type} :
+    {id: meal.id, type: meal.type, title: meal.title};
 
 
 export interface WeeklyRecipesState {
@@ -21,15 +33,7 @@ export const updateSingleWeekplanDay = createAsyncThunk(
     async (weekplanDay: WeekplanDay, thunkAPI): Promise<WeekplanDay> => {
       return RestAPI.setWeekplanRecipes(
           weekplanDay.day,
-          // @ts-ignore Cannot be undefined
-          weekplanDay.recipes
-              .map((recipe) => {
-                if (recipe.type === 'NORMAL_RECIPE') {
-                  return {id: recipe.id, type: recipe.type};
-                } else if (recipe.type === 'SIMPLE_RECIPE') {
-                  return {id: recipe.id, type: recipe.type, title: recipe.title};
-                }
-              }));
+          weekplanDay.recipes.map(toRequestMeal));
     },
 );
 

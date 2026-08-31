@@ -128,7 +128,7 @@ export const RecipeImportBrowser = (props: Props) => {
       title: t('screens.importbrowser.success'),
       detail: t('screens.importbrowser.successdescription'),
       label: t('screens.importbrowser.openRecipe'),
-      color: theme.colors.primary,
+      color: theme.colors.primaryText,
     },
   };
   const presentation = statusPresentation[importStatus];

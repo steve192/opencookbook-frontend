@@ -2,7 +2,7 @@
   "weekdays": {
     "monday": "Monday",
     "tuesday": "Tuesday",
-    "wednesday": "Wdnesday",
+    "wednesday": "Wednesday",
     "thursday": "Thursday",
     "friday": "Friday",
     "saturday": "Saturday",
@@ -35,7 +35,8 @@
       "notavailabletitle": "Offline"
     },
     "appVersion": "Version {{version}}",
-    "appVersionWithBuild": "Version {{version}} (build {{build}})"
+    "appVersionWithBuild": "Version {{version}} (build {{build}})",
+    "undo": "Undo"
   },
   "navigation": {
     "screenTitleImportBrowser": "Recipe import browser",
@@ -81,7 +82,10 @@
       "simple": "Spontaneous meal",
       "simpledescription": "Add a spontaneous recipe for which you have not added a recipe yet",
       "normal": "Recipe",
-      "normaldescription": "Add one of your saved recipes"
+      "normaldescription": "Add one of your saved recipes",
+      "title": "Add to the plan",
+      "close": "Close",
+      "back": "Back"
     },
     "resetPassword": {
       "unknownErrorSendingRequest": "An unknown error occured. Please retry in a few minutes",
@@ -211,7 +215,23 @@
       "screenTitle": "Weekplan",
       "currentWeek": "Current week",
       "nextWeek": "Next week",
-      "week": "Week"
+      "week": "Week",
+      "thisWeek": "This week",
+      "lastWeek": "Last week",
+      "weekNumber": "Week {{number}}",
+      "previousWeek": "Previous week",
+      "today": "Today",
+      "backToThisWeek": "Back to this week",
+      "addMeal": "Add meal",
+      "removeMeal": "Remove from plan",
+      "mealRemoved": "Removed from the plan",
+      "noMealsPlanned": "Nothing planned",
+      "mealsPlanned_one": "{{count}} meal",
+      "mealsPlanned_other": "{{count}} meals",
+      "print": "Print this week",
+      "printFailed": "Printing failed",
+      "moveMealUp": "Move up",
+      "moveMealDown": "Move down"
     }
   }
 }
