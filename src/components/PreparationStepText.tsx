@@ -1,8 +1,8 @@
-import fuzzy from 'fuzzy';
-import React from 'react';
-import {StyleProp, TextStyle, View} from 'react-native';
+import React, {useMemo} from 'react';
+import {StyleProp, TextStyle} from 'react-native';
 import {Text} from 'react-native-paper';
 import {IngredientUse} from '../dao/RestAPI';
+import {matchIngredientsInStep, splitStepForHighlighting} from '../helper/ingredientMatching';
 import {useAppTheme} from '../styles/CentralStyles';
 
 interface Props {
@@ -10,38 +10,28 @@ interface Props {
     style: StyleProp<TextStyle>;
     ingredients: IngredientUse[];
 }
+
 export const PreparationStepText = (props: Props) => {
   const theme = useAppTheme();
 
-  const ingredientStyle: TextStyle = {
-    color: theme.colors.primary,
-    fontWeight: 'bold',
-  };
-
-  const isIngredient = (word: string) => {
-    const results = fuzzy.filter(word, props.ingredients, {
-      extract: (indgredient) => indgredient.ingredient.name,
-    });
-    if (results.length > 0 && results[0].score > 50) {
-      console.log(word, 'matches to', results[0].original.ingredient.name, 'score', results[0].score);
-      return true;
-    } else {
-      return false;
-    }
-  };
-
+  // One pass over the step, memoised. This used to fuzzy match every single word against
+  // every ingredient on every render, and log each hit to the console. It also rendered
+  // each word as its own Text inside a wrapping row, which broke text selection and left
+  // the line breaking to the layout engine rather than the text engine.
+  const parts = useMemo(() => {
+    const {highlights} = matchIngredientsInStep(props.value, props.ingredients);
+    return splitStepForHighlighting(props.value, highlights);
+  }, [props.value, props.ingredients]);
 
   return (
-    <View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
-      {props.value.split(' ').map((word, index) => (
-        // The words come from splitting one static string, so the index is a
-        // stable identity here; the word alone is not (it can repeat).
+    <Text style={props.style}>
+      {parts.map((part, index) => (
         <Text
-          key={`${index}-${word}`}
-          style={isIngredient(word) ? [props.style, ingredientStyle] : props.style}>
-          {word}{' '}
+          key={index}
+          style={part.highlighted ? {color: theme.colors.primaryText, fontWeight: 'bold'} : undefined}>
+          {part.text}
         </Text>
       ))}
-    </View>
+    </Text>
   );
 };

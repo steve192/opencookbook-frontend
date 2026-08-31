@@ -1,8 +1,7 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
-import {Divider, IconButton, Text} from 'react-native-paper';
-import Spacer from 'react-spacer';
+import {Divider, Icon, IconButton, Text, TouchableRipple} from 'react-native-paper';
 import {IngredientUse} from '../dao/RestAPI';
 import {useAppTheme} from '../styles/CentralStyles';
 
@@ -14,6 +13,15 @@ interface Props {
    enableServingScaling?: boolean
    onServingScaleChange?: (newServings: number) => void
    greyedOutStyle?: boolean
+   /** Which rows are ticked off, by index. Absent means the list is not checkable. */
+   checkedIngredients?: Set<number>
+   onIngredientToggle?: (index: number) => void
+   /**
+    * The index to identify each row by, when this list shows a subset of a longer one.
+    * Without it a subset would tick off rows by their position within the subset, and three
+    * lists side by side would all claim index 0. Defaults to the position in this list.
+    */
+   ingredientIndexes?: number[]
 }
 
 
@@ -36,58 +44,101 @@ export const IngredientList = (props: Props) => {
   const updateServings = (newServings:number) => {
     props.onServingScaleChange && props.onServingScaleChange(newServings);
   };
+  const renderRow = (ingredient: IngredientUse, position: number) => {
+    const index = props.ingredientIndexes?.[position] ?? position;
+    const checked = props.checkedIngredients?.has(index) ?? false;
+    const amountLabel = `${ingredient.amount && ingredient.amount > 0 ? scaleIngredient(ingredient.amount) : ''} ${ingredient.unit}`.trim();
+    const dimmed = props.greyedOutStyle || checked;
+
+    const row = (
+      <View style={styles.row}>
+        {props.onIngredientToggle &&
+          <Icon
+            source={checked ? 'checkbox-marked' : 'checkbox-blank-outline'}
+            size={20}
+            color={checked ? theme.colors.primary : theme.colors.onSurfaceVariant} />
+        }
+        <Text
+          style={[
+            styles.amount,
+            {color: dimmed ? theme.colors.onSurfaceDisabled : theme.colors.primaryText},
+            checked && styles.checkedOff,
+          ]}>
+          {amountLabel}
+        </Text>
+        <Text
+          style={[
+            styles.name,
+            {color: dimmed ? theme.colors.onSurfaceDisabled : theme.colors.onSurface},
+            checked && styles.checkedOff,
+          ]}>
+          {ingredient.ingredient.name}
+        </Text>
+      </View>
+    );
+
+    return (
+      <React.Fragment key={index}>
+        {position > 0 && <Divider />}
+        {props.onIngredientToggle ?
+          <TouchableRipple onPress={() => props.onIngredientToggle?.(index)}>{row}</TouchableRipple> :
+          row}
+      </React.Fragment>
+    );
+  };
+
   return (
     <>
-      {/* <View style={{ flexDirection: "row", flexWrap:"wrap", justifyContent: "space-evenly" }}> */}
-      <View style={{alignItems: 'center', justifyContent: 'center'}}>
-        {props.ingredients.map((ingredient, index) =>
-          <React.Fragment key={index}>
-            <Divider />
-            <View style={{flex: 1, alignSelf: 'stretch', flexDirection: 'row'}}>
-              <Text
-                style={{
-                  flex: 2,
-                  alignSelf: 'stretch',
-                  color: props.greyedOutStyle ? theme.colors.onSurfaceDisabled: theme.colors.primary,
-                  fontWeight: 'bold',
-                }}>{`${ingredient.amount && ingredient.amount > 0 ? scaleIngredient(ingredient.amount) : ''} ${ingredient.unit}`}
-              </Text>
-
-              <Text style={{flex: 4, alignSelf: 'stretch', color: props.greyedOutStyle ? theme.colors.onSurfaceDisabled : theme.colors.onSurface}} >{ingredient.ingredient.name}</Text>
-            </View>
-          </React.Fragment>,
-        )}
+      <View>
+        {props.ingredients.map(renderRow)}
       </View>
-      <Spacer height={20} />
       {props.enableServingScaling && <View style={styles.servingsContainer}>
         <IconButton
-          size={32}
+          size={28}
           animated
+          accessibilityLabel={t('screens.recipe.servings')}
           onPress={() => {
             if (props.scaledServings === 1) {
               return;
             }
-            updateServings(
-                props.scaledServings - 1);
+            updateServings(props.scaledServings - 1);
           }}
-          icon="minus-circle" />
-        <Text style={{paddingHorizontal: 20}}> {props.scaledServings} {t('screens.recipe.servings')}</Text>
+          icon="minus-circle-outline" />
+        <Text variant="titleSmall">{t('screens.recipe.servingsCount', {count: props.scaledServings})}</Text>
         <IconButton
-          size={32}
+          size={28}
           animated
+          accessibilityLabel={t('screens.recipe.servings')}
           onPress={() => updateServings(props.scaledServings + 1)}
-          icon="plus-circle" />
+          icon="plus-circle-outline" />
       </View>}
     </>
   );
 };
 
 const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 9,
+  },
+  amount: {
+    minWidth: 74,
+    fontWeight: 'bold',
+    fontVariant: ['tabular-nums'],
+  },
+  name: {
+    flex: 1,
+  },
+  checkedOff: {
+    textDecorationLine: 'line-through',
+  },
   servingsContainer: {
-
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
-
+    gap: 4,
+    paddingTop: 8,
   },
 });

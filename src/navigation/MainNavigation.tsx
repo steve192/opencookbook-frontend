@@ -33,6 +33,7 @@ import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
+import {navigationRef} from './navigationRef';
 import {
   BaseNavigatorProps,
   LoginNavigationProps,
@@ -41,7 +42,7 @@ import {
   RecipeScreenNavigation,
 } from './NavigationRoutes';
 
-// One typed navigator instance per stack — keeps the param-list -> screen-component
+// One typed navigator instance per stack - keeps the param-list -> screen-component
 // type relationships intact (createNativeStackNavigator<...> defaults to ParamListBase
 // which forces components to be FunctionComponent<{}>).
 const BaseStack = createNativeStackNavigator<BaseNavigatorProps>();
@@ -135,7 +136,7 @@ const BottomTabNavigation = () => {
         component={SettingsScreen}
         options={{
           title: t('screens.settings.screenTitle'),
-          tabBarIcon: tabBarIcon('cog-off-outline'),
+          tabBarIcon: tabBarIcon('cog-outline'),
         }} />
     </BottomTab.Navigator>
   );
@@ -299,6 +300,7 @@ const MainNavigation = () => {
     <>
       <StatusBar />
       <NavigationContainer
+        ref={navigationRef}
         // Without a formatter the browser tab falls back to the route name, which puts
         // technical screen names like "RecipeListDetailScreen" in front of the user
         // whenever a screen has no title of its own yet.

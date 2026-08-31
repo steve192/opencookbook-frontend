@@ -1,7 +1,7 @@
 import XDate from 'xdate';
 
 /** The format the weekplan API identifies a day with. */
-export const DAY_KEY_FORMAT = 'yyyy-MM-dd';
+const DAY_KEY_FORMAT = 'yyyy-MM-dd';
 
 /**
  * Monday 00:00 of the ISO week the given date falls into.
@@ -63,16 +63,6 @@ export const isoWeekNumber = (date: XDate): number => new XDate(date).getWeek();
  * @return {boolean} true when both are the same day
  */
 export const isSameDay = (a: XDate, b: XDate): boolean => toDayKey(a) === toDayKey(b);
-
-/**
- * Whole weeks from the week of one date to the week of another.
- *
- * @param {XDate} from week to count from
- * @param {XDate} to week to count to
- * @return {number} number of weeks, negative when `to` lies in the past
- */
-export const weekOffsetBetween = (from: XDate, to: XDate): number =>
-  Math.round(startOfWeek(from).diffDays(startOfWeek(to)) / 7);
 
 /**
  * The span of a week as one short, localised label, e.g. "31 - 6 Sep 2026".

@@ -1,4 +1,5 @@
-import {Recipe, WeekplanDay, WeekplanDayRecipeInfo} from '../dao/RestAPI';
+import {Recipe, WeekplanDay} from '../dao/RestAPI';
+import {moveItem} from './listOrder';
 
 /**
  * The plan of one day, as a value.
@@ -62,15 +63,8 @@ export const withMealRemoved = (day: WeekplanDay, index: number): WeekplanDay =>
  * @return {WeekplanDay} a new day in the new order, or the day unchanged
  */
 export const withMealMoved = (day: WeekplanDay, fromIndex: number, toIndex: number): WeekplanDay => {
-  const isOutside = (index: number) => index < 0 || index >= day.recipes.length;
-  if (fromIndex === toIndex || isOutside(fromIndex) || isOutside(toIndex)) {
-    return day;
-  }
-
-  const reordered: WeekplanDayRecipeInfo[] = [...day.recipes];
-  const [moved] = reordered.splice(fromIndex, 1);
-  reordered.splice(toIndex, 0, moved);
-  return {...day, recipes: reordered};
+  const reordered = moveItem(day.recipes, fromIndex, toIndex);
+  return reordered === day.recipes ? day : {...day, recipes: reordered};
 };
 
 /**

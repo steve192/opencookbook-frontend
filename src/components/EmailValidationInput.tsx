@@ -39,7 +39,7 @@ export const EmailValidationInput = forwardRef<RNTextInput, Props>((props, ref) 
       mode="flat"
       value={props.value}
       onChangeText={handleChange}
-      // Only surface the error state once the user has typed something — an
+      // Only surface the error state once the user has typed something - an
       // empty field on first render shouldn't look like a validation error.
       error={!isValid && props.value.length > 0}
       keyboardType="email-address"

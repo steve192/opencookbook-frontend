@@ -11,6 +11,7 @@ interface Props {
     onValueChanged?: (newValue: Option) => void,
     placeholder?: string,
     allowAdditionalValues?: boolean,
+    dense?: boolean,
     style?: StyleProp<ViewStyle>
 }
 
@@ -19,7 +20,7 @@ export const SelectionPopup = (props: Props) => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   // Paper TextInput's ref typing intersects RNTextInput & TextInputHandles, which is
-  // not satisfiable on its own — use the wider RNTextInput type Paper actually forwards to.
+  // not satisfiable on its own - use the wider RNTextInput type Paper actually forwards to.
   const textbox = useRef<RNTextInput>(null);
 
 
@@ -43,6 +44,7 @@ export const SelectionPopup = (props: Props) => {
           <TextInput
             ref={textbox}
             label={props.label}
+            dense={props.dense}
             mode="outlined"
             onFocus={() => {
               textbox.current?.blur();

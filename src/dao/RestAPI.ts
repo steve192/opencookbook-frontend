@@ -19,6 +19,8 @@ export interface IngredientUse {
 export interface RecipeImage {
     uuid: string
 }
+export type RecipeDiet = 'VEGAN' | 'VEGETARIAN' | 'MEAT';
+
 export interface Recipe {
     id?: number
     title: string;
@@ -29,6 +31,12 @@ export interface Recipe {
     recipeGroups: RecipeGroup[];
     type: 'Recipe'
     recipeSource?: string;
+    // The server stores these and accepts them back on every write. Leaving them off the
+    // client type meant the app sent null for all three, so saving a recipe erased the
+    // times an import had found for it.
+    preparationTime?: number | null;
+    totalTime?: number | null;
+    recipeType?: RecipeDiet | null;
 }
 
 export interface RecipeGroup {
@@ -361,7 +369,9 @@ class RestAPI {
     const token = await AppPersistence.getAuthToken();
     return {'Authorization': 'Bearer ' + token};
   }
-  static async getIngredients(filter: string = ''): Promise<Ingredient[]> {
+  // The endpoint returns everything the user has; the selection popup filters client side.
+  // It takes no query, so callers fetch this once rather than per keystroke.
+  static async getIngredients(): Promise<Ingredient[]> {
     const response = await this.get('/ingredients');
     return response?.data;
   }

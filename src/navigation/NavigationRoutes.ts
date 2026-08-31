@@ -5,7 +5,10 @@ export type BaseNavigatorProps = {
     AccountActivationScreen: { activationId: string}
     PasswordResetScreen: { id: string}
     TermsOfServiceScreen: undefined
-    default: undefined
+    // Holds the login stack until somebody is signed in and the main one afterwards. Typed
+    // as the main one so that reaching a screen from outside the app - from a notification,
+    // say - is checked rather than cast away.
+    default: NavigatorScreenParams<MainNavigationProps> | undefined
 }
 export type LoginNavigationProps = {
     LoginScreen: undefined
@@ -19,7 +22,7 @@ export type MainNavigationProps = {
     RecipeScreen: { recipeId: number }
     ImportScreen: { importUrl?: string },
     RecipeGroupEditScreen: { recipeGroupId?: number, editing: boolean}
-    GuidedCookingScreen: { recipe: Recipe, scaledServings: number }
+    GuidedCookingScreen: { recipe: Recipe, scaledServings: number, initialStep?: number }
 };
 
 export type OverviewNavigationProps = {

@@ -3,6 +3,7 @@ import authSlice from './features/authSlice';
 import imagesSlice from './features/imagesSlice';
 import recipesSlice from './features/recipesSlice';
 import settingsSlice from './features/settingsSlice';
+import timersSlice from './features/timersSlice';
 import weeklyRecipesSlice from './features/weeklyRecipesSlice';
 
 export const store = configureStore({
@@ -12,6 +13,7 @@ export const store = configureStore({
     weeklyRecipes: weeklyRecipesSlice,
     recipes: recipesSlice,
     images: imagesSlice,
+    timers: timersSlice,
   },
 });
 

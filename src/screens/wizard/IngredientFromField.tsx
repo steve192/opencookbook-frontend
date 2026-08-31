@@ -1,22 +1,28 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {View} from 'react-native';
-import {IconButton, TextInput} from 'react-native-paper';
-import Spacer from 'react-spacer';
+import {StyleSheet, View} from 'react-native';
+import {TextInput} from 'react-native-paper';
+import {Option} from '../../components/SelectionPopupModal';
 import {SelectionPopup} from '../../components/SelectionPopup';
-import RestAPI, {Ingredient, IngredientUse} from '../../dao/RestAPI';
-import {useAppTheme} from '../../styles/CentralStyles';
+import {Ingredient, IngredientUse} from '../../dao/RestAPI';
+import {RowActions} from './RowActions';
 
 
 interface Props {
     ingredient: IngredientUse
     ingredientIndex: number
+    /** Built once by the screen: these lists are the same for every row */
+    ingredientOptions: Option[]
+    unitOptions: Option[]
+    resolveIngredient: (name: string) => Ingredient | undefined
+    canMoveUp: boolean
+    canMoveDown: boolean
     onIngredientChange: (newIngredient: IngredientUse, ingredientIndex: number) => void
+    onMove: (fromIndex: number, toIndex: number) => void
     onRemovePress: (ingredientIndex: number) => void
 }
 
 export const IngredientFormField = React.memo(function IngredientFormField(props: Props) {
-  const theme = useAppTheme();
   const [ingredientQuery, setIngredientQuery] = useState<string>(props.ingredient.ingredient.name);
   const [unit, setUnit] = useState<string>(props.ingredient.unit);
   const [amount, setAmount] = useState<string>(props.ingredient.amount === undefined || props.ingredient.amount === null ? '' : String(props.ingredient.amount));
@@ -27,10 +33,6 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
     setAmount(props.ingredient.amount === undefined || props.ingredient.amount === null ? '' : String(props.ingredient.amount));
   }, [props.ingredient]);
 
-  const [availableUnits, setAvailableUnits] = useState<string[]>([]);
-
-  const [availableIngredients, setAvailableIngredients] = useState<Ingredient[]>([]);
-
   const {t} = useTranslation('translation');
 
   const setIngredient = (text: string) => {
@@ -39,7 +41,7 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
   };
 
   const invokeIngredientUpdate = (ingredientName: string, newAmount: string, newUnit: string) => {
-    const existingIngredient = availableIngredients.find((ingredient) => ingredient.name.toLowerCase() === ingredientName.toLowerCase());
+    const existingIngredient = props.resolveIngredient(ingredientName);
 
     let prasedAmount: number | null = parseFloat(newAmount);
     // Check if its a number
@@ -52,17 +54,6 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
     } else {
       props.onIngredientChange({ingredient: {name: ingredientName}, amount: prasedAmount, unit: newUnit}, props.ingredientIndex);
     }
-  };
-
-
-  const queryIngredients = () => {
-    RestAPI.getIngredients(ingredientQuery)
-        .then((ingredients) => {
-          setAvailableIngredients(
-              ingredients,
-              // ingredients.filter(item => item.name.toLowerCase().includes(ingredientQuery.toLowerCase()))
-          );
-        });
   };
 
   const onUnitChange = (newUnit: string) => {
@@ -81,50 +72,67 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
     }
   };
 
-
-  useEffect(queryIngredients, [ingredientQuery]);
-  useEffect(() => {
-    RestAPI.getUnits().then((units) => {
-      setAvailableUnits(units);
-    });
-  }, []);
-
   return (
-    <View style={{borderWidth: 1, borderColor: theme.colors.outline, padding: 10, borderRadius: 16}}>
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <View style={{flex: 1, flexDirection: 'column'}}>
-          <View style={{flex: 1, flexDirection: 'row'}}>
-            <TextInput
-              mode="outlined"
-              style={{width: 100}}
-              keyboardType="numeric"
-              value={(amount !== undefined ? amount.toString() : '')}
-              label={t('screens.editRecipe.amount')}
-              onChangeText={onAmountChange} />
-            <Spacer width={5} />
-            <SelectionPopup
-              style={{flex: 1}}
-              label={t('screens.editRecipe.unit')}
-              value={unit}
-              options={availableUnits.map((availableUnit, index) => ({key: index.toString(), value: availableUnit}))}
-              onValueChanged={(selectedOption) => onUnitChange(selectedOption.value)}
-            />
-          </View>
-          <Spacer height={5} />
-          <View style={{justifyContent: 'center', flex: 1}}>
-            <SelectionPopup
-              label={t('screens.editRecipe.ingredient')}
-              value={ingredientQuery}
-              options={availableIngredients.map((ingredient) => ({key: ingredient.id ? ingredient.id.toString() : '', value: ingredient.name}))}
-              onValueChanged={(selectedOption) => setIngredient(selectedOption.value)}
-              allowAdditionalValues={true}
-            />
-          </View>
+    <View style={styles.row}>
+      <View style={styles.fields}>
+        <View style={styles.amountRow}>
+          <TextInput
+            mode="outlined"
+            dense={true}
+            style={styles.amount}
+            keyboardType="numeric"
+            value={amount}
+            label={t('screens.editRecipe.amount')}
+            onChangeText={onAmountChange} />
+          <SelectionPopup
+            style={styles.unit}
+            dense={true}
+            label={t('screens.editRecipe.unit')}
+            value={unit}
+            options={props.unitOptions}
+            onValueChanged={(selectedOption) => onUnitChange(selectedOption.value)}
+          />
         </View>
-        <IconButton
-          icon="delete-outline"
-          onPress={() => props.onRemovePress(props.ingredientIndex)} />
+        <SelectionPopup
+          dense={true}
+          label={t('screens.editRecipe.ingredient')}
+          value={ingredientQuery}
+          options={props.ingredientOptions}
+          onValueChanged={(selectedOption) => setIngredient(selectedOption.value)}
+          allowAdditionalValues={true}
+        />
       </View>
+      <RowActions
+        canMoveUp={props.canMoveUp}
+        canMoveDown={props.canMoveDown}
+        removeLabel={t('screens.editRecipe.removeIngredient')}
+        onMoveUp={() => props.onMove(props.ingredientIndex, props.ingredientIndex - 1)}
+        onMoveDown={() => props.onMove(props.ingredientIndex, props.ingredientIndex + 1)}
+        onRemove={() => props.onRemovePress(props.ingredientIndex)} />
     </View>
   );
+});
+
+const styles = StyleSheet.create({
+  // No card border and no inner padding any more: the row used to cost about 140px of a
+  // phone screen, which made a fifteen ingredient recipe a very long scroll.
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  fields: {
+    flex: 1,
+    gap: 4,
+  },
+  amountRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  amount: {
+    width: 84,
+  },
+  unit: {
+    flex: 1,
+  },
 });

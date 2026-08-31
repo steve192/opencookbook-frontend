@@ -11,7 +11,6 @@ import {
   startOfWeek,
   toDayKey,
   weekDays,
-  weekOffsetBetween,
 } from './weekplan';
 
 const at = (isoDate: string) => new XDate(isoDate + 'T12:00:00');
@@ -99,25 +98,6 @@ describe('weekplan dates', () => {
     // 2027-01-01 is a Friday, so that week belongs to 2026 and is week 53.
     it('keeps early January in the previous years last week', () => {
       expect(isoWeekNumber(at('2027-01-01'))).toBe(53);
-    });
-  });
-
-  describe('weekOffsetBetween', () => {
-    it('is zero within the same week', () => {
-      expect(weekOffsetBetween(at('2026-08-31'), at('2026-09-06'))).toBe(0);
-    });
-
-    it('counts weeks forward', () => {
-      expect(weekOffsetBetween(at('2026-08-31'), at('2026-09-14'))).toBe(2);
-    });
-
-    it('counts weeks backward as negative', () => {
-      expect(weekOffsetBetween(at('2026-08-31'), at('2026-08-17'))).toBe(-2);
-    });
-
-    // A single day apart still counts as a full week when it crosses Monday.
-    it('counts a Sunday to Monday step as one week', () => {
-      expect(weekOffsetBetween(at('2026-09-06'), at('2026-09-07'))).toBe(1);
     });
   });
 

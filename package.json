@@ -4,7 +4,7 @@
   "scripts": {
     "start": "expo start --tunnel",
     "android": "expo start --tunnel --android",
-    "ios": "expo start --ios",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "eject": "expo prebuild",
     "build-web": "expo export --platform web && workbox generateSW workbox-config.js",
@@ -48,6 +48,7 @@
     "expo-linear-gradient": "~57.0.1",
     "expo-linking": "~57.0.8",
     "expo-localization": "~57.0.1",
+    "expo-notifications": "~57.0.15",
     "expo-print": "~57.0.1",
     "expo-secure-store": "~57.0.2",
     "expo-splash-screen": "~57.0.8",
@@ -60,6 +61,7 @@
     "react-i18next": "^17.0.12",
     "react-icons": "^4.3.1",
     "react-native": "0.86.3",
+    "react-native-alarm-scheduler": "^0.3.0",
     "react-native-cache": "^2.0.2",
     "react-native-gesture-handler": "~2.32.0",
     "react-native-keyboard-controller": "1.21.9",
@@ -111,5 +113,6 @@
       "@react-native-async-storage/async-storage": "$@react-native-async-storage/async-storage"
     }
   },
-  "private": true
+  "private": true,
+  "name": "opencookbook-frontend"
 }

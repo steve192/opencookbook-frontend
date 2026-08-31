@@ -5,6 +5,8 @@ import {Provider as PaperProvider, Snackbar} from 'react-native-paper';
 import {enableScreens} from 'react-native-screens';
 import {Provider, useSelector} from 'react-redux';
 import {Prompt} from './src/helper/Prompt';
+import {CookingTimerWatcher} from './src/components/CookingTimerWatcher';
+import {TimerNotificationOpener} from './src/components/TimerNotificationOpener';
 import {GlobalSnackbar} from './src/helper/GlobalSnackbar';
 import './src/i18n/config';
 import MainNavigation from './src/navigation/MainNavigation';
@@ -43,6 +45,10 @@ const ReduxWrappedApp = () => {
       <MainNavigation />
       <Prompt/>
       <GlobalSnackbar />
+      {/* Cooking timers announce themselves from anywhere in the app, not just from the
+          step that started them, and tapping one goes back to the step it came from */}
+      <CookingTimerWatcher />
+      <TimerNotificationOpener />
     </PaperProvider>
   );
 };
