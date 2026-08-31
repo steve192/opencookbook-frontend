@@ -32,7 +32,7 @@ export const emptyRecipe = (): Recipe => ({
  * @return {number | undefined} the number, or undefined to clear the field
  */
 export const parseOptionalNumber = (text: string): number | undefined => {
-  const parsed = parseInt(text, 10);
+  const parsed = Number.parseInt(text, 10);
   return Number.isNaN(parsed) ? undefined : parsed;
 };
 

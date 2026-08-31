@@ -189,7 +189,7 @@ export const GuidedCookingScreen = (props: Props) => {
       <ViewPager
         selectedIndex={currentStep}
         onIndexChange={setCurrentStep}>
-        {steps.map(renderStepPage)}
+        {steps.map((step, stepIndex) => renderStepPage(step, stepIndex))}
       </ViewPager>
 
       <Divider />

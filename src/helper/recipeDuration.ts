@@ -25,12 +25,23 @@ export interface StepDuration {
   seconds: number;
 }
 
+/** What a unit is worth in seconds, by the ways a recipe writes it. */
+const UNIT_SECONDS: Record<string, number> = {
+  h: 3600, hr: 3600, hrs: 3600, hour: 3600, hours: 3600,
+  std: 3600, stunde: 3600, stunden: 3600,
+  m: 60, min: 60, mins: 60, minute: 60, minutes: 60, minuten: 60,
+  s: 1, sec: 1, secs: 1, second: 1, seconds: 1, sekunde: 1, sekunden: 1,
+};
+
 /**
- * Alternatives are longest first: "minute" would otherwise match inside "minutes" and then
- * fail the word boundary that follows, taking the whole match down with it.
+ * A number, optionally a range, then a word.
+ *
+ * Whether the word is a unit is decided in code rather than spelled out as an alternation
+ * of every spelling. That keeps the pattern simple enough to reason about - it runs over
+ * imported recipe text, which is as long and as odd as the site it came from - and puts the
+ * vocabulary somewhere it can be read and extended.
  */
-const DURATION_PATTERN =
-  /(\d+(?:[.,]\d+)?)\s*(?:(?:-|–|-|bis|to)\s*\d+(?:[.,]\d+)?\s*)?(stunden|stunde|hours|hour|std|hrs|hr|h|minuten|minutes|minute|mins|min|m|sekunden|sekunde|seconds|second|secs|sec|s)\b/gi;
+const DURATION_PATTERN = /(\d+(?:[.,]\d+)?)(?:\s*(?:[-–—]|bis|to)\s*\d+(?:[.,]\d+)?)?\s*([a-zA-Z]+)\b/g;
 
 /** Anything shorter than this is not worth a timer. */
 const SHORTEST_TIMER_SECONDS = 60;
@@ -42,19 +53,15 @@ const SHORTEST_TIMER_SECONDS = 60;
  * instead of being rounded up to two minutes.
  *
  * @param {string} amount the number as it was written
- * @param {string} unit the unit as it was written
- * @return {number} the duration in seconds
+ * @param {string} unit the word that followed it
+ * @return {number | undefined} the duration in seconds, or undefined if that was not a unit
  */
-const toSeconds = (amount: string, unit: string): number => {
-  const value = parseFloat(amount.replace(',', '.'));
-  const normalizedUnit = unit.toLowerCase();
-  if (normalizedUnit.startsWith('h') || normalizedUnit.startsWith('st')) {
-    return Math.round(value * MINUTES_PER_HOUR * 60);
+const toSeconds = (amount: string, unit: string): number | undefined => {
+  const secondsPerUnit = UNIT_SECONDS[unit.toLowerCase()];
+  if (secondsPerUnit === undefined) {
+    return undefined;
   }
-  if (normalizedUnit.startsWith('s')) {
-    return Math.round(value);
-  }
-  return Math.round(value * 60);
+  return Math.round(Number.parseFloat(amount.replace(',', '.')) * secondsPerUnit);
 };
 
 /**
@@ -72,7 +79,7 @@ export const findStepDurations = (step: string): StepDuration[] => {
 
   for (const match of step.matchAll(DURATION_PATTERN)) {
     const seconds = toSeconds(match[1], match[2]);
-    if (seconds < SHORTEST_TIMER_SECONDS || seen.has(seconds)) {
+    if (seconds === undefined || seconds < SHORTEST_TIMER_SECONDS || seen.has(seconds)) {
       continue;
     }
     seen.add(seconds);

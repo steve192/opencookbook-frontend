@@ -105,6 +105,19 @@ const RecipeWizardScreen = (props: Props) => {
       [edit],
   );
 
+  const changeStep = useCallback(
+      (index: number, text: string) => edit((recipe) => withStepChanged(recipe, index, text)),
+      [edit],
+  );
+  const removeStep = useCallback(
+      (index: number) => edit((recipe) => withStepRemoved(recipe, index)),
+      [edit],
+  );
+  const moveStep = useCallback(
+      (fromIndex: number, toIndex: number) => edit((recipe) => withStepMoved(recipe, fromIndex, toIndex)),
+      [edit],
+  );
+
   const saveRecipe = () => {
     if (savePending) return;
     setSavePending(true);
@@ -240,10 +253,10 @@ const RecipeWizardScreen = (props: Props) => {
           value={preparationStep}
           canMoveUp={preparationStepIndex > 0}
           canMoveDown={preparationStepIndex < recipeData.preparationSteps.length - 1}
-          onMoveUp={() => edit((recipe) => withStepMoved(recipe, preparationStepIndex, preparationStepIndex - 1))}
-          onMoveDown={() => edit((recipe) => withStepMoved(recipe, preparationStepIndex, preparationStepIndex + 1))}
-          onRemovePress={() => edit((recipe) => withStepRemoved(recipe, preparationStepIndex))}
-          onChangeText={(newText: string) => edit((recipe) => withStepChanged(recipe, preparationStepIndex, newText))}
+          onMoveUp={() => moveStep(preparationStepIndex, preparationStepIndex - 1)}
+          onMoveDown={() => moveStep(preparationStepIndex, preparationStepIndex + 1)}
+          onRemovePress={() => removeStep(preparationStepIndex)}
+          onChangeText={(newText: string) => changeStep(preparationStepIndex, newText)}
           placeholder={t('screens.editRecipe.preparationStepPlaceholder')} />
       ))}
       <Button icon="plus" onPress={() => edit(withStepAdded)}>{t('screens.editRecipe.addStep')}</Button>

@@ -133,15 +133,18 @@ const MAX_SUFFIX_AFTER_SLASH = 3;
  * @return {string[]} every spelling that should count, without duplicates
  */
 export const ingredientNameForms = (name: string): string[] => {
-  // " (gemahlen)" describes the ingredient rather than spelling it
-  const withoutAside = name.replace(/\s+\([^)]*\)/g, '').trim();
+  // " (gemahlen)" describes the ingredient rather than spelling it. One space rather than
+  // a run of them: whatever is left over is trimmed, and a repeated quantifier in front of
+  // the bracket is what makes this kind of pattern scan badly.
+  const withoutAside = name.replace(/\s\([^)]*\)/g, '').trim();
 
-  // "Ei(er)" attaches straight to the word, and stands for both ways of writing it
-  const attachedEnding = /^(.*?)([\p{L}\p{N}]+)\(([^)]+)\)(.*)$/u.exec(withoutAside);
+  // "Ei(er)" attaches straight to the word, and stands for both ways of writing it. The
+  // leading part cannot cross a bracket, so there is only one way to read this.
+  const attachedEnding = /^([^(]*[\p{L}\p{N}])\(([^)]+)\)(.*)$/u.exec(withoutAside);
   const spellings = attachedEnding ?
     [
-      `${attachedEnding[1]}${attachedEnding[2]}${attachedEnding[4]}`,
-      `${attachedEnding[1]}${attachedEnding[2]}${attachedEnding[3]}${attachedEnding[4]}`,
+      `${attachedEnding[1]}${attachedEnding[3]}`,
+      `${attachedEnding[1]}${attachedEnding[2]}${attachedEnding[3]}`,
     ] :
     [withoutAside];
 
@@ -197,30 +200,41 @@ export const matchIngredientsInStep = (
   const usedIngredientIndexes: number[] = [];
   const highlightedTokens = new Set<Token>();
 
-  ingredients.forEach((ingredient, index) => {
-    let found = false;
-
-    // Any one of the ways the ingredient may be written is enough
-    ingredientNameForms(ingredient.ingredient.name).forEach((form) => {
-      const words = significantWords(form);
-      if (words.length === 0) {
-        return;
-      }
-
-      // Every carrying word of that form has to appear somewhere in the step
-      const matchesPerWord = words.map((word) =>
-        stepTokens.filter((token) => wordsMatch(token.text, word)));
-      if (matchesPerWord.some((matches) => matches.length === 0)) {
-        return;
-      }
-
-      found = true;
-      matchesPerWord.forEach((matches) => matches.forEach((token) => highlightedTokens.add(token)));
-    });
-
-    if (found) {
-      usedIngredientIndexes.push(index);
+  /**
+   * The words of the step that spell out one way of writing an ingredient.
+   *
+   * @param {string} form one spelling of an ingredient name
+   * @return {Token[] | undefined} the words naming it, or undefined if it is not all there
+   */
+  const tokensNaming = (form: string): Token[] | undefined => {
+    const words = significantWords(form);
+    if (words.length === 0) {
+      return undefined;
     }
+
+    const found: Token[] = [];
+    for (const word of words) {
+      const matches = stepTokens.filter((token) => wordsMatch(token.text, word));
+      // Every carrying word of that form has to appear somewhere in the step
+      if (matches.length === 0) {
+        return undefined;
+      }
+      found.push(...matches);
+    }
+    return found;
+  };
+
+  ingredients.forEach((ingredient, index) => {
+    // Any one of the ways the ingredient may be written is enough
+    const naming = ingredientNameForms(ingredient.ingredient.name)
+        .map(tokensNaming)
+        .filter((tokens): tokens is Token[] => tokens !== undefined);
+
+    if (naming.length === 0) {
+      return;
+    }
+    usedIngredientIndexes.push(index);
+    naming.flat().forEach((token) => highlightedTokens.add(token));
   });
 
   const highlights = stepTokens

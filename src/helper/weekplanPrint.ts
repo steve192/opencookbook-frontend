@@ -21,11 +21,11 @@ export interface PrintableWeekplan {
  */
 const escapeHtml = (value: string): string =>
   value
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll('\'', '&#39;');
 
 /**
  * Renders the meals of one day, or the empty notice.
@@ -38,7 +38,8 @@ const renderMeals = (day: PrintableWeekplanDay, emptyLabel: string): string => {
   if (day.meals.length === 0) {
     return `<p class="empty">${escapeHtml(emptyLabel)}</p>`;
   }
-  return `<ul>${day.meals.map((meal) => `<li>${escapeHtml(meal)}</li>`).join('')}</ul>`;
+  const items = day.meals.map((meal) => `<li>${escapeHtml(meal)}</li>`).join('');
+  return `<ul>${items}</ul>`;
 };
 
 /**

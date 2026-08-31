@@ -147,7 +147,7 @@ const RecipeListScreen = (props: Props) => {
           shownRecipeGroupId={(() => {
             const raw = props.route.params?.shownRecipeGroupId;
             if (raw == null) return undefined;
-            return typeof raw === 'string' ? parseInt(raw, 10) : raw;
+            return typeof raw === 'string' ? Number.parseInt(raw, 10) : raw;
           })()}
           onRecipeClick={openRecipe}
           onRecipeGroupClick={openRecipeGroup}

@@ -90,7 +90,7 @@ export const IngredientList = (props: Props) => {
   return (
     <>
       <View>
-        {props.ingredients.map(renderRow)}
+        {props.ingredients.map((ingredient, position) => renderRow(ingredient, position))}
       </View>
       {props.enableServingScaling && <View style={styles.servingsContainer}>
         <IconButton
