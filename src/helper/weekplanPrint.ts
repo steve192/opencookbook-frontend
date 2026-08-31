@@ -65,8 +65,11 @@ export const buildWeekplanPrintHtml = (weekplan: PrintableWeekplan): string => `
   body {
     font-family: Helvetica, Arial, sans-serif;
     color: #111;
-    /* The frame the web build prints from has no page size of its own */
-    width: 182mm;
+    /* Android takes the page size from its own print dialog rather than from @page,
+       so the sheet fills whatever page it is given and only caps at the printable
+       width of an A4 page, which is what the web build lays out in. */
+    width: 100%;
+    max-width: 182mm;
     margin: 0 auto;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;

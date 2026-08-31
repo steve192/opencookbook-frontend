@@ -83,8 +83,20 @@ describe('page setup', () => {
     expect(buildWeekplanPrintHtml(weekplan())).toContain('size: A4 portrait');
   });
 
-  it('constrains the body to the printable width of that page', () => {
+  it('caps the body at the printable width of that page', () => {
     // 210mm wide minus the 14mm margins on both sides
-    expect(buildWeekplanPrintHtml(weekplan())).toContain('width: 182mm');
+    expect(buildWeekplanPrintHtml(weekplan())).toContain('max-width: 182mm');
+  });
+
+  // Android sizes the page from its own print dialog, so the sheet has to fill
+  // whatever it is handed rather than assume A4.
+  it('lets the sheet fill a page of another size', () => {
+    expect(buildWeekplanPrintHtml(weekplan())).toContain('width: 100%');
+  });
+
+  // Android WebView drops background colours when printing unless asked otherwise,
+  // which would lose the band behind every weekday.
+  it('keeps background colours when printing', () => {
+    expect(buildWeekplanPrintHtml(weekplan())).toContain('print-color-adjust: exact');
   });
 });
