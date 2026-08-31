@@ -171,7 +171,12 @@ export const RecipeList = (props: Props) => {
             {recipeGroup.title}
           </Headline>
           {groupRecipes.length > 0 &&
-            <Badge style={styles.groupCountBadge}>{groupRecipes.length}</Badge>
+            <Badge
+              // Paper defaults badges to the error color, which reads as a warning on a
+              // plain "how many recipes are in here" counter. Force the app accent instead.
+              style={[styles.groupCountBadge, {backgroundColor: theme.colors.primary, color: theme.colors.onPrimary}]}>
+              {groupRecipes.length}
+            </Badge>
           }
         </View>
       </Pressable>
