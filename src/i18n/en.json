@@ -67,7 +67,13 @@
       "faileddescription": "This recipe site is not supported yet or you are not on a recipe",
       "success": "Imported successfully",
       "successdescription": "You can find this recipe in your recipes now",
-      "pending": "Import pending..."
+      "pending": "Import pending...",
+      "hint": "Open a recipe, then tap import",
+      "back": "Back",
+      "forward": "Forward",
+      "reload": "Reload",
+      "openRecipe": "Open recipe",
+      "retry": "Try again"
     },
     "recipeselectionpopup": {
       "simplerecipeinput": "What's for dinner?",
@@ -146,7 +152,17 @@
       "supportedServices": "Supported services",
       "importSuccess": "Import successful",
       "importFailed": "Import failed",
-      "startRecipeBrowser": "Search recipes on the web"
+      "startRecipeBrowser": "Search recipes on the web",
+      "title": "Import from a recipe link",
+      "description": "Paste the link of an online recipe. Ingredients, steps and pictures are taken over automatically.",
+      "importing": "Importing recipe…",
+      "invalidUrl": "That does not look like a link. Paste a full address starting with https://",
+      "openRecipe": "Open recipe",
+      "importAnother": "Import another one",
+      "browserTitle": "No link at hand?",
+      "browserDescription": "Browse recipe sites right here and import the recipe you are looking at.",
+      "clearInput": "Clear",
+      "supportedServicesDescription": "These sites import reliably. Other sites often work too - just give it a try."
     },
     "editRecipe": {
       "screenTitleEdit": "Edit recipe",

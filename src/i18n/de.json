@@ -67,7 +67,13 @@
       "faileddescription": "Die Seite wird leider noch noch unterstüzt oder du befindest dich nicht auf einem Rezept",
       "success": "Das Rezept wurde erfolgreich importiert",
       "successdescription": "Du findest es nun unter deinen gespeicherten Rezepten",
-      "pending": "Import läuft..."
+      "pending": "Import läuft...",
+      "hint": "Öffne ein Rezept und tippe dann auf Importieren",
+      "back": "Zurück",
+      "forward": "Vorwärts",
+      "reload": "Neu laden",
+      "openRecipe": "Rezept öffnen",
+      "retry": "Erneut versuchen"
     },
     "recipeselectionpopup": {
       "simplerecipeinput": "Was gibt es zu essen?",
@@ -146,7 +152,17 @@
       "supportedServices": "Unterstützte Dienste",
       "importSuccess": "Import erfolgreich",
       "importFailed": "Import fehlgeschlagen",
-      "startRecipeBrowser": "Rezepte im Web suchen"
+      "startRecipeBrowser": "Rezepte im Web suchen",
+      "title": "Aus einem Rezept-Link importieren",
+      "description": "Füge den Link eines Online-Rezepts ein. Zutaten, Schritte und Bilder werden automatisch übernommen.",
+      "importing": "Rezept wird importiert…",
+      "invalidUrl": "Das sieht nicht nach einem Link aus. Füge eine vollständige Adresse ein, die mit https:// beginnt",
+      "openRecipe": "Rezept öffnen",
+      "importAnother": "Noch eins importieren",
+      "browserTitle": "Kein Link zur Hand?",
+      "browserDescription": "Durchsuche Rezeptseiten direkt hier und importiere das Rezept, das du gerade ansiehst.",
+      "clearInput": "Leeren",
+      "supportedServicesDescription": "Diese Seiten werden zuverlässig importiert. Andere Seiten funktionieren oft ebenfalls - probiere es einfach aus."
     },
     "editRecipe": {
       "screenTitleEdit": "Rezept bearbeiten",
