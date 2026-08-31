@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Dialog, MD3Theme, Paragraph, withTheme} from 'react-native-paper';
+import {Button, Dialog, MD3Theme, Paragraph, Portal, withTheme} from 'react-native-paper';
 import CentralStyles from '../styles/CentralStyles';
 
 interface Options {
@@ -43,23 +43,30 @@ class PromptWithoutStyles extends React.Component<Props, State> {
   }
 
   renderPrompt() {
-    return <Dialog style={[CentralStyles.contentContainer, {width: '90%', paddingBottom: 0}]} visible={this.state.shown} onDismiss={() => this.setState({shown: false})}>
-      <Dialog.Title>{this.state.title}</Dialog.Title>
-      <Dialog.Content>
-        <Paragraph>{this.state.message}</Paragraph>
-      </Dialog.Content>
-      <Dialog.Actions>
-        {this.state.button1 !== undefined && <Button textColor={this.props.theme.colors.onPrimary} buttonColor={this.props.theme.colors.error} onPress={() => {
-          this.state.button1Callback?.();
-          this.setState({shown: false});
-        } }>{this.state.button1}</Button>}
+    // Like Modal, a Paper Dialog only renders above the rest of the app from inside a
+    // Portal. This one happens to sit at the root today, but it is shown from any screen.
+    return <Portal>
+      <Dialog
+        style={[CentralStyles.contentContainer, {width: '90%', paddingBottom: 0}]}
+        visible={this.state.shown}
+        onDismiss={() => this.setState({shown: false})}>
+        <Dialog.Title>{this.state.title}</Dialog.Title>
+        <Dialog.Content>
+          <Paragraph>{this.state.message}</Paragraph>
+        </Dialog.Content>
+        <Dialog.Actions>
+          {this.state.button1 !== undefined && <Button textColor={this.props.theme.colors.onPrimary} buttonColor={this.props.theme.colors.error} onPress={() => {
+            this.state.button1Callback?.();
+            this.setState({shown: false});
+          } }>{this.state.button1}</Button>}
 
-        { this.state.button2 !== undefined && <Button mode='outlined' onPress={() => {
-          this.state.button2Callback?.();
-          this.setState({shown: false});
-        } }>{this.state.button2}</Button> }
-      </Dialog.Actions>
-    </Dialog>;
+          { this.state.button2 !== undefined && <Button mode='outlined' onPress={() => {
+            this.state.button2Callback?.();
+            this.setState({shown: false});
+          } }>{this.state.button2}</Button> }
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>;
   }
 
   componentDidMount() {

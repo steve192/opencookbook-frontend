@@ -3,7 +3,7 @@ import {AxiosError} from 'axios';
 import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, TextInput as RNTextInput, View} from 'react-native';
-import {Button, Card, IconButton, Modal, Text, TextInput} from 'react-native-paper';
+import {Button, Card, IconButton, Modal, Portal, Text, TextInput} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
 import Spacer from 'react-spacer';
 import AppPersistence from '../../AppPersistence';
@@ -70,21 +70,28 @@ const LoginScreen = ({route, navigation}: Props) => {
   };
 
   const settingsModal = (
-    <Modal
-      style={[CentralStyles.contentContainer]}
-      visible={settingsModalVisible}
-      onDismiss={() => setSettingsModalVisible(false)}>
-      <Card>
-        <TextInput label="Server URL" value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
-        <Button onPress={() => {
-          AppPersistence.setBackendURL(serverUrl).then(() => {
-            setSettingsModalVisible(false);
-          });
-        }}>
-          {t('common.save')}
-        </Button>
-      </Card>
-    </Modal>
+    // Paper renders a Modal inline unless it is wrapped in a Portal, which left this one
+    // in the same stacking context as the login form - the floating labels of the e-mail
+    // and password fields drew on top of it. A Portal renders into the host that
+    // PaperProvider mounts at the root of the app, above every screen.
+    <Portal>
+      <Modal
+        visible={settingsModalVisible}
+        onDismiss={() => setSettingsModalVisible(false)}
+        // `style` is the full screen wrapper, the card belongs in the content style
+        contentContainerStyle={CentralStyles.smallContentContainer}>
+        <Card>
+          <TextInput label="Server URL" value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
+          <Button onPress={() => {
+            AppPersistence.setBackendURL(serverUrl).then(() => {
+              setSettingsModalVisible(false);
+            });
+          }}>
+            {t('common.save')}
+          </Button>
+        </Card>
+      </Modal>
+    </Portal>
   );
 
 
