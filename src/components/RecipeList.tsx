@@ -8,6 +8,7 @@ import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {fetchMyRecipeGroups, fetchMyRecipes} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {ListRow, listRowHasChanged, RecipeGroupRow, RecipeRow, toRecipeGroupRow, toRecipeRow} from '../helper/recipeListRows';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 import {RecipeImageComponent} from './RecipeImageComponent';
 
@@ -48,42 +49,38 @@ export const RecipeList = (props: Props) => {
   };
   useEffect(refreshData, []);
 
-  const getShownItems = (includeGroupedRecipes = false): (RecipeGroup | Recipe)[] => {
+  const getShownItems = (includeGroupedRecipes = false): ListRow[] => {
+    const groupRows = () => myRecipeGroups.map((group) => toRecipeGroupRow(group, myRecipes));
+
     if (props.shownRecipeGroupId) {
       // Navigated in a group, return only group items
-      return myRecipes.filter((recipe) => recipe.recipeGroups.filter((group) => group.id === props.shownRecipeGroupId).length > 0);
+      return myRecipes
+          .filter((recipe) => recipe.recipeGroups.filter((group) => group.id === props.shownRecipeGroupId).length > 0)
+          .map(toRecipeRow);
     } else if (includeGroupedRecipes) {
       // Return all recipes and groups (used in search mode)
-      return [...myRecipeGroups, ...myRecipes];
+      return [...groupRows(), ...myRecipes.map(toRecipeRow)];
     } else {
       // Only return recipes, not in a group and groups
-      return [...myRecipeGroups, ...myRecipes.filter((recipe) => recipe.recipeGroups.length === 0)];
+      return [...groupRows(), ...myRecipes.filter((recipe) => recipe.recipeGroups.length === 0).map(toRecipeRow)];
     }
   };
 
-  const dataProvider = useMemo(() => {
-    let shownItems: (Recipe | RecipeGroup)[] = [];
-    if (searchString !== '') {
-      shownItems = getShownItems(true);
-      shownItems = fuzzy
-          .filter(searchString, shownItems, {extract: (e) => e.title})
-          .map((e) => e.original);
-    } else {
-      shownItems = getShownItems();
+  const shownItems = useMemo(() => {
+    if (searchString === '') {
+      return getShownItems();
     }
-
-    // A group and a recipe can carry the same id, and while searching both kinds
-    // share one list. Comparing ids alone let RecyclerListView reuse a group tile
-    // for a recipe row (and the other way round), so the type has to be part of
-    // the comparison.
-    return new DataProvider((item1, item2) => {
-      return item1.type !== item2.type || item1.id !== item2.id || item1.title !== item2.title;
-
-      // Empty object as first item.
-      // This is used for an initial offset due to the search input field
-      // @ts-ignore
-    }).cloneWithRows([{}].concat(shownItems));
+    return fuzzy
+        .filter(searchString, getShownItems(true), {extract: (item) => item.title})
+        .map((match) => match.original);
   }, [myRecipes, myRecipeGroups, searchString, props.shownRecipeGroupId]);
+
+  const dataProvider = useMemo(() =>
+    // Empty object as first item.
+    // This is used for an initial offset due to the search input field
+    // @ts-ignore
+    new DataProvider(listRowHasChanged).cloneWithRows([{}].concat(shownItems)),
+  [shownItems]);
 
   // Which recipes are selected is not part of the row data, so rowHasChanged (which only
   // compares ids) cannot see it. RecyclerListView repaints its rows for exactly this case
@@ -102,7 +99,7 @@ export const RecipeList = (props: Props) => {
     props.onRecipeClick(recipe);
   };
 
-  const createRecipeListItem = (recipe: Recipe) => {
+  const createRecipeListItem = (recipe: RecipeRow) => {
     const cardIsSelected = props.multiSelectionModeActive && props.selectedRecipes && props.selectedRecipes.has(recipe.id!);
     const cardStyles: StyleProp<ViewStyle> = [styles.recipeCard];
     if (cardIsSelected) {
@@ -120,7 +117,7 @@ export const RecipeList = (props: Props) => {
           <RecipeImageComponent
             useThumbnail={true}
             forceFitScaling={true}
-            uuid={recipe.images.length > 0 ? recipe.images[0].uuid : undefined} />
+            uuid={recipe.coverImageUuid} />
         </Surface>
         {renderRecipeTitle(undefined, recipe.title)}
         {props.multiSelectionModeActive && <View style={{position: 'absolute'}}>
@@ -138,12 +135,7 @@ export const RecipeList = (props: Props) => {
   // up to four blurred thumbnails. On lower-end Android devices the old layout
   // queued 4 base64 image fetches and 4 simultaneous Image#blurRadius effects per
   // group card, which dominated scroll cost on the "My recipes" list.
-  const createRecipeGroupListItem = (recipeGroup: RecipeGroup) => {
-    const groupRecipes = myRecipes.filter(
-        (recipe) => recipe.recipeGroups.some((g) => g.id === recipeGroup.id),
-    );
-    const coverImageUuid = groupRecipes.find((r) => r.images.length > 0)?.images[0]?.uuid;
-
+  const createRecipeGroupListItem = (recipeGroup: RecipeGroupRow) => {
     return (
       <Pressable
         testID='recipeGroupListItem'
@@ -162,7 +154,7 @@ export const RecipeList = (props: Props) => {
             blurredMode={true}
             forceFitScaling={true}
             useThumbnail={true}
-            uuid={coverImageUuid} />
+            uuid={recipeGroup.coverImageUuid} />
         </Surface>
         <View style={styles.groupOverlay}>
           <Headline
@@ -174,12 +166,12 @@ export const RecipeList = (props: Props) => {
             }}>
             {recipeGroup.title}
           </Headline>
-          {groupRecipes.length > 0 &&
+          {recipeGroup.recipeCount > 0 &&
             <Badge
               // Paper defaults badges to the error color, which reads as a warning on a
               // plain "how many recipes are in here" counter. Force the app accent instead.
               style={[styles.groupCountBadge, {backgroundColor: theme.colors.primary, color: theme.colors.onPrimary}]}>
-              {groupRecipes.length}
+              {recipeGroup.recipeCount}
             </Badge>
           }
         </View>
@@ -187,7 +179,7 @@ export const RecipeList = (props: Props) => {
     );
   };
 
-  const renderItem = (type: string | number, data: Recipe | RecipeGroup): React.JSX.Element => {
+  const renderItem = (type: string | number, data: ListRow): React.JSX.Element => {
     if (data.type === 'Recipe') {
       return createRecipeListItem(data);
     } else if (data.type === 'RecipeGroup') {
@@ -232,7 +224,13 @@ export const RecipeList = (props: Props) => {
       [componentWidth, numberOfColumns],
   );
 
-  const showNoItemsNotice = !(getShownItems().length > 0 && numberOfColumns !== 0 && componentWidth > 10);
+  // The notice is about owning no recipes at all, not about a search matching nothing,
+  // so it deliberately looks past the search term.
+  const hasItems = useMemo(
+      () => getShownItems().length > 0,
+      [myRecipes, myRecipeGroups, props.shownRecipeGroupId],
+  );
+  const showNoItemsNotice = !(hasItems && numberOfColumns !== 0 && componentWidth > 10);
 
   return (
     <View
