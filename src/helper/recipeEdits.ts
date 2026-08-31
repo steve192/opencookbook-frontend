@@ -9,7 +9,11 @@ import {moveItem} from './listOrder';
  * split the weekplan uses for its days.
  */
 
-/** A recipe that has not been filled in yet, with one blank ingredient and step to start on. */
+/**
+ * A recipe that has not been filled in yet, with one blank ingredient and step to start on.
+ *
+ * @return {Recipe} a blank recipe
+ */
 export const emptyRecipe = (): Recipe => ({
   title: '',
   neededIngredients: [{ingredient: {name: ''}, amount: null, unit: ''}],
