@@ -22,6 +22,7 @@
     "createImperative": "Create",
     "delete": "Delete",
     "cancel": "Cancel",
+    "close": "Close",
     "email": "E-mail",
     "selected": "selected",
     "offlinemode": "Offline mode",
@@ -49,7 +50,8 @@
     "screenTitleLogin": "Log in",
     "screenTitleSignup": "Create account",
     "screenTitleRequestPasswordReset": "Forgot password",
-    "screenTitleAccountActivation": "Account activation"
+    "screenTitleAccountActivation": "Account activation",
+    "screenTitleSharedRecipe": "Shared recipe"
   },
   "screens": {
     "splash": {
@@ -228,7 +230,20 @@
       "noIngredients": "No ingredients yet",
       "noSteps": "No preparation steps yet",
       "editRecipe": "Edit recipe",
-      "moreActions": "More"
+      "moreActions": "More",
+      "sharing": {
+        "sectionTitle": "Sharing",
+        "shareButton": "Share recipe",
+        "shareAgainButton": "Send link again",
+        "sharedNotice": "Anyone with the link can read this recipe.",
+        "validUntil": "Link works until {{date}}",
+        "stopSharingButton": "Stop sharing",
+        "stopSharingTitle": "Stop sharing?",
+        "stopSharingMessage": "The link stops working immediately. Anyone you sent it to will no longer be able to open the recipe.",
+        "stoppedSharing": "The link no longer works",
+        "linkCopied": "Link copied",
+        "shareFailed": "The recipe could not be shared"
+      }
     },
     "guidedCooking": {
       "stepProgress": "Step {{current}} of {{total}}",
@@ -273,6 +288,21 @@
       "printFailed": "Printing failed",
       "moveMealUp": "Move up",
       "moveMealDown": "Move down"
+    },
+    "sharedRecipe": {
+      "screenTitle": "Shared recipe",
+      "loading": "Loading shared recipe...",
+      "notFound": "This link does not work any more. It may have been withdrawn or have expired.",
+      "tooManyRequests": "This recipe is being opened very often right now. Please try again later.",
+      "loadFailed": "The shared recipe could not be loaded.",
+      "importButton": "Save to my recipes",
+      "importing": "Saving...",
+      "imported": "Saved to your recipes",
+      "importFailed": "The recipe could not be saved",
+      "signInToImport": "Sign in to save this recipe to your own cookbook.",
+      "signInButton": "Sign in",
+      "otherInstance": "This recipe is hosted on {{instance}}. Sign in to that server to open it.",
+      "retryButton": "Try again"
     }
   }
 }

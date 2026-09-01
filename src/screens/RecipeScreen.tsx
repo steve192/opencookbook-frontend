@@ -3,26 +3,17 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useKeepAwake} from 'expo-keep-awake';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Linking, ScrollView, StyleSheet, View} from 'react-native';
-import {Appbar, Button, Chip, Divider, Surface, Text} from 'react-native-paper';
+import {StyleSheet, View} from 'react-native';
+import {Appbar, Button, Surface} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {BringImportButton} from '../components/BringExportButton';
-import {IngredientList} from '../components/IngredientList';
-import {RecipeImageViewPager} from '../components/RecipeImageViewPager';
-import {SectionTitle} from '../components/SectionTitle';
-import {TextBullet} from '../components/TextBullet';
-import {dietLabel} from '../helper/recipeDiet';
-import {formatDuration} from '../helper/recipeDuration';
-import {useCheckedIngredients} from '../helper/useCheckedIngredients';
+import {RecipeDetailView} from '../components/RecipeDetailView';
+import {RecipeShareDialog} from '../components/RecipeShareDialog';
 import {useOnlineGuard} from '../helper/useOnlineGuard';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {fetchSingleRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
-import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
-
-const getDomain = (url: string) => {
-  return url.replace('http://', '').replace('https://', '').split(/[/?#]/)[0];
-};
+import {useAppTheme} from '../styles/CentralStyles';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
 export const RecipeScreen = (props: Props) => {
@@ -32,8 +23,9 @@ export const RecipeScreen = (props: Props) => {
   const requireOnline = useOnlineGuard();
 
   const displayedRecipe = useAppSelector((state) => state.recipes.recipes.filter((recipe) => recipe.id == props.route.params.recipeId)[0]);
+  const sharingEnabled = useAppSelector((state) => state.settings.sharingEnabled);
   const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 1);
-  const ingredientChecklist = useCheckedIngredients();
+  const [sharingOpen, setSharingOpen] = useState(false);
   const {t} = useTranslation('translation');
 
   const theme = useAppTheme();
@@ -51,124 +43,79 @@ export const RecipeScreen = (props: Props) => {
         });
   }, [props.route.params.recipeId, focussed]);
 
-  // Only when a different recipe is shown. Keyed on the recipe object, this also ran on
-  // every refetch, so scaling to eight servings was undone by leaving the app and coming back.
+  // Only when a different recipe is shown. Keyed on the recipe object, this also ran on every
+  // refetch, so scaling to eight servings was undone by leaving the app and coming back. The
+  // recipe's own id is in here as well because on a cold start - a deep link straight to a
+  // recipe - there is nothing loaded yet when the screen first mounts, and the amounts would
+  // otherwise stay scaled to the one serving they were initialised with.
   useEffect(() => {
     displayedRecipe && setScaledServings(displayedRecipe.servings);
-    ingredientChecklist.reset();
-  }, [props.route.params.recipeId]);
+  }, [props.route.params.recipeId, displayedRecipe?.id]);
 
   useEffect(() => {
     props.navigation.setOptions({
       title: displayedRecipe ? displayedRecipe.title : t('screens.recipe.loading'),
       headerRight: () => (
-        <Appbar.Action
-          testID='recipe-edit-button'
-          icon="pencil-outline"
-          color={theme.colors.onPrimary}
-          accessibilityLabel={t('screens.recipe.editRecipe')}
-          onPress={() => {
-            if (!requireOnline()) {
-              return;
-            }
-            props.navigation.navigate('RecipeWizardScreen', {
-              editing: true,
-              recipeId: displayedRecipe.id,
-            });
-          }} />
+        // Both act on a recipe that is not there yet during a cold start - a deep link straight
+        // to this screen renders before the fetch comes back.
+        <>
+          {sharingEnabled &&
+            <Appbar.Action
+              testID='recipe-share-action'
+              icon="share-variant"
+              disabled={!displayedRecipe}
+              color={theme.colors.onPrimary}
+              accessibilityLabel={t('screens.recipe.sharing.shareButton')}
+              onPress={() => setSharingOpen(true)} />
+          }
+          <Appbar.Action
+            testID='recipe-edit-button'
+            icon="pencil-outline"
+            disabled={!displayedRecipe}
+            color={theme.colors.onPrimary}
+            accessibilityLabel={t('screens.recipe.editRecipe')}
+            onPress={() => {
+              if (!requireOnline()) {
+                return;
+              }
+              props.navigation.navigate('RecipeWizardScreen', {
+                editing: true,
+                recipeId: displayedRecipe.id,
+              });
+            }} />
+        </>
       ),
     });
-  }, [displayedRecipe, theme, t]);
+  }, [displayedRecipe, theme, t, sharingEnabled]);
 
-  // What a recipe is, at a glance: how long it takes, how much it makes, where it came
-  // from. Times were not shown at all before, and servings only appeared as a stepper
-  // buried inside the ingredient list.
-  const renderFacts = () => {
-    const totalTime = formatDuration(displayedRecipe.totalTime);
-    const prepTime = formatDuration(displayedRecipe.preparationTime);
-    const diet = dietLabel(t, displayedRecipe.recipeType);
-
-    return (
-      <View style={styles.facts}>
-        {totalTime &&
-          <Chip icon="clock-outline" compact>{t('screens.recipe.totalTime', {duration: totalTime})}</Chip>
-        }
-        {prepTime &&
-          <Chip icon="knife" compact>{t('screens.recipe.prepTime', {duration: prepTime})}</Chip>
-        }
-        {displayedRecipe.servings > 0 &&
-          <Chip icon="silverware-fork-knife" compact>
-            {t('screens.recipe.servingsCount', {count: displayedRecipe.servings})}
-          </Chip>
-        }
-        {diet && <Chip icon="leaf" compact>{diet}</Chip>}
-        {displayedRecipe.recipeSource &&
-          <Chip
-            icon="link-variant"
-            compact
-            onPress={() => Linking.openURL(displayedRecipe.recipeSource!)}>
-            {getDomain(displayedRecipe.recipeSource)}
-          </Chip>
-        }
-      </View>
-    );
-  };
-
-  const renderIngredientsSection = () => (
-    <View style={styles.section}>
-      <SectionTitle testID='ingredient-section-caption'>{t('screens.recipe.ingredients')}</SectionTitle>
-      {displayedRecipe.neededIngredients.length === 0 ?
-        <Text style={{color: theme.colors.onSurfaceVariant}}>{t('screens.recipe.noIngredients')}</Text> :
-        <IngredientList
-          ingredients={displayedRecipe.neededIngredients}
-          servings={displayedRecipe.servings}
-          scaledServings={scaledServings}
-          enableServingScaling={true}
-          checkedIngredients={ingredientChecklist.checked}
-          onIngredientToggle={ingredientChecklist.toggle}
-          onServingScaleChange={setScaledServings}
-        />}
-    </View>
-  );
-
-  const renderStepsSection = () => (
-    <View style={styles.section}>
-      <SectionTitle testID='recipe-prepsteps-title'>{t('screens.recipe.preparationSteps')}</SectionTitle>
-      {displayedRecipe.preparationSteps.length === 0 ?
-        <Text style={{color: theme.colors.onSurfaceVariant}}>{t('screens.recipe.noSteps')}</Text> :
-        displayedRecipe.preparationSteps.map((preparationStep, index) => (
-          <React.Fragment key={index}>
-            {index > 0 && <Divider />}
-            <View style={styles.step}>
-              <TextBullet value={(index + 1).toString()} />
-              <Text style={styles.stepText}>{preparationStep}</Text>
-            </View>
-          </React.Fragment>
-        ))}
-    </View>
+  // What can be done with a recipe of your own, below the steps. Sharing is not here: it is an
+  // action you go and take, not something to read past on the way to the preparation steps.
+  const renderOwnerActions = () => (
+    displayedRecipe.id ?
+      <View style={styles.exportRow}>
+        <BringImportButton style={styles.exportButton} recipeId={displayedRecipe.id} />
+      </View> :
+      null
   );
 
   return (
     <Surface style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <RecipeImageViewPager
-          style={{height: 300}}
-          images={displayedRecipe ? displayedRecipe?.images : []}
+      {displayedRecipe &&
+        <RecipeDetailView
+          recipe={displayedRecipe}
+          scaledServings={scaledServings}
+          onScaledServingsChange={setScaledServings}
+          footer={renderOwnerActions()}
         />
-        {displayedRecipe &&
-          <View style={[CentralStyles.contentContainer, styles.content]}>
-            {renderFacts()}
-            {renderIngredientsSection()}
-            <Divider />
-            {renderStepsSection()}
-            {displayedRecipe.id &&
-              <View style={styles.exportRow}>
-                <BringImportButton style={styles.exportButton} recipeId={displayedRecipe.id} />
-              </View>
-            }
-          </View>
-        }
-      </ScrollView>
+      }
+
+      {sharingEnabled && displayedRecipe?.id &&
+        <RecipeShareDialog
+          recipeId={displayedRecipe.id}
+          recipeTitle={displayedRecipe.title}
+          visible={sharingOpen}
+          onDismiss={() => setSharingOpen(false)} />
+      }
 
       {/* Within reach instead of halfway down the page, between ingredients and steps */}
       {displayedRecipe &&
@@ -189,29 +136,6 @@ export const RecipeScreen = (props: Props) => {
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 12,
-  },
-  content: {
-    gap: 18,
-  },
-  facts: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  section: {
-    gap: 8,
-  },
-  step: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 4,
-    paddingVertical: 10,
-  },
-  stepText: {
     flex: 1,
   },
   actionBar: {

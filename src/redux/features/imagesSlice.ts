@@ -12,6 +12,18 @@ export interface ImageStoreState {
     thumbnailImageMap: { [uuid: string]: string }
 }
 
+/**
+ * Which image to load, and how it may be reached.
+ *
+ * The cache is keyed by the uuid alone: an image is the same bytes whether it is read as its
+ * owner or through somebody's share link, so how it was fetched has no business in the key.
+ */
+export interface ImageRequest {
+    uuid: string;
+    /** The share to read the image through, rather than reading it as its owner. */
+    viaShare?: string;
+}
+
 const initialState: ImageStoreState = {
   imageMap: {},
   thumbnailImageMap: {},
@@ -33,89 +45,109 @@ const ensureDirExists = async (dir: string) => {
   }
 };
 
-export const fetchSingleImage = createAsyncThunk<string, string, { state: RootState }>(
+const FULL_IMAGE_DIRECTORY = FileSystem.cacheDirectory + '/images/';
+const THUMBNAIL_DIRECTORY = FileSystem.cacheDirectory + '/images/thumbnails/';
+
+/**
+ * An image already held on this device, if there is one.
+ *
+ * @param {string} directory where images of that size are kept
+ * @param {string} uuid the image
+ * @return {Promise<string | undefined>} the cached data uri, or undefined
+ */
+const readFromDevice = async (directory: string, uuid: string): Promise<string | undefined> => {
+  if (Platform.OS !== 'android') {
+    return undefined;
+  }
+  try {
+    return await FileSystem.readAsStringAsync(directory + uuid);
+  } catch (e) {
+    return undefined;
+  }
+};
+
+/**
+ * Keeps an image on this device for next time.
+ *
+ * @param {string} directory where images of that size are kept
+ * @param {string} uuid the image
+ * @param {string} dataUri what was fetched
+ */
+const writeToDevice = (directory: string, uuid: string, dataUri: string) => {
+  if (Platform.OS !== 'android') {
+    return;
+  }
+  ensureDirExists(directory)
+      .then(() => FileSystem.writeAsStringAsync(directory + uuid, dataUri))
+      .catch((e) => console.error('Error caching image', e));
+};
+
+export const fetchSingleImage = createAsyncThunk<string, ImageRequest, { state: RootState }>(
     'fetchSingleImage',
-    async (uuid: string, {getState}): Promise<string> => {
-      if (getState().images.imageMap[uuid]) {
-        return getState().images.imageMap[uuid];
+    async ({uuid, viaShare}, {getState}): Promise<string> => {
+      const alreadyLoaded = getState().images.imageMap[uuid];
+      if (alreadyLoaded) {
+        return alreadyLoaded;
       }
-      let cached = undefined;
-      if (Platform.OS === 'android') {
-        try {
-          cached = await FileSystem.readAsStringAsync(FileSystem.cacheDirectory + '/images/' + uuid);
-        } catch (e) {
-          cached = undefined;
-        }
-      } else {
-        // cached = await imageCache.get('uuid');
-      }
+      const cached = await readFromDevice(FULL_IMAGE_DIRECTORY, uuid);
       if (cached) {
-        // @ts-ignore
         return cached;
       }
-      console.warn('not cached');
-      return RestAPI.getImageAsDataURI(uuid);
+
+      const fetched = await RestAPI.getImageAsDataURI(uuid, viaShare);
+      writeToDevice(FULL_IMAGE_DIRECTORY, uuid, fetched);
+      return fetched;
     },
 );
-export const fetchSingleThumbnailImage = createAsyncThunk<string, string, { state: RootState }>(
+export const fetchSingleThumbnailImage = createAsyncThunk<string, ImageRequest, { state: RootState }>(
     'fetchSingleThumbnailImage',
-    async (uuid: string, {getState}): Promise<string> => {
-      if (getState().images.thumbnailImageMap[uuid]) {
-        return getState().images.thumbnailImageMap[uuid];
+    async ({uuid, viaShare}, {getState}): Promise<string> => {
+      const alreadyLoaded = getState().images.thumbnailImageMap[uuid];
+      if (alreadyLoaded) {
+        return alreadyLoaded;
       }
-      let cached = undefined;
-      if (Platform.OS === 'android') {
-        try {
-          cached = await FileSystem.readAsStringAsync(FileSystem.cacheDirectory + '/images/thumbnails/' + uuid);
-        } catch (e) {
-          cached = undefined;
-        }
-      } else {
-        cached = await imageCache.get('uuid-thumbnail');
-      }
+      const cached = await readFromDevice(THUMBNAIL_DIRECTORY, uuid) ??
+        await imageCache.get(thumbnailCacheKey(uuid));
       if (cached) {
-        // @ts-ignore
         return cached;
       }
-      console.warn('not cached');
-      return RestAPI.getThumbnailImageAsDataURI(uuid);
+
+      const fetched = await RestAPI.getThumbnailImageAsDataURI(uuid, viaShare);
+      if (Platform.OS === 'android') {
+        writeToDevice(THUMBNAIL_DIRECTORY, uuid, fetched);
+      } else {
+        imageCache.set(thumbnailCacheKey(uuid), fetched);
+      }
+      return fetched;
     },
 );
+
+/**
+ * The key a thumbnail is kept under off Android.
+ *
+ * Reading and writing used to spell this differently - the read asked for the literal string
+ * "uuid-thumbnail" - so the cache never once produced a hit.
+ *
+ * @param {string} uuid the image
+ * @return {string} its cache key
+ */
+const thumbnailCacheKey = (uuid: string) => uuid + '-thumbnail';
 
 export const imagesSlice = createSlice({
   name: 'images',
   initialState,
   reducers: {
   },
+  // Nothing but state goes in here. Writing the device cache from a reducer made it a side
+  // effect of reducing, and ran on every fulfilled action - rewriting the very file the value
+  // had just been read from.
   extraReducers: (builder) => {
     builder.addCase(fetchSingleImage.fulfilled, (state, action) => {
-      if (Platform.OS === 'android') {
-        ensureDirExists(FileSystem.cacheDirectory + '/images/').then(() => {
-          FileSystem.writeAsStringAsync(FileSystem.cacheDirectory + '/images/' + action.meta.arg, action.payload ).catch((e) => {
-            console.error('Error caching image', e);
-          });
-        }).catch((e) => {
-          console.error('error creating image cache dir', e);
-        });
-      } else {
-        // imageCache.set(action.meta.arg, action.payload);
-      }
-      state.imageMap[action.meta.arg] = action.payload;
+      state.imageMap[action.meta.arg.uuid] = action.payload;
     });
 
     builder.addCase(fetchSingleThumbnailImage.fulfilled, (state, action) => {
-      if (Platform.OS === 'android') {
-        ensureDirExists(FileSystem.cacheDirectory + '/images/thumbnails/').then(() => {
-          FileSystem.writeAsStringAsync(FileSystem.cacheDirectory + '/images/thumbnails/' + action.meta.arg, action.payload ).catch((e) => {
-            console.error('Error caching image', e);
-          });
-        }).catch((e) => {
-          console.error('error creating image cache dir', e);
-        });
-      } else {
-        imageCache.set(action.meta.arg + '-thumbnail', action.payload);
-      }
-      state.thumbnailImageMap[action.meta.arg] = action.payload;
+      state.thumbnailImageMap[action.meta.arg.uuid] = action.payload;
     });
   },
 });

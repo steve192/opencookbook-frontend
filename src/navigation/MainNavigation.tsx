@@ -11,7 +11,6 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Platform} from 'react-native';
 import {KeyboardAvoidingView} from 'react-native-keyboard-controller';
-import {Appbar} from 'react-native-paper';
 import AppPersistence from '../AppPersistence';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {changeOnlineState} from '../redux/features/settingsSlice';
@@ -28,12 +27,14 @@ import {RecipeGroupEditScreen} from '../screens/RecipeGroupEditScreen';
 import {RecipeImportBrowser} from '../screens/RecipeImportBrowser';
 import RecipeListScreen from '../screens/RecipeListScreen';
 import {RecipeScreen} from '../screens/RecipeScreen';
+import {SharedRecipeScreen} from '../screens/SharedRecipeScreen';
 import {SettingsScreen} from '../screens/SettingsScreen';
 import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 import {navigationRef} from './navigationRef';
+import {PaperStackHeader} from './PaperStackHeader';
 import {
   BaseNavigatorProps,
   LoginNavigationProps,
@@ -145,23 +146,11 @@ const BottomTabNavigation = () => {
 
 const MainStackNavigation = () => {
   const {t} = useTranslation('translation');
-  const theme = useAppTheme();
   return (
     <KeyboardAvoidingView style={CentralStyles.fullscreen}>
       <MainStack.Navigator
         screenOptions={{
-          header: (nav) => (
-            <Appbar.Header style={{backgroundColor: theme.colors.primary}}>
-              {nav.back ? (
-                <Appbar.BackAction
-                  color={theme.colors.onPrimary}
-                  onPress={() => nav.navigation.goBack()} />
-              ) : null}
-              {nav.options.headerLeft?.({tintColor: undefined, canGoBack: false})}
-              <Appbar.Content color={theme.colors.onPrimary} title={nav.options.title} />
-              {nav.options.headerRight?.({tintColor: undefined, canGoBack: false})}
-            </Appbar.Header>
-          ),
+          header: (nav) => <PaperStackHeader {...nav} />,
         }}>
         <MainStack.Screen
           name="OverviewScreen"
@@ -293,6 +282,15 @@ const MainNavigation = () => {
           component={TermsOfServiceScreen}
           options={{headerShown: true, title: t('screens.login.toc')}}
         />
+        <BaseStack.Screen
+          name='SharedRecipeScreen'
+          component={SharedRecipeScreen}
+          options={{
+            headerShown: true,
+            header: (nav) => <PaperStackHeader {...nav} />,
+            title: t('navigation.screenTitleSharedRecipe'),
+          }}
+        />
       </BaseStack.Navigator>
   );
 
@@ -314,6 +312,7 @@ const MainNavigation = () => {
               AccountActivationScreen: 'activateAccount',
               PasswordResetScreen: 'resetPassword',
               TermsOfServiceScreen: 'tos',
+              SharedRecipeScreen: 'share/:shareId',
               default: {
                 screens: {
                   LoginScreen: 'login',

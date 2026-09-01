@@ -5,6 +5,9 @@ export type BaseNavigatorProps = {
     AccountActivationScreen: { activationId: string}
     PasswordResetScreen: { id: string}
     TermsOfServiceScreen: undefined
+    // Outside the authenticated navigator on purpose: a public link that demanded an account
+    // would not be public. Only saving the recipe needs one.
+    SharedRecipeScreen: { shareId: string }
     // Holds the login stack until somebody is signed in and the main one afterwards. Typed
     // as the main one so that reaching a screen from outside the app - from a notification,
     // say - is checked rather than cast away.

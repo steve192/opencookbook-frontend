@@ -98,12 +98,28 @@ export default class AppPersistence {
     } else {
       backendUrl = await AsyncStorage.getItem('backendUrl');
     }
-    if (!backendUrl) {
-      // Default backend url if not set
-      backendUrl = Constants.expoConfig?.extra?.defaultApiUrl ? Constants.expoConfig?.extra?.defaultApiUrl : 'https://beta.cookpal.io';
+
+    return backendUrl ?? AppPersistence.defaultBackendURL();
+  }
+
+  /**
+   * Where to talk to when nobody has said otherwise.
+   *
+   * On the web this is the origin the app was served from, because a deployed web app and its api
+   * live behind the same address. It matters most for somebody who has never signed in - opening
+   * a share link, say - who has no stored server and cannot be asked for one.
+   *
+   * @return {string} the backend url to use
+   */
+  private static defaultBackendURL(): string {
+    const configuredAtBuildTime = Constants.expoConfig?.extra?.defaultApiUrl;
+    if (configuredAtBuildTime) {
+      return configuredAtBuildTime;
     }
-    console.log('Backend url is' + backendUrl);
-    return backendUrl;
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.origin) {
+      return window.location.origin;
+    }
+    return 'https://beta.cookpal.io';
   }
 
   static async setBackendURL(url: string) {

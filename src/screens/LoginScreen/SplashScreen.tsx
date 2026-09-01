@@ -5,7 +5,7 @@ import {ActivityIndicator, Text} from 'react-native-paper';
 import AppPersistence from '../../AppPersistence';
 import RestAPI from '../../dao/RestAPI';
 import {login, logout} from '../../redux/features/authSlice';
-import {changeBackendUrl, changeOnlineState} from '../../redux/features/settingsSlice';
+import {changeBackendUrl, changeOnlineState, changeSharingEnabled} from '../../redux/features/settingsSlice';
 import {useAppDispatch} from '../../redux/hooks';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
@@ -33,6 +33,12 @@ export const SplashScreen = () => {
       console.log('Setting backend url');
       // TODO: Proper management of backend url via redux
       dispatch(changeBackendUrl(await AppPersistence.getBackendURL()));
+
+      // What this instance offers, which is public and needed before anybody signs in - a
+      // share link is opened by people who never will.
+      RestAPI.getInstanceInfo()
+          .then((instanceInfo) => dispatch(changeSharingEnabled(instanceInfo.sharingEnabled)))
+          .catch(() => console.info('Instance info unavailable, assuming defaults'));
 
       setStatusText(t('screens.splash.loggingin'));
       console.log('Getting userinfo');
