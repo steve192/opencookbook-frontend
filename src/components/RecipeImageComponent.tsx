@@ -4,6 +4,7 @@ import {Portal} from 'react-native-paper';
 import {fetchSingleImage, fetchSingleThumbnailImage} from '../redux/features/imagesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {RootState} from '../redux/store';
+import {useImageAccess} from './ImageAccessContext';
 
 interface Props {
     uuid?: string
@@ -29,6 +30,10 @@ export const RecipeImageComponent = React.memo(function RecipeImageComponent(pro
 
   const [isDragging, setIsDragging] = useState(false);
 
+  // Set when this image belongs to a recipe somebody shared, in which case it has to be read
+  // through the share: the viewer may well have no account at all.
+  const viaShare = useImageAccess();
+
   const gestureInProgress = useRef<number | undefined>(undefined);
   const initialTouches = useRef<NativeTouchEvent[] | undefined>(undefined);
   const initialImageSize = useRef<{width: number, height: number} | undefined>(undefined);
@@ -42,17 +47,13 @@ export const RecipeImageComponent = React.memo(function RecipeImageComponent(pro
   useEffect(() => {
     if (!requestPending && props.uuid) {
       setRequestPending(true);
-      if (props.useThumbnail) {
-        dispatch(fetchSingleThumbnailImage(props.uuid)).finally(() => {
-          setRequestPending(false);
-        });
-      } else {
-        dispatch(fetchSingleImage(props.uuid)).finally(() => {
-          setRequestPending(false);
-        });
-      }
+      const request = {uuid: props.uuid, viaShare: viaShare};
+      const load = props.useThumbnail ? fetchSingleThumbnailImage(request) : fetchSingleImage(request);
+      dispatch(load).finally(() => {
+        setRequestPending(false);
+      });
     }
-  }, [props.uuid]);
+  }, [props.uuid, viaShare]);
 
   const resizeMode = Platform.OS === 'web' && !props.forceFitScaling ? 'center' : 'cover';
 

@@ -22,6 +22,7 @@
     "createImperative": "Erstelle",
     "delete": "Löschen",
     "cancel": "Abbrechen",
+    "close": "Schließen",
     "email": "E-Mail",
     "selected": "Ausgewählt",
     "offlinemode": "Offlinemodus",
@@ -49,7 +50,8 @@
     "screenTitleLogin": "Anmelden",
     "screenTitleSignup": "Konto erstellen",
     "screenTitleRequestPasswordReset": "Passwort vergessen",
-    "screenTitleAccountActivation": "Kontoaktivierung"
+    "screenTitleAccountActivation": "Kontoaktivierung",
+    "screenTitleSharedRecipe": "Geteiltes Rezept"
   },
   "screens": {
     "splash": {
@@ -228,7 +230,20 @@
       "noIngredients": "Noch keine Zutaten",
       "noSteps": "Noch keine Zubereitungsschritte",
       "editRecipe": "Rezept bearbeiten",
-      "moreActions": "Mehr"
+      "moreActions": "Mehr",
+      "sharing": {
+        "sectionTitle": "Teilen",
+        "shareButton": "Rezept teilen",
+        "shareAgainButton": "Link erneut senden",
+        "sharedNotice": "Wer den Link hat, kann dieses Rezept lesen.",
+        "validUntil": "Link gilt bis {{date}}",
+        "stopSharingButton": "Teilen beenden",
+        "stopSharingTitle": "Teilen beenden?",
+        "stopSharingMessage": "Der Link funktioniert sofort nicht mehr. Wer ihn bekommen hat, kann das Rezept dann nicht mehr öffnen.",
+        "stoppedSharing": "Der Link funktioniert nicht mehr",
+        "linkCopied": "Link kopiert",
+        "shareFailed": "Das Rezept konnte nicht geteilt werden"
+      }
     },
     "guidedCooking": {
       "stepProgress": "Schritt {{current}} von {{total}}",
@@ -273,6 +288,21 @@
       "printFailed": "Drucken fehlgeschlagen",
       "moveMealUp": "Nach oben",
       "moveMealDown": "Nach unten"
+    },
+    "sharedRecipe": {
+      "screenTitle": "Geteiltes Rezept",
+      "loading": "Geteiltes Rezept wird geladen...",
+      "notFound": "Dieser Link funktioniert nicht mehr. Er wurde zurückgezogen oder ist abgelaufen.",
+      "tooManyRequests": "Dieses Rezept wird gerade sehr oft geöffnet. Bitte versuche es später noch einmal.",
+      "loadFailed": "Das geteilte Rezept konnte nicht geladen werden.",
+      "importButton": "Zu meinen Rezepten hinzufügen",
+      "importing": "Wird gespeichert...",
+      "imported": "Zu deinen Rezepten hinzugefügt",
+      "importFailed": "Das Rezept konnte nicht gespeichert werden",
+      "signInToImport": "Melde dich an, um dieses Rezept in dein eigenes Kochbuch zu übernehmen.",
+      "signInButton": "Anmelden",
+      "otherInstance": "Dieses Rezept liegt auf {{instance}}. Melde dich auf diesem Server an, um es zu öffnen.",
+      "retryButton": "Erneut versuchen"
     }
   }
 }
