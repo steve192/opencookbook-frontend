@@ -6,7 +6,7 @@ import Constants from 'expo-constants';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, View} from 'react-native';
-import {Avatar, Button, Caption, Divider, Surface, Text} from 'react-native-paper';
+import {Avatar, Button, Caption, Divider, Surface, Switch, Text} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
 import AppPersistence from '../AppPersistence';
@@ -14,6 +14,7 @@ import {CustomCard} from '../components/CustomCard';
 import RestAPI from '../dao/RestAPI';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {PromptUtil} from '../helper/Prompt';
+import {setAppbarOptions} from '../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps} from '../navigation/NavigationRoutes';
 import {logout} from '../redux/features/authSlice';
 import {changeTheme} from '../redux/features/settingsSlice';
@@ -37,6 +38,13 @@ export const SettingsScreen = (props: Props) => {
   const [emailAddress, setEmailAddress] = useState('');
   const [passwordResetPending, setPasswordResetPending] = useState(false);
 
+  const ocrImportEnabled = useSelector((state: RootState) => state.settings.ocrImportEnabled);
+  const [scanTrainingConsent, setScanTrainingConsent] = useState(false);
+
+  useEffect(() => {
+    AppPersistence.getScanTrainingConsent().then((consent) => setScanTrainingConsent(consent ?? false));
+  }, []);
+
   useEffect(() => {
     RestAPI.getUserInfo()
         .then((userInfo) => setEmailAddress(userInfo?.email ?? ''))
@@ -45,12 +53,12 @@ export const SettingsScreen = (props: Props) => {
 
   useEffect(() => {
     return props.navigation.addListener('focus', () => {
-      props.navigation.getParent()?.setOptions({
+      setAppbarOptions(props.navigation.getParent(), {
         title: t('screens.settings.screenTitle'),
         // Clearing both sides: the recipe list leaves a back action in the
         // shared header when it is showing a group, and it belongs to that tab.
-        headerLeft: undefined,
-        headerRight: undefined,
+        leading: undefined,
+        actions: undefined,
       });
     });
   }, [props.navigation]);
@@ -94,6 +102,27 @@ export const SettingsScreen = (props: Props) => {
     });
   };
 
+  // Recorded per submission, so switching this off stops future scans being kept but says
+  // nothing about the ones already donated - which is what the deletion below is for.
+  const onScanTrainingConsentChange = (consented: boolean) => {
+    setScanTrainingConsent(consented);
+    AppPersistence.setScanTrainingConsent(consented);
+  };
+
+  const onDeleteScanDataPress = () => {
+    PromptUtil.show({
+      title: t('screens.settings.deleteScanData'),
+      message: t('screens.settings.deleteScanDataQuestion'),
+      button1: t('common.delete'),
+      button1Callback: () => {
+        RestAPI.deleteScanTrainingData()
+            .then(() => SnackbarUtil.show({message: t('screens.settings.deleteScanDataDone')}))
+            .catch(() => SnackbarUtil.show({message: t('common.unknownerror')}));
+      },
+      button2: t('common.cancel'),
+    });
+  };
+
   const onLogoutPress = () => {
     PromptUtil.show({
       title: t('screens.settings.logoutTitle'),
@@ -126,6 +155,28 @@ export const SettingsScreen = (props: Props) => {
             mode='outlined'
             onPress={onLogoutPress}>{t('screens.settings.logout')}</Button>
           <Divider style={{marginTop: 10, marginBottom: 10}}/>
+          {ocrImportEnabled &&
+            <>
+              <Spacer height={20} />
+              <CustomCard>
+                <Caption>{t('screens.settings.scanning')}</Caption>
+                <View style={{flexDirection: 'row', alignItems: 'center', gap: 12}}>
+                  <Switch
+                    value={scanTrainingConsent}
+                    onValueChange={onScanTrainingConsentChange} />
+                  <Text style={{flex: 1}}>{t('screens.settings.scanTrainingConsent')}</Text>
+                </View>
+                <Caption>{t('screens.settings.scanTrainingConsentExplanation')}</Caption>
+                <Spacer height={10} />
+                <Button
+                  mode="outlined"
+                  icon="delete-outline"
+                  onPress={onDeleteScanDataPress}>
+                  {t('screens.settings.deleteScanData')}
+                </Button>
+              </CustomCard>
+            </>
+          }
           <Spacer height={20} />
           <CustomCard>
             <Caption>{t('screens.settings.theme')}</Caption>

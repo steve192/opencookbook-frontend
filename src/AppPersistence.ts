@@ -134,6 +134,23 @@ export default class AppPersistence {
     await SecureStore.setItemAsync('backendUrl', url);
   }
 
+  /**
+   * Whether photographs of scanned recipes may be kept to improve recognition.
+   *
+   * Undefined rather than false when nothing is stored: "no" is a decision to respect and
+   * "not asked yet" is a question still to put, and they lead to different things.
+   *
+   * @return {Promise<boolean | undefined>} what was chosen, or undefined if it was never asked
+   */
+  static async getScanTrainingConsent(): Promise<boolean | undefined> {
+    const stored = await AsyncStorage.getItem('scan_training_consent');
+    return stored === null ? undefined : stored === 'true';
+  }
+
+  static async setScanTrainingConsent(consented: boolean) {
+    await AsyncStorage.setItem('scan_training_consent', consented ? 'true' : 'false');
+  }
+
   static getApiRoute(): string {
     return '/api/v1';
   }

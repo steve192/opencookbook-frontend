@@ -36,7 +36,8 @@
     "appVersion": "Version {{version}}",
     "appVersionWithBuild": "Version {{version}} (build {{build}})",
     "undo": "Undo",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "experimental": "experimental"
   },
   "navigation": {
     "screenTitleImportBrowser": "Recipe import browser",
@@ -51,7 +52,8 @@
     "screenTitleSignup": "Create account",
     "screenTitleRequestPasswordReset": "Forgot password",
     "screenTitleAccountActivation": "Account activation",
-    "screenTitleSharedRecipe": "Shared recipe"
+    "screenTitleSharedRecipe": "Shared recipe",
+    "screenTitleRecipeScan": "Scan a recipe"
   },
   "screens": {
     "splash": {
@@ -149,7 +151,13 @@
       "changePasswordTitle": "Change password?",
       "changePasswordMessage": "A link to set a new password will be sent to {{email}}.",
       "changePasswordSent": "Link sent. Please check your inbox to set a new password",
-      "changePasswordFailed": "The link could not be sent. Please try again"
+      "changePasswordFailed": "The link could not be sent. Please try again",
+      "scanning": "Scanning recipes",
+      "scanTrainingConsent": "Keep photos to improve recognition",
+      "scanTrainingConsentExplanation": "Photos of scanned recipes are kept and used to make recognition better. Without this they are deleted once the recipe has been read.",
+      "deleteScanData": "Delete kept photos",
+      "deleteScanDataQuestion": "Delete every photo you contributed towards improving recognition? Your recipes are not affected.",
+      "deleteScanDataDone": "The photos were deleted"
     },
     "import": {
       "notSupported": "The website is unfortunately not supported yet",
@@ -167,7 +175,10 @@
       "browserTitle": "No link at hand?",
       "browserDescription": "Browse recipe sites right here and import the recipe you are looking at.",
       "clearInput": "Clear",
-      "supportedServicesDescription": "These sites import reliably. Other sites often work too - just give it a try."
+      "supportedServicesDescription": "These sites import reliably. Other sites often work too - just give it a try.",
+      "scanTitle": "Photograph a recipe",
+      "scanDescription": "Take a picture of a printed recipe and have it read automatically.",
+      "startScan": "Scan a recipe"
     },
     "editRecipe": {
       "screenTitleEdit": "Edit recipe",
@@ -265,7 +276,7 @@
       "timerRunningTitle": "Timer running - {{label}}",
       "timerRunningBody": "Ends at {{time}} · {{recipe}}, step {{step}}",
       "stopAlarm": "Stop",
-      "alarmUnavailable": "No alarm available — this timer will only show a notification",
+      "alarmUnavailable": "No alarm available - this timer will only show a notification",
       "openRecipe": "Open"
     },
     "weekplan": {
@@ -303,6 +314,71 @@
       "signInButton": "Sign in",
       "otherInstance": "This recipe is hosted on {{instance}}. Sign in to that server to open it.",
       "retryButton": "Try again"
+    },
+    "recipeScan": {
+      "screenTitle": "Scan a recipe",
+      "introduction": "Photograph a recipe and have it read. Several photos are read as one recipe - a double page, for instance.",
+      "cropHint": "Drag the corners onto the part with the recipe.",
+      "rotateLeft": "Turn left",
+      "rotateRight": "Turn right",
+      "rotationFailed": "That photo could not be turned.",
+      "takePhoto": "Take a photo",
+      "choosePhoto": "Choose a photo",
+      "page": "Page {{number}}",
+      "pageLimit": "A recipe can span at most {{count}} photos.",
+      "startScan": "Read the recipe",
+      "waiting": "Waiting to be read …",
+      "reading": "Reading the recipe …",
+      "failed": "That did not work",
+      "tryAgain": "Try again",
+      "permissionRefused": "Scanning needs access to the camera or your photos.",
+      "errors": {
+        "dailyLimit": "You have scanned as many recipes as you can today. It resets tomorrow.",
+        "busy": "Recognition is busy right now. Try again in a few minutes.",
+        "unavailable": "Scanning recipes is not available on this server at the moment.",
+        "imageTooLarge": "That photo is too large. Take a smaller one, or crop closer.",
+        "unsupportedImage": "That file format cannot be read.",
+        "tooManyPages": "That is more photos than can be read at once.",
+        "badImage": "Nothing could be made of that photo.",
+        "noTextFound": "No readable text was found. Try a sharper photo, or crop closer to the recipe.",
+        "timedOut": "Recognition took too long. Try again."
+      },
+      "blocks": {
+        "progress": "Question {{step}} of {{total}}",
+        "correct": "Yes, that's right",
+        "showMe": "No, let me show you",
+        "ingredients": {
+          "question": "Are the ingredients here?",
+          "notFound": "No ingredients were found. Where are they?",
+          "none": "There are no ingredients in this picture",
+          "markHint": "Drag a rough frame around the ingredient list."
+        },
+        "steps": {
+          "question": "Are the preparation steps here?",
+          "notFound": "No preparation steps were found. Where are they?",
+          "none": "There are no preparation steps in this picture",
+          "markHint": "Drag a rough frame around the preparation steps."
+        },
+        "done": "Done",
+        "addAnother": "Add another area",
+        "markedSoFar_one": "{{count}} area marked. Add another, or you're done.",
+        "markedSoFar_other": "{{count}} areas marked. Add another, or you're done."
+      },
+      "correctionFailed": "The correction could not be applied. You can still edit the recipe.",
+      "queuedBehind_one": "{{count}} scan ahead of you",
+      "queuedBehind_other": "{{count}} scans ahead of you",
+      "takesAMoment": "This usually takes a few seconds.",
+      "photo": {
+        "sideways": "That photo is on its side, so the text could not be read. Turn it with the rotate buttons and read it again.",
+        "unreadable": "Almost no text could be read from that photo. Take another one with more light, holding the camera steady.",
+        "too_small": "The writing is too small in that photo to read. Take another one closer to the page."
+      },
+      "consent": {
+        "title": "Keep your photos?",
+        "message": "Reading recipes from photographs is new and gets things wrong. If you let us keep your photos and your corrections, recognition improves for everyone. Without this your photos are deleted once the recipe has been read. You can change this later in settings.",
+        "yes": "Keep them",
+        "no": "No thanks"
+      }
     }
   }
 }

@@ -7,7 +7,7 @@ import {Button, Chip, Divider, HelperText, Icon, List, Surface, Text, TextInput}
 import RestAPI, {Recipe} from '../dao/RestAPI';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {importRecipe} from '../redux/features/recipesSlice';
-import {useAppDispatch} from '../redux/hooks';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 
@@ -30,6 +30,7 @@ export const ImportScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
   const dispatch = useAppDispatch();
+  const ocrImportEnabled = useAppSelector((state) => state.settings.ocrImportEnabled);
 
   useEffect(() => {
     RestAPI.getAvailableImportHosts()
@@ -134,6 +135,33 @@ export const ImportScreen = (props: Props) => {
     );
   };
 
+  // Only offered where the instance can actually read one, so nobody is shown a button that
+  // can only ever fail.
+  const renderScanSection = () => {
+    if (!ocrImportEnabled) {
+      return null;
+    }
+    return (
+      <>
+        <Divider style={styles.divider} />
+        <View style={styles.sectionHeading}>
+          <Text variant="titleMedium">{t('screens.import.scanTitle')}</Text>
+          {/* Reading a photograph gets things wrong in ways a url import does not. */}
+          <Chip compact icon="flask-outline">{t('common.experimental')}</Chip>
+        </View>
+        <Text style={[styles.sectionDescription, {color: theme.colors.onSurfaceVariant}]}>
+          {t('screens.import.scanDescription')}
+        </Text>
+        <Button
+          mode="outlined"
+          icon="camera"
+          onPress={() => props.navigation.navigate('RecipeScanScreen')}>
+          {t('screens.import.startScan')}
+        </Button>
+      </>
+    );
+  };
+
   // The in-app browser needs a webview, which only exists on the native platforms
   const renderBrowserSection = () => (
     <>
@@ -194,6 +222,7 @@ export const ImportScreen = (props: Props) => {
 
           {renderResult()}
           {renderSupportedServices()}
+          {renderScanSection()}
           {Platform.OS !== 'web' && renderBrowserSection()}
         </View>
       </ScrollView>
@@ -204,6 +233,12 @@ export const ImportScreen = (props: Props) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+  },
+  sectionHeading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexWrap: 'wrap',
   },
   sectionDescription: {
     marginTop: 4,

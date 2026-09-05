@@ -7,6 +7,7 @@ import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
 import {SectionTitle} from '../../components/SectionTitle';
 import {Option} from '../../components/SelectionPopupModal';
 import RestAPI, {Ingredient, IngredientUse, Recipe, RecipeDiet} from '../../dao/RestAPI';
+import {takeDraft} from '../../helper/recipeDraftHandover';
 import {dietLabel, RECIPE_DIETS} from '../../helper/recipeDiet';
 import {
   emptyRecipe,
@@ -29,6 +30,7 @@ import {
 } from '../../helper/recipeEdits';
 import {useProgressiveRender} from '../../helper/useProgressiveRender';
 import {PromptUtil} from '../../helper/Prompt';
+import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {createRecipe, deleteRecipe, updateRecipe} from '../../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
@@ -48,7 +50,10 @@ const RecipeWizardScreen = (props: Props) => {
 
   const existingRecipe: Recipe | undefined = useAppSelector((state) => state.recipes.recipes.filter((recipe) => recipe.id === props.route.params?.recipeId)?.[0]);
 
-  const [recipeData, setRecipeData] = useState<Recipe>(existingRecipe ?? emptyRecipe());
+  // A draft wins over anything in the store: it is why the wizard was opened, and it has no id.
+  const [recipeData, setRecipeData] = useState<Recipe>(
+      () => (props.route.params?.hasDraft ? takeDraft() : undefined) ??
+        existingRecipe ?? emptyRecipe());
   const [savePending, setSavePending] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -171,10 +176,9 @@ const RecipeWizardScreen = (props: Props) => {
   }), [props.navigation, recipeData, t]);
 
   useLayoutEffect(() => {
-    props.navigation.setOptions({
+    setAppbarOptions(props.navigation, {
       title: props.route.params?.editing ? t('screens.editRecipe.screenTitleEdit') : t('screens.editRecipe.screenTitleCreate'),
-      // Save is the only thing in the bar now. Delete used to sit right beside it.
-      headerRight: () => (
+      actions: () => (
         <>
           <Appbar.Action
             icon="content-save-outline"

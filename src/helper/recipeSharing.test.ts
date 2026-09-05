@@ -74,7 +74,7 @@ describe('isSameInstance', () => {
 describe('shareMessage', () => {
   it('leads with the title, because nothing else will say what the link is', () => {
     expect(shareMessage('Lasagne', 'https://beta.cookpal.io/share/abc'))
-        .toBe('Lasagne — https://beta.cookpal.io/share/abc');
+        .toBe('Lasagne - https://beta.cookpal.io/share/abc');
   });
 });
 

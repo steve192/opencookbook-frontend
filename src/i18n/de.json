@@ -36,7 +36,8 @@
     "appVersion": "Version {{version}}",
     "appVersionWithBuild": "Version {{version}} (Build {{build}})",
     "undo": "Rückgängig",
-    "dismiss": "Schließen"
+    "dismiss": "Schließen",
+    "experimental": "experimentell"
   },
   "navigation": {
     "screenTitleImportBrowser": "Rezept Import Browser",
@@ -51,7 +52,8 @@
     "screenTitleSignup": "Konto erstellen",
     "screenTitleRequestPasswordReset": "Passwort vergessen",
     "screenTitleAccountActivation": "Kontoaktivierung",
-    "screenTitleSharedRecipe": "Geteiltes Rezept"
+    "screenTitleSharedRecipe": "Geteiltes Rezept",
+    "screenTitleRecipeScan": "Rezept scannen"
   },
   "screens": {
     "splash": {
@@ -149,7 +151,13 @@
       "changePasswordTitle": "Passwort ändern?",
       "changePasswordMessage": "Ein Link zum Setzen eines neuen Passworts wird an {{email}} gesendet.",
       "changePasswordSent": "Link gesendet. Bitte prüfe dein Postfach, um ein neues Passwort zu setzen",
-      "changePasswordFailed": "Der Link konnte nicht gesendet werden. Bitte erneut versuchen"
+      "changePasswordFailed": "Der Link konnte nicht gesendet werden. Bitte erneut versuchen",
+      "scanning": "Rezepte scannen",
+      "scanTrainingConsent": "Fotos zur Verbesserung der Erkennung behalten",
+      "scanTrainingConsentExplanation": "Die Fotos gescannter Rezepte werden gespeichert und genutzt, um die Erkennung zu verbessern. Ohne diese Einstellung werden sie nach dem Auslesen wieder gelöscht.",
+      "deleteScanData": "Gespeicherte Fotos löschen",
+      "deleteScanDataQuestion": "Alle Fotos löschen, die du zur Verbesserung der Erkennung beigetragen hast? Deine Rezepte bleiben erhalten.",
+      "deleteScanDataDone": "Die Fotos wurden gelöscht"
     },
     "import": {
       "notSupported": "Die Webseite wird leider noch nicht unterstüzt",
@@ -167,7 +175,10 @@
       "browserTitle": "Kein Link zur Hand?",
       "browserDescription": "Durchsuche Rezeptseiten direkt hier und importiere das Rezept, das du gerade ansiehst.",
       "clearInput": "Leeren",
-      "supportedServicesDescription": "Diese Seiten werden zuverlässig importiert. Andere Seiten funktionieren oft ebenfalls - probiere es einfach aus."
+      "supportedServicesDescription": "Diese Seiten werden zuverlässig importiert. Andere Seiten funktionieren oft ebenfalls - probiere es einfach aus.",
+      "scanTitle": "Rezept fotografieren",
+      "scanDescription": "Ein gedrucktes Rezept abfotografieren und automatisch auslesen lassen.",
+      "startScan": "Rezept scannen"
     },
     "editRecipe": {
       "screenTitleEdit": "Rezept bearbeiten",
@@ -265,7 +276,7 @@
       "timerRunningTitle": "Timer läuft - {{label}}",
       "timerRunningBody": "Endet um {{time}} · {{recipe}}, Schritt {{step}}",
       "stopAlarm": "Stopp",
-      "alarmUnavailable": "Kein Alarm verfügbar — dieser Timer zeigt nur eine Benachrichtigung",
+      "alarmUnavailable": "Kein Alarm verfügbar - dieser Timer zeigt nur eine Benachrichtigung",
       "openRecipe": "Öffnen"
     },
     "weekplan": {
@@ -303,6 +314,71 @@
       "signInButton": "Anmelden",
       "otherInstance": "Dieses Rezept liegt auf {{instance}}. Melde dich auf diesem Server an, um es zu öffnen.",
       "retryButton": "Erneut versuchen"
+    },
+    "recipeScan": {
+      "screenTitle": "Rezept scannen",
+      "introduction": "Fotografiere ein Rezept und lass es auslesen. Mehrere Fotos werden als ein Rezept gelesen - zum Beispiel eine Doppelseite.",
+      "cropHint": "Zieh die Ecken auf den Bereich mit dem Rezept.",
+      "rotateLeft": "Nach links drehen",
+      "rotateRight": "Nach rechts drehen",
+      "rotationFailed": "Das Foto konnte nicht gedreht werden.",
+      "takePhoto": "Foto aufnehmen",
+      "choosePhoto": "Foto auswählen",
+      "page": "Seite {{number}}",
+      "pageLimit": "Mehr als {{count}} Fotos pro Rezept sind nicht möglich.",
+      "startScan": "Rezept auslesen",
+      "waiting": "Warte auf die Erkennung …",
+      "reading": "Das Rezept wird gelesen …",
+      "failed": "Das hat nicht geklappt",
+      "tryAgain": "Nochmal versuchen",
+      "permissionRefused": "Ohne Zugriff auf Kamera oder Fotos kann kein Rezept gescannt werden.",
+      "errors": {
+        "dailyLimit": "Du hast heute schon die maximale Anzahl an Rezepten gescannt. Morgen geht es weiter.",
+        "busy": "Die Erkennung ist gerade ausgelastet. Versuche es in ein paar Minuten nochmal.",
+        "unavailable": "Das Scannen von Rezepten ist auf diesem Server gerade nicht verfügbar.",
+        "imageTooLarge": "Das Foto ist zu groß. Nimm ein kleineres auf oder schneide es enger zu.",
+        "unsupportedImage": "Dieses Dateiformat kann nicht gelesen werden.",
+        "tooManyPages": "So viele Fotos können nicht auf einmal gelesen werden.",
+        "badImage": "Mit diesem Foto konnte nichts angefangen werden.",
+        "noTextFound": "Auf dem Foto war kein lesbarer Text. Versuche ein schärferes Bild oder schneide näher am Rezept zu.",
+        "timedOut": "Die Erkennung hat zu lange gedauert. Versuche es nochmal."
+      },
+      "blocks": {
+        "progress": "Frage {{step}} von {{total}}",
+        "correct": "Ja, das stimmt",
+        "showMe": "Nein, ich zeige es dir",
+        "ingredients": {
+          "question": "Stehen hier die Zutaten?",
+          "notFound": "Es wurden keine Zutaten gefunden. Wo stehen sie?",
+          "none": "Auf dem Bild sind keine Zutaten",
+          "markHint": "Zieh einen groben Rahmen um die Zutatenliste."
+        },
+        "steps": {
+          "question": "Steht hier die Zubereitung?",
+          "notFound": "Es wurde keine Zubereitung gefunden. Wo steht sie?",
+          "none": "Auf dem Bild ist keine Zubereitung",
+          "markHint": "Zieh einen groben Rahmen um die Zubereitung."
+        },
+        "done": "Fertig",
+        "addAnother": "Weiteren Bereich hinzufügen",
+        "markedSoFar_one": "{{count}} Bereich markiert. Noch einen hinzufügen oder fertig.",
+        "markedSoFar_other": "{{count}} Bereiche markiert. Noch einen hinzufügen oder fertig."
+      },
+      "correctionFailed": "Die Korrektur konnte nicht übernommen werden. Du kannst das Rezept trotzdem bearbeiten.",
+      "queuedBehind_one": "Noch {{count}} Scan vor dir",
+      "queuedBehind_other": "Noch {{count}} Scans vor dir",
+      "takesAMoment": "Das dauert meist ein paar Sekunden.",
+      "photo": {
+        "sideways": "Das Foto liegt auf der Seite, deshalb konnte der Text nicht gelesen werden. Dreh es mit den Drehknöpfen und lies es erneut aus.",
+        "unreadable": "Aus diesem Foto konnte fast kein Text gelesen werden. Mach ein neues mit mehr Licht und halt die Kamera ruhig.",
+        "too_small": "Die Schrift ist auf diesem Foto zu klein zum Lesen. Mach ein neues näher an der Seite."
+      },
+      "consent": {
+        "title": "Fotos behalten?",
+        "message": "Rezepte aus Fotos zu lesen ist neu und macht Fehler. Wenn du uns deine Fotos und Korrekturen überlässt, wird die Erkennung für alle besser. Ohne das werden deine Fotos gelöscht, sobald das Rezept gelesen wurde. Du kannst das später in den Einstellungen ändern.",
+        "yes": "Behalten",
+        "no": "Nein danke"
+      }
     }
   }
 }

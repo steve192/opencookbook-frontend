@@ -27,6 +27,7 @@ import {
 } from '../../helper/weekplanDay';
 import {buildWeekplanPrintHtml} from '../../helper/weekplanPrint';
 import {useWeekplanWeek} from '../../helper/useWeekplanWeek';
+import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps} from '../../navigation/NavigationRoutes';
 import {updateSingleWeekplanDay} from '../../redux/features/weeklyRecipesSlice';
 import {useAppDispatch} from '../../redux/hooks';
@@ -112,11 +113,11 @@ export const WeeklyRecipeListScreen = (props: Props) => {
       if (!props.navigation.isFocused()) {
         return;
       }
-      props.navigation.getParent()?.setOptions({
+      setAppbarOptions(props.navigation.getParent(), {
         title: t('screens.weekplan.screenTitle'),
         // The recipe list leaves a back action here while it shows a group
-        headerLeft: undefined,
-        headerRight: () => (
+        leading: undefined,
+        actions: () => (
           <Appbar.Action
             icon="printer-outline"
             color={theme.colors.onPrimary}

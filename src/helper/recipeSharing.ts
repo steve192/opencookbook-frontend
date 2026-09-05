@@ -88,7 +88,7 @@ export const isSameInstance = (one?: string, other?: string): boolean => {
  * @param {string} url its share link
  * @return {string} the message to send
  */
-export const shareMessage = (title: string, url: string): string => `${title} — ${url}`;
+export const shareMessage = (title: string, url: string): string => `${title} - ${url}`;
 
 /**
  * When a link stops working, as a date on its own.
