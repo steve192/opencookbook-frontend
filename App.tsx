@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/display-name */
 import React from 'react';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Provider as PaperProvider, Snackbar} from 'react-native-paper';
 import {enableScreens} from 'react-native-screens';
 import {Provider, useSelector} from 'react-redux';
@@ -12,17 +13,24 @@ import './src/i18n/config';
 import MainNavigation from './src/navigation/MainNavigation';
 import {RootState, store} from './src/redux/store';
 import {OwnPaperTheme, OwnPaperThemeDark} from './src/styles/CentralStyles';
-import {useColorScheme} from 'react-native';
+import {StyleSheet, useColorScheme} from 'react-native';
 
 enableScreens();
 
 export default () => {
   return (
-    <Provider store={store}>
-      <ReduxWrappedApp />
-    </Provider>
+    // Gestures are only recognised inside this, so it sits above everything that might use one.
+    <GestureHandlerRootView style={styles.root}>
+      <Provider store={store}>
+        <ReduxWrappedApp />
+      </Provider>
+    </GestureHandlerRootView>
   );
 };
+
+const styles = StyleSheet.create({
+  root: {flex: 1},
+});
 
 
 const ReduxWrappedApp = () => {

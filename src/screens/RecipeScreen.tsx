@@ -11,6 +11,7 @@ import {RecipeDetailView} from '../components/RecipeDetailView';
 import {RecipeShareDialog} from '../components/RecipeShareDialog';
 import {useOnlineGuard} from '../helper/useOnlineGuard';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
+import {setAppbarOptions} from '../navigation/appbarOptions';
 import {fetchSingleRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {useAppTheme} from '../styles/CentralStyles';
@@ -53,9 +54,9 @@ export const RecipeScreen = (props: Props) => {
   }, [props.route.params.recipeId, displayedRecipe?.id]);
 
   useEffect(() => {
-    props.navigation.setOptions({
+    setAppbarOptions(props.navigation, {
       title: displayedRecipe ? displayedRecipe.title : t('screens.recipe.loading'),
-      headerRight: () => (
+      actions: () => (
         // Both act on a recipe that is not there yet during a cold start - a deep link straight
         // to this screen renders before the fetch comes back.
         <>

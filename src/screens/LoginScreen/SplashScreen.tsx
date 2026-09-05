@@ -5,7 +5,7 @@ import {ActivityIndicator, Text} from 'react-native-paper';
 import AppPersistence from '../../AppPersistence';
 import RestAPI from '../../dao/RestAPI';
 import {login, logout} from '../../redux/features/authSlice';
-import {changeBackendUrl, changeOnlineState, changeSharingEnabled} from '../../redux/features/settingsSlice';
+import {changeBackendUrl, changeOcrImportEnabled, changeOnlineState, changeSharingEnabled} from '../../redux/features/settingsSlice';
 import {useAppDispatch} from '../../redux/hooks';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
@@ -37,7 +37,10 @@ export const SplashScreen = () => {
       // What this instance offers, which is public and needed before anybody signs in - a
       // share link is opened by people who never will.
       RestAPI.getInstanceInfo()
-          .then((instanceInfo) => dispatch(changeSharingEnabled(instanceInfo.sharingEnabled)))
+          .then((instanceInfo) => {
+            dispatch(changeSharingEnabled(instanceInfo.sharingEnabled));
+            dispatch(changeOcrImportEnabled(instanceInfo.ocrImportEnabled));
+          })
           .catch(() => console.info('Instance info unavailable, assuming defaults'));
 
       setStatusText(t('screens.splash.loggingin'));

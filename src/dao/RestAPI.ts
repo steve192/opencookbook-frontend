@@ -74,6 +74,49 @@ export interface UserInfo {
 export interface InstanceInfo {
   termsOfService: string;
   sharingEnabled: boolean;
+  /**
+   * Whether this instance can read a recipe from a photograph. False when the operator has no
+   * machine learning subsystem, switched scanning off, or has one that is unreachable.
+   */
+  ocrImportEnabled: boolean;
+}
+
+/** One area of a photograph holding a kind of content, as fractions of the picture. */
+export interface RecipeScanBlock {
+  pageIndex: number;
+  lineCount: number;
+  box: {left: number; top: number; right: number; bottom: number};
+}
+
+/** Where the server thinks the page is in a photograph. */
+export interface DetectedPage {
+  /** Four corners as [x, y] fractions of the picture, clockwise from the top left. */
+  corners: [number, number][];
+  confidence: number;
+  /** False when nothing convincing was found; the corners are then the whole frame. */
+  detected: boolean;
+}
+
+/** What the server says about a recipe being read from photographs. */
+export interface RecipeScanJob {
+  id: string;
+  jobType: string;
+  status: 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
+  /** The recipe that was read, once it is done. Not saved anywhere until somebody says so. */
+  recipe?: Recipe;
+  /** Where each kind of content was found. Either half may be null: none found is an answer. */
+  blocks?: {
+    ingredients?: RecipeScanBlock[] | null;
+    steps?: RecipeScanBlock[] | null;
+  };
+  /**
+   * What is wrong with the photograph. Beside the recipe rather than instead of it: a page that
+   * could not be read is still read as far as it goes.
+   */
+  photo?: {usable: boolean; problem?: string | null; pageIndex?: number | null};
+  /** How many scans are ahead of this one, while it is still waiting. */
+  queuePosition?: number | null;
+  error?: {code: string; message: string; retryable: boolean};
 }
 
 /** A public link to one of your own recipes. */
@@ -457,6 +500,106 @@ class RestAPI {
     const response = await axios.get(url, {responseType: 'arraybuffer'});
     return imageDataUri(response.data);
   }
+  /**
+   * Hands photographs of one recipe to the server to be read. Several pictures are one scan:
+   * a recipe printed across a spread would otherwise come back as two halves.
+   *
+   * @param {string[]} imageUris the pages, in the order they should be read
+   * @param {string} payload what to do with them, as json - see buildScanPayload
+   * @param {boolean} trainingConsent whether the pictures may be kept to improve recognition
+   * @return {Promise<RecipeScanJob>} the job to watch
+   */
+  static async scanRecipe(
+      imageUris: string[], payload: string, trainingConsent: boolean,
+  ): Promise<RecipeScanJob> {
+    const formData = new FormData();
+    for (const uri of imageUris) {
+      formData.append('images', await this.imagePart(uri));
+    }
+    formData.append('payload', payload);
+    formData.append('trainingConsent', String(trainingConsent));
+
+    const response = await this.post(
+        '/ml/recipe-ocr', formData, {'Content-Type': 'multipart/form-data'});
+    return this.asScanJob(response?.data);
+  }
+
+  /**
+   * Asks where the page is in a photograph, so the crop starts on the recipe. Answered at once
+   * and costs no allowance, so it is safe to call for every picture taken.
+   *
+   * @param {string} imageUri the photograph just taken
+   * @return {Promise<DetectedPage>} the corners to start from, and whether anything was found
+   */
+  static async detectPageEdges(imageUri: string): Promise<DetectedPage> {
+    const formData = new FormData();
+    formData.append('image', await this.imagePart(imageUri));
+    const response = await this.post(
+        '/ml/page-edges', formData, {'Content-Type': 'multipart/form-data'});
+    return response?.data;
+  }
+
+  static async getRecipeScanJob(jobId: string): Promise<RecipeScanJob> {
+    const response = await this.get(`/ml/jobs/${jobId}`);
+    return this.asScanJob(response?.data);
+  }
+
+  /**
+   * The server does not send the discriminator the app's own Recipe type carries. Added here so
+   * nothing downstream has to.
+   *
+   * @param {any} data what the scan endpoint returned
+   * @return {RecipeScanJob} the same job, with a recipe the rest of the app can use
+   */
+  private static asScanJob(data: any): RecipeScanJob {
+    if (!data?.recipe) {
+      return data;
+    }
+    return {...data, recipe: {...data.recipe, type: 'Recipe'}};
+  }
+
+  /**
+   * Tells the server where the ingredients and the steps actually are. Answered at once: it
+   * relabels what has already been read rather than starting the whole thing again.
+   *
+   * @param {string} jobId the scan to correct
+   * @param {Record<string, unknown>} corrections the areas, keyed by kind
+   * @return {Promise<RecipeScanJob>} the scan, read again
+   */
+  static async refineRecipeScan(
+      jobId: string, corrections: Record<string, unknown>,
+  ): Promise<RecipeScanJob> {
+    const response = await this.post(`/ml/jobs/${jobId}/refine`, {blocks: corrections});
+    return this.asScanJob(response?.data);
+  }
+
+  // Gives up a scan, so its place in the queue is not spent on a recipe nobody wants.
+  static async cancelRecipeScanJob(jobId: string): Promise<void> {
+    await this.delete(`/ml/jobs/${jobId}`);
+  }
+
+  // Withdraws consent: the photographs kept for improving recognition are deleted.
+  static async deleteScanTrainingData(): Promise<void> {
+    await this.delete('/ml/training-data');
+  }
+
+  /**
+   * One picture, in whichever shape form data accepts on this platform.
+   *
+   * @param {string} uri where the picture is
+   * @return {Promise<any>} the part to append
+   */
+  private static async imagePart(uri: string): Promise<any> {
+    if (Platform.OS === 'web') {
+      // The picker hands out a blob: url; fetch reads that back with its mime type.
+      return await (await fetch(uri)).blob();
+    }
+    // Android and ios file:/// uris must be passed to form data in this undocumented shape.
+    const filename = uri.split('/').pop() ?? 'page.jpg';
+    const extension = /\.(\w+)$/.exec(filename);
+    return {uri, name: filename, type: 'image/' + (extension ? extension[1] : 'jpeg')} as any;
+  }
+
   static async uploadImage(uri: string): Promise<string> {
     const formData = new FormData();
     if (Platform.OS === 'web') {

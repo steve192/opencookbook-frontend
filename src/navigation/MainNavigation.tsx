@@ -27,6 +27,7 @@ import {RecipeGroupEditScreen} from '../screens/RecipeGroupEditScreen';
 import {RecipeImportBrowser} from '../screens/RecipeImportBrowser';
 import RecipeListScreen from '../screens/RecipeListScreen';
 import {RecipeScreen} from '../screens/RecipeScreen';
+import {RecipeScanScreen} from '../screens/ocr/RecipeScanScreen';
 import {SharedRecipeScreen} from '../screens/SharedRecipeScreen';
 import {SettingsScreen} from '../screens/SettingsScreen';
 import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
@@ -171,6 +172,11 @@ const MainStackNavigation = () => {
           name="ImportScreen"
           component={ImportScreen}
           options={{title: t('navigation.screenTitleImport')}}
+        />
+        <MainStack.Screen
+          name="RecipeScanScreen"
+          component={RecipeScanScreen}
+          options={{title: t('navigation.screenTitleRecipeScan')}}
         />
         <MainStack.Screen
           name="RecipeGroupEditScreen"
@@ -321,6 +327,7 @@ const MainNavigation = () => {
                   RecipeScreen: 'recipe',
                   RecipeWizardScreen: 'editRecipe',
                   ImportScreen: 'import',
+                  RecipeScanScreen: 'scanRecipe',
                   OverviewScreen: {
                     screens: {
                       SettingsScreen: 'settings',

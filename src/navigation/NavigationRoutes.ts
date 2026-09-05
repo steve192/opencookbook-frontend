@@ -21,7 +21,13 @@ export type LoginNavigationProps = {
 export type MainNavigationProps = {
     OverviewScreen: NavigatorScreenParams<OverviewNavigationProps>
     RecipeImportBrowser: undefined
-    RecipeWizardScreen: { editing?: boolean, recipeId?: number }
+    /**
+     * `hasDraft` opens the wizard on an unsaved recipe left in `recipeDraftHandover`. A flag
+     * rather than the recipe itself: navigation parameters go into the address bar, where a
+     * recipe becomes "[object Object]".
+     */
+    RecipeWizardScreen: { editing?: boolean, recipeId?: number, hasDraft?: boolean }
+    RecipeScanScreen: undefined
     RecipeScreen: { recipeId: number }
     ImportScreen: { importUrl?: string },
     RecipeGroupEditScreen: { recipeGroupId?: number, editing: boolean}

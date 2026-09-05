@@ -17,6 +17,7 @@ import {findIngredientsWithoutStep, matchIngredientsInStep} from '../helper/ingr
 import {useCheckedIngredients} from '../helper/useCheckedIngredients';
 import {findStepDurations} from '../helper/recipeDuration';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
+import {setAppbarOptions} from '../navigation/appbarOptions';
 import {useAppSelector} from '../redux/hooks';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
@@ -68,12 +69,12 @@ export const GuidedCookingScreen = (props: Props) => {
   );
 
   useLayoutEffect(() => {
-    props.navigation.setOptions({
+    setAppbarOptions(props.navigation, {
       // The row of numbered bullets gave every step a fixed width in a row that did not
       // scroll, so a long recipe pushed the later steps off the screen. A count says the
       // same thing in constant space, and also says how much is left.
       title: t('screens.guidedCooking.stepProgress', {current: currentStep + 1, total: stepCount}),
-      headerRight: () => (
+      actions: () => (
         <Appbar.Action
           icon="format-size"
           color={theme.colors.onPrimary}

@@ -10,6 +10,7 @@ import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {findRecipeGroupByOption, moveRecipesToGroup, toRecipeGroupOptions} from '../helper/recipeGroups';
 import {useOnlineGuard} from '../helper/useOnlineGuard';
 import {VibrationUtils} from '../helper/VibrationUtil';
+import {setAppbarOptions} from '../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
 import {updateRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
@@ -53,15 +54,15 @@ const RecipeListScreen = (props: Props) => {
 
     const adjustActionbar = () => {
       if (multiSelectionModeActive) {
-        mainStackNav?.setOptions({
+        setAppbarOptions(mainStackNav, {
           title: selectedRecipes.size + ' ' + t('common.selected'),
-          headerRight: () => (
+          actions: () => (
             <Appbar.Action
               icon="group"
               color={theme.colors.onPrimary}
               onPress={() => setRecipeGroupSelectionOpened(true)} />
           ),
-          headerLeft: () => (
+          leading: () => (
             <Appbar.Action
               icon="close"
               color={theme.colors.onPrimary}
@@ -73,14 +74,14 @@ const RecipeListScreen = (props: Props) => {
         // this the only way out is the system back gesture/button, since the inner
         // RecipeStack has its header hidden and the outer header's nav.back is
         // false at this depth.
-        mainStackNav?.setOptions({
+        setAppbarOptions(mainStackNav, {
           title: shownRecipeGroup.title,
-          headerLeft: () => (
+          leading: () => (
             <Appbar.BackAction
               color={theme.colors.onPrimary}
               onPress={() => props.navigation.goBack()} />
           ),
-          headerRight: () => (
+          actions: () => (
             <Appbar.Action
               icon="pencil-outline"
               color={theme.colors.onPrimary}
@@ -88,10 +89,10 @@ const RecipeListScreen = (props: Props) => {
           ),
         });
       } else {
-        mainStackNav?.setOptions({
+        setAppbarOptions(mainStackNav, {
           title: t('screens.overview.myRecipes'),
-          headerLeft: undefined,
-          headerRight: undefined,
+          leading: undefined,
+          actions: undefined,
         });
       }
     };

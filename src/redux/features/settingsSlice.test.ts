@@ -8,7 +8,8 @@ vi.mock('../../dao/RestAPI', () => ({
   default: {setIsOnline: (value: boolean) => setIsOnline(value)},
 }));
 
-const {changeBackendUrl, changeOnlineState, changeSharingEnabled, changeTheme} =
+const {changeBackendUrl, changeOcrImportEnabled, changeOnlineState, changeSharingEnabled,
+  changeTheme} =
   await import('./settingsSlice');
 const reducer = (await import('./settingsSlice')).default;
 
@@ -20,6 +21,7 @@ describe('settingsSlice', () => {
   it('starts on the system theme, online, with no backend url', () => {
     expect(initialState()).toEqual({
       theme: 'system', backendUrl: '', isOnline: true, sharingEnabled: true,
+      ocrImportEnabled: false,
     });
   });
 
@@ -31,6 +33,18 @@ describe('settingsSlice', () => {
 
   it.each([true, false])('stores that the instance has sharing %s', (enabled) => {
     expect(reducer(initialState(), changeSharingEnabled(enabled)).sharingEnabled).toBe(enabled);
+  });
+
+  // The opposite default to sharing, and deliberately so: most instances have no machine
+  // learning subsystem at all, and offering a scan that cannot work is worse than offering
+  // it a moment late.
+  it('assumes recipe scanning is unavailable until the instance says otherwise', () => {
+    expect(initialState().ocrImportEnabled).toBe(false);
+  });
+
+  it.each([true, false])('stores that the instance can scan recipes: %s', (enabled) => {
+    expect(reducer(initialState(), changeOcrImportEnabled(enabled)).ocrImportEnabled)
+        .toBe(enabled);
   });
 
   it.each(['light', 'dark', 'system'] as const)('stores the %s theme', (theme) => {
@@ -47,6 +61,7 @@ describe('settingsSlice', () => {
     const withTheme = reducer(withUrl, changeTheme('dark'));
     expect(withTheme).toEqual({
       theme: 'dark', backendUrl: 'https://example.test', isOnline: true, sharingEnabled: true,
+      ocrImportEnabled: false,
     });
   });
 

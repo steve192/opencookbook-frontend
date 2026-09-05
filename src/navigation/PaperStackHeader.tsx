@@ -2,6 +2,7 @@ import {NativeStackHeaderProps} from '@react-navigation/native-stack';
 import React from 'react';
 import {Appbar} from 'react-native-paper';
 import {useAppTheme} from '../styles/CentralStyles';
+import {appbarOptionsOf} from './appbarOptions';
 
 /**
  * The app bar every stack screen wears.
@@ -15,6 +16,7 @@ import {useAppTheme} from '../styles/CentralStyles';
  */
 export const PaperStackHeader = (nav: NativeStackHeaderProps) => {
   const theme = useAppTheme();
+  const {leading, actions} = appbarOptionsOf(nav.options);
 
   return (
     <Appbar.Header style={{backgroundColor: theme.colors.primary}}>
@@ -23,9 +25,9 @@ export const PaperStackHeader = (nav: NativeStackHeaderProps) => {
           color={theme.colors.onPrimary}
           onPress={() => nav.navigation.goBack()} />
       ) : null}
-      {nav.options.headerLeft?.({tintColor: undefined, canGoBack: false})}
+      {leading?.()}
       <Appbar.Content color={theme.colors.onPrimary} title={nav.options.title} />
-      {nav.options.headerRight?.({tintColor: undefined, canGoBack: false})}
+      {actions?.()}
     </Appbar.Header>
   );
 };
