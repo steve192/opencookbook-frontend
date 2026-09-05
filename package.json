@@ -39,6 +39,7 @@
     "buffer": "^6.0.3",
     "expo": "57.0.20",
     "expo-application": "~57.0.2",
+    "expo-build-properties": "~57.0.17",
     "expo-constants": "~57.0.16",
     "expo-dev-client": "57.0.18",
     "expo-file-system": "~57.0.6",
