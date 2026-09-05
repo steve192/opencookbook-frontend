@@ -202,13 +202,13 @@ export const RecipeScanScreen = (props: Props) => {
         setJob(current);
 
         const outcome = outcomeOf(current);
-        if (outcome.then === 'keepWaiting') {
+        if (outcome.next === 'keepWaiting') {
           attempt += 1;
           setTimeout(ask, nextPollDelay(attempt));
           return;
         }
         runningJobId.current = undefined;
-        if (outcome.then === 'giveUp') {
+        if (outcome.next === 'giveUp') {
           giveUp(outcome.failure);
         } else {
           setStep('confirming');

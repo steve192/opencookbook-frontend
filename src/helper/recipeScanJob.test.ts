@@ -117,12 +117,12 @@ describe('outcomeOf', () => {
   });
 
   it('keeps waiting while the scan is unfinished', () => {
-    expect(outcomeOf(job({status: 'QUEUED'})).then).toBe('keepWaiting');
-    expect(outcomeOf(job({status: 'PROCESSING'})).then).toBe('keepWaiting');
+    expect(outcomeOf(job({status: 'QUEUED'})).next).toBe('keepWaiting');
+    expect(outcomeOf(job({status: 'PROCESSING'})).next).toBe('keepWaiting');
   });
 
   it('moves on to the questions once a recipe has been read', () => {
-    expect(outcomeOf(job()).then).toBe('confirm');
+    expect(outcomeOf(job()).next).toBe('confirm');
   });
 
   it('gives up with the reason when the photo could not be read', () => {
@@ -131,7 +131,7 @@ describe('outcomeOf', () => {
     const outcome = outcomeOf(job({photo: {usable: false, problem: 'sideways'}}));
 
     expect(outcome).toEqual({
-      then: 'giveUp',
+      next: 'giveUp',
       // Not retryable: the same picture would fail the same way, and taking another one
       // starts the scan anyway.
       failure: {messageKey: 'screens.recipeScan.photo.sideways', retryable: false},
@@ -139,7 +139,7 @@ describe('outcomeOf', () => {
   });
 
   it('goes on to the questions when the photo was fine', () => {
-    expect(outcomeOf(job({photo: {usable: true}})).then).toBe('confirm');
+    expect(outcomeOf(job({photo: {usable: true}})).next).toBe('confirm');
   });
 
   it('gives up with the failure when the scan failed', () => {
@@ -150,16 +150,16 @@ describe('outcomeOf', () => {
     }));
 
     expect(outcome).toEqual({
-      then: 'giveUp',
+      next: 'giveUp',
       failure: {messageKey: 'screens.recipeScan.errors.noTextFound', retryable: false},
     });
   });
 
   it('gives up when a finished scan somehow carries no recipe', () => {
-    expect(outcomeOf(job({recipe: undefined})).then).toBe('giveUp');
+    expect(outcomeOf(job({recipe: undefined})).next).toBe('giveUp');
   });
 
   it('gives up when the scan was cancelled', () => {
-    expect(outcomeOf(job({status: 'CANCELLED', recipe: undefined})).then).toBe('giveUp');
+    expect(outcomeOf(job({status: 'CANCELLED', recipe: undefined})).next).toBe('giveUp');
   });
 });

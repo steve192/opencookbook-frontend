@@ -97,9 +97,9 @@ export const failureFromError = (error?: ScanError): ScanFailure => ({
 
 /** What the app should do once it has asked after a scan. */
 export type ScanOutcome =
-  | {then: 'keepWaiting'}
-  | {then: 'confirm'}
-  | {then: 'giveUp'; failure: ScanFailure};
+  | {next: 'keepWaiting'}
+  | {next: 'confirm'}
+  | {next: 'giveUp'; failure: ScanFailure};
 
 export const outcomeOf = (job: {
   status: ScanStatus;
@@ -108,7 +108,7 @@ export const outcomeOf = (job: {
   error?: ScanError;
 }): ScanOutcome => {
   if (!isFinished(job.status)) {
-    return {then: 'keepWaiting'};
+    return {next: 'keepWaiting'};
   }
 
   // A picture that could not be read goes back to the photographs with a reason, rather than on
@@ -116,11 +116,11 @@ export const outcomeOf = (job: {
   // fail the same way, and taking another one starts the scan anyway.
   const problem = photoProblem(job.photo);
   if (job.status === 'COMPLETED' && problem) {
-    return {then: 'giveUp', failure: {messageKey: photoProblemMessageKey(problem),
+    return {next: 'giveUp', failure: {messageKey: photoProblemMessageKey(problem),
       retryable: false}};
   }
   if (job.status === 'COMPLETED' && job.recipe) {
-    return {then: 'confirm'};
+    return {next: 'confirm'};
   }
-  return {then: 'giveUp', failure: failureFromError(job.error)};
+  return {next: 'giveUp', failure: failureFromError(job.error)};
 };

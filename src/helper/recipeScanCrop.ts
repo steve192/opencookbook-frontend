@@ -52,9 +52,14 @@ export const orderCorners = (corners: CropCorner[]): Crop => {
   ];
 };
 
-const indexOfExtreme = (values: number[], pick: 'lowest' | 'highest'): number =>
-  values.reduce((best, value, index) =>
-    (pick === 'lowest' ? value < values[best] : value > values[best]) ? index : best, 0);
+const indexOfExtreme = (values: number[], pick: 'lowest' | 'highest'): number => {
+  const beats = pick === 'lowest' ?
+    (value: number, best: number) => value < best :
+    (value: number, best: number) => value > best;
+
+  return values.reduce((best, value, index) =>
+    beats(value, values[best]) ? index : best, 0);
+};
 
 // Too little of the picture to be worth reading, so the crop is ignored rather than obeyed.
 export const isTooSmall = (crop: Crop): boolean => {
