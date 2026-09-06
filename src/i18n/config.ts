@@ -1,3 +1,4 @@
+import axios from 'axios';
 import * as Localization from 'expo-localization';
 import i18n from 'i18next';
 import {initReactI18next} from 'react-i18next';
@@ -16,6 +17,10 @@ export const resources = {
 const locale = Localization.getLocales()[0]?.languageCode ?? 'en';
 
 console.debug('Detected locale', locale);
+
+// Sent on every request, logged in or not, so that the server can use the users language
+axios.defaults.headers.common['Accept-Language'] = locale;
+
 i18n.use(initReactI18next).init({
   lng: locale,
   interpolation: {
