@@ -7,6 +7,7 @@ import Spacer from 'react-spacer';
 import {PasswordValidationInput} from '../components/PasswordValidationInput';
 import {SuccessErrorBanner} from '../components/SuccessErrorBanner';
 import RestAPI from '../dao/RestAPI';
+import {errorMessageKey} from '../helper/apiErrorMessage';
 import {BaseNavigatorProps} from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
 import {LoginBackdrop} from './LoginScreen/LoginBackdrop';
@@ -17,7 +18,7 @@ export const PasswordResetScreen = (props: Props) => {
 
   const [newPassword, setNewPassword] = useState('');
   const [passwordOk, setPasswordOk] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string>();
   const [success, setSuccess] = useState(false);
   const [pending, setPending] = useState(false);
 
@@ -26,11 +27,11 @@ export const PasswordResetScreen = (props: Props) => {
       return;
     }
     setPending(true);
-    setError(false);
+    setError(undefined);
     RestAPI.resetPassword(props.route.params.id, newPassword).then(() => {
       setSuccess(true);
-    }).catch(() => {
-      setError(true);
+    }).catch((cause) => {
+      setError(t(errorMessageKey(cause)));
       setSuccess(false);
     }).finally(() => setPending(false));
   };
@@ -78,11 +79,11 @@ export const PasswordResetScreen = (props: Props) => {
   return (
     <LoginBackdrop>
       <SuccessErrorBanner
-        error={error}
+        error={!!error}
         success={success}
         pending={false}
         pendingContent=""
-        errorContent={t('screens.resetPassword.unknownErrorSendingRequest')}
+        errorContent={error ?? ''}
         successContent={t('screens.resetPassword.successPasswordReset.message')}
       />
       {success ? successView : resetForm}

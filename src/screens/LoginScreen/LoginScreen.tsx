@@ -1,5 +1,4 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AxiosError} from 'axios';
 import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, TextInput as RNTextInput, View} from 'react-native';
@@ -7,12 +6,14 @@ import {Button, Card, IconButton, Modal, Portal, Text, TextInput} from 'react-na
 import {useDispatch} from 'react-redux';
 import Spacer from 'react-spacer';
 import AppPersistence from '../../AppPersistence';
+import {FormErrorMessage} from '../../components/FormErrorMessage';
 import {PasswordInput} from '../../components/PasswordInput';
 import RestAPI from '../../dao/RestAPI';
+import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {resolveAppVersion} from '../../helper/appVersion';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import {login} from '../../redux/features/authSlice';
-import CentralStyles, {OwnColors, useAppTheme} from '../../styles/CentralStyles';
+import CentralStyles, {OwnColors} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
 
 
@@ -31,7 +32,6 @@ const LoginScreen = ({route, navigation}: Props) => {
   const dispatch = useDispatch();
 
   const {t} = useTranslation('translation');
-  const {colors} = useAppTheme();
 
   const doLogin = () => {
     if (loginPending || !email || !password) {
@@ -41,15 +41,8 @@ const LoginScreen = ({route, navigation}: Props) => {
     setApiErrorMessage(undefined);
     RestAPI.authenticate(email, password).then(() => {
       dispatch(login());
-    }).catch((error: AxiosError) => {
-      // @ts-ignore
-      if (error.response?.status === 401 && error?.response?.data?.userActive === false) {
-        setApiErrorMessage(t('screens.login.inactiveaccount'));
-      } else if (error.response?.status === 401) {
-        setApiErrorMessage(t('screens.login.invaliduserpass'));
-      } else {
-        setApiErrorMessage(t('common.unknownerror'));
-      }
+    }).catch((error) => {
+      setApiErrorMessage(t(errorMessageKey(error)));
     }).finally(() => setLoginPending(false));
   };
 
@@ -149,7 +142,7 @@ const LoginScreen = ({route, navigation}: Props) => {
             loading={loginPending}
             disabled={loginPending || !email || !password}
             onPress={doLogin}>Login</Button>
-          {apiErrorMessage && <Text theme={{colors: {text: colors.error}}}>{apiErrorMessage}</Text>}
+          <FormErrorMessage testID='loginError' message={apiErrorMessage} />
           <Button
             testID='SignUpButton'
             textColor={OwnColors.bluishGrey}

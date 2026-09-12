@@ -8,6 +8,7 @@ import {ActivityIndicator, Button, Card, IconButton, Surface, Text} from 'react-
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import AppPersistence from '../../AppPersistence';
 import {QuadCropper} from '../../components/QuadCropper';
+import {toApiError} from '../../dao/ApiError';
 import RestAPI, {RecipeScanJob} from '../../dao/RestAPI';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {PromptUtil} from '../../helper/Prompt';
@@ -174,8 +175,8 @@ export const RecipeScanScreen = (props: Props) => {
       runningJobId.current = started.id;
       setJob(started);
       watch(started);
-    } catch (error: any) {
-      giveUp(failureFromError(error?.response?.data?.error));
+    } catch (error) {
+      giveUp(failureFromError(toApiError(error)));
     }
   };
 
@@ -213,9 +214,9 @@ export const RecipeScanScreen = (props: Props) => {
         } else {
           setStep('confirming');
         }
-      } catch (error: any) {
+      } catch (error) {
         if (watching.current) {
-          giveUp(failureFromError(error?.response?.data?.error));
+          giveUp(failureFromError(toApiError(error)));
         }
       }
     };

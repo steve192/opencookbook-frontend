@@ -1,10 +1,10 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {AxiosError} from 'axios';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Platform, ScrollView, StyleSheet, View} from 'react-native';
 import {Button, Chip, Divider, HelperText, Icon, List, Surface, Text, TextInput} from 'react-native-paper';
 import RestAPI, {Recipe} from '../dao/RestAPI';
+import {errorMessageKey} from '../helper/apiErrorMessage';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {importRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
@@ -51,16 +51,6 @@ export const ImportScreen = (props: Props) => {
   const showInvalidUrlHint = importURL.trim().length > 0 && !urlLooksValid;
   const canImport = !importPending && urlLooksValid;
 
-  const describeError = (error: AxiosError): string => {
-    if (error.response?.status === 501) {
-      return t('screens.import.notSupported');
-    }
-    if (!error.response) {
-      return t('common.unknownerror');
-    }
-    return error.message;
-  };
-
   const startImport = () => {
     if (!canImport) return;
     setImportPending(true);
@@ -71,8 +61,8 @@ export const ImportScreen = (props: Props) => {
       setImportError('');
       setImportedRecipe(recipe);
       setImportURL('');
-    }).catch((error: AxiosError) => {
-      setImportError(describeError(error));
+    }).catch((error) => {
+      setImportError(t(errorMessageKey(error, 'errors.importFailed')));
     }).finally(() => setImportPending(false));
   };
 
