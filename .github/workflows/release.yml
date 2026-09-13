@@ -60,7 +60,7 @@ jobs:
       # not invoked here - but @semantic-release/exec resolves its config up
       # front, and splex sets Python up in this job too. Cheap insurance.
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.14"
 
@@ -233,7 +233,7 @@ jobs:
 
       # semantic-release's prepareCmd shells out to bump_versions.py.
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.14"
 
