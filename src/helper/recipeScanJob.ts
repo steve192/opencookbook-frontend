@@ -1,5 +1,6 @@
 /** Waiting for a photographed recipe to be read, and saying what went wrong when it is not. */
 
+import {ErrorMessageKey, messageKeyForCode} from './apiErrorMessage';
 import {
   PhotoMessageKey,
   photoProblem,
@@ -11,7 +12,6 @@ export type ScanStatus = 'QUEUED' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CAN
 
 export interface ScanError {
   code: string;
-  message: string;
   retryable: boolean;
 }
 
@@ -31,44 +31,22 @@ export const nextPollDelay = (attempt: number): number =>
 
 export const hasWaitedLongEnough = (elapsedMs: number): boolean => elapsedMs >= GIVE_UP_AFTER_MS;
 
-/** Which message to show for a failure. */
-export type ScanMessageKey =
-  | 'screens.recipeScan.errors.dailyLimit'
-  | 'screens.recipeScan.errors.busy'
-  | 'screens.recipeScan.errors.unavailable'
-  | 'screens.recipeScan.errors.imageTooLarge'
-  | 'screens.recipeScan.errors.unsupportedImage'
-  | 'screens.recipeScan.errors.tooManyPages'
-  | 'screens.recipeScan.errors.badImage'
-  | 'screens.recipeScan.errors.noTextFound'
-  | 'screens.recipeScan.errors.timedOut'
-  | 'common.unknownerror';
-
-const MESSAGES: Record<string, ScanMessageKey> = {
-  USER_QUOTA_EXCEEDED: 'screens.recipeScan.errors.dailyLimit',
-  QUOTA_EXCEEDED: 'screens.recipeScan.errors.busy',
-  TOO_MANY_IN_FLIGHT: 'screens.recipeScan.errors.busy',
-  ML_UNREACHABLE: 'screens.recipeScan.errors.unavailable',
-  TOKEN_REVOKED: 'screens.recipeScan.errors.unavailable',
-  TOKEN_EXPIRED: 'screens.recipeScan.errors.unavailable',
-  INVALID_TOKEN: 'screens.recipeScan.errors.unavailable',
-  ATTACHMENT_TOO_LARGE: 'screens.recipeScan.errors.imageTooLarge',
-  ATTACHMENT_TYPE_UNSUPPORTED: 'screens.recipeScan.errors.unsupportedImage',
-  ATTACHMENT_COUNT_INVALID: 'screens.recipeScan.errors.tooManyPages',
-  INVALID_PAYLOAD: 'screens.recipeScan.errors.badImage',
-  OCR_NO_TEXT_FOUND: 'screens.recipeScan.errors.noTextFound',
-  ML_TIMEOUT: 'screens.recipeScan.errors.timedOut',
-  JOB_ABANDONED: 'screens.recipeScan.errors.timedOut',
-};
-
-const UNKNOWN: ScanMessageKey = 'common.unknownerror';
-
-export const scanErrorMessageKey = (error?: ScanError): ScanMessageKey =>
-  (error && MESSAGES[error.code]) || UNKNOWN;
+/**
+ * Which message explains a scan that failed.
+ *
+ * A job failure names itself with the same codes a rejected request does, so there is one table
+ * for both and nothing to keep in step.
+ *
+ * @param {ScanError} error what the scan failed with
+ * @return {string} the key of the message to show
+ */
+export const scanErrorMessageKey = (error?: ScanError): ErrorMessageKey =>
+  // A scan that failed without saying why is not the same as one whose answer never arrived.
+  (error ? messageKeyForCode(error.code) : 'errors.unknown');
 
 // Whether sending the very same photographs again could succeed.
 export const isWorthRetrying = (error?: ScanError): boolean =>
-  !error || (error.retryable && error.code !== 'USER_QUOTA_EXCEEDED');
+  !error || (error.retryable && error.code !== 'SCAN_DAILY_LIMIT_REACHED');
 
 export const progressMessageKey = (
     status: ScanStatus,
@@ -85,7 +63,7 @@ export const jobsAhead = (
 
 /** Everything the screen needs to explain a failure, however it came about. */
 export interface ScanFailure {
-  messageKey: ScanMessageKey | PhotoMessageKey;
+  messageKey: PhotoMessageKey | ErrorMessageKey;
   /** Whether to offer "try again" rather than sending somebody back to the photographs. */
   retryable: boolean;
 }

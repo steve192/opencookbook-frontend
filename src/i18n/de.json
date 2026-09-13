@@ -14,7 +14,6 @@
       "restartbutton": "Jetzt neustarten"
     },
     "save": "Speichern",
-    "unknownerror": "Unknown error occured",
     "ok": "Okay",
     "create": "Erstellen",
     "next": "Weiter",
@@ -92,7 +91,6 @@
       "back": "Zurück"
     },
     "resetPassword": {
-      "unknownErrorSendingRequest": "Ein unbekannter Fehler ist aufgetreten. Bitte versuche es in ein paar Minuten noch einmal",
       "successRequestSent": {
         "title": "Anfrage gesendet",
         "message": "Wenn unter der angegebenen E-Mail addresse ein Account existiert, wurde eine E-Mail zum zurücksetzen des Passworts gesendet. Bitte klicke den Link in dieser E-Mail um dein Passwort zurückzusetzen."
@@ -160,7 +158,6 @@
       "deleteScanDataDone": "Die Fotos wurden gelöscht"
     },
     "import": {
-      "notSupported": "Die Webseite wird leider noch nicht unterstüzt",
       "URLToImport": "URL zum importieren",
       "import": "Importieren",
       "supportedServices": "Unterstützte Dienste",
@@ -221,7 +218,9 @@
       "keepEditing": "Weiter bearbeiten",
       "stepNumber": "Schritt {{number}}",
       "noIngredientsYet": "Noch keine Zutaten. Füge unten die erste hinzu.",
-      "noStepsYet": "Noch keine Schritte. Füge unten den ersten hinzu."
+      "noStepsYet": "Noch keine Schritte. Füge unten den ersten hinzu.",
+      "saveFailed": "Das Rezept konnte nicht gespeichert werden. Bitte versuche es erneut",
+      "deleteFailed": "Das Rezept konnte nicht gelöscht werden. Bitte versuche es erneut"
     },
     "createGroup": {
       "groupName": "Gruppen Name",
@@ -341,7 +340,8 @@
         "tooManyPages": "So viele Fotos können nicht auf einmal gelesen werden.",
         "badImage": "Mit diesem Foto konnte nichts angefangen werden.",
         "noTextFound": "Auf dem Foto war kein lesbarer Text. Versuche ein schärferes Bild oder schneide näher am Rezept zu.",
-        "timedOut": "Die Erkennung hat zu lange gedauert. Versuche es nochmal."
+        "timedOut": "Die Erkennung hat zu lange gedauert. Versuche es nochmal.",
+        "failed": "Die Fotos konnten nicht gelesen werden."
       },
       "blocks": {
         "progress": "Frage {{step}} von {{total}}",
@@ -380,5 +380,30 @@
         "no": "Nein danke"
       }
     }
+  },
+  "errors": {
+    "unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut",
+    "offline": "Der Server ist nicht erreichbar. Bitte prüfe deine Verbindung",
+    "serverError": "Auf dem Server ist ein Fehler aufgetreten. Bitte versuche es in ein paar Minuten erneut",
+    "validation": "Bitte prüfe deine Eingaben und versuche es erneut",
+    "unsupportedMediaType": "Die App hat etwas gesendet, das dieser Server nicht lesen konnte",
+    "unsupportedFileType": "Dieser Dateityp kann hier nicht verwendet werden",
+    "fileTooLarge": "Diese Datei ist zu groß",
+    "authenticationRequired": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an",
+    "invalidCredentials": "Falsche E-Mail-Adresse oder falsches Passwort",
+    "accountNotActivated": "Dein Konto ist noch nicht aktiv. Bitte prüfe dein Postfach auf die Aktivierungsmail",
+    "accessDenied": "Dazu hast du keine Berechtigung",
+    "emailAlreadyRegistered": "Für diese E-Mail-Adresse gibt es bereits ein Konto",
+    "signupDisabled": "Dieser Server nimmt keine neuen Konten an",
+    "activationLinkInvalid": "Dieser Aktivierungslink ist nicht mehr gültig",
+    "passwordResetLinkInvalid": "Dieser Link zum Zurücksetzen des Passworts ist nicht mehr gültig",
+    "lastAdministrator": "Der letzte Administrator dieses Servers kann nicht entfernt werden",
+    "notFound": "Das gibt es nicht mehr",
+    "conflict": "Das steht im Konflikt mit etwas, das bereits existiert",
+    "rateLimited": "Das wurde ein paar Mal zu oft versucht. Bitte warte einen Moment",
+    "mailFailed": "Die E-Mail konnte nicht gesendet werden. Bitte versuche es in ein paar Minuten erneut",
+    "importUrlInvalid": "Das sieht nicht nach einem Rezept-Link aus. Füge eine vollständige Adresse ein, die mit https:// beginnt",
+    "importNotSupported": "Diese Webseite wird leider noch nicht unterstützt",
+    "importFailed": "Von dieser Seite konnte kein Rezept gelesen werden"
   }
 }

@@ -5,6 +5,7 @@ import {Avatar, Button} from 'react-native-paper';
 import RestAPI from '../dao/RestAPI';
 import axios from 'axios';
 import AppPersistence from '../AppPersistence';
+import {errorMessageKey} from '../helper/apiErrorMessage';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {BRING_DEEPLINK_API, unwrapBringDeeplink} from '../helper/bringDeeplink';
 
@@ -38,7 +39,7 @@ export const BringImportButton = (props: React.ComponentPropsWithRef<typeof View
 
       await Linking.openURL(await unwrapBringDeeplink(shortLink) ?? shortLink);
     } catch (error) {
-      SnackbarUtil.show({message: t('common.bringimportfailed')});
+      SnackbarUtil.show({message: t(errorMessageKey(error, 'common.bringimportfailed'))});
     } finally {
       setExporting(false);
     }

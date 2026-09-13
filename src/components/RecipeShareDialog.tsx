@@ -3,6 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Button, Dialog, Portal, Text} from 'react-native-paper';
 import RestAPI, {RecipeShare} from '../dao/RestAPI';
+import {errorMessageKey} from '../helper/apiErrorMessage';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {PromptUtil} from '../helper/Prompt';
 import {formatShareExpiry} from '../helper/recipeSharing';
@@ -37,14 +38,14 @@ export const RecipeShareDialog = (props: Props) => {
   const [busy, setBusy] = useState(false);
   // Reported inside the dialog rather than through a snackbar: everything in a Portal renders
   // above the global snackbar, so a message raised while this is open would never be seen.
-  const [failed, setFailed] = useState(false);
+  const [failure, setFailure] = useState<string>();
 
   const loadShare = useCallback(() => {
     if (!props.visible) {
       return;
     }
     setLoading(true);
-    setFailed(false);
+    setFailure(undefined);
     RestAPI.getSharesOfRecipe(props.recipeId)
         .then((shares) => setShare(shares[0]))
         // Not knowing whether a recipe is shared is not worth an error dialog on top of a dialog;
@@ -60,7 +61,7 @@ export const RecipeShareDialog = (props: Props) => {
       return;
     }
     setBusy(true);
-    setFailed(false);
+    setFailure(undefined);
     try {
       const created = share ?? await RestAPI.shareRecipe(props.recipeId);
       setShare(created);
@@ -73,7 +74,7 @@ export const RecipeShareDialog = (props: Props) => {
         SnackbarUtil.show({message: t('screens.recipe.sharing.linkCopied')});
       }
     } catch (e) {
-      setFailed(true);
+      setFailure(t(errorMessageKey(e, 'screens.recipe.sharing.shareFailed')));
     } finally {
       setBusy(false);
     }
@@ -89,14 +90,14 @@ export const RecipeShareDialog = (props: Props) => {
       button1: t('screens.recipe.sharing.stopSharingButton'),
       button1Callback: async () => {
         setBusy(true);
-        setFailed(false);
+        setFailure(undefined);
         try {
           await RestAPI.revokeShare(share.shareId);
           setShare(undefined);
           props.onDismiss();
           SnackbarUtil.show({message: t('screens.recipe.sharing.stoppedSharing')});
         } catch (e) {
-          setFailed(true);
+          setFailure(t(errorMessageKey(e, 'screens.recipe.sharing.shareFailed')));
         } finally {
           setBusy(false);
         }
@@ -133,9 +134,9 @@ export const RecipeShareDialog = (props: Props) => {
                   }
                 </View>
               }
-              {failed &&
+              {failure &&
                 <Text testID='recipe-sharing-error' style={{color: theme.colors.error}}>
-                  {t('screens.recipe.sharing.shareFailed')}
+                  {failure}
                 </Text>
               }
             </>

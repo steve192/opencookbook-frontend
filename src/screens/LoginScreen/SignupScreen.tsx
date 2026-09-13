@@ -6,8 +6,10 @@ import {StyleSheet, TextInput as RNTextInput, View} from 'react-native';
 import {Button, Checkbox, MD3Colors, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {EmailValidationInput} from '../../components/EmailValidationInput';
+import {FormErrorMessage} from '../../components/FormErrorMessage';
 import {PasswordValidationInput} from '../../components/PasswordValidationInput';
 import RestAPI from '../../dao/RestAPI';
+import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {PromptUtil} from '../../helper/Prompt';
 import {BaseNavigatorProps, LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
@@ -39,7 +41,7 @@ export const SignupScreen = (props: Props) => {
       return;
     }
     setRegisterPending(true);
-    setApiErrorMessage('');
+    setApiErrorMessage(undefined);
     RestAPI.registerUser(email, password).then(() => {
       props.navigation.goBack();
       PromptUtil.show({
@@ -47,8 +49,8 @@ export const SignupScreen = (props: Props) => {
         message: t('screens.login.activationpending'),
         title: t('screens.login.activationpendingtitle'),
       });
-    }).catch((error: Error) => {
-      setApiErrorMessage(error.toString());
+    }).catch((error) => {
+      setApiErrorMessage(t(errorMessageKey(error)));
     }).finally(() => setRegisterPending(false));
   };
 
@@ -102,9 +104,7 @@ export const SignupScreen = (props: Props) => {
             loading={registerPending}
             style={CentralStyles.elementSpacing}
             onPress={register}>{t('screens.login.register')}</Button>
-          {!!apiErrorMessage &&
-            <Text style={{fontWeight: 'bold', color: MD3Colors.error0, textAlign: 'center'}}>{apiErrorMessage}</Text>
-          }
+          <FormErrorMessage testID='signupError' message={apiErrorMessage} />
         </View>
       </View>
     </LoginBackdrop>

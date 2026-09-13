@@ -7,6 +7,7 @@ import {Button, Divider, Icon, IconButton, ProgressBar, Surface, Text} from 'rea
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import RestAPI, {Recipe} from '../dao/RestAPI';
+import {errorMessageKey} from '../helper/apiErrorMessage';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {importRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch} from '../redux/hooks';
@@ -38,6 +39,7 @@ export const RecipeImportBrowser = (props: Props) => {
   const [availableImportHosts, setAvailableImportHosts] = useState<string[]>([]);
   const [importStatus, setImportStatus] = useState<ImportStatus>('not_started');
   const [importedRecipe, setImportedRecipe] = useState<Recipe | undefined>(undefined);
+  const [importFailure, setImportFailure] = useState<string>();
   const [currentURL, setCurrentURL] = useState('');
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
@@ -101,7 +103,8 @@ export const RecipeImportBrowser = (props: Props) => {
     dispatch(importRecipe(currentURL)).unwrap().then((recipe) => {
       setImportedRecipe(recipe);
       setImportStatus('success');
-    }).catch(() => {
+    }).catch((error) => {
+      setImportFailure(t(errorMessageKey(error, 'screens.importbrowser.faileddescription')));
       setImportStatus('failed');
     });
   };
@@ -135,7 +138,7 @@ export const RecipeImportBrowser = (props: Props) => {
     'failed': {
       icon: 'alert-circle-outline',
       title: t('screens.importbrowser.failed'),
-      detail: t('screens.importbrowser.faileddescription'),
+      detail: importFailure ?? t('screens.importbrowser.faileddescription'),
       label: t('screens.importbrowser.retry'),
       color: theme.colors.error,
     },

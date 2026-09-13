@@ -14,7 +14,6 @@
       "restartbutton": "Restart now"
     },
     "save": "Save",
-    "unknownerror": "Unknown error occured",
     "ok": "Okay",
     "create": "Create",
     "next": "Next",
@@ -92,7 +91,6 @@
       "back": "Back"
     },
     "resetPassword": {
-      "unknownErrorSendingRequest": "An unknown error occured. Please retry in a few minutes",
       "successRequestSent": {
         "title": "Password reset request sent",
         "message": "If there is an account associated with the email address you entered, an email to reset your password was sent to you. Please click the link in the email"
@@ -160,7 +158,6 @@
       "deleteScanDataDone": "The photos were deleted"
     },
     "import": {
-      "notSupported": "The website is unfortunately not supported yet",
       "URLToImport": "URL to import",
       "import": "Import",
       "supportedServices": "Supported services",
@@ -221,7 +218,9 @@
       "keepEditing": "Keep editing",
       "stepNumber": "Step {{number}}",
       "noIngredientsYet": "No ingredients yet. Add the first one below.",
-      "noStepsYet": "No steps yet. Add the first one below."
+      "noStepsYet": "No steps yet. Add the first one below.",
+      "saveFailed": "The recipe could not be saved. Please try again",
+      "deleteFailed": "The recipe could not be deleted. Please try again"
     },
     "createGroup": {
       "groupName": "Group name",
@@ -341,7 +340,8 @@
         "tooManyPages": "That is more photos than can be read at once.",
         "badImage": "Nothing could be made of that photo.",
         "noTextFound": "No readable text was found. Try a sharper photo, or crop closer to the recipe.",
-        "timedOut": "Recognition took too long. Try again."
+        "timedOut": "Recognition took too long. Try again.",
+        "failed": "The photos could not be read."
       },
       "blocks": {
         "progress": "Question {{step}} of {{total}}",
@@ -380,5 +380,30 @@
         "no": "No thanks"
       }
     }
+  },
+  "errors": {
+    "unknown": "Something went wrong. Please try again",
+    "offline": "The server cannot be reached. Please check your connection",
+    "serverError": "The server had a problem. Please try again in a few minutes",
+    "validation": "Please check what you entered and try again",
+    "unsupportedMediaType": "The app sent something this server could not read",
+    "unsupportedFileType": "That file type cannot be used here",
+    "fileTooLarge": "That file is too large",
+    "authenticationRequired": "Your session has ended. Please sign in again",
+    "invalidCredentials": "Wrong e-mail address or password",
+    "accountNotActivated": "Your account is not active yet. Please check your inbox for the activation email",
+    "accessDenied": "You are not allowed to do that",
+    "emailAlreadyRegistered": "There is already an account for that e-mail address",
+    "signupDisabled": "This server does not accept new accounts",
+    "activationLinkInvalid": "This activation link is not valid any more",
+    "passwordResetLinkInvalid": "This password reset link is not valid any more",
+    "lastAdministrator": "The last administrator of this server cannot be removed",
+    "notFound": "That does not exist any more",
+    "conflict": "That conflicts with something that already exists",
+    "rateLimited": "That was tried a few times too often. Please wait a moment",
+    "mailFailed": "The email could not be sent. Please try again in a few minutes",
+    "importUrlInvalid": "That does not look like a recipe link. Paste a full address starting with https://",
+    "importNotSupported": "This website is unfortunately not supported yet",
+    "importFailed": "No recipe could be read from that page"
   }
 }

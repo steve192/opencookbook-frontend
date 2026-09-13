@@ -12,7 +12,7 @@ import {
   scanErrorMessageKey,
 } from './recipeScanJob';
 
-const error = (code: string, retryable = false): ScanError => ({code, message: 'x', retryable});
+const error = (code: string, retryable = false): ScanError => ({code, retryable});
 
 describe('knowing when a scan is over', () => {
   it.each(['COMPLETED', 'FAILED', 'CANCELLED'] as const)('%s is finished', (status) => {
@@ -49,38 +49,43 @@ describe('how often to ask', () => {
 
 describe('explaining a failure', () => {
   it.each([
-    ['USER_QUOTA_EXCEEDED', 'screens.recipeScan.errors.dailyLimit'],
-    ['TOO_MANY_IN_FLIGHT', 'screens.recipeScan.errors.busy'],
-    ['ML_UNREACHABLE', 'screens.recipeScan.errors.unavailable'],
-    ['TOKEN_REVOKED', 'screens.recipeScan.errors.unavailable'],
-    ['ATTACHMENT_TOO_LARGE', 'screens.recipeScan.errors.imageTooLarge'],
-    ['OCR_NO_TEXT_FOUND', 'screens.recipeScan.errors.noTextFound'],
-    ['ML_TIMEOUT', 'screens.recipeScan.errors.timedOut'],
+    ['SCAN_DAILY_LIMIT_REACHED', 'screens.recipeScan.errors.dailyLimit'],
+    ['SCAN_BUSY', 'screens.recipeScan.errors.busy'],
+    ['SCAN_UNAVAILABLE', 'screens.recipeScan.errors.unavailable'],
+    ['SCAN_IMAGE_TOO_LARGE', 'screens.recipeScan.errors.imageTooLarge'],
+    ['SCAN_NO_TEXT_FOUND', 'screens.recipeScan.errors.noTextFound'],
+    ['SCAN_TIMED_OUT', 'screens.recipeScan.errors.timedOut'],
+    ['SCAN_FAILED', 'screens.recipeScan.errors.failed'],
   ])('%s is explained in the app rather than in the server log', (code, key) => {
     expect(scanErrorMessageKey(error(code))).toBe(key);
   });
 
   it('falls back to something generic for a code it has never seen', () => {
-    expect(scanErrorMessageKey(error('SOMETHING_NEW'))).toBe('common.unknownerror');
+    expect(scanErrorMessageKey(error('SOMETHING_NEW'))).toBe('errors.unknown');
   });
 
   it('falls back when there is no error at all', () => {
-    expect(scanErrorMessageKey(undefined)).toBe('common.unknownerror');
+    expect(scanErrorMessageKey(undefined)).toBe('errors.unknown');
+  });
+
+  it('uses what the app says everywhere else for a failure that is not about the photos', () => {
+    expect(scanErrorMessageKey(error('AUTHENTICATION_REQUIRED')))
+        .toBe('errors.authenticationRequired');
   });
 });
 
 describe('offering to try again', () => {
   it('does for something that might work next time', () => {
-    expect(isWorthRetrying(error('ML_UNREACHABLE', true))).toBe(true);
+    expect(isWorthRetrying(error('SCAN_UNAVAILABLE', true))).toBe(true);
   });
 
   it('does not for a picture that will never read any better', () => {
-    expect(isWorthRetrying(error('OCR_NO_TEXT_FOUND', false))).toBe(false);
+    expect(isWorthRetrying(error('SCAN_NO_TEXT_FOUND', false))).toBe(false);
   });
 
   it('does not when the allowance is spent, however retryable that is in principle', () => {
     // Trying again today can only fail again, and would spend nothing but the person's patience.
-    expect(isWorthRetrying(error('USER_QUOTA_EXCEEDED', true))).toBe(false);
+    expect(isWorthRetrying(error('SCAN_DAILY_LIMIT_REACHED', true))).toBe(false);
   });
 });
 
@@ -146,7 +151,7 @@ describe('outcomeOf', () => {
     const outcome = outcomeOf(job({
       status: 'FAILED',
       recipe: undefined,
-      error: {code: 'OCR_NO_TEXT_FOUND', message: 'nothing', retryable: false},
+      error: {code: 'SCAN_NO_TEXT_FOUND', retryable: false},
     }));
 
     expect(outcome).toEqual({

@@ -7,6 +7,7 @@ import Spacer from 'react-spacer';
 import {EmailValidationInput} from '../../components/EmailValidationInput';
 import {SuccessErrorBanner} from '../../components/SuccessErrorBanner';
 import RestAPI from '../../dao/RestAPI';
+import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
@@ -16,7 +17,7 @@ export const RequestPasswordResetScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const [emailAddress, setEmailAddress] = useState('');
   const [emailValid, setEmailValid] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string>();
   const [success, setSuccess] = useState(false);
   const [pending, setPending] = useState(false);
 
@@ -25,11 +26,11 @@ export const RequestPasswordResetScreen = (props: Props) => {
       return;
     }
     setPending(true);
-    setError(false);
+    setError(undefined);
     RestAPI.requestPasswordReset(emailAddress).then(() => {
       setSuccess(true);
-    }).catch(() => {
-      setError(true);
+    }).catch((cause) => {
+      setError(t(errorMessageKey(cause)));
       setSuccess(false);
     }).finally(() => setPending(false));
   };
@@ -37,11 +38,11 @@ export const RequestPasswordResetScreen = (props: Props) => {
   return (
     <LoginBackdrop>
       <SuccessErrorBanner
-        error={error}
+        error={!!error}
         success={success}
         pending={false}
         pendingContent=""
-        errorContent={t('screens.resetPassword.unknownErrorSendingRequest')}
+        errorContent={error ?? ''}
         successContent={t('screens.resetPassword.successRequestSent.message')}
       />
       <View style={{flex: 1,

@@ -11,11 +11,16 @@ import {TimerNotificationOpener} from './src/components/TimerNotificationOpener'
 import {GlobalSnackbar} from './src/helper/GlobalSnackbar';
 import './src/i18n/config';
 import MainNavigation from './src/navigation/MainNavigation';
+import RestAPI from './src/dao/RestAPI';
+import {logout} from './src/redux/features/authSlice';
 import {RootState, store} from './src/redux/store';
 import {OwnPaperTheme, OwnPaperThemeDark} from './src/styles/CentralStyles';
 import {StyleSheet, useColorScheme} from 'react-native';
 
 enableScreens();
+
+// A session that can no longer be renewed means the login screen, wherever the app happens to be.
+RestAPI.onSessionExpired = () => store.dispatch(logout());
 
 export default () => {
   return (

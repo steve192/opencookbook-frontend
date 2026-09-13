@@ -7,6 +7,8 @@ import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
 import {SectionTitle} from '../../components/SectionTitle';
 import {Option} from '../../components/SelectionPopupModal';
 import RestAPI, {Ingredient, IngredientUse, Recipe, RecipeDiet} from '../../dao/RestAPI';
+import {errorMessageKey} from '../../helper/apiErrorMessage';
+import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {takeDraft} from '../../helper/recipeDraftHandover';
 import {dietLabel, RECIPE_DIETS} from '../../helper/recipeDiet';
 import {
@@ -123,24 +125,33 @@ const RecipeWizardScreen = (props: Props) => {
       [edit],
   );
 
+  // Unwrapped so that a rejected request is a rejected promise: a plain dispatch resolves
+  // either way, which used to close the screen on a recipe the server never accepted.
   const saveRecipe = () => {
     if (savePending) return;
     setSavePending(true);
     const toSave = forSaving(recipeData);
     const action = props.route.params.editing ? updateRecipe(toSave) : createRecipe(toSave);
-    dispatch(action).then(() => {
+    dispatch(action).unwrap().then(() => {
       savedOrDiscarded.current = true;
       props.navigation.goBack();
+    }).catch((error) => {
+      SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.editRecipe.saveFailed'))});
     }).finally(() => setSavePending(false));
   };
 
   const performDelete = () => {
-    savedOrDiscarded.current = true;
-    if (props.route.params.editing) {
-      dispatch(deleteRecipe(recipeData)).then(() => props.navigation.goBack());
-    } else {
+    if (!props.route.params.editing) {
+      savedOrDiscarded.current = true;
       props.navigation.goBack();
+      return;
     }
+    dispatch(deleteRecipe(recipeData)).unwrap().then(() => {
+      savedOrDiscarded.current = true;
+      props.navigation.goBack();
+    }).catch((error) => {
+      SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.editRecipe.deleteFailed'))});
+    });
   };
 
   // Always confirm before destroying a recipe - the old behaviour was a single

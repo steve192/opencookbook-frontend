@@ -116,7 +116,7 @@ export interface RecipeScanJob {
   photo?: {usable: boolean; problem?: string | null; pageIndex?: number | null};
   /** How many scans are ahead of this one, while it is still waiting. */
   queuePosition?: number | null;
-  error?: {code: string; message: string; retryable: boolean};
+  error?: {code: string; retryable: boolean};
 }
 
 /** A public link to one of your own recipes. */
@@ -190,6 +190,10 @@ const imageDataUri = (data: ArrayBuffer): string =>
  */
 class RestAPI {
   private static isOnline = true;
+
+  /** Called when the session cannot be renewed, so the app can send somebody back to login. */
+  static onSessionExpired?: () => void;
+
   static setIsOnline(payload: boolean) {
     RestAPI.isOnline = payload;
   }
@@ -686,14 +690,10 @@ class RestAPI {
   }
 
   static async registerUser(emailAddress: string, password: string) {
-    const response = await axios.post(await this.url('/users/signup'), {
+    await axios.post(await this.url('/users/signup'), {
       emailAddress: emailAddress,
       password: password,
     });
-
-    if (response.status > 299) {
-      throw Error('Error server responded with http' + response.status);
-    }
   }
 
   private static async url(path: string) {
@@ -763,13 +763,17 @@ class RestAPI {
       throw axiosError;
     }
 
-    if (errResponse.status === 401 || errResponse.status === 403) {
-      // Maybe token expired?
+    // 403 is a permission the account does not have, not a token that has run out; renewing
+    // would answer the same way and cost a second request for every refusal.
+    if (errResponse.status === 401) {
       console.warn('Axios warning: Auth fail, trying to refresh token');
       try {
         await this.refreshToken();
       } catch (refreshError) {
-        console.error('Failed to refesh token');
+        // The refresh token is spent too, so there is no way back without signing in. Said
+        // once, here, rather than left to each screen to notice.
+        console.error('Failed to refresh token');
+        this.onSessionExpired?.();
         throw refreshError;
       }
     } else {

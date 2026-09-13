@@ -4,6 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {Image, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import {Avatar, IconButton, Text} from 'react-native-paper';
 import RestAPI, {RecipeImage} from '../dao/RestAPI';
+import {errorMessageKey} from '../helper/apiErrorMessage';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {PromptUtil} from '../helper/Prompt';
 import {TITLE_IMAGE_INDEX, moveImage} from '../helper/recipeImages';
@@ -55,7 +56,8 @@ export const RecipeImageViewPager = (props: Props) => {
       props.onImageAdded?.(uuid);
     } catch (error) {
       console.error('Error uploading image', error);
-      SnackbarUtil.show({message: t('screens.editRecipe.imageUploadFailed')});
+      SnackbarUtil.show(
+          {message: t(errorMessageKey(error, 'screens.editRecipe.imageUploadFailed'))});
     }
   };
 

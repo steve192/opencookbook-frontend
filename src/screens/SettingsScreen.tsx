@@ -12,6 +12,7 @@ import Spacer from 'react-spacer';
 import AppPersistence from '../AppPersistence';
 import {CustomCard} from '../components/CustomCard';
 import RestAPI from '../dao/RestAPI';
+import {errorMessageKey} from '../helper/apiErrorMessage';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {PromptUtil} from '../helper/Prompt';
 import {setAppbarOptions} from '../navigation/appbarOptions';
@@ -69,8 +70,11 @@ export const SettingsScreen = (props: Props) => {
       message: t('screens.settings.deleteAccountConfirmationQuestion'),
       button1: t('common.delete'),
       button1Callback: () => {
-        RestAPI.deleteAccount();
-        dispatch(logout());
+        // Signed out only once the account is actually gone: doing it first left somebody at
+        // the login screen believing a request that had failed.
+        RestAPI.deleteAccount()
+            .then(() => dispatch(logout()))
+            .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
       },
       button2: t('common.cancel'),
     });
@@ -88,7 +92,8 @@ export const SettingsScreen = (props: Props) => {
     setPasswordResetPending(true);
     RestAPI.requestPasswordReset(emailAddress)
         .then(() => SnackbarUtil.show({message: t('screens.settings.changePasswordSent')}))
-        .catch(() => SnackbarUtil.show({message: t('screens.settings.changePasswordFailed')}))
+        .catch((error) => SnackbarUtil.show(
+            {message: t(errorMessageKey(error, 'errors.mailFailed'))}))
         .finally(() => setPasswordResetPending(false));
   };
 
@@ -117,7 +122,7 @@ export const SettingsScreen = (props: Props) => {
       button1Callback: () => {
         RestAPI.deleteScanTrainingData()
             .then(() => SnackbarUtil.show({message: t('screens.settings.deleteScanDataDone')}))
-            .catch(() => SnackbarUtil.show({message: t('common.unknownerror')}));
+            .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
       },
       button2: t('common.cancel'),
     });

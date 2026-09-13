@@ -8,7 +8,9 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import AppPersistence from '../AppPersistence';
 import {SharedImageAccess} from '../components/ImageAccessContext';
 import {RecipeDetailView} from '../components/RecipeDetailView';
+import {toApiError} from '../dao/ApiError';
 import RestAPI, {Recipe} from '../dao/RestAPI';
+import {errorMessageKey} from '../helper/apiErrorMessage';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {isSameInstance, parseShareLink} from '../helper/recipeSharing';
 import {BaseNavigatorProps} from '../navigation/NavigationRoutes';
@@ -17,9 +19,6 @@ import CentralStyles from '../styles/CentralStyles';
 
 /** Why a share could not be shown. Each one needs its own thing said about it. */
 type LoadFailure = 'gone' | 'elsewhere' | 'tooManyRequests' | 'failed';
-
-const HTTP_NOT_FOUND = 404;
-const HTTP_TOO_MANY_REQUESTS = 429;
 
 type Props = NativeStackScreenProps<BaseNavigatorProps, 'SharedRecipeScreen'>;
 
@@ -96,7 +95,7 @@ export const SharedRecipeScreen = (props: Props) => {
         });
       }
     } catch (e) {
-      SnackbarUtil.show({message: t('screens.sharedRecipe.importFailed')});
+      SnackbarUtil.show({message: t(errorMessageKey(e, 'screens.sharedRecipe.importFailed'))});
     } finally {
       setImporting(false);
     }
@@ -230,11 +229,14 @@ const useShareLinkOrigin = (shareId: string): string | undefined => {
  * @return {LoadFailure} what happened
  */
 const failureFor = (error: unknown): LoadFailure => {
-  const status = (error as {response?: {status?: number}})?.response?.status;
-  if (status === HTTP_TOO_MANY_REQUESTS) {
-    return 'tooManyRequests';
+  switch (toApiError(error).code) {
+    case 'RATE_LIMITED':
+      return 'tooManyRequests';
+    case 'RESOURCE_NOT_FOUND':
+      return 'gone';
+    default:
+      return 'failed';
   }
-  return status === HTTP_NOT_FOUND ? 'gone' : 'failed';
 };
 
 const messageKeyFor = (failure: LoadFailure) => {
