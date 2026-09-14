@@ -45,6 +45,7 @@ export const SharedRecipeScreen = (props: Props) => {
 
   const shareId = props.route.params.shareId;
   const linkOrigin = useShareLinkOrigin(shareId);
+  const loadNutrition = useCallback(() => RestAPI.getSharedRecipeNutrition(shareId), [shareId]);
 
   // Only used to explain a share that is not here: it is the difference between "your link has
   // expired" and "this recipe lives on a server you are not signed in to".
@@ -140,6 +141,7 @@ export const SharedRecipeScreen = (props: Props) => {
           recipe={recipe}
           scaledServings={scaledServings}
           onScaledServingsChange={setScaledServings}
+          nutrition={{loadDetails: loadNutrition}}
         />
       </SharedImageAccess>
 

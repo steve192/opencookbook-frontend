@@ -1,13 +1,15 @@
-import React, {ReactNode, useEffect} from 'react';
+import React, {ReactNode, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Linking, ScrollView, StyleSheet, View} from 'react-native';
-import {Chip, Divider, Text} from 'react-native-paper';
-import {Recipe} from '../dao/RestAPI';
+import {Chip, Divider, List, Text} from 'react-native-paper';
+import {Recipe, RecipeNutrition} from '../dao/RestAPI';
 import {dietLabel} from '../helper/recipeDiet';
+import {formatNutrient} from '../helper/nutrition';
 import {formatDuration} from '../helper/recipeDuration';
 import {useCheckedIngredients} from '../helper/useCheckedIngredients';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 import {IngredientList} from './IngredientList';
+import {NutritionSheet} from './NutritionSheet';
 import {RecipeImageViewPager} from './RecipeImageViewPager';
 import {SectionTitle} from './SectionTitle';
 import {TextBullet} from './TextBullet';
@@ -28,6 +30,11 @@ interface Props {
    * What that is depends on whether this is your recipe or somebody else's.
    */
   footer?: ReactNode;
+  /** onLinkChanged only for the reader's own recipe. */
+  nutrition?: {
+    loadDetails: () => Promise<RecipeNutrition>;
+    onLinkChanged?: () => void;
+  };
 }
 
 /**
@@ -41,9 +48,10 @@ interface Props {
  * @return {JSX.Element} the recipe, ready to read
  */
 export const RecipeDetailView = (props: Props) => {
-  const {t} = useTranslation('translation');
+  const {t, i18n} = useTranslation('translation');
   const theme = useAppTheme();
   const ingredientChecklist = useCheckedIngredients();
+  const [nutritionOpen, setNutritionOpen] = useState(false);
 
   // A different recipe starts with nothing ticked off. Keyed on the title rather than on the
   // recipe object, which changes identity on every refetch of the same recipe.
@@ -79,6 +87,39 @@ export const RecipeDetailView = (props: Props) => {
             {getDomain(props.recipe.recipeSource)}
           </Chip>
         }
+      </View>
+    );
+  };
+
+  const renderNutritionRow = () => {
+    const summary = props.recipe.nutrition;
+    if (!summary || !props.nutrition) {
+      return null;
+    }
+    const canCorrect = props.nutrition.onLinkChanged !== undefined;
+    const energy = formatNutrient(summary.values.energyKcal, 'kcal', i18n.language);
+    const value = t(summary.basis === 'SERVING' ? 'nutrition.summaryPerServing' : 'nutrition.summaryTotal', {energy});
+    const description = {
+      COMPLETE: value,
+      INCOMPLETE: t('nutrition.summaryWithMissing', {value}),
+      UNAVAILABLE: t(canCorrect ? 'nutrition.summaryAddMissing' : 'nutrition.summaryIncomplete'),
+    }[summary.status];
+    const complete = summary.status === 'COMPLETE';
+    const accent = complete ? theme.colors.onSurfaceVariant : theme.colors.error;
+    return (
+      <View>
+        <Divider />
+        <List.Item
+          testID='nutrition-row'
+          title={t('nutrition.sheetTitle')}
+          description={description}
+          descriptionStyle={{color: accent}}
+          style={styles.nutritionRow}
+          left={(iconProps) =>
+            <List.Icon {...iconProps} style={[iconProps.style, styles.flushLeft]} icon={complete ? 'fire' : 'alert-outline'} color={accent} />}
+          right={(iconProps) => <List.Icon {...iconProps} icon="chevron-right" />}
+          onPress={() => setNutritionOpen(true)} />
+        <Divider />
       </View>
     );
   };
@@ -126,10 +167,18 @@ export const RecipeDetailView = (props: Props) => {
       <View style={[CentralStyles.contentContainer, styles.content]}>
         {renderFacts()}
         {renderIngredientsSection()}
-        <Divider />
+        {renderNutritionRow() ?? <Divider />}
         {renderStepsSection()}
         {props.footer}
       </View>
+      {nutritionOpen && props.recipe.nutrition && props.nutrition &&
+        <NutritionSheet
+          summary={props.recipe.nutrition}
+          scaledServings={props.scaledServings}
+          loadDetails={props.nutrition.loadDetails}
+          onLinkChanged={props.nutrition.onLinkChanged}
+          onDismiss={() => setNutritionOpen(false)} />
+      }
     </ScrollView>
   );
 };
@@ -148,6 +197,13 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: 8,
+  },
+  // Aligned with the ingredient rows above.
+  nutritionRow: {
+    paddingRight: 0,
+  },
+  flushLeft: {
+    marginLeft: 0,
   },
   step: {
     flexDirection: 'row',

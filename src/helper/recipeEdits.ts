@@ -177,11 +177,14 @@ export const withImageRemoved = (recipe: Recipe, uuid: string): Recipe =>
  */
 export const withImages = (recipe: Recipe, images: RecipeImage[]): Recipe => ({...recipe, images});
 
+const isUntouchedIngredientLine = (line: IngredientUse): boolean =>
+  line.ingredient.name.trim() === '' && line.amount === null && line.unit.trim() === '';
+
 /**
  * What is sent when the recipe is saved.
  *
  * A group the user never picked is left behind as a blank entry, which the server would
- * store as a group with no name.
+ * store as a group with no name. The editor's blank ingredient line is left out too.
  *
  * @param {Recipe} recipe the recipe being edited
  * @return {Recipe} the recipe as it should be stored
@@ -189,4 +192,5 @@ export const withImages = (recipe: Recipe, images: RecipeImage[]): Recipe => ({.
 export const forSaving = (recipe: Recipe): Recipe => ({
   ...recipe,
   recipeGroups: recipe.recipeGroups.filter((group) => group.title !== ''),
+  neededIngredients: recipe.neededIngredients.filter((line) => !isUntouchedIngredientLine(line)),
 });

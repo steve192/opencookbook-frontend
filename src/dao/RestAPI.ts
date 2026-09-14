@@ -37,6 +37,70 @@ export interface Recipe {
     preparationTime?: number | null;
     totalTime?: number | null;
     recipeType?: RecipeDiet | null;
+    /** Absent where the instance does not estimate nutrition. */
+    nutrition?: NutritionSummary | null;
+}
+
+/** Grams, except energy. */
+export interface Nutrients {
+    energyKcal: number | null;
+    energyKj: number | null;
+    fat: number | null;
+    saturatedFat: number | null;
+    carbohydrates: number | null;
+    sugar: number | null;
+    fibre: number | null;
+    protein: number | null;
+    salt: number | null;
+}
+
+/** UNAVAILABLE values are not shown. */
+export interface NutritionSummary {
+    basis: 'SERVING' | 'RECIPE';
+    status: 'COMPLETE' | 'INCOMPLETE' | 'UNAVAILABLE';
+    values: Nutrients;
+    warningCount: number;
+}
+
+export type NutritionLineStatus = 'RESOLVED' | 'EXCLUDED' | 'UNLINKED' | 'UNIT_UNKNOWN' | 'NO_PORTION' | 'NO_AMOUNT';
+export type NutritionLineFlag = 'LOW_CONFIDENCE' | 'VOLUME_WITHOUT_DENSITY' | 'ESTIMATED_PORTION' |
+    'SIZE_SCALED_PORTION' | 'TYPICAL_CONTAINER_SIZE' | 'PINCH';
+
+export interface NutritionLine {
+    /** Null for shared recipes. */
+    ingredientId: number | null;
+    ingredientName: string;
+    amount: number | null;
+    unit: string | null;
+    grams: number | null;
+    values: Nutrients;
+    food: {id: number, displayName: string, sourceName: string | null} | null;
+    status: NutritionLineStatus;
+    flags: NutritionLineFlag[];
+    /** Null for shared recipes. */
+    ownPortion: boolean | null;
+    warns: boolean;
+}
+
+export interface NutritionAttribution {
+    source: string;
+    text: string;
+    license: string;
+    licenseUrl: string;
+}
+
+export interface RecipeNutrition {
+    summary: NutritionSummary;
+    lines: NutritionLine[];
+    attributions: NutritionAttribution[];
+}
+
+export interface CatalogueFood {
+    id: number;
+    displayName: string;
+    sourceName: string | null;
+    /** Per 100 g. */
+    energyKcal: number | null;
 }
 
 export interface RecipeGroup {
@@ -151,6 +215,7 @@ interface SharedRecipeResponse {
   totalTime?: number | null;
   recipeType?: RecipeDiet | null;
   recipeSource?: string;
+  nutrition?: NutritionSummary | null;
 }
 
 /**
@@ -174,6 +239,7 @@ const sharedRecipeToRecipe = (shared: SharedRecipeResponse): Recipe => ({
   preparationTime: shared.preparationTime,
   totalTime: shared.totalTime,
   recipeType: shared.recipeType,
+  nutrition: shared.nutrition,
 });
 
 /**
@@ -279,6 +345,33 @@ class RestAPI {
   static async importSharedRecipe(shareId: string): Promise<Recipe> {
     const response = await this.post(`/shares/${shareId}/import`, {});
     return {...response?.data, type: 'Recipe'};
+  }
+
+  static async getSharedRecipeNutrition(shareId: string): Promise<RecipeNutrition> {
+    return (await axios.get(await this.sharedUrl(shareId, '/nutrition'))).data;
+  }
+
+  static async getRecipeNutrition(recipeId: number): Promise<RecipeNutrition> {
+    return (await this.get(`/recipes/${recipeId}/nutrition`))?.data;
+  }
+
+  static async searchCatalogue(query: string): Promise<CatalogueFood[]> {
+    return (await this.get(`/catalogue/search?q=${encodeURIComponent(query)}`))?.data;
+  }
+
+  // catalogueFoodId null excludes the ingredient from nutrition.
+  static async linkIngredient(ingredientId: number, catalogueFoodId: number | null): Promise<void> {
+    await this.put(`/ingredients/${ingredientId}/link`,
+      catalogueFoodId === null ? {excluded: true} : {catalogueFoodId: catalogueFoodId});
+  }
+
+  // unit as the recipe writes it; empty for pieces.
+  static async setOwnPortion(ingredientId: number, unit: string, grams: number): Promise<void> {
+    await this.put(`/ingredients/${ingredientId}/portion`, {unit: unit, grams: grams});
+  }
+
+  static async removeOwnPortion(ingredientId: number, unit: string): Promise<void> {
+    await this.delete(`/ingredients/${ingredientId}/portion?unit=${encodeURIComponent(unit)}`);
   }
 
   static async createBringExport(recipeId: number): Promise<string> {
