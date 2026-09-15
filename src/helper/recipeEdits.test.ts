@@ -155,6 +155,18 @@ describe('forSaving', () => {
     expect(forSaving(recipe({recipeGroups: [group]})).recipeGroups).toEqual([group]);
   });
 
+  // The editor always offers a blank ingredient line to type into
+  it('drops an ingredient line that was never filled in', () => {
+    const untouched = {ingredient: {name: ' '}, amount: null, unit: ''};
+    const salt = {ingredient: {name: 'Salz'}, amount: null, unit: ''};
+    expect(forSaving(recipe({neededIngredients: [untouched, salt]})).neededIngredients).toEqual([salt]);
+  });
+
+  it('keeps a line that has an amount but no name yet, so the server can refuse it', () => {
+    const amountOnly = {ingredient: {name: ''}, amount: 2, unit: 'EL'};
+    expect(forSaving(recipe({neededIngredients: [amountOnly]})).neededIngredients).toEqual([amountOnly]);
+  });
+
   it('changes nothing else', () => {
     expect(forSaving(recipe({title: 'Pizza'})).title).toBe('Pizza');
   });

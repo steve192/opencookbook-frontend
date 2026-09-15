@@ -381,6 +381,78 @@
       }
     }
   },
+  "nutrition": {
+    "summaryPerServing": "≈ {{energy}} per serving",
+    "summaryTotal": "≈ {{energy}} in total",
+    "summaryWithMissing": "{{value}} · incomplete",
+    "summaryAddMissing": "Too little known – complete the ingredients",
+    "summaryIncomplete": "Too little known",
+    "sheetTitle": "Nutrition",
+    "estimateNotice": "An estimate from the ingredients and their amounts. Real values depend on variety, size and preparation.",
+    "incompleteNotice_one": "Something is missing for {{count}} ingredient: the values are probably higher.",
+    "incompleteNotice_other": "Something is missing for {{count}} ingredients: the values are probably higher.",
+    "unavailableNotice": "For too many ingredients it is not known what or how much they are. Complete them below and the values are shown.",
+    "unavailableSharedNotice": "For too many ingredients it is not known what or how much they are.",
+    "perServing": "per serving",
+    "servingsTotal_one": "{{count}} serving",
+    "servingsTotal_other": "{{count}} servings",
+    "total": "total",
+    "ingredients": "Ingredients",
+    "tapToCorrect": "Tap an ingredient to change what it is.",
+    "linkedTo": "as {{food}}",
+    "limitsTitle": "Not taken into account",
+    "limitsNotice": "Oil left in the pan, weight lost or water taken up while cooking, drained liquids and differences between brands.",
+    "sources": "Sources",
+    "loadFailed": "The nutrition values could not be loaded",
+    "retry": "Try again",
+    "nutrients": {
+      "energy": "Energy",
+      "fat": "Fat",
+      "saturatedFat": "of which saturates",
+      "carbohydrates": "Carbohydrates",
+      "sugar": "of which sugars",
+      "fibre": "Fibre",
+      "protein": "Protein",
+      "salt": "Salt"
+    },
+    "lineStatus": {
+      "EXCLUDED": "does not count",
+      "UNLINKED": "unknown ingredient",
+      "UNIT_UNKNOWN": "unknown unit",
+      "NO_PORTION": "piece weight unknown",
+      "NO_AMOUNT": "no amount"
+    },
+    "lineFlag": {
+      "LOW_CONFIDENCE": "uncertain match",
+      "VOLUME_WITHOUT_DENSITY": "volume counted as water",
+      "ESTIMATED_PORTION": "piece weight estimated",
+      "SIZE_SCALED_PORTION": "size estimated",
+      "TYPICAL_CONTAINER_SIZE": "typical package size",
+      "PINCH": "pinch"
+    },
+    "ownPortionNote": "own piece weight",
+    "portion": {
+      "button": "Enter weight per piece",
+      "title": "How much does 1 {{unit}} {{ingredient}} weigh?",
+      "piece": "piece",
+      "grams": "Grams",
+      "appliesEverywhere": "Applies to all your recipes with this ingredient and unit.",
+      "save": "Save",
+      "remove": "Remove own weight",
+      "invalid": "Enter a weight above 0 g",
+      "failed": "The weight could not be saved"
+    },
+    "link": {
+      "title": "What is \"{{ingredient}}\"?",
+      "searchPlaceholder": "Search foods",
+      "per100g": "{{energy}} per 100 g",
+      "noResults": "Nothing found",
+      "excludeButton": "Does not count for nutrition",
+      "appliesEverywhere": "Applies to all your recipes with this ingredient.",
+      "failed": "The ingredient could not be changed",
+      "searchFailed": "The search failed"
+    }
+  },
   "errors": {
     "unknown": "Something went wrong. Please try again",
     "offline": "The server cannot be reached. Please check your connection",

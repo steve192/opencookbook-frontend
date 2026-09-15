@@ -1,7 +1,7 @@
 import {useIsFocused} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useKeepAwake} from 'expo-keep-awake';
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Appbar, Button, Surface} from 'react-native-paper';
@@ -9,6 +9,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {BringImportButton} from '../components/BringExportButton';
 import {RecipeDetailView} from '../components/RecipeDetailView';
 import {RecipeShareDialog} from '../components/RecipeShareDialog';
+import RestAPI from '../dao/RestAPI';
 import {useOnlineGuard} from '../helper/useOnlineGuard';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {setAppbarOptions} from '../navigation/appbarOptions';
@@ -89,6 +90,11 @@ export const RecipeScreen = (props: Props) => {
     });
   }, [displayedRecipe, theme, t, sharingEnabled]);
 
+  const recipeId = props.route.params.recipeId;
+  const loadNutrition = useCallback(() => RestAPI.getRecipeNutrition(recipeId), [recipeId]);
+  // The summary comes with the recipe.
+  const reloadRecipe = useCallback(() => dispatch(fetchSingleRecipe(recipeId)), [recipeId]);
+
   // What can be done with a recipe of your own, below the steps. Sharing is not here: it is an
   // action you go and take, not something to read past on the way to the preparation steps.
   const renderOwnerActions = () => (
@@ -107,6 +113,7 @@ export const RecipeScreen = (props: Props) => {
           scaledServings={scaledServings}
           onScaledServingsChange={setScaledServings}
           footer={renderOwnerActions()}
+          nutrition={{loadDetails: loadNutrition, onLinkChanged: reloadRecipe}}
         />
       }
 

@@ -381,6 +381,78 @@
       }
     }
   },
+  "nutrition": {
+    "summaryPerServing": "≈ {{energy}} pro Portion",
+    "summaryTotal": "≈ {{energy}} gesamt",
+    "summaryWithMissing": "{{value}} · unvollständig",
+    "summaryAddMissing": "Zu wenig bekannt – Zutaten ergänzen",
+    "summaryIncomplete": "Zu wenig bekannt",
+    "sheetTitle": "Nährwerte",
+    "estimateNotice": "Eine Schätzung aus den Zutaten und ihren Mengen. Echte Werte hängen von Sorte, Größe und Zubereitung ab.",
+    "incompleteNotice_one": "Bei {{count}} Zutat fehlt etwas: Die Werte sind vermutlich höher.",
+    "incompleteNotice_other": "Bei {{count}} Zutaten fehlt etwas: Die Werte sind vermutlich höher.",
+    "unavailableNotice": "Für zu viele Zutaten ist nicht bekannt, was oder wie viel sie sind. Ergänze sie unten, dann werden die Werte angezeigt.",
+    "unavailableSharedNotice": "Für zu viele Zutaten ist nicht bekannt, was oder wie viel sie sind.",
+    "perServing": "pro Portion",
+    "servingsTotal_one": "{{count}} Portion",
+    "servingsTotal_other": "{{count}} Portionen",
+    "total": "gesamt",
+    "ingredients": "Zutaten",
+    "tapToCorrect": "Tippe auf eine Zutat, um zu ändern, was sie ist.",
+    "linkedTo": "als {{food}}",
+    "limitsTitle": "Nicht berücksichtigt",
+    "limitsNotice": "Öl, das in der Pfanne bleibt, Gewichtsverlust oder Wasseraufnahme beim Garen, abgegossene Flüssigkeit und Unterschiede zwischen Marken.",
+    "sources": "Quellen",
+    "loadFailed": "Die Nährwerte konnten nicht geladen werden",
+    "retry": "Erneut versuchen",
+    "nutrients": {
+      "energy": "Energie",
+      "fat": "Fett",
+      "saturatedFat": "davon gesättigte Fettsäuren",
+      "carbohydrates": "Kohlenhydrate",
+      "sugar": "davon Zucker",
+      "fibre": "Ballaststoffe",
+      "protein": "Eiweiß",
+      "salt": "Salz"
+    },
+    "lineStatus": {
+      "EXCLUDED": "zählt nicht",
+      "UNLINKED": "unbekannte Zutat",
+      "UNIT_UNKNOWN": "unbekannte Einheit",
+      "NO_PORTION": "Stückgewicht unbekannt",
+      "NO_AMOUNT": "ohne Menge"
+    },
+    "lineFlag": {
+      "LOW_CONFIDENCE": "Zuordnung unsicher",
+      "VOLUME_WITHOUT_DENSITY": "Volumen wie Wasser gerechnet",
+      "ESTIMATED_PORTION": "Stückgewicht geschätzt",
+      "SIZE_SCALED_PORTION": "Größe geschätzt",
+      "TYPICAL_CONTAINER_SIZE": "übliche Packungsgröße",
+      "PINCH": "Prise"
+    },
+    "ownPortionNote": "eigenes Stückgewicht",
+    "portion": {
+      "button": "Gewicht pro Stück angeben",
+      "title": "Wie viel wiegt 1 {{unit}} {{ingredient}}?",
+      "piece": "Stück",
+      "grams": "Gramm",
+      "appliesEverywhere": "Gilt für alle deine Rezepte mit dieser Zutat und Einheit.",
+      "save": "Speichern",
+      "remove": "Eigenes Gewicht entfernen",
+      "invalid": "Gib ein Gewicht über 0 g an",
+      "failed": "Das Gewicht konnte nicht gespeichert werden"
+    },
+    "link": {
+      "title": "Was ist „{{ingredient}}“?",
+      "searchPlaceholder": "Lebensmittel suchen",
+      "per100g": "{{energy}} pro 100 g",
+      "noResults": "Nichts gefunden",
+      "excludeButton": "Zählt nicht für Nährwerte",
+      "appliesEverywhere": "Gilt für alle deine Rezepte mit dieser Zutat.",
+      "failed": "Die Zutat konnte nicht geändert werden",
+      "searchFailed": "Die Suche ist fehlgeschlagen"
+    }
+  },
   "errors": {
     "unknown": "Etwas ist schiefgelaufen. Bitte versuche es erneut",
     "offline": "Der Server ist nicht erreichbar. Bitte prüfe deine Verbindung",
