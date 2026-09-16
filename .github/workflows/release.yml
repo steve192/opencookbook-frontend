@@ -69,7 +69,7 @@ jobs:
         uses: cycjimmy/semantic-release-action@v6.0.0
         with:
           dry_run: true
-          semantic_version: 23
+          semantic_version: 25
           branches: main
           extra_plugins: |
             @semantic-release/exec@6
@@ -240,7 +240,7 @@ jobs:
       - name: Run semantic-release
         uses: cycjimmy/semantic-release-action@v6.0.0
         with:
-          semantic_version: 23
+          semantic_version: 25
           branches: main
           extra_plugins: |
             @semantic-release/exec@6
