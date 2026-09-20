@@ -24,7 +24,7 @@ export const SignupScreen = (props: Props) => {
   const [password, setPassword] = useState<string>('');
   const [apiErrorMessage, setApiErrorMessage] = useState<string>();
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
-  const [emailOk, setEmailValid] = useState(false);
+  const [emailOk, setEmailOk] = useState(false);
   const [passwordOk, setPasswordOk] = useState(false);
   const [registerPending, setRegisterPending] = useState(false);
 
@@ -64,7 +64,7 @@ export const SignupScreen = (props: Props) => {
             ref={emailRef}
             value={email}
             onChangeText={setEmail}
-            onValidityChange={setEmailValid}
+            onValidityChange={setEmailOk}
             returnKeyType='next'
             submitBehavior='submit'
             onSubmitEditing={() => passwordSectionRef.current?.focus()}

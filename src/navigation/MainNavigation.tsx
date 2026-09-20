@@ -7,6 +7,7 @@ import Constants from 'expo-constants';
 import {createURL} from 'expo-linking';
 import {StatusBar} from 'expo-status-bar';
 import * as Updates from 'expo-updates';
+import {TFunction} from 'i18next';
 import React, {useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Platform} from 'react-native';
@@ -221,6 +222,37 @@ const MainStackNavigation = () => {
 };
 
 
+/** Applies a downloaded update, dropping offline data the new build may not understand. */
+const restartIntoUpdate = () => {
+  AppPersistence.clearOfflineData()
+      .then(() => Updates.reloadAsync())
+      .then((result) => console.log('Restart triggered', result))
+      .catch((error) => console.error('Restarting failed', error));
+};
+
+/**
+ * Fetches a newer app version if there is one, and offers to restart into it.
+ *
+ * @param {TFunction} t the translations for the offer
+ */
+const offerUpdate = async (t: TFunction) => {
+  console.log('Update check');
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  const update = await Updates.checkForUpdateAsync();
+  if (!update.isAvailable) {
+    console.log('No updates available');
+    return;
+  }
+  console.log('Download update');
+  await Updates.fetchUpdateAsync();
+  console.log('Restarting app');
+  SnackbarUtil.show({
+    message: t('common.update.restartprompt'),
+    action: t('common.update.restartbutton'),
+    onAction: restartIntoUpdate,
+  });
+};
+
 const MainNavigation = () => {
   const loggedIn = useAppSelector((state) => state.auth.loggedIn);
   const isLoading = useAppSelector((state) => state.auth.isLoading);
@@ -248,31 +280,7 @@ const MainNavigation = () => {
       // Check for new app versions
       const info = await NetInfo.fetch();
       if (info.isInternetReachable) {
-        const updateAsync = async () => {
-          console.log('Update check');
-          await new Promise((r) => setTimeout(r, 1000));
-          const update = await Updates.checkForUpdateAsync();
-          if (update.isAvailable) {
-            console.log('Download update');
-            await Updates.fetchUpdateAsync();
-            console.log('Restarting app');
-
-            SnackbarUtil.show({
-              message: t('common.update.restartprompt'),
-              action: t('common.update.restartbutton'),
-              onAction: () => {
-                AppPersistence.clearOfflineData().then(() => {
-                  Updates.reloadAsync()
-                      .then((r) => console.log('Restart triggered', r))
-                      .catch((e) => console.error('Restarting failed', e));
-                });
-              },
-            });
-          } else {
-            console.log('No updates available');
-          }
-        };
-        updateAsync();
+        offerUpdate(t);
       }
     })();
   }, []);
@@ -284,38 +292,37 @@ const MainNavigation = () => {
       [loggedIn],
   );
 
-  const BaseNavigator = () => (
-    isLoading ? <SplashScreen /> :
-      <BaseStack.Navigator screenOptions={{headerShown: false}}>
-        <BaseStack.Screen
-          name='default'
-          component={AuthenticationNavigator}
-        />
-        <BaseStack.Screen
-          name='AccountActivationScreen'
-          component={AccountActivationScreen}
-          options={{title: t('navigation.screenTitleAccountActivation')}}
-        />
-        <BaseStack.Screen
-          name='PasswordResetScreen'
-          component={PasswordResetScreen}
-          options={{title: t('screens.resetPassword.title')}}
-        />
-        <BaseStack.Screen
-          name='TermsOfServiceScreen'
-          component={TermsOfServiceScreen}
-          options={{headerShown: true, title: t('screens.login.toc')}}
-        />
-        <BaseStack.Screen
-          name='SharedRecipeScreen'
-          component={SharedRecipeScreen}
-          options={{
-            headerShown: true,
-            header: (nav) => <PaperStackHeader {...nav} />,
-            title: t('navigation.screenTitleSharedRecipe'),
-          }}
-        />
-      </BaseStack.Navigator>
+  const baseNavigator = isLoading ? <SplashScreen /> : (
+    <BaseStack.Navigator screenOptions={{headerShown: false}}>
+      <BaseStack.Screen
+        name='default'
+        component={AuthenticationNavigator}
+      />
+      <BaseStack.Screen
+        name='AccountActivationScreen'
+        component={AccountActivationScreen}
+        options={{title: t('navigation.screenTitleAccountActivation')}}
+      />
+      <BaseStack.Screen
+        name='PasswordResetScreen'
+        component={PasswordResetScreen}
+        options={{title: t('screens.resetPassword.title')}}
+      />
+      <BaseStack.Screen
+        name='TermsOfServiceScreen'
+        component={TermsOfServiceScreen}
+        options={{headerShown: true, title: t('screens.login.toc')}}
+      />
+      <BaseStack.Screen
+        name='SharedRecipeScreen'
+        component={SharedRecipeScreen}
+        options={{
+          headerShown: true,
+          header: (nav) => <PaperStackHeader {...nav} />,
+          title: t('navigation.screenTitleSharedRecipe'),
+        }}
+      />
+    </BaseStack.Navigator>
   );
 
   return (
@@ -365,7 +372,7 @@ const MainNavigation = () => {
           } as any,
         }}
       >
-        <BaseNavigator/>
+        {baseNavigator}
       </NavigationContainer>
     </>
   );

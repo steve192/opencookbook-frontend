@@ -54,15 +54,20 @@ export const PlanningDetailsPrompt = () => {
         setDietDerived(diet !== null);
       });
 
-  overlay.useOpener(async ({recipe: asked, always}) => {
+  overlay.useOpener(({recipe: asked, always}) => {
     const insisting = always === true;
-    if (!insisting && (missingDetails(asked).length === 0 || !await AppPersistence.getAskForPlanningDetails())) {
-      return;
-    }
-    setInsisted(insisting);
-    setDietDerived(false);
-    setDietChosen(false);
-    setRecipe(asked);
+    const ask = async () => {
+      if (!insisting && (missingDetails(asked).length === 0 || !await AppPersistence.getAskForPlanningDetails())) {
+        return;
+      }
+      setInsisted(insisting);
+      setDietDerived(false);
+      setDietChosen(false);
+      setRecipe(asked);
+    };
+    // The opener answers nothing, so the read of the stored preference is settled here.
+    // Failing to read it leaves the prompt closed, same as answering no.
+    ask().catch(() => undefined);
   });
 
   if (!recipe) {

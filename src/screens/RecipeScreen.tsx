@@ -24,7 +24,7 @@ export const RecipeScreen = (props: Props) => {
   const insets = useSafeAreaInsets();
   const requireOnline = useOnlineGuard();
 
-  const displayedRecipe = useAppSelector((state) => state.recipes.recipes.filter((recipe) => recipe.id == props.route.params.recipeId)[0]);
+  const displayedRecipe = useAppSelector((state) => state.recipes.recipes.find((recipe) => recipe.id === props.route.params.recipeId));
   const sharingEnabled = useAppSelector((state) => state.settings.sharingEnabled);
   const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 1);
   const [sharingOpen, setSharingOpen] = useState(false);
@@ -77,7 +77,7 @@ export const RecipeScreen = (props: Props) => {
             color={theme.colors.onPrimary}
             accessibilityLabel={t('screens.recipe.editRecipe')}
             onPress={() => {
-              if (!requireOnline()) {
+              if (!requireOnline() || !displayedRecipe) {
                 return;
               }
               props.navigation.navigate('RecipeWizardScreen', {
@@ -98,7 +98,7 @@ export const RecipeScreen = (props: Props) => {
   // What can be done with a recipe of your own, below the steps. Sharing is not here: it is an
   // action you go and take, not something to read past on the way to the preparation steps.
   const renderOwnerActions = () => (
-    displayedRecipe.id ?
+    displayedRecipe?.id ?
       <View style={styles.exportRow}>
         <BringImportButton style={styles.exportButton} recipeId={displayedRecipe.id} />
       </View> :

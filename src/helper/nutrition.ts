@@ -67,12 +67,12 @@ export const nutritionColumns = (summary: NutritionSummary, scaledServings: numb
 export const linesWarningFirst = (lines: NutritionLine[]): NutritionLine[] =>
   [...lines.filter((line) => line.warns), ...lines.filter((line) => !line.warns)];
 
-const GUESSED_PIECE_FLAGS: NutritionLineFlag[] = ['ESTIMATED_PORTION', 'SIZE_SCALED_PORTION', 'TYPICAL_CONTAINER_SIZE'];
+const GUESSED_PIECE_FLAGS = new Set<NutritionLineFlag>(['ESTIMATED_PORTION', 'SIZE_SCALED_PORTION', 'TYPICAL_CONTAINER_SIZE']);
 
 // Counted pieces whose weight is unknown, guessed, or already the owner's.
 export const canWeighPieces = (line: NutritionLine): boolean =>
   line.ingredientId !== null && line.amount !== null &&
-  (line.status === 'NO_PORTION' || line.ownPortion === true || line.flags.some((flag) => GUESSED_PIECE_FLAGS.includes(flag)));
+  (line.status === 'NO_PORTION' || line.ownPortion === true || line.flags.some((flag) => GUESSED_PIECE_FLAGS.has(flag)));
 
 export const lineNoteKeys = (line: NutritionLine): LineNoteKey[] => {
   if (line.status !== 'RESOLVED') {

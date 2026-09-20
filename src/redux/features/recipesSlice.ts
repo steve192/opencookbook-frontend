@@ -24,7 +24,7 @@ export const fetchMyRecipes = createAsyncThunk<Recipe[], void, {state: RootState
       if (!getState().settings.isOnline) {
         const offlineRecipe = (await AppPersistence.getRecipesOffline());
         if (offlineRecipe === undefined) {
-          throw Error('No offline data');
+          throw new Error('No offline data');
         }
         return offlineRecipe;
       }
@@ -35,15 +35,15 @@ export const fetchMyRecipes = createAsyncThunk<Recipe[], void, {state: RootState
 export const fetchSingleRecipe = createAsyncThunk<Recipe, number, { state: RootState }>(
     'fetchSingleRecipe',
     async (recipeId: number, {getState}): Promise<Recipe> => {
-      if (getState().recipes.recipes.find((recipe) => recipe.id === recipeId)) {
-        // Already exists
-        return getState().recipes.recipes.filter((recipe) => recipe.id === recipeId)[0];
+      const knownRecipe = getState().recipes.recipes.find((recipe) => recipe.id === recipeId);
+      if (knownRecipe) {
+        return knownRecipe;
       }
 
       if (!getState().settings.isOnline) {
-        const offlineRecipe = (await AppPersistence.getRecipesOffline()).filter((recipe) => recipe.id === recipeId)[0];
+        const offlineRecipe = (await AppPersistence.getRecipesOffline()).find((recipe) => recipe.id === recipeId);
         if (offlineRecipe === undefined) {
-          throw Error('No offline data');
+          throw new Error('No offline data');
         }
         return offlineRecipe;
       }
@@ -57,7 +57,7 @@ export const fetchMyRecipeGroups = createAsyncThunk<RecipeGroup[], void, {state:
       if (!getState().settings.isOnline) {
         const offlineRecipeGroups = (await AppPersistence.getRecipeGroupsOffline());
         if (offlineRecipeGroups === undefined) {
-          throw Error('No offline data');
+          throw new Error('No offline data');
         }
         return offlineRecipeGroups;
       }
@@ -69,7 +69,7 @@ export const createRecipeGroup = createAsyncThunk<RecipeGroup, RecipeGroup, { st
     'createRecipeGroup',
     async (recipeGroup: RecipeGroup, {getState}): Promise<RecipeGroup> => {
       if (!getState().settings.isOnline) {
-        throw Error('Action not possible while offline');
+        throw new Error('Action not possible while offline');
       }
       return RestAPI.createNewRecipeGroup(recipeGroup);
     },
@@ -78,7 +78,7 @@ export const updateRecipeGroup = createAsyncThunk<RecipeGroup, RecipeGroup, { st
     'updateRecipeGroup',
     async (recipeGroup: RecipeGroup, {getState}): Promise<RecipeGroup> => {
       if (!getState().settings.isOnline) {
-        throw Error('Action not possible while offline');
+        throw new Error('Action not possible while offline');
       }
       return RestAPI.updateRecipeGroup(recipeGroup);
     },
@@ -87,7 +87,7 @@ export const deleteRecipeGroup = createAsyncThunk<void, number, { state: RootSta
     'deleteRecipeGroup',
     async (groupId: number, {getState}) => {
       if (!getState().settings.isOnline) {
-        throw Error('Action not possible while offline');
+        throw new Error('Action not possible while offline');
       }
       RestAPI.deleteRecipeGroup(groupId);
     },
@@ -96,7 +96,7 @@ export const updateRecipe = createAsyncThunk<Recipe, Recipe, { state: RootState 
     'updateRecipe',
     async (recipe: Recipe, {getState}): Promise<Recipe> => {
       if (!getState().settings.isOnline) {
-        throw Error('Action not possible while offline');
+        throw new Error('Action not possible while offline');
       }
       return RestAPI.updateRecipe(recipe);
     },
@@ -106,7 +106,7 @@ export const importRecipe = createAsyncThunk<Recipe, string, { state: RootState,
     'importRecipe',
     async (importURL: string, thunk) => {
       if (!thunk.getState().settings.isOnline) {
-        throw Error('Action not possible while offline');
+        throw new Error('Action not possible while offline');
       }
       try {
         return await RestAPI.importRecipe(importURL);
@@ -120,7 +120,7 @@ export const createRecipe = createAsyncThunk<Recipe, Recipe, { state: RootState 
     'createRecipe',
     async (recipe: Recipe, {getState}): Promise<Recipe> => {
       if (!getState().settings.isOnline) {
-        throw Error('Action not possible while offline');
+        throw new Error('Action not possible while offline');
       }
       return RestAPI.createNewRecipe(recipe);
     },
@@ -129,7 +129,7 @@ export const deleteRecipe = createAsyncThunk<void, Recipe, { state: RootState }>
     'deleteRecipe',
     async (recipe: Recipe, {getState}): Promise<void> => {
       if (!getState().settings.isOnline) {
-        throw Error('Action not possible while offline');
+        throw new Error('Action not possible while offline');
       }
       return RestAPI.deleteRecipe(recipe);
     },
@@ -177,7 +177,7 @@ export const recipesSlice = createSlice({
         })
         .addCase(fetchSingleRecipe.fulfilled, (state, action) => {
           state.pendingRequests--;
-          if (!state.recipes.find((recipe) => recipe.id === action.meta.arg)) {
+          if (!state.recipes.some((recipe) => recipe.id === action.meta.arg)) {
             // Newly added
             state.recipes.push(action.payload);
             return;

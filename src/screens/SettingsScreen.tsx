@@ -6,7 +6,7 @@ import Constants from 'expo-constants';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Avatar, Button, Caption, Divider, Surface, Switch, Text} from 'react-native-paper';
+import {Avatar, Button, Divider, Surface, Switch, Text} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
 import AppPersistence from '../AppPersistence';
@@ -174,14 +174,14 @@ export const SettingsScreen = (props: Props) => {
             <>
               <Spacer height={20} />
               <CustomCard>
-                <Caption>{t('screens.settings.scanning')}</Caption>
+                <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>{t('screens.settings.scanning')}</Text>
                 <View style={{flexDirection: 'row', alignItems: 'center', gap: 12}}>
                   <Switch
                     value={scanTrainingConsent}
                     onValueChange={onScanTrainingConsentChange} />
                   <Text style={{flex: 1}}>{t('screens.settings.scanTrainingConsent')}</Text>
                 </View>
-                <Caption>{t('screens.settings.scanTrainingConsentExplanation')}</Caption>
+                <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>{t('screens.settings.scanTrainingConsentExplanation')}</Text>
                 <Spacer height={10} />
                 <Button
                   mode="outlined"
@@ -194,7 +194,7 @@ export const SettingsScreen = (props: Props) => {
           }
           <Spacer height={20} />
           <CustomCard>
-            <Caption>{t('screens.settings.planning')}</Caption>
+            <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>{t('screens.settings.planning')}</Text>
             <View style={{flexDirection: 'row', alignItems: 'center', gap: 12}}>
               <Switch value={askPlanningDetails} onValueChange={onAskPlanningDetailsChange} />
               <Text style={{flex: 1}}>{t('screens.settings.askPlanningDetails')}</Text>
@@ -202,7 +202,7 @@ export const SettingsScreen = (props: Props) => {
           </CustomCard>
           <Spacer height={20} />
           <CustomCard>
-            <Caption>{t('screens.settings.theme')}</Caption>
+            <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>{t('screens.settings.theme')}</Text>
             <Picker
               selectedValue={selectedTheme}
               onValueChange={(value) => dispatch(changeTheme(value))}>
@@ -213,7 +213,7 @@ export const SettingsScreen = (props: Props) => {
           </CustomCard>
           <Spacer height={20} />
           <View style={[styles.dangerZone, {borderColor: theme.colors.destructive}]}>
-            <Caption style={{color: theme.colors.error}}>{t('screens.settings.dangerZone')}</Caption>
+            <Text variant="bodySmall" style={{color: theme.colors.error}}>{t('screens.settings.dangerZone')}</Text>
             <Spacer height={20} />
             <Button
               icon="alert-circle-outline"

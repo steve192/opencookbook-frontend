@@ -42,7 +42,7 @@ export const IngredientList = (props: Props) => {
   };
 
   const updateServings = (newServings:number) => {
-    props.onServingScaleChange && props.onServingScaleChange(newServings);
+    props.onServingScaleChange?.(newServings);
   };
   const renderRow = (ingredient: IngredientUse, position: number) => {
     const index = props.ingredientIndexes?.[position] ?? position;

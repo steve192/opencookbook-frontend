@@ -1,5 +1,5 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useURL} from 'expo-linking';
+import {useLinkingURL} from 'expo-linking';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
@@ -213,7 +213,7 @@ const ImportAction = (props: {
  * @return {string | undefined} the instance from the link, or undefined when it named none
  */
 const useShareLinkOrigin = (shareId: string): string | undefined => {
-  const openedUrl = useURL();
+  const openedUrl = useLinkingURL();
 
   return useMemo(() => {
     if (!openedUrl) {

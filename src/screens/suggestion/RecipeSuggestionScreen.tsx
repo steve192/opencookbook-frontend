@@ -191,8 +191,8 @@ export const RecipeSuggestionScreen = (props: Props) => {
   };
 
   const showingResults = !asking && suggestions !== undefined;
-  const searchLabel = showingResults ? 'screens.suggestion.searchAgain' :
-    hasAnswers(request) ? 'screens.suggestion.search' : 'screens.suggestion.surpriseMe';
+  const unaskedLabel = hasAnswers(request) ? 'screens.suggestion.search' : 'screens.suggestion.surpriseMe';
+  const searchLabel = showingResults ? 'screens.suggestion.searchAgain' : unaskedLabel;
 
   return (
     <Surface style={styles.screen}>

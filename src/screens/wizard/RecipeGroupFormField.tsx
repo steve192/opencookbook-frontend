@@ -37,14 +37,12 @@ export const RecipeGroupFormField = (props: Props) => {
   useEffect(queryGroups, []);
 
   return (
-    <>
-      <SelectionPopup
-        label={t('screens.editRecipe.searchOrCreateRecipeGroup')}
-        value={props.recipeGroup ? props.recipeGroup.title : ''}
-        onValueChanged={setRecipeGroup}
-        options={toRecipeGroupOptions(availableGroups, t('common.noRecipeGroup'))}
-        allowAdditionalValues={true}
-      />
-    </>
+    <SelectionPopup
+      label={t('screens.editRecipe.searchOrCreateRecipeGroup')}
+      value={props.recipeGroup ? props.recipeGroup.title : ''}
+      onValueChanged={setRecipeGroup}
+      options={toRecipeGroupOptions(availableGroups, t('common.noRecipeGroup'))}
+      allowCreate={true}
+    />
   );
 };

@@ -68,7 +68,7 @@ export const SelectionPopupModal = (props: Props) => {
     // Filter distinct values (user cannot distinct keys anyhow)
     const presentKeys: string[] = [];
     listItems = listItems.filter((item) => {
-      if (presentKeys.indexOf(item.option.value) !== -1) {
+      if (presentKeys.includes(item.option.value)) {
         return false;
       }
       presentKeys.push(item.option.value);

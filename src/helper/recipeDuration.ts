@@ -50,7 +50,7 @@ const UNIT_SECONDS: Record<string, number> = {
  * imported recipe text, which is as long and as odd as the site it came from - and puts the
  * vocabulary somewhere it can be read and extended.
  */
-const DURATION_PATTERN = /(\d+(?:[.,]\d+)?)(?:\s*(?:[-–—]|bis|to)\s*\d+(?:[.,]\d+)?)?\s*([a-zA-Z]+)\b/g;
+const DURATION_PATTERN = /(\d+(?:[.,]\d+)?)\s*(?:(?:[-–—]|bis|to)\s*\d+(?:[.,]\d+)?\s*)?([a-zA-Z]+)\b/g;
 
 /** Anything shorter than this is not worth a timer. */
 const SHORTEST_TIMER_SECONDS = 60;

@@ -45,7 +45,10 @@ export const unwrapBringDeeplink = async (shortLink: string): Promise<string | n
 
     // Only ever hand a bring owned https link to the os, never a store page or custom scheme
     return BRING_HTTPS_LINK.test(directLink) ? directLink : null;
-  } catch (error) {
+  } catch {
+    // Any failure to resolve the short link - offline, a timeout, an answer that is not a
+    // redirect - means there is no deep link to hand the os. The caller falls back to the
+    // browser, so there is nothing to report here.
     return null;
   }
 };

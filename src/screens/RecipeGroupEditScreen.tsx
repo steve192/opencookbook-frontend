@@ -2,7 +2,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
-import {Button, Caption, Divider, Surface, TextInput} from 'react-native-paper';
+import {Button, Divider, Surface, Text, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {RecipeGroup} from '../dao/RestAPI';
 import {PromptUtil} from '../helper/Prompt';
@@ -19,13 +19,11 @@ export const RecipeGroupEditScreen = (props: Props) => {
   const theme = useAppTheme();
 
   const existingRecipeGroup = useAppSelector(
-      (store) => store.recipes.recipeGroups.filter((group) => group.id === props.route.params.recipeGroupId),
-  )[0];
+      (store) => store.recipes.recipeGroups.find((group) => group.id === props.route.params.recipeGroupId),
+  );
 
   const [recipeGroupData, setRecipeGroupData] = useState<RecipeGroup>(
-      existingRecipeGroup ?
-        existingRecipeGroup :
-        {title: '', type: 'RecipeGroup'},
+      existingRecipeGroup ?? {title: '', type: 'RecipeGroup'},
   );
 
   const [pending, setPending] = useState(false);
@@ -85,7 +83,7 @@ export const RecipeGroupEditScreen = (props: Props) => {
   return (
     <Surface style={CentralStyles.fullscreen}>
       <View style={CentralStyles.contentContainer}>
-        <Caption>{t('screens.createGroup.groupName')}</Caption>
+        <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>{t('screens.createGroup.groupName')}</Text>
         <TextInput
           mode="flat"
           dense={true}

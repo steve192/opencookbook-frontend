@@ -2,7 +2,7 @@ import {Vibration} from 'react-native';
 
 
 export class VibrationUtils {
-  public static longPressFeedbackVibration = () => {
+  public static readonly longPressFeedbackVibration = () => {
     Vibration.vibrate(10);
   };
 }

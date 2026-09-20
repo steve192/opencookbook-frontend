@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Button, Dialog, Paragraph, Portal} from 'react-native-paper';
+import {Button, Dialog, Portal, Text} from 'react-native-paper';
 import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
 import {createGlobalOverlay} from './globalOverlay';
 
@@ -45,7 +45,7 @@ export const Prompt = () => {
       <Dialog visible style={overlayStyles.dialogView} onDismiss={close}>
         <Dialog.Title>{options.title}</Dialog.Title>
         <Dialog.Content>
-          <Paragraph>{options.message}</Paragraph>
+          <Text variant="bodyMedium">{options.message}</Text>
         </Dialog.Content>
         <Dialog.Actions style={overlayStyles.dialogActions}>
           {options.cancel !== undefined &&

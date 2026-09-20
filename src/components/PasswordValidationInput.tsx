@@ -1,6 +1,6 @@
 import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {NativeSyntheticEvent, TextInput as RNTextInput, TextInputSubmitEditingEventData} from 'react-native';
+import {TextInput as RNTextInput, TextInputSubmitEditingEvent} from 'react-native';
 import {HelperText} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {PasswordInput} from './PasswordInput';
@@ -10,7 +10,7 @@ interface Props {
   onPasswordChange: (newPassword: string) => void;
   /** Forwarded to the *confirm* field so the parent can chain Enter into submit. */
   confirmReturnKeyType?: 'done' | 'go' | 'next' | 'search' | 'send';
-  onSubmitConfirm?: (e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void;
+  onSubmitConfirm?: (e: TextInputSubmitEditingEvent) => void;
 }
 
 // Expose `.focus()` so a parent (e.g. SignupScreen's email field) can move focus

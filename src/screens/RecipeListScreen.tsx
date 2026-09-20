@@ -39,7 +39,7 @@ const RecipeListScreen = (props: Props) => {
 
   const allRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
   const allRecipes = useAppSelector((state) => state.recipes.recipes);
-  const shownRecipeGroup = useAppSelector((state) => state.recipes.recipeGroups.filter((recipeGroup) => recipeGroup.id == props.route.params?.shownRecipeGroupId)[0]);
+  const shownRecipeGroup = useAppSelector((state) => state.recipes.recipeGroups.find((recipeGroup) => recipeGroup.id === props.route.params?.shownRecipeGroupId));
 
   const [selectedRecipes, setSelectedRecipes] = useState(new Set<number>());
   const [multiSelectionModeActive, setMultiSelectionModeActive] = useState(false);

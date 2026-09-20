@@ -10,7 +10,7 @@ interface Props {
     options: Option[],
     onValueChanged?: (newValue: Option) => void,
     placeholder?: string,
-    allowAdditionalValues?: boolean,
+    allowCreate?: boolean,
     dense?: boolean,
     style?: StyleProp<ViewStyle>
 }
@@ -61,6 +61,7 @@ export const SelectionPopup = (props: Props) => {
         onClose={() => setModalVisible(false) }
         onSelection={applySelection}
         placeholder={props.placeholder}
+        allowCreate={props.allowCreate}
       />
       }
     </>

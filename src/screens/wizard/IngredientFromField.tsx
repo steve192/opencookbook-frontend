@@ -43,7 +43,7 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
   const invokeIngredientUpdate = (ingredientName: string, newAmount: string, newUnit: string) => {
     const existingIngredient = props.resolveIngredient(ingredientName);
 
-    let prasedAmount: number | null = parseFloat(newAmount);
+    let prasedAmount: number | null = Number.parseFloat(newAmount);
     // Check if its a number
     if (prasedAmount.toString() !== newAmount || newAmount === '') {
       prasedAmount = null;
@@ -65,7 +65,7 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
     text = text.replace(',', '.');
     setAmount(text);
 
-    const prasedAmount = parseFloat(text);
+    const prasedAmount = Number.parseFloat(text);
     // Check if its a number
     if (prasedAmount.toString() === text || text === '') {
       invokeIngredientUpdate(ingredientQuery, text, unit);
@@ -99,7 +99,7 @@ export const IngredientFormField = React.memo(function IngredientFormField(props
           value={ingredientQuery}
           options={props.ingredientOptions}
           onValueChanged={(selectedOption) => setIngredient(selectedOption.value)}
-          allowAdditionalValues={true}
+          allowCreate={true}
         />
       </View>
       <RowActions

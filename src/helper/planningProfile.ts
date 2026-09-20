@@ -106,7 +106,8 @@ export const withMealToggled = (profile: PlanningProfile, mealType: MealType): P
   const meals = plannedMeal(profile, mealType) ?
     profile.meals.filter((meal) => meal.mealType !== mealType) :
     [...profile.meals, newMeal(mealType)];
-  return {...profile, meals: meals.sort((left, right) => inDayOrder(left.mealType, right.mealType))};
+  meals.sort((left, right) => inDayOrder(left.mealType, right.mealType));
+  return {...profile, meals};
 };
 
 const withMeal = (profile: PlanningProfile, mealType: MealType, change: (meal: PlanningMeal) => PlanningMeal):

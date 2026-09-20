@@ -54,7 +54,7 @@ const RecipeWizardScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const dispatch = useAppDispatch();
 
-  const existingRecipe: Recipe | undefined = useAppSelector((state) => state.recipes.recipes.filter((recipe) => recipe.id === props.route.params?.recipeId)?.[0]);
+  const existingRecipe: Recipe | undefined = useAppSelector((state) => state.recipes.recipes.find((recipe) => recipe.id === props.route.params?.recipeId));
 
   // A draft wins over anything in the store: it is why the wizard was opened, and it has no id.
   const [recipeData, setRecipeData] = useState<Recipe>(

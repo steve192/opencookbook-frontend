@@ -1,6 +1,6 @@
 import React, {forwardRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {NativeSyntheticEvent, TextInput as RNTextInput, TextInputSubmitEditingEventData} from 'react-native';
+import {TextInput as RNTextInput, TextInputSubmitEditingEvent} from 'react-native';
 import {TextInput} from 'react-native-paper';
 
 interface Props {
@@ -8,12 +8,13 @@ interface Props {
     onValidityChange: (valid: boolean) => void;
     onChangeText: (text: string) => void;
     returnKeyType?: 'done' | 'go' | 'next' | 'search' | 'send';
-    onSubmitEditing?: (e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void;
+    onSubmitEditing?: (e: TextInputSubmitEditingEvent) => void;
     submitBehavior?: 'submit' | 'blurAndSubmit' | 'newline';
 }
 
-const EMAIL_PATTERN =
-  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+// Enough to catch a typo, not a judgement on what an address may look like: the server
+// validates for real, and an over-strict pattern here only ever turns away real addresses.
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const isEmailValid = (email: string): boolean => EMAIL_PATTERN.test(email.toLowerCase());
 

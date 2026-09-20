@@ -3,7 +3,7 @@ import fuzzy from 'fuzzy';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, RefreshControl, StyleProp, StyleSheet, View, ViewProps, ViewStyle} from 'react-native';
-import {Badge, Headline, RadioButton, Searchbar, Surface, Text} from 'react-native-paper';
+import {Badge, RadioButton, Searchbar, Surface, Text} from 'react-native-paper';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
 import {fetchMyRecipeGroups, fetchMyRecipes} from '../redux/features/recipesSlice';
@@ -28,7 +28,7 @@ export const RecipeList = (props: Props) => {
   const [searchStringPendingInput, setSearchStringPendingInput] = useState('');
   const [searchString, setSearchString] = useState('');
 
-  const [componentWidth, setComponentWith] = useState<number>(1);
+  const [componentWidth, setComponentWidth] = useState<number>(1);
 
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
@@ -55,7 +55,7 @@ export const RecipeList = (props: Props) => {
     if (props.shownRecipeGroupId) {
       // Navigated in a group, return only group items
       return myRecipes
-          .filter((recipe) => recipe.recipeGroups.filter((group) => group.id === props.shownRecipeGroupId).length > 0)
+          .filter((recipe) => recipe.recipeGroups.some((group) => group.id === props.shownRecipeGroupId))
           .map(toRecipeRow);
     } else if (includeGroupedRecipes) {
       // Return all recipes and groups (used in search mode)
@@ -100,7 +100,7 @@ export const RecipeList = (props: Props) => {
   };
 
   const createRecipeListItem = (recipe: RecipeRow) => {
-    const cardIsSelected = props.multiSelectionModeActive && props.selectedRecipes && props.selectedRecipes.has(recipe.id!);
+    const cardIsSelected = props.multiSelectionModeActive && props.selectedRecipes?.has(recipe.id!);
     const cardStyles: StyleProp<ViewStyle> = [styles.recipeCard];
     if (cardIsSelected) {
       cardStyles.push({backgroundColor: theme.colors.primary});
@@ -157,7 +157,8 @@ export const RecipeList = (props: Props) => {
             uuid={recipeGroup.coverImageUuid} />
         </Surface>
         <View style={styles.groupOverlay}>
-          <Headline
+          <Text
+            variant="headlineSmall"
             style={{
               padding: 16,
               fontWeight: 'bold',
@@ -165,7 +166,7 @@ export const RecipeList = (props: Props) => {
               flex: 1,
             }}>
             {recipeGroup.title}
-          </Headline>
+          </Text>
           {recipeGroup.recipeCount > 0 &&
             <Badge
               // Paper defaults badges to the error color, which reads as a warning on a
@@ -197,9 +198,9 @@ export const RecipeList = (props: Props) => {
   const renderNoItemsNotice = () => (
     <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', flex: 1, position: 'absolute'}}>
       <MaterialIcons name="no-food" size={64} color={theme.colors.onSurfaceDisabled} />
-      <Headline style={{padding: 64, color: theme.colors.onSurfaceDisabled}}>
+      <Text variant="headlineSmall" style={{padding: 64, color: theme.colors.onSurfaceDisabled}}>
         {t('screens.overview.noRecipesMessage')}
-      </Headline>
+      </Text>
     </View>
   );
 
@@ -236,7 +237,7 @@ export const RecipeList = (props: Props) => {
     <View
       style={styles.container}
       onLayout={(event) => {
-        event.nativeEvent.layout.width > 0 && setComponentWith(event.nativeEvent.layout.width);
+        event.nativeEvent.layout.width > 0 && setComponentWidth(event.nativeEvent.layout.width);
       }}>
 
 

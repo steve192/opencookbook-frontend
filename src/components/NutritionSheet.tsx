@@ -121,14 +121,14 @@ export const NutritionSheet = (props: Props) => {
           }
         </ScrollView>
       </Modal>
-      {correcting && correcting.ingredientId !== null &&
+      {correcting?.ingredientId != null &&
         <IngredientLinkDialog
           ingredientId={correcting.ingredientId}
           ingredientName={correcting.ingredientName}
           onDismiss={() => setCorrecting(undefined)}
           onLinked={corrected} />
       }
-      {weighing && weighing.ingredientId !== null &&
+      {weighing?.ingredientId != null &&
         <OwnPortionDialog
           line={{...weighing, ingredientId: weighing.ingredientId}}
           onDismiss={() => setWeighing(undefined)}
@@ -145,8 +145,9 @@ const SummaryNotice = (props: {summary: NutritionSummary, canCorrect: boolean}) 
   if (props.summary.status === 'COMPLETE') {
     return null;
   }
+  const unavailableKey = props.canCorrect ? 'nutrition.unavailableNotice' : 'nutrition.unavailableSharedNotice';
   const message = props.summary.status === 'UNAVAILABLE' ?
-    t(props.canCorrect ? 'nutrition.unavailableNotice' : 'nutrition.unavailableSharedNotice') :
+    t(unavailableKey) :
     t('nutrition.incompleteNotice', {count: props.summary.warningCount});
   return (
     <View style={styles.notice}>

@@ -24,7 +24,7 @@ interface ErrorBody {
   retryable?: unknown;
 }
 
-const RETRYABLE_STATUS = [408, 425, 429, 500, 502, 503, 504];
+const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
 
 /**
  * Reads whatever a failed request threw as an {@link ApiError}.
@@ -45,7 +45,7 @@ export const toApiError = (error: unknown): ApiError => {
   const code = typeof body?.code === 'string' ? body.code : statusCode(response.status);
   const retryable = typeof body?.retryable === 'boolean' ?
     body.retryable :
-    RETRYABLE_STATUS.includes(response.status);
+    RETRYABLE_STATUS.has(response.status);
 
   return {code, status: response.status, retryable};
 };

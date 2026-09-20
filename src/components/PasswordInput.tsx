@@ -1,5 +1,5 @@
 import React, {forwardRef, useCallback, useMemo, useState} from 'react';
-import {NativeSyntheticEvent, TextInput as RNTextInput, TextInputSubmitEditingEventData} from 'react-native';
+import {TextInput as RNTextInput, TextInputSubmitEditingEvent} from 'react-native';
 import {TextInput} from 'react-native-paper';
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
   error?: boolean,
   testID?: string,
   returnKeyType?: 'done' | 'go' | 'next' | 'search' | 'send',
-  onSubmitEditing?: (e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => void,
+  onSubmitEditing?: (e: TextInputSubmitEditingEvent) => void,
 }
 
 const ICON_INPUT_HIDDEN = 'eye-off';
