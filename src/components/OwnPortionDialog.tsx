@@ -4,7 +4,7 @@ import {StyleSheet} from 'react-native';
 import {Button, Dialog, Portal, Text, TextInput} from 'react-native-paper';
 import RestAPI, {NutritionLine} from '../dao/RestAPI';
 import {errorMessageKey} from '../helper/apiErrorMessage';
-import {useAppTheme} from '../styles/CentralStyles';
+import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
 
 // The server's limit.
 const MAX_GRAMS = 10000;
@@ -44,7 +44,7 @@ export const OwnPortionDialog = (props: Props) => {
 
   return (
     <Portal>
-      <Dialog visible={true} onDismiss={props.onDismiss} testID='own-portion-dialog'>
+      <Dialog style={overlayStyles.dialogView} visible={true} onDismiss={props.onDismiss} testID='own-portion-dialog'>
         <Dialog.Title>
           {t('nutrition.portion.title', {unit: unit || t('nutrition.portion.piece'), ingredient: props.line.ingredientName})}
         </Dialog.Title>
@@ -64,7 +64,7 @@ export const OwnPortionDialog = (props: Props) => {
           <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>{t('nutrition.portion.appliesEverywhere')}</Text>
           {failure && <Text style={{color: theme.colors.error}}>{failure}</Text>}
         </Dialog.Content>
-        <Dialog.Actions style={styles.actions}>
+        <Dialog.Actions style={overlayStyles.dialogActions}>
           {props.line.ownPortion &&
             <Button disabled={saving} onPress={() => run(() => RestAPI.removeOwnPortion(props.line.ingredientId, unit))}>
               {t('nutrition.portion.remove')}
@@ -88,9 +88,5 @@ export const OwnPortionDialog = (props: Props) => {
 const styles = StyleSheet.create({
   content: {
     gap: 8,
-  },
-  actions: {
-    flexWrap: 'wrap',
-    gap: 4,
   },
 });

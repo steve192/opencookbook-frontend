@@ -217,8 +217,8 @@ export const RecipeImportBrowser = (props: Props) => {
         </View>
         <Button
           mode={importStatus === 'not_started' && !importPossible ? 'contained-tonal' : 'contained'}
-          buttonColor={importStatus === 'failed' ? theme.colors.error : undefined}
-          textColor={importStatus === 'failed' ? theme.colors.onError : undefined}
+          buttonColor={importStatus === 'failed' ? theme.colors.destructive : undefined}
+          textColor={importStatus === 'failed' ? theme.colors.onDestructive : undefined}
           icon={importStatus === 'success' ? 'arrow-right' : 'import'}
           loading={importStatus === 'pending'}
           disabled={importStatus === 'pending' || !currentURL}

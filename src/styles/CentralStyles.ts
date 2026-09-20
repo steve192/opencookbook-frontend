@@ -80,6 +80,10 @@ export const OwnPaperTheme = {
     primaryText: green.tone30,
     primaryContainer: green.tone90,
     onPrimaryContainer: green.tone10,
+    // For filled delete buttons. Not `error`, which is the colour of error *text* and so
+    // has to stay pale on a dark surface - white on that was unreadable.
+    destructive: '#ba1a1a',
+    onDestructive: '#ffffff',
     secondary: sage.tone40,
     onSecondary: sage.tone100,
     secondaryContainer: sage.tone90,
@@ -124,6 +128,9 @@ export const OwnPaperThemeDark = {
     primaryText: green.tone80,
     primaryContainer: '#3b5e00',
     onPrimaryContainer: green.tone90,
+    // Lighter than the light theme red, to separate from the near black surface
+    destructive: '#c5352e',
+    onDestructive: '#ffffff',
     secondary: sage.tone80,
     onSecondary: sage.tone20,
     secondaryContainer: sage.tone30,
@@ -213,43 +220,37 @@ export default StyleSheet.create({
   fullscreen: {width: '100%', height: '100%'},
 });
 
-export const modalStyles = StyleSheet.create({
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-    width: '100%',
-  },
-  // Render this as a sibling placed *before* the popup content, never as its parent.
-  // On native the deepest view wins the touch responder, so wrapping the content works
-  // there, but on web the click bubbles up the dom and closes the popup as soon as
-  // anything inside it is touched - the search field, for instance.
-  modalBackdrop: {
-    width: '100%',
-    height: '100%',
-    position: 'absolute',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
+export const overlayStyles = StyleSheet.create({
+  // For popups holding a list: a definite height, because the list measures its parent.
   modalView: {
     width: '90%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
     maxWidth: 600,
+    height: '80%',
     maxHeight: 800,
-    flex: 1,
-    marginBottom: 10,
+    alignSelf: 'center',
+    borderRadius: 16,
+    overflow: 'hidden',
     padding: 10,
-    marginHorizontal: 10,
   },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
+  // For popups as tall as what is in them.
+  sheetView: {
+    width: '100%',
+    maxWidth: 640,
+    maxHeight: '90%',
+    alignSelf: 'center',
+    margin: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  // Dialogs bring their own surface; this only stops them spanning a wide window.
+  dialogView: {
+    width: '90%',
+    maxWidth: 600,
+    alignSelf: 'center',
+    maxHeight: '90%',
+  },
+  dialogActions: {
+    flexWrap: 'wrap',
+    gap: 4,
   },
 });

@@ -163,8 +163,8 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     // Removing is a single tap now, so it has to be undoable
     SnackbarUtil.show({
       message: t('screens.weekplan.mealRemoved'),
-      button1: t('common.undo'),
-      button1Callback: () => persist(day),
+      action: t('common.undo'),
+      onAction: () => persist(day),
     });
   };
 

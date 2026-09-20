@@ -1,93 +1,71 @@
-import React from 'react';
-import {Button, Dialog, MD3Theme, Paragraph, Portal, withTheme} from 'react-native-paper';
-import CentralStyles from '../styles/CentralStyles';
+import React, {useState} from 'react';
+import {Button, Dialog, Paragraph, Portal} from 'react-native-paper';
+import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
+import {createGlobalOverlay} from './globalOverlay';
 
 interface Options {
   title: string;
   message: string;
-  button1?:string;
-  button1Callback?: () => void;
-  button2?: string;
-  button2Callback?: () => void ;
-}
-interface State extends Options{
-  shown: boolean;
+  /** Goes ahead with what was asked. Rendered last, as the filled button. */
+  confirm?: string;
+  onConfirm?: () => void;
+  /** Backs out. Rendered first, as plain text. */
+  cancel?: string;
+  onCancel?: () => void;
+  /** Colours the confirming answer red, for the ones that delete or revoke. */
+  destructive?: boolean;
 }
 
-interface Props {
-  theme: MD3Theme
-}
-class PromptWithoutStyles extends React.Component<Props, State> {
-  private static component: PromptWithoutStyles;
-  constructor(props: Props) {
-    super(props);
-    PromptWithoutStyles.component = this;
-    this.state = {
-      shown: false,
-      title: '',
-      message: '',
-      button1: '',
-      button1Callback: undefined,
-      button2: '',
-      button2Callback: undefined,
-    };
+const overlay = createGlobalOverlay<Options>();
+
+/**
+ * The confirmation dialog any screen can raise through {@link PromptUtil}.
+ *
+ * @return {React.ReactElement | null} the dialog, while one is asked for
+ */
+export const Prompt = () => {
+  const theme = useAppTheme();
+  const [options, setOptions] = useState<Options>();
+
+  overlay.useOpener(setOptions);
+
+  if (!options) {
+    return null;
   }
 
-  render() {
-    if (!this.state.shown) {
-      return <></>;
-    }
-    return (
-      this.renderPrompt()
-    );
-  }
+  const close = () => setOptions(undefined);
 
-  renderPrompt() {
-    // Like Modal, a Paper Dialog only renders above the rest of the app from inside a
-    // Portal. This one happens to sit at the root today, but it is shown from any screen.
-    return <Portal>
-      <Dialog
-        style={[CentralStyles.contentContainer, {width: '90%', paddingBottom: 0}]}
-        visible={this.state.shown}
-        onDismiss={() => this.setState({shown: false})}>
-        <Dialog.Title>{this.state.title}</Dialog.Title>
+  const answer = (callback?: () => void) => {
+    callback?.();
+    close();
+  };
+
+  return (
+    <Portal>
+      <Dialog visible style={overlayStyles.dialogView} onDismiss={close}>
+        <Dialog.Title>{options.title}</Dialog.Title>
         <Dialog.Content>
-          <Paragraph>{this.state.message}</Paragraph>
+          <Paragraph>{options.message}</Paragraph>
         </Dialog.Content>
-        <Dialog.Actions>
-          {this.state.button1 !== undefined && <Button textColor={this.props.theme.colors.onPrimary} buttonColor={this.props.theme.colors.error} onPress={() => {
-            this.state.button1Callback?.();
-            this.setState({shown: false});
-          } }>{this.state.button1}</Button>}
-
-          { this.state.button2 !== undefined && <Button mode='outlined' onPress={() => {
-            this.state.button2Callback?.();
-            this.setState({shown: false});
-          } }>{this.state.button2}</Button> }
+        <Dialog.Actions style={overlayStyles.dialogActions}>
+          {options.cancel !== undefined &&
+            <Button onPress={() => answer(options.onCancel)}>{options.cancel}</Button>
+          }
+          {options.confirm !== undefined &&
+            <Button
+              mode="contained"
+              buttonColor={options.destructive ? theme.colors.destructive : undefined}
+              textColor={options.destructive ? theme.colors.onDestructive : undefined}
+              onPress={() => answer(options.onConfirm)}>
+              {options.confirm}
+            </Button>
+          }
         </Dialog.Actions>
       </Dialog>
-    </Portal>;
-  }
-
-  componentDidMount() {
-    PromptWithoutStyles.component = this;
-  }
-
-  public static show(options: Options) {
-    this.component.setState({title: options.title,
-      button1: options.button1,
-      button1Callback: options.button1Callback,
-      button2: options.button2,
-      button2Callback: options.button2Callback,
-      message: options.message,
-      shown: true,
-    });
-  }
-}
-export const PromptUtil = {
-  show: (options: Options) => {
-    PromptWithoutStyles.show(options);
-  },
+    </Portal>
+  );
 };
 
-export const Prompt = withTheme(PromptWithoutStyles);
+export const PromptUtil = {
+  show: overlay.show,
+};

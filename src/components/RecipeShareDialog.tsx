@@ -9,7 +9,7 @@ import {PromptUtil} from '../helper/Prompt';
 import {formatShareExpiry} from '../helper/recipeSharing';
 import {shareRecipeLink} from '../helper/shareLink';
 import {useOnlineGuard} from '../helper/useOnlineGuard';
-import {useAppTheme} from '../styles/CentralStyles';
+import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
 
 interface Props {
   recipeId: number;
@@ -87,8 +87,9 @@ export const RecipeShareDialog = (props: Props) => {
     PromptUtil.show({
       title: t('screens.recipe.sharing.stopSharingTitle'),
       message: t('screens.recipe.sharing.stopSharingMessage'),
-      button1: t('screens.recipe.sharing.stopSharingButton'),
-      button1Callback: async () => {
+      destructive: true,
+      confirm: t('screens.recipe.sharing.stopSharingButton'),
+      onConfirm: async () => {
         setBusy(true);
         setFailure(undefined);
         try {
@@ -102,7 +103,7 @@ export const RecipeShareDialog = (props: Props) => {
           setBusy(false);
         }
       },
-      button2: t('common.cancel'),
+      cancel: t('common.cancel'),
     });
   };
 
@@ -110,7 +111,7 @@ export const RecipeShareDialog = (props: Props) => {
 
   return (
     <Portal>
-      <Dialog visible={props.visible} onDismiss={props.onDismiss} testID='recipe-share-dialog'>
+      <Dialog style={overlayStyles.dialogView} visible={props.visible} onDismiss={props.onDismiss} testID='recipe-share-dialog'>
         <Dialog.Title>{t('screens.recipe.sharing.sectionTitle')}</Dialog.Title>
         <Dialog.Content style={styles.content}>
           {loading ?
@@ -142,7 +143,7 @@ export const RecipeShareDialog = (props: Props) => {
             </>
           }
         </Dialog.Content>
-        <Dialog.Actions style={styles.actions}>
+        <Dialog.Actions style={overlayStyles.dialogActions}>
           {share &&
             <Button
               testID='recipe-stop-sharing-button'
@@ -173,10 +174,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   linkDetails: {
-    gap: 4,
-  },
-  actions: {
-    flexWrap: 'wrap',
     gap: 4,
   },
 });

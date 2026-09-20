@@ -5,7 +5,7 @@ import {ActivityIndicator, Button, Dialog, List, Portal, Searchbar, Text} from '
 import RestAPI, {CatalogueFood} from '../dao/RestAPI';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {formatNutrient} from '../helper/nutrition';
-import {useAppTheme} from '../styles/CentralStyles';
+import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
 
 const SEARCH_DELAY_MS = 300;
 
@@ -69,7 +69,7 @@ export const IngredientLinkDialog = (props: Props) => {
 
   return (
     <Portal>
-      <Dialog visible={true} onDismiss={props.onDismiss} style={styles.dialog} testID='ingredient-link-dialog'>
+      <Dialog visible={true} onDismiss={props.onDismiss} style={overlayStyles.dialogView} testID='ingredient-link-dialog'>
         <Dialog.Title>{t('nutrition.link.title', {ingredient: props.ingredientName})}</Dialog.Title>
         <Dialog.Content style={styles.content}>
           <Searchbar
@@ -105,7 +105,7 @@ export const IngredientLinkDialog = (props: Props) => {
             ))}
           </ScrollView>
         </Dialog.ScrollArea>
-        <Dialog.Actions style={styles.actions}>
+        <Dialog.Actions style={overlayStyles.dialogActions}>
           {saving && <ActivityIndicator animating={true} />}
           <Button testID='ingredient-link-exclude' disabled={saving} onPress={() => link(null)}>
             {t('nutrition.link.excludeButton')}
@@ -118,9 +118,6 @@ export const IngredientLinkDialog = (props: Props) => {
 };
 
 const styles = StyleSheet.create({
-  dialog: {
-    maxHeight: '90%',
-  },
   content: {
     gap: 8,
   },
@@ -130,9 +127,5 @@ const styles = StyleSheet.create({
   },
   noResults: {
     padding: 16,
-  },
-  actions: {
-    flexWrap: 'wrap',
-    gap: 4,
   },
 });

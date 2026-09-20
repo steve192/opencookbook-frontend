@@ -2,7 +2,7 @@
 /* eslint-disable react/display-name */
 import React from 'react';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {Provider as PaperProvider, Snackbar} from 'react-native-paper';
+import {Provider as PaperProvider} from 'react-native-paper';
 import {enableScreens} from 'react-native-screens';
 import {Provider, useSelector} from 'react-redux';
 import {PlanningDetailsPrompt} from './src/components/PlanningDetailsPrompt';

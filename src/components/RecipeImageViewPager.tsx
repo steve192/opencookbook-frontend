@@ -72,9 +72,10 @@ export const RecipeImageViewPager = (props: Props) => {
     PromptUtil.show({
       title: t('screens.editRecipe.deleteImageTitle'),
       message: t('screens.editRecipe.deleteImageMessage'),
-      button1: t('common.delete'),
-      button1Callback: () => props.onImageRemoved?.(shownImage.uuid),
-      button2: t('common.cancel'),
+      destructive: true,
+      confirm: t('common.delete'),
+      onConfirm: () => props.onImageRemoved?.(shownImage.uuid),
+      cancel: t('common.cancel'),
     });
   };
 

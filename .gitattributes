@@ -1,0 +1,3 @@
+# LF in the working tree whatever a machine's core.autocrlf says: a CRLF checkout
+# fails the linebreak-style lint rule and changes the bytes of anything hashed.
+* text=auto eol=lf

@@ -259,8 +259,8 @@ const MainNavigation = () => {
 
             SnackbarUtil.show({
               message: t('common.update.restartprompt'),
-              button1: t('common.update.restartbutton'),
-              button1Callback: () => {
+              action: t('common.update.restartbutton'),
+              onAction: () => {
                 AppPersistence.clearOfflineData().then(() => {
                   Updates.reloadAsync()
                       .then((r) => console.log('Restart triggered', r))

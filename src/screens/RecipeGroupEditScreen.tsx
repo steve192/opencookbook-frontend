@@ -64,9 +64,10 @@ export const RecipeGroupEditScreen = (props: Props) => {
     PromptUtil.show({
       title: t('screens.createGroup.deleteTitle'),
       message: t('screens.createGroup.deleteMessage'),
-      button1: t('common.delete'),
-      button1Callback: performDelete,
-      button2: t('common.cancel'),
+      destructive: true,
+      confirm: t('common.delete'),
+      onConfirm: performDelete,
+      cancel: t('common.cancel'),
     });
   };
 
@@ -74,7 +75,9 @@ export const RecipeGroupEditScreen = (props: Props) => {
     <>
       <Divider style={{marginVertical: 10}}/>
       <Button
-        buttonColor={theme.colors.error}
+        mode="contained"
+        buttonColor={theme.colors.destructive}
+        textColor={theme.colors.onDestructive}
         onPress={onDeletePress}>{t('common.delete')}</Button>
     </>
   );
