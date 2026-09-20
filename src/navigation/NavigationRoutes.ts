@@ -28,6 +28,10 @@ export type MainNavigationProps = {
      */
     RecipeWizardScreen: { editing?: boolean, recipeId?: number, hasDraft?: boolean }
     RecipeScanScreen: undefined
+    RecipeSuggestionScreen: undefined
+    /** The week preselected for planning, in weeks from the current one. */
+    WeekplanWizardScreen: { weekOffset: number }
+    PlanDraftScreen: { draftId: number }
     RecipeScreen: { recipeId: number }
     ImportScreen: { importUrl?: string },
     RecipeGroupEditScreen: { recipeGroupId?: number, editing: boolean}

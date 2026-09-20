@@ -9,6 +9,7 @@ import WebView from 'react-native-webview';
 import RestAPI, {Recipe} from '../dao/RestAPI';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
+import {askForPlanningDetails} from '../components/PlanningDetailsPrompt';
 import {importRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch} from '../redux/hooks';
 import {useAppTheme} from '../styles/CentralStyles';
@@ -103,6 +104,7 @@ export const RecipeImportBrowser = (props: Props) => {
     dispatch(importRecipe(currentURL)).unwrap().then((recipe) => {
       setImportedRecipe(recipe);
       setImportStatus('success');
+      askForPlanningDetails(recipe);
     }).catch((error) => {
       setImportFailure(t(errorMessageKey(error, 'screens.importbrowser.faileddescription')));
       setImportStatus('failed');

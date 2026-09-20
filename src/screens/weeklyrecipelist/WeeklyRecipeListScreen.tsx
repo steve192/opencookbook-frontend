@@ -15,9 +15,11 @@ import {
   formatWeekdayAndDate,
   formatWeekRange,
   isSameDay,
-  isoWeekNumber,
+  plannableDays,
+  weekOffsetLabel,
   toDayKey,
 } from '../../helper/weekplan';
+import {DAYS_OF_WEEK, dayOfWeekLabel} from '../../helper/daysOfWeek';
 import {
   countMeals,
   withMealMoved,
@@ -42,16 +44,6 @@ type Props =
         NativeStackScreenProps<MainNavigationProps, 'OverviewScreen'>
     >;
 
-const WEEKDAY_KEYS = [
-  'weekdays.monday',
-  'weekdays.tuesday',
-  'weekdays.wednesday',
-  'weekdays.thursday',
-  'weekdays.friday',
-  'weekdays.saturday',
-  'weekdays.sunday',
-] as const;
-
 export const WeeklyRecipeListScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
@@ -67,23 +59,21 @@ export const WeeklyRecipeListScreen = (props: Props) => {
 
   const {today, weekStart, days, plans, loading, reload} = useWeekplanWeek(weekOffset);
   const weekStartKey = toDayKey(weekStart);
+  // Only what is still ahead can be planned; a week that is over gets no plan action at all
+  const todayKey = toDayKey(today);
+  const plannable = useMemo(() => plannableDays(weekStart, today), [weekStartKey, todayKey]);
 
   // One row per day, so nothing downstream has to keep two arrays in step
   const week = useMemo(
       () => days.map((date, index) => ({
         date: date,
         plan: plans[index],
-        weekdayName: t(WEEKDAY_KEYS[index]),
+        weekdayName: dayOfWeekLabel(t, DAYS_OF_WEEK[index]),
       })),
       [days, plans, t],
   );
 
-  const weekTitle = useCallback(() => {
-    if (weekOffset === 0) return t('screens.weekplan.thisWeek');
-    if (weekOffset === 1) return t('screens.weekplan.nextWeek');
-    if (weekOffset === -1) return t('screens.weekplan.lastWeek');
-    return t('screens.weekplan.weekNumber', {number: isoWeekNumber(weekStart)});
-  }, [weekOffset, weekStartKey, t]);
+  const weekTitle = useCallback(() => weekOffsetLabel(t, weekOffset, weekStart), [weekOffset, weekStartKey, t]);
 
   const printWeek = useCallback(() => {
     const html = buildWeekplanPrintHtml({
@@ -118,11 +108,18 @@ export const WeeklyRecipeListScreen = (props: Props) => {
         // The recipe list leaves a back action here while it shows a group
         leading: undefined,
         actions: () => (
-          <Appbar.Action
-            icon="printer-outline"
-            color={theme.colors.onPrimary}
-            accessibilityLabel={t('screens.weekplan.print')}
-            onPress={printWeek} />
+          <>
+            {plannable.length > 0 && <Appbar.Action
+              icon="creation"
+              color={theme.colors.onPrimary}
+              accessibilityLabel={t('screens.planning.planWeek')}
+              onPress={() => props.navigation.navigate('WeekplanWizardScreen', {weekOffset})} />}
+            <Appbar.Action
+              icon="printer-outline"
+              color={theme.colors.onPrimary}
+              accessibilityLabel={t('screens.weekplan.print')}
+              onPress={printWeek} />
+          </>
         ),
       });
     };
@@ -134,7 +131,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
       // old screen only ever loaded once on mount.
       reload();
     });
-  }, [props.navigation, t, theme, reload, printWeek]);
+  }, [props.navigation, t, theme, reload, printWeek, plannable, weekOffset]);
 
   // Every change goes through the same path: build the new day, then persist it.
   const persist = (day: WeekplanDay) => dispatch(updateSingleWeekplanDay(day));

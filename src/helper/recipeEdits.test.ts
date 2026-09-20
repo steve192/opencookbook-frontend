@@ -3,7 +3,6 @@ import {Recipe} from '../dao/RestAPI';
 import {
   emptyRecipe,
   forSaving,
-  parseOptionalNumber,
   withDiet,
   withGroup,
   withImageAdded,
@@ -18,6 +17,7 @@ import {
   withStepChanged,
   withStepMoved,
   withStepRemoved,
+  withSuitToggled,
   withTitle,
 } from './recipeEdits';
 
@@ -44,17 +44,6 @@ describe('emptyRecipe', () => {
   });
 });
 
-describe('parseOptionalNumber', () => {
-  it('reads a number', () => {
-    expect(parseOptionalNumber('35')).toBe(35);
-  });
-
-  it('clears the field when the text is not a number', () => {
-    expect(parseOptionalNumber('')).toBeUndefined();
-    expect(parseOptionalNumber('abc')).toBeUndefined();
-  });
-});
-
 describe('editing a recipe', () => {
   it('sets the title', () => {
     expect(withTitle(recipe(), 'Pizza').title).toBe('Pizza');
@@ -63,6 +52,24 @@ describe('editing a recipe', () => {
   it('sets and clears the diet', () => {
     expect(withDiet(recipe(), 'VEGAN').recipeType).toBe('VEGAN');
     expect(withDiet(recipe({recipeType: 'VEGAN'}), null).recipeType).toBeNull();
+  });
+
+  // Several are allowed: most dishes are honestly both lunch and dinner
+  it('turns a meal on and off again', () => {
+    const lunch = withSuitToggled(recipe(), 'LUNCH');
+
+    expect(lunch.mealTypes).toEqual(['LUNCH']);
+    expect(withSuitToggled(lunch, 'DINNER').mealTypes).toEqual(['LUNCH', 'DINNER']);
+    expect(withSuitToggled(lunch, 'LUNCH').mealTypes).toEqual([]);
+  });
+
+  // A sauce is not a dinner, so the two exclude each other
+  it('marks a side or component, which suits no meal', () => {
+    const sauce = withSuitToggled(withSuitToggled(recipe(), 'DINNER'), 'COMPONENT');
+
+    expect(sauce).toMatchObject({mealTypes: [], dishRole: 'COMPONENT'});
+    expect(withSuitToggled(sauce, 'COMPONENT').dishRole).toBeNull();
+    expect(withSuitToggled(sauce, 'LUNCH')).toMatchObject({mealTypes: ['LUNCH'], dishRole: null});
   });
 
   it('sets a number field and clears it again', () => {

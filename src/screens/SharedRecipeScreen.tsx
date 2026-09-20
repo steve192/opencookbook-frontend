@@ -7,6 +7,7 @@ import {ActivityIndicator, Button, Surface, Text} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import AppPersistence from '../AppPersistence';
 import {SharedImageAccess} from '../components/ImageAccessContext';
+import {askForPlanningDetails} from '../components/PlanningDetailsPrompt';
 import {RecipeDetailView} from '../components/RecipeDetailView';
 import {toApiError} from '../dao/ApiError';
 import RestAPI, {Recipe} from '../dao/RestAPI';
@@ -89,6 +90,7 @@ export const SharedRecipeScreen = (props: Props) => {
     try {
       const imported = await RestAPI.importSharedRecipe(shareId);
       SnackbarUtil.show({message: t('screens.sharedRecipe.imported')});
+      askForPlanningDetails(imported);
       if (imported.id) {
         props.navigation.navigate('default', {
           screen: 'RecipeScreen',

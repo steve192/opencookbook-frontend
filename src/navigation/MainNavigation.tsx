@@ -28,6 +28,9 @@ import {RecipeImportBrowser} from '../screens/RecipeImportBrowser';
 import RecipeListScreen from '../screens/RecipeListScreen';
 import {RecipeScreen} from '../screens/RecipeScreen';
 import {RecipeScanScreen} from '../screens/ocr/RecipeScanScreen';
+import {RecipeSuggestionScreen} from '../screens/suggestion/RecipeSuggestionScreen';
+import {PlanDraftScreen} from '../screens/weekplanning/PlanDraftScreen';
+import {WeekplanWizardScreen} from '../screens/weekplanning/WeekplanWizardScreen';
 import {SharedRecipeScreen} from '../screens/SharedRecipeScreen';
 import {SettingsScreen} from '../screens/SettingsScreen';
 import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
@@ -191,6 +194,21 @@ const MainStackNavigation = () => {
           name="GuidedCookingScreen"
           component={GuidedCookingScreen}
           options={{title: t('navigation.screenTitleGuidedCooking')}}
+        />
+        <MainStack.Screen
+          name="RecipeSuggestionScreen"
+          component={RecipeSuggestionScreen}
+          options={{title: t('screens.suggestion.screenTitle')}}
+        />
+        <MainStack.Screen
+          name="WeekplanWizardScreen"
+          component={WeekplanWizardScreen}
+          options={{title: t('screens.planning.wizardTitle')}}
+        />
+        <MainStack.Screen
+          name="PlanDraftScreen"
+          component={PlanDraftScreen}
+          options={{title: t('screens.planning.draftTitle')}}
         />
         <MainStack.Screen
           name="RecipeScreen"

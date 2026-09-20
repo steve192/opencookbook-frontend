@@ -3,11 +3,12 @@ import {useKeepAwake} from 'expo-keep-awake';
 import React, {useEffect, useLayoutEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Appbar, Button, Divider, Icon, ProgressBar, Surface, Text} from 'react-native-paper';
+import {Appbar, Button, Divider, Icon, Surface, Text} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {IngredientList} from '../components/IngredientList';
 import {PreparationStepText} from '../components/PreparationStepText';
 import {SectionTitle} from '../components/SectionTitle';
+import {StepProgressBar} from '../components/StepProgressBar';
 import {StepTimer} from '../components/StepTimer';
 import {ViewPager} from '../components/ViewPager';
 import {IngredientUse} from '../dao/RestAPI';
@@ -173,15 +174,8 @@ export const GuidedCookingScreen = (props: Props) => {
 
   return (
     <Surface style={styles.screen}>
-      {/* The app bar above is painted in the primary green, which is also what a Paper
-          ProgressBar fills itself with by default, so the two ran together into a single
-          green band. It now sits inset on the page rather than flush under the bar, in the
-          darker on-surface tone, over a track that shows how much is left. */}
       <View style={styles.progressRow}>
-        <ProgressBar
-          progress={stepCount > 0 ? (currentStep + 1) / stepCount : 0}
-          color={theme.colors.primaryText}
-          style={[styles.progress, {backgroundColor: theme.colors.surfaceVariant}]} />
+        <StepProgressBar progress={stepCount > 0 ? (currentStep + 1) / stepCount : 0} />
       </View>
 
       {/* Swiping between steps is how this is used with messy hands, so the steps are pages
@@ -223,10 +217,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 4,
-  },
-  progress: {
-    height: 6,
-    borderRadius: 3,
   },
   content: {
     gap: 16,

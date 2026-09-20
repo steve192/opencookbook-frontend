@@ -1,5 +1,8 @@
 import {IngredientUse, Recipe, RecipeDiet, RecipeGroup, RecipeImage} from '../dao/RestAPI';
+import {parseOptionalNumber} from './choices';
 import {moveItem} from './listOrder';
+import {toggledMealType} from './mealTypes';
+import {RecipeSuit} from './recipeSuits';
 
 /**
  * One recipe being edited, as a value.
@@ -26,17 +29,6 @@ export const emptyRecipe = (): Recipe => ({
 });
 
 /**
- * Reads a number the user typed, treating anything that is not one as "not set".
- *
- * @param {string} text what was typed
- * @return {number | undefined} the number, or undefined to clear the field
- */
-export const parseOptionalNumber = (text: string): number | undefined => {
-  const parsed = Number.parseInt(text, 10);
-  return Number.isNaN(parsed) ? undefined : parsed;
-};
-
-/**
  * @param {Recipe} recipe the recipe being edited
  * @param {string} title the new title
  * @return {Recipe} a new recipe with that title
@@ -50,6 +42,21 @@ export const withTitle = (recipe: Recipe, title: string): Recipe => ({...recipe,
  */
 export const withDiet = (recipe: Recipe, diet: RecipeDiet | null): Recipe =>
   ({...recipe, recipeType: diet});
+
+/**
+ * A side or component suits no meal, so choosing one clears the meals, and choosing a meal clears
+ * it; tapping what is chosen clears it again.
+ *
+ * @param {Recipe} recipe the recipe being edited
+ * @param {RecipeSuit} suit the meal, or side or component, that was tapped
+ * @return {Recipe} a new recipe marked so, or no longer
+ */
+export const withSuitToggled = (recipe: Recipe, suit: RecipeSuit): Recipe => {
+  if (suit === 'SIDE' || suit === 'COMPONENT') {
+    return {...recipe, dishRole: recipe.dishRole === suit ? null : suit, mealTypes: []};
+  }
+  return {...recipe, mealTypes: toggledMealType(recipe.mealTypes, suit), dishRole: null};
+};
 
 /**
  * The app carries one group per recipe, even though the server allows several.

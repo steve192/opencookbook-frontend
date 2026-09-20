@@ -41,9 +41,11 @@ export const SettingsScreen = (props: Props) => {
 
   const ocrImportEnabled = useSelector((state: RootState) => state.settings.ocrImportEnabled);
   const [scanTrainingConsent, setScanTrainingConsent] = useState(false);
+  const [askPlanningDetails, setAskPlanningDetails] = useState(true);
 
   useEffect(() => {
     AppPersistence.getScanTrainingConsent().then((consent) => setScanTrainingConsent(consent ?? false));
+    AppPersistence.getAskForPlanningDetails().then(setAskPlanningDetails);
   }, []);
 
   useEffect(() => {
@@ -114,6 +116,12 @@ export const SettingsScreen = (props: Props) => {
     AppPersistence.setScanTrainingConsent(consented);
   };
 
+  // Turned off from the question itself after an import; turned back on here
+  const onAskPlanningDetailsChange = (ask: boolean) => {
+    setAskPlanningDetails(ask);
+    AppPersistence.setAskForPlanningDetails(ask);
+  };
+
   const onDeleteScanDataPress = () => {
     PromptUtil.show({
       title: t('screens.settings.deleteScanData'),
@@ -182,6 +190,14 @@ export const SettingsScreen = (props: Props) => {
               </CustomCard>
             </>
           }
+          <Spacer height={20} />
+          <CustomCard>
+            <Caption>{t('screens.settings.planning')}</Caption>
+            <View style={{flexDirection: 'row', alignItems: 'center', gap: 12}}>
+              <Switch value={askPlanningDetails} onValueChange={onAskPlanningDetailsChange} />
+              <Text style={{flex: 1}}>{t('screens.settings.askPlanningDetails')}</Text>
+            </View>
+          </CustomCard>
           <Spacer height={20} />
           <CustomCard>
             <Caption>{t('screens.settings.theme')}</Caption>

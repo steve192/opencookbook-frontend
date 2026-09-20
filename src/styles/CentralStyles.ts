@@ -164,6 +164,17 @@ export const OwnColors = {
   bluishGrey: '#8f9bb3',
 };
 export default StyleSheet.create({
+  // The outline every recipe card shares, whether an overview tile or a wider suggestion row
+  recipeCardFrame: {
+    borderColor: 'rgba(0,0,0,0.09)',
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  chipRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
   scrollView: {
     marginVertical: 10,
   },

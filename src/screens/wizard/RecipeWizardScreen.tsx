@@ -2,15 +2,16 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Appbar, Button, Divider, Menu, SegmentedButtons, Surface, Text, TextInput} from 'react-native-paper';
+import {Appbar, Button, Divider, Menu, Surface, Text, TextInput} from 'react-native-paper';
 import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
 import {SectionTitle} from '../../components/SectionTitle';
 import {Option} from '../../components/SelectionPopupModal';
 import RestAPI, {Ingredient, IngredientUse, Recipe, RecipeDiet} from '../../dao/RestAPI';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
+import {missesPlanningDetails, missingDetails} from '../../helper/recipeCompleteness';
 import {takeDraft} from '../../helper/recipeDraftHandover';
-import {dietLabel, RECIPE_DIETS} from '../../helper/recipeDiet';
+import {useDerivedDiet} from '../../helper/useDerivedDiet';
 import {
   emptyRecipe,
   forSaving,
@@ -28,6 +29,7 @@ import {
   withStepChanged,
   withStepMoved,
   withStepRemoved,
+  withSuitToggled,
   withTitle,
 } from '../../helper/recipeEdits';
 import {useProgressiveRender} from '../../helper/useProgressiveRender';
@@ -39,6 +41,8 @@ import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
 import {IngredientFormField} from './IngredientFromField';
 import {RecipeFormField} from './PreparationStepFormField';
+import {ImportCompletionNotice} from './ImportCompletionNotice';
+import {PlanningDetailsSection} from './PlanningDetailsSection';
 import {RecipeGroupFormField} from './RecipeGroupFormField';
 
 
@@ -57,6 +61,16 @@ const RecipeWizardScreen = (props: Props) => {
       () => (props.route.params?.hasDraft ? takeDraft() : undefined) ??
         existingRecipe ?? emptyRecipe());
   const [savePending, setSavePending] = useState(false);
+
+  // A scan opens with a draft: what its source did not say is asked for here
+  const opensDraft = props.route.params?.hasDraft === true;
+  const [planningExpanded, setPlanningExpanded] = useState(
+      () => opensDraft && missesPlanningDetails(missingDetails(recipeData)));
+  // A diet the cook chose, or one an existing recipe already has, is never overwritten by the one read
+  // from the ingredients
+  const [dietChosen, setDietChosen] = useState(
+      () => !!recipeData.recipeType || props.route.params?.editing === true);
+  const [dietDerived, setDietDerived] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   // What the form looked like when it opened, to tell an edit from an untouched visit
@@ -92,6 +106,17 @@ const RecipeWizardScreen = (props: Props) => {
           (ingredient) => ingredient.name.toLowerCase() === name.toLowerCase()),
       [availableIngredients],
   );
+
+  useDerivedDiet(recipeData.neededIngredients.map((use) => use.ingredient.name), !dietChosen, (diet) => {
+    setRecipeData((recipe) => withDiet(recipe, diet));
+    setDietDerived(diet !== null);
+  });
+
+  const chooseDiet = (diet: RecipeDiet | null) => {
+    setDietChosen(true);
+    setDietDerived(false);
+    edit((recipe) => withDiet(recipe, diet));
+  };
 
   const isDirty = () => JSON.stringify(recipeData) !== pristineRecipe.current;
 
@@ -224,11 +249,6 @@ const RecipeWizardScreen = (props: Props) => {
   const renderedIngredients = useProgressiveRender(recipeData.neededIngredients.length, 5);
   const renderedSteps = useProgressiveRender(recipeData.preparationSteps.length, 3);
 
-  const dietOptions = useMemo(
-      () => RECIPE_DIETS.map((diet) => ({value: diet, label: dietLabel(t, diet) ?? diet})),
-      [t],
-  );
-
   const renderIngredientsSection = () => (
     <View style={styles.section}>
       <SectionTitle testID='ingredient-list-title'>{t('screens.editRecipe.ingredients')}</SectionTitle>
@@ -308,14 +328,6 @@ const RecipeWizardScreen = (props: Props) => {
           value={recipeData.totalTime ? String(recipeData.totalTime) : ''}
           onChangeText={(newText) => edit((recipe) => withNumberField(recipe, 'totalTime', newText))} />
       </View>
-      <Text variant="labelLarge" style={{color: theme.colors.onSurfaceVariant}}>{t('screens.editRecipe.diet')}</Text>
-      <SegmentedButtons
-        density="small"
-        value={recipeData.recipeType ?? ''}
-        // Tapping the selected option again clears it, so a recipe can go back to unset
-        onValueChange={(value) => edit((recipe) =>
-          withDiet(recipe, value === recipe.recipeType ? null : (value as RecipeDiet)))}
-        buttons={dietOptions} />
     </View>
   );
 
@@ -337,9 +349,18 @@ const RecipeWizardScreen = (props: Props) => {
             mode="outlined"
             onChangeText={(newText) => edit((recipe) => withTitle(recipe, newText))}
             placeholder={t('screens.editRecipe.name')} />
+          {opensDraft && <ImportCompletionNotice missing={missingDetails(recipeData)} />}
           {renderFactsSection()}
           <Divider />
           {renderIngredientsSection()}
+          <Divider />
+          <PlanningDetailsSection
+            recipe={recipeData}
+            expanded={planningExpanded}
+            onToggleExpanded={() => setPlanningExpanded(!planningExpanded)}
+            dietDerived={dietDerived}
+            onDietChosen={chooseDiet}
+            onSuitToggled={(suit) => edit((recipe) => withSuitToggled(recipe, suit))} />
           <Divider />
           {renderPreparationStepsSection()}
           <Divider />

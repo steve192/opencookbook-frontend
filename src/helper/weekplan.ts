@@ -1,3 +1,4 @@
+import {TFunction} from 'i18next';
 import XDate from 'xdate';
 
 /** The format the weekplan API identifies a day with. */
@@ -38,6 +39,18 @@ export const addWeeks = (date: XDate, weeks: number): XDate =>
  */
 export const weekDays = (weekStart: XDate): XDate[] =>
   Array.from({length: 7}, (unused, index) => new XDate(weekStart).addDays(index));
+
+/**
+ * The days of a week that can still be planned: none before today.
+ *
+ * @param {XDate} weekStart Monday of the week, as returned by startOfWeek
+ * @param {XDate} today the current day
+ * @return {XDate[]} the days from today, or from Monday for a week still ahead; empty for a past week
+ */
+export const plannableDays = (weekStart: XDate, today: XDate): XDate[] => {
+  const firstDay = new XDate(today).clearTime();
+  return weekDays(weekStart).filter((day) => day.getTime() >= firstDay.getTime());
+};
 
 /**
  * Formats a date the way the weekplan API keys its days.
@@ -110,3 +123,26 @@ export const formatMonth = (date: XDate, locale?: string): string =>
  */
 export const formatWeekdayAndDate = (date: XDate, locale?: string): string =>
   date.toDate().toLocaleDateString(locale, {weekday: 'long', day: 'numeric', month: 'long'});
+
+/**
+ * A day in a few letters, e.g. "Mon 31".
+ *
+ * @param {XDate} date date to format
+ * @param {string} [locale] locale to format in, the device default when omitted
+ * @return {string} the formatted date
+ */
+export const formatShortWeekday = (date: XDate, locale?: string): string =>
+  date.toDate().toLocaleDateString(locale, {weekday: 'short', day: 'numeric'});
+
+/**
+ * @param {TFunction} t the translation function of the calling screen
+ * @param {number} weekOffset weeks from the current one, negative for past weeks
+ * @param {XDate} weekStart Monday of that week
+ * @return {string} "This week", "Next week", "Last week", or the week's number
+ */
+export const weekOffsetLabel = (t: TFunction, weekOffset: number, weekStart: XDate): string => {
+  if (weekOffset === 0) return t('screens.weekplan.thisWeek');
+  if (weekOffset === 1) return t('screens.weekplan.nextWeek');
+  if (weekOffset === -1) return t('screens.weekplan.lastWeek');
+  return t('screens.weekplan.weekNumber', {number: isoWeekNumber(weekStart)});
+};

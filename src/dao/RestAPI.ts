@@ -20,6 +20,9 @@ export interface RecipeImage {
     uuid: string
 }
 export type RecipeDiet = 'VEGAN' | 'VEGETARIAN' | 'MEAT';
+export type MealType = 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK' | 'DESSERT';
+/** What a recipe is when it is not a dish of its own; neither is planned or suggested as a meal. */
+export type DishRole = 'SIDE' | 'COMPONENT';
 
 export interface Recipe {
     id?: number
@@ -37,6 +40,10 @@ export interface Recipe {
     preparationTime?: number | null;
     totalTime?: number | null;
     recipeType?: RecipeDiet | null;
+    /** Empty while nobody has said which meals this suits, which keeps it eligible for all but breakfast. */
+    mealTypes?: MealType[];
+    /** Null for a dish. */
+    dishRole?: DishRole | null;
     /** Absent where the instance does not estimate nutrition. */
     nutrition?: NutritionSummary | null;
 }
@@ -242,6 +249,128 @@ const sharedRecipeToRecipe = (shared: SharedRecipeResponse): Recipe => ({
   nutrition: shared.nutrition,
 });
 
+/** How the ingredients a cook named are meant. */
+export type SuggestionMatchMode = 'ANY_RANKED' | 'MUST_CONTAIN';
+
+export type MacroStyle = 'BALANCED' | 'LOW_CARB' | 'LOW_FAT' | 'HIGH_PROTEIN';
+
+/** Everything is optional: a request answering nothing is a valid "surprise me". */
+export interface RecipeSuggestionRequest {
+  mode?: SuggestionMatchMode;
+  ingredientIds?: number[];
+  maxTotalTimeMinutes?: number | null;
+  diet?: RecipeDiet | null;
+  mealTypes?: MealType[];
+  targetKcalPerServing?: number | null;
+  macroStyle?: MacroStyle | null;
+  limit?: number;
+  /** Repeat a seed to get that result set back; leave it out for a new draw. */
+  seed?: number | null;
+}
+
+/** Why a recipe was chosen: a key and its weight. The app writes the sentence; the server never sends prose. */
+export interface ScoreReason {
+  term: string;
+  value: number;
+}
+
+export interface SuggestedRecipe {
+  recipe: Recipe;
+  score: number;
+  matchedIngredients: Ingredient[];
+  missingIngredients: Ingredient[];
+  reasons: ScoreReason[];
+}
+
+/**
+ * Where the cookbook was narrowed, so an empty list can say which answer emptied it:
+ * `owned` to `afterFilters` is what diet, time and meal removed, `afterFilters` to `matched`
+ * what the wanted ingredients did.
+ */
+export interface SuggestionPoolStats {
+  owned: number;
+  afterFilters: number;
+  matched: number;
+  returned: number;
+}
+
+export interface RecipeSuggestions {
+  seed: number;
+  results: SuggestedRecipe[];
+  /** One wanted ingredient short, kept apart so MUST_CONTAIN still means what it says. */
+  nearMisses: SuggestedRecipe[];
+  poolStats: SuggestionPoolStats;
+}
+
+/** How much work a meal may be, judged against the cook's own cookbook. */
+export type Effort = 'SIMPLE' | 'ANY' | 'ELABORATE';
+
+export type DayOfWeek = 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
+
+/** How one meal of the day is planned. */
+export interface PlanningMeal {
+  mealType: MealType;
+  /** The weekdays it is cooked, each with how much work it may be; on the others it is a gap. */
+  days: Partial<Record<DayOfWeek, Effort>>;
+  /** Per serving; left out, the meal gets an even share of the daily calories. */
+  targetKcal?: number | null;
+}
+
+/** Something the cook has and wants used up; without an amount it is worth one recipe. */
+export interface PantryEntry {
+  ingredientId: number;
+  amount?: number | null;
+  unit?: string | null;
+}
+
+/** A cook's answers to the weekplan wizard, kept so that next week is one tap. */
+export interface PlanningProfile {
+  id?: number;
+  name: string;
+  defaultProfile?: boolean;
+  householdSize?: number;
+  diet?: RecipeDiet | null;
+  meatMealsPerWeek?: number | null;
+  kcalPerDay?: number | null;
+  macroStyle?: MacroStyle | null;
+  cooldownWeeks?: number;
+  leftoversAllowed?: boolean;
+  spreadVariety?: boolean;
+  meals: PlanningMeal[];
+  pantry?: PantryEntry[];
+  avoidedIngredientIds?: number[];
+}
+
+export type PlanSlotKind = 'COOKED' | 'LEFTOVER' | 'GAP';
+
+/** Why a cook passed over a planned recipe; each steers the replacement away from what put them off. */
+export type RerollReason = 'HAD_RECENTLY' | 'TOO_MUCH_WORK' | 'MISSING_INGREDIENTS' | 'NOT_A_FULL_MEAL';
+
+/** One meal of a proposed week. */
+export interface PlanSlot {
+  id: number;
+  date: string;
+  mealType: MealType;
+  kind: PlanSlotKind;
+  /** Null for a gap, and for a meal the cookbook had nothing for. */
+  recipe: Recipe | null;
+  servings: number | null;
+  /** For a leftover, the id of the slot where it is cooked. */
+  leftoverOf: number | null;
+  locked: boolean;
+  reasons: ScoreReason[];
+}
+
+/** A proposed week. Nothing reaches the weekplan until it is accepted. */
+export interface PlanDraft {
+  id: number;
+  profileId: number | null;
+  startDate: string;
+  days: number;
+  status: 'DRAFT' | 'ACCEPTED' | 'DISCARDED';
+  slots: PlanSlot[];
+}
+
 /**
  * Wraps image bytes so they can be handed straight to an Image source.
  *
@@ -349,6 +478,121 @@ class RestAPI {
 
   static async getSharedRecipeNutrition(shareId: string): Promise<RecipeNutrition> {
     return (await axios.get(await this.sharedUrl(shareId, '/nutrition'))).data;
+  }
+
+  /**
+   * Ranks the user's own recipes against what they have and want.
+   *
+   * A POST because the request is structured, not because it changes anything.
+   *
+   * @param {RecipeSuggestionRequest} request what the cook answered
+   * @return {Promise<RecipeSuggestions>} the ranked recipes, with the seed that ordered them
+   */
+  static async suggestRecipes(request: RecipeSuggestionRequest): Promise<RecipeSuggestions> {
+    const response = await this.post('/recipes/suggestions', request);
+    return response?.data;
+  }
+
+  static async getPlanningProfiles(): Promise<PlanningProfile[]> {
+    const response = await this.get('/planning/profiles');
+    return response?.data;
+  }
+
+  /**
+   * @param {PlanningProfile} profile the answers; created when it has no id, changed otherwise
+   * @return {Promise<PlanningProfile>} the profile as saved
+   */
+  static async savePlanningProfile(profile: PlanningProfile): Promise<PlanningProfile> {
+    const response = profile.id === undefined ?
+      await this.post('/planning/profiles', profile) :
+      await this.put(`/planning/profiles/${profile.id}`, profile);
+    return response?.data;
+  }
+
+  /**
+   * @param {number} profileId the answers to plan from
+   * @param {string} startDate the first day, as a day key
+   * @param {number} days how many days from there
+   * @param {string[]} skippedDates days the cook is not at home; nothing is planned for them
+   * @return {Promise<PlanDraft>} the proposed week
+   */
+  static async generatePlanDraft(
+      profileId: number, startDate: string, days: number, skippedDates: string[],
+  ): Promise<PlanDraft> {
+    const response = await this.post('/planning/drafts', {profileId, startDate, days, skippedDates});
+    return response?.data;
+  }
+
+  static async getPlanDraft(draftId: number): Promise<PlanDraft> {
+    const response = await this.get(`/planning/drafts/${draftId}`);
+    return response?.data;
+  }
+
+  /**
+   * Something else for one meal; never the recipe it had.
+   *
+   * @param {number} draftId the proposed week
+   * @param {number} slotId the meal
+   * @param {RerollReason} [reason] why the recipe was passed over, which steers the replacement
+   * @return {Promise<PlanDraft>} the week after the change
+   */
+  static async rerollPlanSlot(draftId: number, slotId: number, reason?: RerollReason): Promise<PlanDraft> {
+    const response = await this.post(`/planning/drafts/${draftId}/slots/${slotId}/reroll`, {reason});
+    return response?.data;
+  }
+
+  static async setPlanSlotLocked(draftId: number, slotId: number, locked: boolean): Promise<PlanDraft> {
+    const response = await this.post(`/planning/drafts/${draftId}/slots/${slotId}/lock`, {locked});
+    return response?.data;
+  }
+
+  /**
+   * Turns a meal into a gap for the cook to fill, or a gap back into a cooked meal.
+   *
+   * @param {number} draftId the proposed week
+   * @param {number} slotId the meal
+   * @return {Promise<PlanDraft>} the week after the change
+   */
+  static async togglePlanSlotGap(draftId: number, slotId: number): Promise<PlanDraft> {
+    const response = await this.post(`/planning/drafts/${draftId}/slots/${slotId}/toggle-gap`, {});
+    return response?.data;
+  }
+
+  /**
+   * A new draw for every meal that is not locked.
+   *
+   * @param {number} draftId the proposed week
+   * @return {Promise<PlanDraft>} the week after the change
+   */
+  static async rerollPlanDraft(draftId: number): Promise<PlanDraft> {
+    const response = await this.post(`/planning/drafts/${draftId}/reroll`, {});
+    return response?.data;
+  }
+
+  /**
+   * Adds the week's meals to the weekplan; meals planned by hand stay.
+   *
+   * @param {number} draftId the proposed week
+   * @return {Promise<PlanDraft>} the week, now accepted
+   */
+  static async acceptPlanDraft(draftId: number): Promise<PlanDraft> {
+    const response = await this.post(`/planning/drafts/${draftId}/accept`, {});
+    return response?.data;
+  }
+
+  static async discardPlanDraft(draftId: number): Promise<void> {
+    await this.delete(`/planning/drafts/${draftId}`);
+  }
+
+  /**
+   * The diet a recipe with these ingredients would have, read from the catalogue; nothing is stored.
+   *
+   * @param {string[]} ingredientNames the ingredients as written
+   * @return {Promise<RecipeDiet | null>} the diet, or null where the ingredients do not tell
+   */
+  static async previewDiet(ingredientNames: string[]): Promise<RecipeDiet | null> {
+    const response = await this.post('/recipes/diet-preview', {ingredientNames});
+    return response?.data.diet ?? null;
   }
 
   static async getRecipeNutrition(recipeId: number): Promise<RecipeNutrition> {

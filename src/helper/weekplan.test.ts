@@ -1,3 +1,4 @@
+import {TFunction} from 'i18next';
 import {describe, expect, it} from 'vitest';
 import XDate from 'xdate';
 import {
@@ -8,6 +9,8 @@ import {
   formatWeekRange,
   isSameDay,
   isoWeekNumber,
+  plannableDays,
+  weekOffsetLabel,
   startOfWeek,
   toDayKey,
   weekDays,
@@ -156,5 +159,33 @@ describe('day formatting', () => {
   // timezone, or the plan would label a day with its neighbour.
   it('keeps the day when a day key is parsed back', () => {
     expect(formatDayAndMonth(new XDate('2026-08-31'), 'en-GB')).toBe('31 August');
+  });
+});
+
+describe('plannableDays', () => {
+  const monday = new XDate(2026, 8, 14);
+
+  it('starts the current week today', () => {
+    const days = plannableDays(monday, new XDate(2026, 8, 18, 15, 30));
+    expect(days.map(toDayKey)).toEqual(['2026-09-18', '2026-09-19', '2026-09-20']);
+  });
+
+  it('offers a whole week that is still ahead', () => {
+    expect(plannableDays(monday, new XDate(2026, 8, 10))).toHaveLength(7);
+  });
+
+  it('offers nothing for a week that is over', () => {
+    expect(plannableDays(monday, new XDate(2026, 8, 21))).toEqual([]);
+  });
+});
+
+describe('weekOffsetLabel', () => {
+  const t = ((key: string, options?: Record<string, unknown>) =>
+    options ? `${key}:${Object.values(options).join()}` : key) as unknown as TFunction;
+
+  it('names the weeks around the current one and numbers the rest', () => {
+    expect(weekOffsetLabel(t, 0, new XDate(2026, 8, 14))).toBe('screens.weekplan.thisWeek');
+    expect(weekOffsetLabel(t, 1, new XDate(2026, 8, 21))).toBe('screens.weekplan.nextWeek');
+    expect(weekOffsetLabel(t, 2, new XDate(2026, 8, 28))).toBe('screens.weekplan.weekNumber:40');
   });
 });

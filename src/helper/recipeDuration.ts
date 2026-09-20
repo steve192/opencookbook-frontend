@@ -1,3 +1,5 @@
+import {Recipe} from '../dao/RestAPI';
+
 const MINUTES_PER_HOUR = 60;
 
 /**
@@ -17,6 +19,13 @@ export const formatDuration = (minutes?: number | null): string | undefined => {
   }
   return remainder === 0 ? `${hours} h` : `${hours} h ${remainder} min`;
 };
+
+/**
+ * @param {Recipe} recipe the recipe
+ * @return {string | undefined} how long it takes in all, falling back to its preparation time
+ */
+export const formatRecipeTime = (recipe: Recipe): string | undefined =>
+  formatDuration(recipe.totalTime ?? recipe.preparationTime);
 
 /** A duration mentioned in a preparation step, offered as a timer. */
 export interface StepDuration {

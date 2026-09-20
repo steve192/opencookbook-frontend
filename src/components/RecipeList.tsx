@@ -292,10 +292,8 @@ const styles = StyleSheet.create({
     height: 100,
   },
   recipeCard: {
+    ...CentralStyles.recipeCardFrame,
     margin: 3,
-    borderColor: 'rgba(0,0,0,0.09)',
-    borderRadius: 16,
-    borderWidth: 1,
     flex: 1,
   },
   recipeGroupCard: {

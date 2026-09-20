@@ -23,6 +23,8 @@ interface Props {
     options: Option[];
     onClose: () => void;
     placeholder?: string;
+    /** Offers what was typed as a new option; off where only existing options make sense. */
+    allowCreate?: boolean;
     onSelection: (selectedValue: Option) => void;
 }
 
@@ -55,7 +57,9 @@ export const SelectionPopupModal = (props: Props) => {
 
     filteredItems.sort(sortFunction);
 
-    let listItems: ListItemData[] = value.length > 0 ? [{option: {key: '', value: t('common.createImperative') + ' ' + value, newlyCreated: true}}] : [];
+    const offersCreate = (props.allowCreate ?? true) && value.length > 0;
+    let listItems: ListItemData[] = offersCreate ?
+      [{option: {key: '', value: t('common.createImperative') + ' ' + value, newlyCreated: true}}] : [];
     if (filteredItems.length > 0) {
       filteredItems.forEach((item) => {
         listItems.push({option: item});

@@ -4,6 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {Platform, ScrollView, StyleSheet, View} from 'react-native';
 import {Button, Chip, Divider, HelperText, Icon, List, Surface, Text, TextInput} from 'react-native-paper';
 import RestAPI, {Recipe} from '../dao/RestAPI';
+import {askForPlanningDetails} from '../components/PlanningDetailsPrompt';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {importRecipe} from '../redux/features/recipesSlice';
@@ -61,6 +62,7 @@ export const ImportScreen = (props: Props) => {
       setImportError('');
       setImportedRecipe(recipe);
       setImportURL('');
+      askForPlanningDetails(recipe);
     }).catch((error) => {
       setImportError(t(errorMessageKey(error, 'errors.importFailed')));
     }).finally(() => setImportPending(false));

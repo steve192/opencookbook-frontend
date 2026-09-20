@@ -5,6 +5,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Provider as PaperProvider, Snackbar} from 'react-native-paper';
 import {enableScreens} from 'react-native-screens';
 import {Provider, useSelector} from 'react-redux';
+import {PlanningDetailsPrompt} from './src/components/PlanningDetailsPrompt';
 import {Prompt} from './src/helper/Prompt';
 import {CookingTimerWatcher} from './src/components/CookingTimerWatcher';
 import {TimerNotificationOpener} from './src/components/TimerNotificationOpener';
@@ -57,6 +58,7 @@ const ReduxWrappedApp = () => {
     <PaperProvider theme={theme}>
       <MainNavigation />
       <Prompt/>
+      <PlanningDetailsPrompt />
       <GlobalSnackbar />
       {/* Cooking timers announce themselves from anywhere in the app, not just from the
           step that started them, and tapping one goes back to the step it came from */}

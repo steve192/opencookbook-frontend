@@ -175,6 +175,17 @@ const RecipeListScreen = (props: Props) => {
           actions={[
             {
               size: 'medium',
+              icon: 'chef-hat',
+              label: t('navigation.suggestion'),
+              onPress: () => {
+                if (!requireOnline()) {
+                  return;
+                }
+                props.navigation.navigate('RecipeSuggestionScreen');
+              },
+            },
+            {
+              size: 'medium',
               icon: 'plus',
               label: t('screens.overview.addRecipe'),
               onPress: () => {

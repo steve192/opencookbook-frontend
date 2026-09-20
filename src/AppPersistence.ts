@@ -151,6 +151,20 @@ export default class AppPersistence {
     await AsyncStorage.setItem('scan_training_consent', consented ? 'true' : 'false');
   }
 
+  /**
+   * Whether to ask for what planning needs to know after a recipe is imported. Asked every time
+   * until the cook says not to; they can turn it back on in the settings.
+   *
+   * @return {Promise<boolean>} whether to ask
+   */
+  static async getAskForPlanningDetails(): Promise<boolean> {
+    return await AsyncStorage.getItem('ask_planning_details') !== 'false';
+  }
+
+  static async setAskForPlanningDetails(ask: boolean) {
+    await AsyncStorage.setItem('ask_planning_details', ask ? 'true' : 'false');
+  }
+
   static getApiRoute(): string {
     return '/api/v1';
   }
