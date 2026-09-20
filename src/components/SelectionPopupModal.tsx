@@ -1,10 +1,9 @@
-import {HeaderHeightContext} from '@react-navigation/elements';
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Modal, Pressable, TextInput as RNTextInput, View} from 'react-native';
-import {Divider, List, Surface, TextInput} from 'react-native-paper';
+import {View} from 'react-native';
+import {Divider, List, Modal, Portal, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import CentralStyles, {modalStyles} from '../styles/CentralStyles';
+import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 
 
@@ -30,8 +29,8 @@ interface Props {
 
 
 export const SelectionPopupModal = (props: Props) => {
-  const modalInputRef = useRef<RNTextInput>(null);
   const [value, setValue] = useState<string>('');
+  const theme = useAppTheme();
 
 
   const {t} = useTranslation('translation');
@@ -89,58 +88,42 @@ export const SelectionPopupModal = (props: Props) => {
     title={data.option.value}
     onPress={() => data.option.newlyCreated ? props.onSelection({key: '', value: value, newlyCreated: true}) : props.onSelection(data.option)} />;
 
-  return <View style={modalStyles.centeredView}>
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={props.modalVisible}
-      onShow={() => modalInputRef.current?.focus()}
-      onRequestClose={() => props.onClose()}
-    >
-      <View style={CentralStyles.fullscreen}>
-        <Pressable
-          onPress={() => props.onClose()}
-          style={modalStyles.modalBackdrop} />
-        <HeaderHeightContext.Consumer>
-          {(headerHeight) => headerHeight &&
-              // box-none lets presses in the margins around the popup reach the backdrop
-              <View style={modalStyles.centeredView} pointerEvents="box-none">
-                {/* headerHeight / 2 is a workaround. Calculate the real header height (header height is navigation bar + safe area, instead of only navigation bar)*/}
-                <Surface style={[{flex: 1, marginTop: (headerHeight / 2), width: '100%'}, modalStyles.modalView]}>
-                  <View
-                    style={{flexDirection: 'row', alignContent: 'center'}}>
-                    <TextInput
-                      placeholder={props.placeholder}
-                      ref={modalInputRef}
-                      onChangeText={onSearchInputChange}
-                      style={{flex: 1}}
-                      value={value} />
-                    <Spacer width={10} />
-                  </View>
-                  <Divider style={{paddingVertical: 2, marginVertical: 10}} />
-                  {dataProvider.getSize() > 0 && <RecyclerListView
-                    keyboardShouldPersistTaps={true}
-                    rowRenderer={renderRow}
-                    dataProvider={dataProvider}
-                    forceNonDeterministicRendering={true}
-                    layoutProvider={new LayoutProvider(
-                        (index) => {
-                          return 0; // Does not matter as only single type is used
-                        },
-                        (type, dim, index) => {
-                          dim.width = 1000; // Just enough to fill parent, value does not matter
-                          dim.height = 40; // Does not matter because of nonDeterministicRendering?
-                        },
-                    )}
-                  >
-                  </RecyclerListView>}
-                </Surface>
-              </View>
-          }
-        </HeaderHeightContext.Consumer>
-      </View>
-    </Modal>
-  </View>;
+  return (
+    <Portal>
+      <Modal
+        visible={props.modalVisible}
+        onDismiss={props.onClose}
+        contentContainerStyle={[overlayStyles.modalView, {backgroundColor: theme.colors.elevation.level3}]}>
+        <View style={{flexDirection: 'row', alignContent: 'center'}}>
+          <TextInput
+            autoFocus={true}
+            placeholder={props.placeholder}
+            onChangeText={onSearchInputChange}
+            style={{flex: 1}}
+            value={value} />
+          <Spacer width={10} />
+        </View>
+        <Divider style={{paddingVertical: 2, marginVertical: 10}} />
+        {dataProvider.getSize() > 0 && <RecyclerListView
+          style={{flex: 1}}
+          keyboardShouldPersistTaps={true}
+          rowRenderer={renderRow}
+          dataProvider={dataProvider}
+          forceNonDeterministicRendering={true}
+          layoutProvider={new LayoutProvider(
+              (index) => {
+                return 0; // Does not matter as only single type is used
+              },
+              (type, dim, index) => {
+                dim.width = 1000; // Just enough to fill parent, value does not matter
+                dim.height = 40; // Does not matter because of nonDeterministicRendering?
+              },
+          )}
+        >
+        </RecyclerListView>}
+      </Modal>
+    </Portal>
+  );
 };
 
 

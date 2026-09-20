@@ -6,7 +6,7 @@ import {NutritionLine, NutritionSummary, RecipeNutrition} from '../dao/RestAPI';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {canWeighPieces, formatEstimate, formatNutrient, lineNoteKeys, linesWarningFirst, NUTRIENT_ROWS, nutritionColumns} from '../helper/nutrition';
 import {useOnlineGuard} from '../helper/useOnlineGuard';
-import {useAppTheme} from '../styles/CentralStyles';
+import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
 import {IngredientLinkDialog} from './IngredientLinkDialog';
 import {OwnPortionDialog} from './OwnPortionDialog';
 
@@ -68,7 +68,7 @@ export const NutritionSheet = (props: Props) => {
       <Modal
         visible={true}
         onDismiss={props.onDismiss}
-        contentContainerStyle={[styles.sheet, {backgroundColor: theme.colors.surface}]}>
+        contentContainerStyle={[overlayStyles.sheetView, {backgroundColor: theme.colors.elevation.level3}]}>
         <View style={styles.header}>
           <Text variant="titleLarge" style={styles.title}>{t('nutrition.sheetTitle')}</Text>
           <IconButton icon="close" accessibilityLabel={t('common.close')} onPress={props.onDismiss} />
@@ -231,15 +231,6 @@ const LineRow = (props: {line: NutritionLine, onPress?: () => void, onWeigh?: ()
 };
 
 const styles = StyleSheet.create({
-  sheet: {
-    margin: 16,
-    borderRadius: 16,
-    maxHeight: '90%',
-    maxWidth: 640,
-    width: '100%',
-    alignSelf: 'center',
-    overflow: 'hidden',
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -5,7 +5,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import Constants from 'expo-constants';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, View} from 'react-native';
+import {ScrollView, StyleSheet, View} from 'react-native';
 import {Avatar, Button, Caption, Divider, Surface, Switch, Text} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
@@ -70,15 +70,16 @@ export const SettingsScreen = (props: Props) => {
     PromptUtil.show({
       title: t('screens.settings.deleteAccount'),
       message: t('screens.settings.deleteAccountConfirmationQuestion'),
-      button1: t('common.delete'),
-      button1Callback: () => {
+      destructive: true,
+      confirm: t('common.delete'),
+      onConfirm: () => {
         // Signed out only once the account is actually gone: doing it first left somebody at
         // the login screen believing a request that had failed.
         RestAPI.deleteAccount()
             .then(() => dispatch(logout()))
             .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
       },
-      button2: t('common.cancel'),
+      cancel: t('common.cancel'),
     });
   };
 
@@ -103,9 +104,9 @@ export const SettingsScreen = (props: Props) => {
     PromptUtil.show({
       title: t('screens.settings.changePasswordTitle'),
       message: t('screens.settings.changePasswordMessage', {email: emailAddress}),
-      button1: t('common.ok'),
-      button1Callback: sendPasswordResetLink,
-      button2: t('common.cancel'),
+      confirm: t('common.ok'),
+      onConfirm: sendPasswordResetLink,
+      cancel: t('common.cancel'),
     });
   };
 
@@ -126,13 +127,14 @@ export const SettingsScreen = (props: Props) => {
     PromptUtil.show({
       title: t('screens.settings.deleteScanData'),
       message: t('screens.settings.deleteScanDataQuestion'),
-      button1: t('common.delete'),
-      button1Callback: () => {
+      destructive: true,
+      confirm: t('common.delete'),
+      onConfirm: () => {
         RestAPI.deleteScanTrainingData()
             .then(() => SnackbarUtil.show({message: t('screens.settings.deleteScanDataDone')}))
             .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
       },
-      button2: t('common.cancel'),
+      cancel: t('common.cancel'),
     });
   };
 
@@ -140,9 +142,9 @@ export const SettingsScreen = (props: Props) => {
     PromptUtil.show({
       title: t('screens.settings.logoutTitle'),
       message: t('screens.settings.logoutMessage'),
-      button1: t('common.ok'),
-      button1Callback: performLogout,
-      button2: t('common.cancel'),
+      confirm: t('common.ok'),
+      onConfirm: performLogout,
+      cancel: t('common.cancel'),
     });
   };
 
@@ -210,14 +212,14 @@ export const SettingsScreen = (props: Props) => {
             </Picker>
           </CustomCard>
           <Spacer height={20} />
-          <View style={{padding: 10, borderWidth: 1, borderRadius: 16, borderColor: 'red'}}>
+          <View style={[styles.dangerZone, {borderColor: theme.colors.destructive}]}>
             <Caption style={{color: theme.colors.error}}>{t('screens.settings.dangerZone')}</Caption>
             <Spacer height={20} />
             <Button
-              dark={true}
               icon="alert-circle-outline"
               mode="contained"
-              buttonColor={theme.colors.error}
+              buttonColor={theme.colors.destructive}
+              textColor={theme.colors.onDestructive}
               onPress={deleteAccount}>
               {t('screens.settings.deleteAccount')}
             </Button>
@@ -231,3 +233,11 @@ export const SettingsScreen = (props: Props) => {
     </Surface>
   );
 };
+
+const styles = StyleSheet.create({
+  dangerZone: {
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 16,
+  },
+});

@@ -186,9 +186,10 @@ const RecipeWizardScreen = (props: Props) => {
     PromptUtil.show({
       title: discarding ? t('screens.editRecipe.discardTitle') : t('screens.editRecipe.deleteTitle'),
       message: discarding ? t('screens.editRecipe.discardMessage') : t('screens.editRecipe.deleteMessage'),
-      button1: t('common.delete'),
-      button1Callback: performDelete,
-      button2: t('common.cancel'),
+      destructive: true,
+      confirm: t('common.delete'),
+      onConfirm: performDelete,
+      cancel: t('common.cancel'),
     });
   };
 
@@ -202,12 +203,13 @@ const RecipeWizardScreen = (props: Props) => {
     PromptUtil.show({
       title: t('screens.editRecipe.unsavedTitle'),
       message: t('screens.editRecipe.unsavedMessage'),
-      button1: t('common.delete'),
-      button1Callback: () => {
+      destructive: true,
+      confirm: t('common.delete'),
+      onConfirm: () => {
         savedOrDiscarded.current = true;
         props.navigation.dispatch(event.data.action);
       },
-      button2: t('screens.editRecipe.keepEditing'),
+      cancel: t('screens.editRecipe.keepEditing'),
     });
   }), [props.navigation, recipeData, t]);
 

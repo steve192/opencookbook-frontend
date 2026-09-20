@@ -147,10 +147,10 @@ export const RecipeScanScreen = (props: Props) => {
       PromptUtil.show({
         title: t('screens.recipeScan.consent.title'),
         message: t('screens.recipeScan.consent.message'),
-        button1: t('screens.recipeScan.consent.no'),
-        button1Callback: () => decided(false),
-        button2: t('screens.recipeScan.consent.yes'),
-        button2Callback: () => decided(true),
+        confirm: t('screens.recipeScan.consent.yes'),
+        onConfirm: () => decided(true),
+        cancel: t('screens.recipeScan.consent.no'),
+        onCancel: () => decided(false),
       });
     });
     await AppPersistence.setScanTrainingConsent(answer);

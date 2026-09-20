@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Modal, Pressable, StyleSheet, View} from 'react-native';
-import {Appbar, Button, Icon, Surface, Text, TextInput, TouchableRipple} from 'react-native-paper';
+import {StyleSheet, View} from 'react-native';
+import {Appbar, Button, Icon, Modal, Portal, Text, TextInput, TouchableRipple} from 'react-native-paper';
 import {RecipeList} from '../../components/RecipeList';
 import {Recipe, RecipeGroup} from '../../dao/RestAPI';
-import CentralStyles, {modalStyles, useAppTheme} from '../../styles/CentralStyles';
+import {overlayStyles, useAppTheme} from '../../styles/CentralStyles';
 
 interface Props {
   visible: boolean;
@@ -120,50 +120,38 @@ export const RecipeSelectionPopup = (props: Props) => {
   };
 
   return (
-    <View style={modalStyles.centeredView}>
+    <Portal>
       <Modal
-        animationType="slide"
-        transparent={true}
         visible={props.visible}
-        onRequestClose={props.onClose}
-      >
-        <View style={CentralStyles.fullscreen}>
-          <Pressable
-            onPress={props.onClose}
-            style={modalStyles.modalBackdrop} />
-          {/* box-none lets presses in the margins around the popup reach the backdrop */}
-          <View style={modalStyles.centeredView} pointerEvents="box-none">
-            <Surface style={[modalStyles.modalView, styles.modal]}>
-              {/* The popup is not under the system status bar, so the header must
-                  not reserve room for it. */}
-              <Appbar.Header statusBarHeight={0} style={styles.header}>
-                {selectionType !== undefined &&
-                  <Appbar.BackAction
-                    accessibilityLabel={t('screens.recipeselectionpopup.back')}
-                    onPress={goBack} />
-                }
-                <Appbar.Content title={headerTitle()} />
-                <Appbar.Action
-                  icon="close"
-                  accessibilityLabel={t('screens.recipeselectionpopup.close')}
-                  onPress={props.onClose} />
-              </Appbar.Header>
-              {/* Appbar.Content drops its subtitle under MD3, so the day this is
-                  planning for gets its own line. */}
-              {props.dayLabel ?
-                <View style={styles.dayContext}>
-                  <Icon source="calendar-outline" size={16} color={theme.colors.onSurfaceVariant} />
-                  <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>
-                    {props.dayLabel}
-                  </Text>
-                </View> :
-                null}
-              {renderContent()}
-            </Surface>
-          </View>
-        </View>
+        onDismiss={props.onClose}
+        contentContainerStyle={[overlayStyles.modalView, styles.modal, {backgroundColor: theme.colors.elevation.level3}]}>
+        {/* The popup is not under the system status bar, so the header must
+            not reserve room for it. */}
+        <Appbar.Header statusBarHeight={0} style={styles.header}>
+          {selectionType !== undefined &&
+            <Appbar.BackAction
+              accessibilityLabel={t('screens.recipeselectionpopup.back')}
+              onPress={goBack} />
+          }
+          <Appbar.Content title={headerTitle()} />
+          <Appbar.Action
+            icon="close"
+            accessibilityLabel={t('screens.recipeselectionpopup.close')}
+            onPress={props.onClose} />
+        </Appbar.Header>
+        {/* Appbar.Content drops its subtitle under MD3, so the day this is
+            planning for gets its own line. */}
+        {props.dayLabel ?
+          <View style={styles.dayContext}>
+            <Icon source="calendar-outline" size={16} color={theme.colors.onSurfaceVariant} />
+            <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>
+              {props.dayLabel}
+            </Text>
+          </View> :
+          null}
+        {renderContent()}
       </Modal>
-    </View>
+    </Portal>
   );
 };
 

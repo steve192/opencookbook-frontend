@@ -21,7 +21,7 @@ export const useOnlineGuard = (): (() => boolean) => {
     }
     PromptUtil.show({
       title: t('common.offline.notavailabletitle'),
-      button1: t('common.ok'),
+      confirm: t('common.ok'),
       message: t('common.offline.notavailable'),
     });
     return false;

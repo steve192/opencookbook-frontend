@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet} from 'react-native';
 import {Button, Dialog, Portal, Text} from 'react-native-paper';
 import AppPersistence from '../AppPersistence';
 import {Recipe, RecipeDiet} from '../dao/RestAPI';
 import {errorMessageKey} from '../helper/apiErrorMessage';
+import {createGlobalOverlay} from '../helper/globalOverlay';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {missingDetails} from '../helper/recipeCompleteness';
 import {withDiet, withSuitToggled} from '../helper/recipeEdits';
@@ -12,7 +13,7 @@ import {RecipeSuit} from '../helper/recipeSuits';
 import {useDerivedDiet} from '../helper/useDerivedDiet';
 import {updateRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch} from '../redux/hooks';
-import CentralStyles from '../styles/CentralStyles';
+import {overlayStyles} from '../styles/CentralStyles';
 import {PlanningDetailsFields} from './PlanningDetailsFields';
 
 interface Options {
@@ -20,7 +21,7 @@ interface Options {
   always?: boolean;
 }
 
-let open: ((recipe: Recipe, options?: Options) => void) | undefined;
+const overlay = createGlobalOverlay<{recipe: Recipe} & Options>();
 
 /**
  * Asks for what planning needs to know about a freshly imported recipe. Silent where the recipe
@@ -30,7 +31,7 @@ let open: ((recipe: Recipe, options?: Options) => void) | undefined;
  * @param {Options} [options] how insistently to ask
  * @return {void}
  */
-export const askForPlanningDetails = (recipe: Recipe, options?: Options) => open?.(recipe, options);
+export const askForPlanningDetails = (recipe: Recipe, options?: Options) => overlay.show({recipe, ...options});
 
 // Mounted once, shown from wherever a recipe arrives: an import, the browser, a shared recipe, or a
 // reroll saying the recipe is no meal of its own.
@@ -53,21 +54,16 @@ export const PlanningDetailsPrompt = () => {
         setDietDerived(diet !== null);
       });
 
-  useEffect(() => {
-    open = async (asked, options) => {
-      const always = options?.always === true;
-      if (!always && (missingDetails(asked).length === 0 || !await AppPersistence.getAskForPlanningDetails())) {
-        return;
-      }
-      setInsisted(always);
-      setDietDerived(false);
-      setDietChosen(false);
-      setRecipe(asked);
-    };
-    return () => {
-      open = undefined;
-    };
-  }, []);
+  overlay.useOpener(async ({recipe: asked, always}) => {
+    const insisting = always === true;
+    if (!insisting && (missingDetails(asked).length === 0 || !await AppPersistence.getAskForPlanningDetails())) {
+      return;
+    }
+    setInsisted(insisting);
+    setDietDerived(false);
+    setDietChosen(false);
+    setRecipe(asked);
+  });
 
   if (!recipe) {
     return null;
@@ -93,7 +89,7 @@ export const PlanningDetailsPrompt = () => {
 
   return (
     <Portal>
-      <Dialog visible style={[CentralStyles.contentContainer, styles.dialog]} onDismiss={close}>
+      <Dialog visible style={overlayStyles.dialogView} onDismiss={close}>
         <Dialog.Title>{t('planningDetails.title')}</Dialog.Title>
         <Dialog.Content style={styles.content}>
           <Text variant="bodyMedium">{t('planningDetails.explanation', {title: recipe.title})}</Text>
@@ -107,7 +103,7 @@ export const PlanningDetailsPrompt = () => {
             }}
             onSuitToggled={(suit: RecipeSuit) => setRecipe(withSuitToggled(recipe, suit))} />
         </Dialog.Content>
-        <Dialog.Actions style={styles.actions}>
+        <Dialog.Actions style={overlayStyles.dialogActions}>
           {!insisted && <Button onPress={neverAgain}>{t('planningDetails.neverAgain')}</Button>}
           <Button onPress={close}>{t('planningDetails.later')}</Button>
           <Button mode="contained" loading={saving} disabled={saving} onPress={save}>{t('common.save')}</Button>
@@ -118,7 +114,5 @@ export const PlanningDetailsPrompt = () => {
 };
 
 const styles = StyleSheet.create({
-  dialog: {width: '90%'},
   content: {gap: 12},
-  actions: {flexWrap: 'wrap'},
 });

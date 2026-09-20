@@ -45,7 +45,7 @@ export const SignupScreen = (props: Props) => {
     RestAPI.registerUser(email, password).then(() => {
       props.navigation.goBack();
       PromptUtil.show({
-        button2: t('common.ok'),
+        confirm: t('common.ok'),
         message: t('screens.login.activationpending'),
         title: t('screens.login.activationpendingtitle'),
       });
