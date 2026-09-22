@@ -7,6 +7,7 @@ import {enableScreens} from 'react-native-screens';
 import {Provider, useSelector} from 'react-redux';
 import {PlanningDetailsPrompt} from './src/components/PlanningDetailsPrompt';
 import {Prompt} from './src/helper/Prompt';
+import {TextPrompt} from './src/helper/TextPrompt';
 import {CookingTimerWatcher} from './src/components/CookingTimerWatcher';
 import {TimerNotificationOpener} from './src/components/TimerNotificationOpener';
 import {GlobalSnackbar} from './src/helper/GlobalSnackbar';
@@ -58,6 +59,7 @@ const ReduxWrappedApp = () => {
     <PaperProvider theme={theme}>
       <MainNavigation />
       <Prompt/>
+      <TextPrompt />
       <PlanningDetailsPrompt />
       <GlobalSnackbar />
       {/* Cooking timers announce themselves from anywhere in the app, not just from the

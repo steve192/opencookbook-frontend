@@ -8,7 +8,8 @@ vi.mock('../../dao/RestAPI', () => ({
   default: {setIsOnline: (value: boolean) => setIsOnline(value)},
 }));
 
-const {changeBackendUrl, changeOcrImportEnabled, changeOnlineState, changeSharingEnabled,
+const {changeBackendUrl, changeHouseholdsEnabled, changeOcrImportEnabled, changeOnlineState,
+  changeSharingEnabled,
   changeTheme} =
   await import('./settingsSlice');
 const reducer = (await import('./settingsSlice')).default;
@@ -21,6 +22,7 @@ describe('settingsSlice', () => {
   it('starts on the system theme, online, with no backend url', () => {
     expect(initialState()).toEqual({
       theme: 'system', backendUrl: '', isOnline: true, sharingEnabled: true,
+      householdsEnabled: true,
       ocrImportEnabled: false,
     });
   });
@@ -33,6 +35,10 @@ describe('settingsSlice', () => {
 
   it.each([true, false])('stores that the instance has sharing %s', (enabled) => {
     expect(reducer(initialState(), changeSharingEnabled(enabled)).sharingEnabled).toBe(enabled);
+  });
+
+  it.each([true, false])('stores that the instance has households %s', (enabled) => {
+    expect(reducer(initialState(), changeHouseholdsEnabled(enabled)).householdsEnabled).toBe(enabled);
   });
 
   // The opposite default to sharing, and deliberately so: most instances have no machine
@@ -61,6 +67,7 @@ describe('settingsSlice', () => {
     const withTheme = reducer(withUrl, changeTheme('dark'));
     expect(withTheme).toEqual({
       theme: 'dark', backendUrl: 'https://example.test', isOnline: true, sharingEnabled: true,
+      householdsEnabled: true,
       ocrImportEnabled: false,
     });
   });

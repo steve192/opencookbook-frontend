@@ -36,7 +36,7 @@ import {useProgressiveRender} from '../../helper/useProgressiveRender';
 import {PromptUtil} from '../../helper/Prompt';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
-import {createRecipe, deleteRecipe, updateRecipe} from '../../redux/features/recipesSlice';
+import {createRecipe, deleteRecipe, ownRecipes, updateRecipe} from '../../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
 import {IngredientFormField} from './IngredientFromField';
@@ -54,7 +54,7 @@ const RecipeWizardScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const dispatch = useAppDispatch();
 
-  const existingRecipe: Recipe | undefined = useAppSelector((state) => state.recipes.recipes.find((recipe) => recipe.id === props.route.params?.recipeId));
+  const existingRecipe: Recipe | undefined = useAppSelector((state) => ownRecipes(state.recipes.recipes).find((recipe) => recipe.id === props.route.params?.recipeId));
 
   // A draft wins over anything in the store: it is why the wizard was opened, and it has no id.
   const [recipeData, setRecipeData] = useState<Recipe>(
@@ -180,12 +180,22 @@ const RecipeWizardScreen = (props: Props) => {
   };
 
   // Always confirm before destroying a recipe - the old behaviour was a single
-  // tap on the trash icon with no safety net.
-  const onDeleteRecipe = () => {
+  // tap on the trash icon with no safety net. It also says which households and plans lose it.
+  const onDeleteRecipe = async () => {
     const discarding = !props.route.params.editing;
+    const impact = discarding || !recipeData.id ? undefined :
+      await RestAPI.getRecipeDeletionImpact(recipeData.id).catch(() => undefined);
+    const consequences = [
+      discarding ? t('screens.editRecipe.discardMessage') : t('screens.editRecipe.deleteMessage'),
+      impact?.households ?
+        t('screens.recipe.deleteImpactHouseholds', {count: impact.households}) : undefined,
+      impact?.plannedMeals ?
+        t('screens.recipe.deleteImpactPlanned', {count: impact.plannedMeals}) : undefined,
+    ].filter(Boolean).join(' ');
+
     PromptUtil.show({
       title: discarding ? t('screens.editRecipe.discardTitle') : t('screens.editRecipe.deleteTitle'),
-      message: discarding ? t('screens.editRecipe.discardMessage') : t('screens.editRecipe.deleteMessage'),
+      message: consequences,
       destructive: true,
       confirm: t('common.delete'),
       onConfirm: performDelete,

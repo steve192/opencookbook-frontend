@@ -6,7 +6,7 @@ import Constants from 'expo-constants';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Avatar, Button, Divider, Surface, Switch, Text} from 'react-native-paper';
+import {Avatar, Button, Card, IconButton, Surface, Switch, Text, TextInput} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import Spacer from 'react-spacer';
 import AppPersistence from '../AppPersistence';
@@ -14,6 +14,7 @@ import {CustomCard} from '../components/CustomCard';
 import RestAPI from '../dao/RestAPI';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
+import {DISPLAY_NAME_MAX_LENGTH} from '../helper/nameLimits';
 import {PromptUtil} from '../helper/Prompt';
 import {setAppbarOptions} from '../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps} from '../navigation/NavigationRoutes';
@@ -40,8 +41,12 @@ export const SettingsScreen = (props: Props) => {
   const [passwordResetPending, setPasswordResetPending] = useState(false);
 
   const ocrImportEnabled = useSelector((state: RootState) => state.settings.ocrImportEnabled);
+  const householdsEnabled = useSelector((state: RootState) => state.settings.householdsEnabled);
   const [scanTrainingConsent, setScanTrainingConsent] = useState(false);
   const [askPlanningDetails, setAskPlanningDetails] = useState(true);
+  const [displayName, setDisplayName] = useState('');
+  const [savedDisplayName, setSavedDisplayName] = useState('');
+  const [savingDisplayName, setSavingDisplayName] = useState(false);
 
   useEffect(() => {
     AppPersistence.getScanTrainingConsent().then((consent) => setScanTrainingConsent(consent ?? false));
@@ -50,7 +55,11 @@ export const SettingsScreen = (props: Props) => {
 
   useEffect(() => {
     RestAPI.getUserInfo()
-        .then((userInfo) => setEmailAddress(userInfo?.email ?? ''))
+        .then((userInfo) => {
+          setEmailAddress(userInfo?.email ?? '');
+          setDisplayName(userInfo?.displayName ?? '');
+          setSavedDisplayName(userInfo?.displayName ?? '');
+        })
         .catch(() => setEmailAddress(''));
   }, []);
 
@@ -138,6 +147,19 @@ export const SettingsScreen = (props: Props) => {
     });
   };
 
+  const saveDisplayName = () => {
+    // Saved on blur, which also happens when nothing was changed.
+    if (displayName.trim() === savedDisplayName) {
+      return;
+    }
+    setSavingDisplayName(true);
+    RestAPI.setDisplayName(displayName)
+        .then((userInfo) => setSavedDisplayName(userInfo.displayName ?? ''))
+        .then(() => SnackbarUtil.show({message: t('screens.settings.displayNameSaved')}))
+        .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}))
+        .finally(() => setSavingDisplayName(false));
+  };
+
   const onLogoutPress = () => {
     PromptUtil.show({
       title: t('screens.settings.logoutTitle'),
@@ -158,18 +180,47 @@ export const SettingsScreen = (props: Props) => {
             <Text style={{alignSelf: 'center'}}>{emailAddress}</Text>
           }
           <Spacer height={20} />
-          <Button
-            mode='outlined'
-            icon="lock-reset"
-            loading={passwordResetPending}
-            // Without an address there is nothing to send the link to
-            disabled={passwordResetPending || emailAddress.length === 0}
-            onPress={onChangePasswordPress}>{t('screens.settings.changePassword')}</Button>
-          <Spacer height={10} />
-          <Button
-            mode='outlined'
-            onPress={onLogoutPress}>{t('screens.settings.logout')}</Button>
-          <Divider style={{marginTop: 10, marginBottom: 10}}/>
+          {householdsEnabled &&
+            <>
+              <Card onPress={() => props.navigation.getParent()?.navigate('HouseholdListScreen')}>
+                <Card.Title
+                  title={t('screens.households.listTitle')}
+                  subtitle={t('screens.settings.householdsSubtitle')}
+                  subtitleNumberOfLines={2}
+                  left={(iconProps) => <Avatar.Icon {...iconProps} icon="account-group" />}
+                  right={(iconProps) => <IconButton {...iconProps} icon="chevron-right"
+                    onPress={() => props.navigation.getParent()?.navigate('HouseholdListScreen')} />} />
+              </Card>
+              <Spacer height={20} />
+            </>
+          }
+          <CustomCard>
+            <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>
+              {t('screens.settings.account')}
+            </Text>
+            <TextInput
+              mode="outlined"
+              label={t('screens.settings.displayName')}
+              value={displayName}
+              onChangeText={setDisplayName}
+              onBlur={saveDisplayName}
+              disabled={savingDisplayName}
+              maxLength={DISPLAY_NAME_MAX_LENGTH} />
+            <Text variant="bodySmall">{t('screens.settings.displayNameExplanation')}</Text>
+            <Spacer height={10} />
+            <Button
+              mode='outlined'
+              icon="lock-reset"
+              loading={passwordResetPending}
+              // Without an address there is nothing to send the link to
+              disabled={passwordResetPending || emailAddress.length === 0}
+              onPress={onChangePasswordPress}>{t('screens.settings.changePassword')}</Button>
+            <Spacer height={10} />
+            <Button
+              mode='outlined'
+              icon="logout"
+              onPress={onLogoutPress}>{t('screens.settings.logout')}</Button>
+          </CustomCard>
           {ocrImportEnabled &&
             <>
               <Spacer height={20} />

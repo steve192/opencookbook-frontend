@@ -30,12 +30,16 @@ export type MainNavigationProps = {
     RecipeScanScreen: undefined
     RecipeSuggestionScreen: undefined
     /** The week preselected for planning, in weeks from the current one. */
-    WeekplanWizardScreen: { weekOffset: number }
-    PlanDraftScreen: { draftId: number }
+    WeekplanWizardScreen: { weekOffset: number, householdId?: string }
+    PlanDraftScreen: { draftId: number, householdId?: string }
     RecipeScreen: { recipeId: number }
     ImportScreen: { importUrl?: string },
     RecipeGroupEditScreen: { recipeGroupId?: number, editing: boolean}
     GuidedCookingScreen: { recipe: Recipe, scaledServings: number, initialStep?: number }
+    HouseholdListScreen: undefined
+    HouseholdScreen: { householdId: string }
+    /** Opening an invitation link. The token is the invitation. */
+    HouseholdInviteScreen: { token: string }
 };
 
 export type OverviewNavigationProps = {

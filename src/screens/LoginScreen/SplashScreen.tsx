@@ -5,7 +5,8 @@ import {ActivityIndicator, Text} from 'react-native-paper';
 import AppPersistence from '../../AppPersistence';
 import RestAPI from '../../dao/RestAPI';
 import {login, logout} from '../../redux/features/authSlice';
-import {changeBackendUrl, changeOcrImportEnabled, changeOnlineState, changeSharingEnabled} from '../../redux/features/settingsSlice';
+import {changeBackendUrl, changeHouseholdsEnabled, changeOcrImportEnabled, changeOnlineState,
+  changeSharingEnabled} from '../../redux/features/settingsSlice';
 import {useAppDispatch} from '../../redux/hooks';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
@@ -39,6 +40,7 @@ export const SplashScreen = () => {
       RestAPI.getInstanceInfo()
           .then((instanceInfo) => {
             dispatch(changeSharingEnabled(instanceInfo.sharingEnabled));
+            dispatch(changeHouseholdsEnabled(instanceInfo.householdsEnabled));
             dispatch(changeOcrImportEnabled(instanceInfo.ocrImportEnabled));
           })
           .catch(() => console.info('Instance info unavailable, assuming defaults'));

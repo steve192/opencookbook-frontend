@@ -12,6 +12,15 @@ export interface RecipesState {
 
 }
 
+/**
+ * Your own cookbook. The store also holds household recipes the detail screen rendered.
+ *
+ * @param {Recipe[]} recipes everything the store has fetched
+ * @return {Recipe[]} the ones this account owns
+ */
+export const ownRecipes = (recipes: Recipe[]): Recipe[] =>
+  recipes.filter((recipe) => recipe.mine !== false);
+
 const initialState: RecipesState = {
   recipes: [],
   recipeGroups: [],
@@ -152,7 +161,7 @@ export const recipesSlice = createSlice({
         .addCase(fetchMyRecipes.fulfilled, (state, action) => {
           state.pendingRequests--;
           state.recipes = action.payload;
-          AppPersistence.storeRecipesOffline(state.recipes);
+          AppPersistence.storeRecipesOffline(ownRecipes(state.recipes));
         })
         .addCase(fetchMyRecipes.rejected, (state) => {
           state.pendingRequests--;
@@ -187,7 +196,7 @@ export const recipesSlice = createSlice({
               state.recipes[index] = action.payload;
             }
           });
-          AppPersistence.storeRecipesOffline(state.recipes);
+          AppPersistence.storeRecipesOffline(ownRecipes(state.recipes));
         })
         .addCase(fetchSingleRecipe.rejected, (state) => {
           state.pendingRequests--;

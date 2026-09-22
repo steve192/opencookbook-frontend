@@ -10,11 +10,11 @@ import type {ShareOutcome} from './shareLink';
  * clipboard is the fallback rather than the exception - a self hosted instance reached over
  * plain http will always land there.
  *
- * @param {string} title the recipe being shared
+ * @param {string} title what is being shared: a recipe title or a household name
  * @param {string} url its share link
  * @return {Promise<ShareOutcome>} what the browser did with it
  */
-export const shareRecipeLink = async (title: string, url: string): Promise<ShareOutcome> => {
+export const shareLink = async (title: string, url: string): Promise<ShareOutcome> => {
   const message = shareMessage(title, url);
 
   if (navigator.share) {

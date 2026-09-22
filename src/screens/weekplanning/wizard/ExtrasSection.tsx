@@ -10,23 +10,31 @@ import {CalorieTargets} from './CalorieTargets';
 import {ProfileCountStepper} from './ProfileCountStepper';
 import {ProfileSectionProps} from './ProfileSectionProps';
 
+interface Props extends ProfileSectionProps {
+  /** Only for a personal plan of somebody in a household. */
+  offerHouseholdRecipes: boolean;
+}
+
 // The optional preferences; the defaults suit most weeks.
-export const ExtrasSection = ({profile, onChange}: ProfileSectionProps) => {
+export const ExtrasSection = ({profile, onChange, offerHouseholdRecipes}: Props) => {
   const {t} = useTranslation('translation');
 
-  // Both default to on, as the server does
-  const renderSwitch = (label: string, hint: string, field: 'leftoversAllowed' | 'spreadVariety') => (
+  // Defaults as the server has them
+  const renderSwitch = (label: string, hint: string,
+      field: 'leftoversAllowed' | 'spreadVariety' | 'includeHouseholdRecipes', fallback = true) => (
     <View style={styles.switchRow}>
       <View style={styles.switchText}>
         <Text variant="bodyLarge">{label}</Text>
         <HintText>{hint}</HintText>
       </View>
-      <Switch value={profile[field] ?? true} onValueChange={(value) => onChange({...profile, [field]: value})} />
+      <Switch value={profile[field] ?? fallback} onValueChange={(value) => onChange({...profile, [field]: value})} />
     </View>
   );
 
   return (
     <>
+      {offerHouseholdRecipes && renderSwitch(t('screens.planning.includeHouseholdRecipes'),
+          t('screens.planning.includeHouseholdRecipesHint'), 'includeHouseholdRecipes', false)}
       {renderSwitch(t('screens.planning.leftovers'), t('screens.planning.leftoversHint'), 'leftoversAllowed')}
       {renderSwitch(t('screens.planning.spreadVariety'), t('screens.planning.spreadVarietyHint'), 'spreadVariety')}
       <ProfileCountStepper profile={profile} onChange={onChange} field="cooldownWeeks"

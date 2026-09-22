@@ -24,23 +24,23 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'PlanDraftScreen'>;
 // or leave it to the cook. Leaving without adding it throws the proposal away.
 export const PlanDraftScreen = (props: Props) => {
   const {t} = useTranslation('translation');
-  const {draftId} = props.route.params;
+  const {draftId, householdId} = props.route.params;
 
   const [draft, setDraft] = useState<PlanDraft>();
   const [busy, setBusy] = useState(false);
   const accepted = useRef(false);
 
   useEffect(() => {
-    RestAPI.getPlanDraft(draftId)
+    RestAPI.getPlanDraft(draftId, householdId)
         .then(setDraft)
         .catch((e) => SnackbarUtil.show({message: t(errorMessageKey(e, 'screens.planning.loadFailed'))}));
-  }, [draftId, t]);
+  }, [draftId, householdId, t]);
 
   useEffect(() => props.navigation.addListener('beforeRemove', () => {
     if (!accepted.current) {
-      RestAPI.discardPlanDraft(draftId).catch(() => undefined);
+      RestAPI.discardPlanDraft(draftId, householdId).catch(() => undefined);
     }
-  }), [props.navigation, draftId]);
+  }), [props.navigation, draftId, householdId]);
 
   const whileBusy = async (action: () => Promise<void>) => {
     setBusy(true);
@@ -57,7 +57,7 @@ export const PlanDraftScreen = (props: Props) => {
   const change = (request: () => Promise<PlanDraft>) => whileBusy(async () => setDraft(await request()));
 
   const reroll = async (slot: PlanSlot, reason?: RerollReason) => {
-    await change(() => RestAPI.rerollPlanSlot(draftId, slot.id, reason));
+    await change(() => RestAPI.rerollPlanSlot(draftId, slot.id, reason, householdId));
     // The cook just said what the recipe is; ask them to write it down so it is not planned as a meal again
     if (reason === 'NOT_A_FULL_MEAL' && slot.recipe) {
       askForPlanningDetails(slot.recipe, {always: true});
@@ -65,7 +65,7 @@ export const PlanDraftScreen = (props: Props) => {
   };
 
   const accept = () => whileBusy(async () => {
-    await RestAPI.acceptPlanDraft(draftId);
+    await RestAPI.acceptPlanDraft(draftId, householdId);
     accepted.current = true;
     SnackbarUtil.show({message: t('screens.planning.accepted')});
     props.navigation.goBack();
@@ -96,15 +96,15 @@ export const PlanDraftScreen = (props: Props) => {
                   busy={busy}
                   onOpenRecipe={(recipeId) => props.navigation.navigate('RecipeScreen', {recipeId})}
                   onReroll={(reason) => reroll(slot, reason)}
-                  onLock={(locked) => change(() => RestAPI.setPlanSlotLocked(draftId, slot.id, locked))}
-                  onToggleGap={() => change(() => RestAPI.togglePlanSlotGap(draftId, slot.id))} />
+                  onLock={(locked) => change(() => RestAPI.setPlanSlotLocked(draftId, slot.id, locked, householdId))}
+                  onToggleGap={() => change(() => RestAPI.togglePlanSlotGap(draftId, slot.id, householdId))} />
               ))}
             </View>
           ))}
         </View>
       </ScrollView>
       <ScreenFooter>
-        <Button mode="outlined" disabled={busy} onPress={() => change(() => RestAPI.rerollPlanDraft(draftId))}>
+        <Button mode="outlined" disabled={busy} onPress={() => change(() => RestAPI.rerollPlanDraft(draftId, householdId))}>
           {t('screens.planning.rerollAll')}
         </Button>
         <Button mode="contained" disabled={busy} loading={busy} onPress={accept}>

@@ -1,16 +1,19 @@
 import {MaterialIcons} from '@expo/vector-icons';
 import fuzzy from 'fuzzy';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Pressable, RefreshControl, StyleProp, StyleSheet, View, ViewProps, ViewStyle} from 'react-native';
-import {Badge, RadioButton, Searchbar, Surface, Text} from 'react-native-paper';
+import {Pressable, RefreshControl, StyleSheet, View} from 'react-native';
+import {Badge, Surface, Text} from 'react-native-paper';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {Recipe, RecipeGroup} from '../dao/RestAPI';
-import {fetchMyRecipeGroups, fetchMyRecipes} from '../redux/features/recipesSlice';
+import {fetchMyRecipeGroups, fetchMyRecipes, ownRecipes} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {ListRow, listRowHasChanged, RecipeGroupRow, RecipeRow, toRecipeGroupRow, toRecipeRow} from '../helper/recipeListRows';
+import {columnsFor, RECIPE_TILE_HEIGHT} from '../helper/recipeGrid';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 import {RecipeImageComponent} from './RecipeImageComponent';
+import {RecipeSearchbar} from './RecipeSearchbar';
+import {RecipeTile} from './RecipeTile';
 
 interface Props {
   shownRecipeGroupId: number | undefined
@@ -22,10 +25,9 @@ interface Props {
   onRecipeSelected?: (selectedRecipe: number) => void
 }
 export const RecipeList = (props: Props) => {
-  const myRecipes = useAppSelector((state) => state.recipes.recipes);
+  const myRecipes = useAppSelector((state) => ownRecipes(state.recipes.recipes));
   const myRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
   const listRefreshing = useAppSelector((state) => state.recipes.pendingRequests > 0);
-  const [searchStringPendingInput, setSearchStringPendingInput] = useState('');
   const [searchString, setSearchString] = useState('');
 
   const [componentWidth, setComponentWidth] = useState<number>(1);
@@ -34,18 +36,10 @@ export const RecipeList = (props: Props) => {
   const theme = useAppTheme();
 
   const dispatch = useAppDispatch();
-  const searchDebounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const refreshData = () => {
     dispatch(fetchMyRecipes());
     dispatch(fetchMyRecipeGroups());
-
-    // Clear the search debounce timer, to avoid state changes on unmounted component
-    return () => {
-      if (searchDebounceTimer.current) {
-        clearTimeout(searchDebounceTimer.current);
-      }
-    };
   };
   useEffect(refreshData, []);
 
@@ -99,38 +93,16 @@ export const RecipeList = (props: Props) => {
     props.onRecipeClick(recipe);
   };
 
-  const createRecipeListItem = (recipe: RecipeRow) => {
-    const cardIsSelected = props.multiSelectionModeActive && props.selectedRecipes?.has(recipe.id!);
-    const cardStyles: StyleProp<ViewStyle> = [styles.recipeCard];
-    if (cardIsSelected) {
-      cardStyles.push({backgroundColor: theme.colors.primary});
-    }
-    return (
-      <Pressable
-        testID='recipeListItem'
-        key={recipe.id}
-        style={cardStyles}
-        onPress={() => onRecipeClick(recipe)}
-        onLongPress={() => props.onMultiSelectionModeToggled?.(recipe)}>
-
-        <Surface style={{height: 180, borderRadius: 16, overflow: 'hidden'}}>
-          <RecipeImageComponent
-            useThumbnail={true}
-            forceFitScaling={true}
-            uuid={recipe.coverImageUuid} />
-        </Surface>
-        {renderRecipeTitle(undefined, recipe.title)}
-        {props.multiSelectionModeActive && <View style={{position: 'absolute'}}>
-          <RadioButton
-            value=''
-            color={theme.colors.primary}
-            uncheckedColor={theme.colors.primary}
-            status={cardIsSelected ? 'checked': 'unchecked'}
-            onPress={() => onRecipeClick(recipe)}/>
-        </View>}
-      </Pressable>
-    );
-  };
+  const createRecipeListItem = (recipe: RecipeRow) => (
+    <RecipeTile
+      key={recipe.id}
+      title={recipe.title}
+      coverImageUuid={recipe.coverImageUuid}
+      onPress={() => onRecipeClick(recipe)}
+      onLongPress={() => props.onMultiSelectionModeToggled?.(recipe)}
+      selectable={props.multiSelectionModeActive}
+      selected={props.multiSelectionModeActive && props.selectedRecipes?.has(recipe.id!)} />
+  );
   // Show one blurred cover image per group plus a count badge instead of rendering
   // up to four blurred thumbnails. On lower-end Android devices the old layout
   // queued 4 base64 image fetches and 4 simultaneous Image#blurRadius effects per
@@ -189,12 +161,6 @@ export const RecipeList = (props: Props) => {
     return <View></View>;
   };
 
-  const renderRecipeTitle = (headerProps: ViewProps | undefined, title: string) => (
-    <Text numberOfLines={2} style={{height: 60, padding: 10, fontWeight: 'bold'}} >
-      {title}
-    </Text>
-  );
-
   const renderNoItemsNotice = () => (
     <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', flex: 1, position: 'absolute'}}>
       <MaterialIcons name="no-food" size={64} color={theme.colors.onSurfaceDisabled} />
@@ -205,16 +171,7 @@ export const RecipeList = (props: Props) => {
   );
 
 
-  const updateSearchString = (newValue: string) => {
-    setSearchStringPendingInput(newValue);
-    searchDebounceTimer.current && clearTimeout(searchDebounceTimer.current);
-    searchDebounceTimer.current = setTimeout(() => {
-      // User has not entered anything for some time, start searching
-      setSearchString(newValue);
-    }, 500);
-  };
-
-  const numberOfColumns = Math.min(4, Math.ceil(componentWidth / 300));
+  const numberOfColumns = columnsFor(componentWidth);
 
   // Handed a layout provider it has not seen before, RecyclerListView rebuilds its layout
   // and re-anchors the scroll offset to the top edge of the first visible row. Building one
@@ -266,11 +223,7 @@ export const RecipeList = (props: Props) => {
       { showNoItemsNotice && renderNoItemsNotice()}
 
       <View style={[CentralStyles.contentContainer, styles.searchContainer]}>
-        <Searchbar
-          value={searchStringPendingInput}
-          onChangeText={updateSearchString}
-          style={{flex: 1, width: '100%', maxWidth: 500, alignSelf: 'center'}}
-          placeholder={t('screens.overview.searchPlaceholder')} />
+        <RecipeSearchbar onSearch={setSearchString} style={styles.searchbar} />
       </View>
     </View>
   );
@@ -291,6 +244,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     height: 100,
+  },
+  searchbar: {
+    flex: 1,
   },
   recipeCard: {
     ...CentralStyles.recipeCardFrame,
@@ -339,7 +295,7 @@ class LayoutUtil {
             return;
           }
           dim.width = componentWidth / numberOfColumns;
-          dim.height = 246;
+          dim.height = RECIPE_TILE_HEIGHT;
         },
     );
   }

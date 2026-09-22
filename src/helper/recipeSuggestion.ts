@@ -106,6 +106,24 @@ export const forNewDraw = (request: RecipeSuggestionRequest): RecipeSuggestionRe
   ({...request, seed: null});
 
 /**
+ * Whether this search also draws on the household cookbooks you may read.
+ *
+ * @param {RecipeSuggestionRequest} request the answers so far
+ * @param {boolean} include whether to use them
+ * @return {RecipeSuggestionRequest} the answers with that decided
+ */
+export const withHouseholdRecipes = (
+    request: RecipeSuggestionRequest, include: boolean,
+): RecipeSuggestionRequest => ({...request, includeHouseholdRecipes: include});
+
+/**
+ * @param {RecipeSuggestionRequest} request the answers so far
+ * @return {boolean} whether household cookbooks are in the pool; unanswered means no
+ */
+export const usesHouseholdRecipes = (request: RecipeSuggestionRequest): boolean =>
+  request.includeHouseholdRecipes === true;
+
+/**
  * @param {TFunction} t the translation function of the calling screen
  * @param {SuggestionMatchMode} [mode] how the named ingredients are meant
  * @return {string} the sentence explaining what that mode will do
@@ -152,6 +170,7 @@ export const answersSummary = (t: TFunction, request: RecipeSuggestionRequest, i
     dietLabel(t, request.diet),
     request.targetKcalPerServing != null ? t('screens.suggestion.summaryKcal', {kcal: request.targetKcalPerServing}) : undefined,
     request.macroStyle && request.macroStyle !== 'BALANCED' ? macroStyleLabel(t, request.macroStyle) : undefined,
+    usesHouseholdRecipes(request) ? t('screens.suggestion.summaryWithHouseholds') : undefined,
   ].filter((part): part is string => !!part);
   return parts.length > 0 ? parts.join(' · ') : t('screens.suggestion.summaryAnything');
 };

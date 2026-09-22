@@ -133,7 +133,8 @@
       "importRecipe": "Rezept importieren",
       "addRecipeGroup": "Neue Rezeptgruppe",
       "noRecipesMessage": "Sieht so aus als hättest du noch keine Rezepte",
-      "searchPlaceholder": "Suchbegriff eingeben"
+      "searchPlaceholder": "Suchbegriff eingeben",
+      "chooseCookbook": "Kochbuch wählen"
     },
     "settings": {
       "screenTitle": "Einstellungen",
@@ -159,7 +160,12 @@
       "deleteScanDataQuestion": "Alle Fotos löschen, die du zur Verbesserung der Erkennung beigetragen hast? Deine Rezepte bleiben erhalten.",
       "deleteScanDataDone": "Die Fotos wurden gelöscht",
       "planning": "Planung",
-      "askPlanningDetails": "Nach dem Import nach Planungsdaten fragen"
+      "askPlanningDetails": "Nach dem Import nach Planungsdaten fragen",
+      "displayName": "Anzeigename",
+      "displayNameExplanation": "Was andere Haushaltsmitglieder statt deiner E-Mail-Adresse sehen.",
+      "displayNameSaved": "Anzeigename gespeichert",
+      "account": "Konto",
+      "householdsSubtitle": "Kochbuch und Wochenplan gemeinsam nutzen"
     },
     "import": {
       "URLToImport": "URL zum importieren",
@@ -265,7 +271,14 @@
         "stoppedSharing": "Der Link funktioniert nicht mehr",
         "linkCopied": "Link kopiert",
         "shareFailed": "Das Rezept konnte nicht geteilt werden"
-      }
+      },
+      "deleteImpactHouseholds_one": "Es ist in {{count}} Haushalt.",
+      "deleteImpactHouseholds_other": "Es ist in {{count}} Haushalten.",
+      "deleteImpactPlanned_one": "Es ist {{count}}-mal eingeplant.",
+      "deleteImpactPlanned_other": "Es ist {{count}}-mal eingeplant.",
+      "saveACopy": "In meine Rezepte kopieren",
+      "savedACopy": "Als eigenes Rezept gespeichert",
+      "saveACopyFailed": "Das Rezept konnte nicht kopiert werden."
     },
     "guidedCooking": {
       "stepProgress": "Schritt {{current}} von {{total}}",
@@ -309,7 +322,10 @@
       "print": "Diese Woche drucken",
       "printFailed": "Drucken fehlgeschlagen",
       "moveMealUp": "Nach oben",
-      "moveMealDown": "Nach unten"
+      "moveMealDown": "Nach unten",
+      "myPlan": "Mein Plan",
+      "whichPlanToGenerate": "Welchen Plan vorschlagen?",
+      "whichPlanToAddTo": "Zu welchem Plan hinzufügen?"
     },
     "sharedRecipe": {
       "screenTitle": "Geteiltes Rezept",
@@ -430,7 +446,11 @@
       "summaryKcal": "etwa {{kcal}} kcal",
       "summaryAnything": "Alles aus deinem Kochbuch",
       "failed": "Vorschläge konnten nicht geladen werden",
-      "doesNotUse": "Verwendet nicht: {{ingredients}}"
+      "doesNotUse": "Verwendet nicht: {{ingredients}}",
+      "cookbooks": "Kochbücher",
+      "includeHouseholds": "Auch Haushaltsrezepte vorschlagen",
+      "includeHouseholdsHint": "Zusätzlich zu deinen eigenen: {{names}}.",
+      "summaryWithHouseholds": "mit Haushaltsrezepten"
     },
     "planning": {
       "wizardTitle": "Woche planen",
@@ -500,6 +520,7 @@
       "summaryCooldown_other": "keine Wiederholung innerhalb von {{count}} Wochen",
       "summaryLeftovers": "Reste",
       "summaryVariety": "Abwechslung",
+      "summaryWithHouseholds": "mit Haushaltsrezepten",
       "whichWeek": "Welche Woche",
       "planWeek": "Woche planen",
       "workdays": "Montag bis Freitag",
@@ -515,19 +536,78 @@
       "rerollNotAFullMeal": "Keine ganze Mahlzeit",
       "leftoversHint": "Ein Rezept, das für zwei Mahlzeiten reicht, wird doppelt gekocht und am nächsten Tag mittags oder abends noch einmal gegessen.",
       "spreadVarietyHint": "Vermeidet an benachbarten Tagen dieselbe Hauptzutat und nach Möglichkeit dieselbe Rezeptgruppe.",
+      "includeHouseholdRecipes": "Haushaltsrezepte einbeziehen",
+      "includeHouseholdRecipesHint": "Auch mit den Rezepten planen, die deine Haushalte teilen.",
       "calories": "Kalorien",
       "kcalSplit": "Aufteilung: {{split}} kcal pro Portion",
       "kcalPerMeal": "Pro Mahlzeit festlegen",
       "kcalEven": "Gleichmäßig verteilen",
       "kcalPerMealHint": "Eine leere Mahlzeit teilt sich, was der Tag übrig lässt.",
       "summaryKcalPerMeal": "Kalorien pro Mahlzeit"
+    },
+    "households": {
+      "screenTitle": "Haushalte",
+      "listTitle": "Deine Haushalte",
+      "empty": "Du bist noch in keinem Haushalt. Ein Haushalt ist eine kleine private Gruppe mit einem gemeinsamen Kochbuch und einer gemeinsamen Woche.",
+      "create": "Haushalt gründen",
+      "createTitle": "Haushalt gründen",
+      "nameLabel": "Name",
+      "shareMyRecipes_one": "Mein {{count}} Rezept und alle künftigen Rezepte teilen",
+      "shareMyRecipes_other": "Meine {{count}} Rezepte und alle künftigen Rezepte teilen",
+      "shareExplanation": "Alle im Haushalt können lesen, was du teilst, und Kopien speichern. Du kannst es jederzeit wieder abschalten.",
+      "members": "Mitglieder",
+      "cookbook": "Kochbuch",
+      "recipeCount_one": "{{count}} Rezept",
+      "recipeCount_other": "{{count}} Rezepte",
+      "memberCount_one": "{{count}} Mitglied",
+      "memberCount_other": "{{count}} Mitglieder",
+      "invite": "Jemanden einladen",
+      "revokeInvite": "Zurückziehen",
+      "revokeInviteTitle": "Diesen Link zurückziehen?",
+      "revokeInviteMessage": "Wer ihn schon hat, kann damit nicht mehr beitreten.",
+      "invitesTitle": "Offene Einladungen",
+      "inviteExpires": "Gültig bis {{date}}",
+      "leave": "Haushalt verlassen",
+      "leaveTitle": "{{name}} verlassen?",
+      "leaveMessage": "Deine Rezepte gehen mit dir, und deine Mahlzeiten werden aus der Woche entfernt. Nichts von dir wird gelöscht.",
+      "remove": "Entfernen",
+      "removeTitle": "{{name}} entfernen?",
+      "removeMessage": "Die Rezepte gehen mit. Nichts davon wird gelöscht.",
+      "ownedBy": "von {{name}}",
+      "byYou": "von dir",
+      "joinTitle": "{{name}} beitreten?",
+      "joinExplanation": "Du kannst dann alle geteilten Rezepte lesen und die Woche gemeinsam planen.",
+      "join": "Beitreten",
+      "joined": "Du bist {{name}} beigetreten",
+      "inviteInvalid": "Diese Einladung gilt nicht mehr. Sie wurde zurückgezogen oder ist abgelaufen.",
+      "full": "In diesem Haushalt ist kein Platz mehr.",
+      "tooMany": "Du bist in so vielen Haushalten, wie dieser Server erlaubt.",
+      "alreadyMember": "Du bist in diesem Haushalt schon Mitglied.",
+      "loadFailed": "Der Haushalt konnte nicht geladen werden.",
+      "saveFailed": "Die Änderung konnte nicht gespeichert werden.",
+      "tooManyInvites": "Dieser Haushalt hat so viele offene Einladungen, wie dieser Server erlaubt.",
+      "defaultName": "{{name}}s Haushalt",
+      "createMessage": "Wie soll er heißen? Du kannst den Namen jederzeit ändern.",
+      "renameTitle": "Haushalt umbenennen",
+      "memberSharing": "Teilt das eigene Kochbuch",
+      "memberNotSharing": "Teilt das eigene Kochbuch nicht",
+      "youShare": "Du teilst dein Kochbuch",
+      "youDoNotShare": "Du teilst dein Kochbuch nicht",
+      "shareInvite": "Link teilen"
+    },
+    "onboarding": {
+      "title": "Willkommen",
+      "intro": "Wie sollen wir dich nennen?",
+      "nameLabel": "Name",
+      "save": "Los geht’s",
+      "failed": "Der Name konnte nicht gespeichert werden."
     }
   },
   "nutrition": {
     "summaryPerServing": "≈ {{energy}} pro Portion",
     "summaryTotal": "≈ {{energy}} gesamt",
     "summaryWithMissing": "{{value}} · unvollständig",
-    "summaryAddMissing": "Zu wenig bekannt – Zutaten ergänzen",
+    "summaryAddMissing": "Zu wenig bekannt: Zutaten ergänzen",
     "summaryIncomplete": "Zu wenig bekannt",
     "sheetTitle": "Nährwerte",
     "estimateNotice": "Eine Schätzung aus den Zutaten und ihren Mengen. Echte Werte hängen von Sorte, Größe und Zubereitung ab.",

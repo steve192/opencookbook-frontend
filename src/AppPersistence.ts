@@ -165,6 +165,21 @@ export default class AppPersistence {
     await AsyncStorage.setItem('ask_planning_details', ask ? 'true' : 'false');
   }
 
+  /**
+   * @return {Promise<string | undefined>} the household whose cookbook was shown last; undefined for your own
+   */
+  static async getShownCookbook(): Promise<string | undefined> {
+    return await AsyncStorage.getItem('shown_cookbook') ?? undefined;
+  }
+
+  static async setShownCookbook(householdId: string | undefined) {
+    if (householdId) {
+      await AsyncStorage.setItem('shown_cookbook', householdId);
+    } else {
+      await AsyncStorage.removeItem('shown_cookbook');
+    }
+  }
+
   static getApiRoute(): string {
     return '/api/v1';
   }

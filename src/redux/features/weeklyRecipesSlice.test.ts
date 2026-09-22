@@ -1,4 +1,6 @@
 import {describe, expect, it, vi} from 'vitest';
+import XDate from 'xdate';
+import {WeekplanDay} from '../../dao/RestAPI';
 
 // RestAPI is only reached through the thunks' payload creators, which these
 // tests never run - they dispatch the fulfilled actions directly.
@@ -14,10 +16,15 @@ const day = (date: string, titles: string[] = []) => ({
   })),
 });
 
-const stateWith = (...days: ReturnType<typeof day>[]) => ({weekplanDays: days});
+const stateWith = (...days: WeekplanDay[]) => ({weekplanDays: days});
 
-const fetched = (payload: ReturnType<typeof day>[]) =>
-  ({type: fetchWeekplanDays.fulfilled.type, payload});
+const onDay = (key: string) => {
+  const [year, month, dayOfMonth] = key.split('-').map(Number);
+  return new XDate(year, month - 1, dayOfMonth);
+};
+
+const fetched = (from: string, to: string, payload: WeekplanDay[]) =>
+  ({type: fetchWeekplanDays.fulfilled.type, payload, meta: {arg: {from: onDay(from), to: onDay(to)}}});
 
 const updated = (arg: ReturnType<typeof day>, payload = arg) =>
   ({type: updateSingleWeekplanDay.fulfilled.type, payload, meta: {arg}});
@@ -29,7 +36,7 @@ describe('weeklyRecipesSlice', () => {
 
   describe('fetchWeekplanDays', () => {
     it('adds fetched days to an empty state', () => {
-      const state = reducer(stateWith(), fetched([day('2026-01-01')]));
+      const state = reducer(stateWith(), fetched('2026-01-01', '2026-01-07', [day('2026-01-01')]));
       expect(state.weekplanDays.map((d) => d.day)).toEqual(['2026-01-01']);
     });
 
@@ -37,7 +44,7 @@ describe('weeklyRecipesSlice', () => {
     // which would render the same day twice in the week view.
     it('replaces days that were already present rather than duplicating them', () => {
       const existing = stateWith(day('2026-01-01', ['old']), day('2026-01-02', ['keep']));
-      const state = reducer(existing, fetched([day('2026-01-01', ['new'])]));
+      const state = reducer(existing, fetched('2026-01-01', '2026-01-01', [day('2026-01-01', ['new'])]));
 
       expect(state.weekplanDays).toHaveLength(2);
       const first = state.weekplanDays.find((d) => d.day === '2026-01-01');
@@ -46,13 +53,20 @@ describe('weeklyRecipesSlice', () => {
 
     it('keeps days outside the fetched range', () => {
       const existing = stateWith(day('2026-01-02', ['keep']));
-      const state = reducer(existing, fetched([day('2026-01-01')]));
+      const state = reducer(existing, fetched('2026-01-01', '2026-01-01', [day('2026-01-01')]));
       expect(state.weekplanDays.map((d) => d.day).sort()).toEqual(['2026-01-01', '2026-01-02']);
     });
 
     it('is a no-op for an empty payload', () => {
       const existing = stateWith(day('2026-01-02', ['keep']));
-      expect(reducer(existing, fetched([]))).toEqual(existing);
+      expect(reducer(existing, fetched('2026-01-01', '2026-01-01', []))).toEqual(existing);
+    });
+
+    it('drops a plan the server no longer returns for the fetched range', () => {
+      const household = {...day('2026-01-01', ['shared']), householdId: 'h1', householdName: 'Familie'};
+      const state = reducer(stateWith(household), fetched('2026-01-01', '2026-01-07', [day('2026-01-01')]));
+
+      expect(state.weekplanDays).toEqual([day('2026-01-01')]);
     });
   });
 

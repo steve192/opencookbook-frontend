@@ -13,11 +13,11 @@ export type ShareOutcome =
 /**
  * Hands a share link to the operating system.
  *
- * @param {string} title the recipe being shared
+ * @param {string} title what is being shared: a recipe title or a household name
  * @param {string} url its share link
  * @return {Promise<ShareOutcome>} what the platform did with it
  */
-export const shareRecipeLink = async (title: string, url: string): Promise<ShareOutcome> => {
+export const shareLink = async (title: string, url: string): Promise<ShareOutcome> => {
   const result = await Share.share({message: shareMessage(title, url)});
   return result.action === Share.sharedAction ? 'shared' : 'dismissed';
 };

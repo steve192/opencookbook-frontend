@@ -10,6 +10,8 @@ import {BringImportButton} from '../components/BringExportButton';
 import {RecipeDetailView} from '../components/RecipeDetailView';
 import {RecipeShareDialog} from '../components/RecipeShareDialog';
 import RestAPI from '../dao/RestAPI';
+import {errorMessageKey} from '../helper/apiErrorMessage';
+import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {useOnlineGuard} from '../helper/useOnlineGuard';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {setAppbarOptions} from '../navigation/appbarOptions';
@@ -28,6 +30,9 @@ export const RecipeScreen = (props: Props) => {
   const sharingEnabled = useAppSelector((state) => state.settings.sharingEnabled);
   const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 1);
   const [sharingOpen, setSharingOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  // Absent on a cold start and in the offline copy, which only holds your own.
+  const mine = displayedRecipe?.mine !== false;
   const {t} = useTranslation('translation');
 
   const theme = useAppTheme();
@@ -59,9 +64,9 @@ export const RecipeScreen = (props: Props) => {
       title: displayedRecipe ? displayedRecipe.title : t('screens.recipe.loading'),
       actions: () => (
         // Both act on a recipe that is not there yet during a cold start - a deep link straight
-        // to this screen renders before the fetch comes back.
+        // to this screen renders before the fetch comes back. Both are the owner's alone.
         <>
-          {sharingEnabled &&
+          {sharingEnabled && mine &&
             <Appbar.Action
               testID='recipe-share-action'
               icon="share-variant"
@@ -70,7 +75,7 @@ export const RecipeScreen = (props: Props) => {
               accessibilityLabel={t('screens.recipe.sharing.shareButton')}
               onPress={() => setSharingOpen(true)} />
           }
-          <Appbar.Action
+          {mine && <Appbar.Action
             testID='recipe-edit-button'
             icon="pencil-outline"
             disabled={!displayedRecipe}
@@ -84,26 +89,44 @@ export const RecipeScreen = (props: Props) => {
                 editing: true,
                 recipeId: displayedRecipe.id,
               });
-            }} />
+            }} />}
         </>
       ),
     });
-  }, [displayedRecipe, theme, t, sharingEnabled]);
+  }, [displayedRecipe, theme, t, sharingEnabled, mine]);
 
   const recipeId = props.route.params.recipeId;
+
+  // Replaces the original with the copy, so going back returns to where it was opened from.
+  const saveACopy = useCallback(async () => {
+    setSaving(true);
+    try {
+      const copy = await RestAPI.saveRecipeCopy(recipeId);
+      SnackbarUtil.show({message: t('screens.recipe.savedACopy')});
+      copy.id && props.navigation.replace('RecipeScreen', {recipeId: copy.id});
+    } catch (error) {
+      SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.recipe.saveACopyFailed'))});
+    } finally {
+      setSaving(false);
+    }
+  }, [props.navigation, recipeId, t]);
+
   const loadNutrition = useCallback(() => RestAPI.getRecipeNutrition(recipeId), [recipeId]);
   // The summary comes with the recipe.
   const reloadRecipe = useCallback(() => dispatch(fetchSingleRecipe(recipeId)), [recipeId]);
 
-  // What can be done with a recipe of your own, below the steps. Sharing is not here: it is an
-  // action you go and take, not something to read past on the way to the preparation steps.
-  const renderOwnerActions = () => (
-    displayedRecipe?.id ?
+  // What can be done with the recipe, below the steps. Sharing is not here: it is an action you
+  // go and take, not something to read past on the way to the preparation steps.
+  const renderFooterActions = () => {
+    if (!displayedRecipe?.id) {
+      return null;
+    }
+    return (
       <View style={styles.exportRow}>
         <BringImportButton style={styles.exportButton} recipeId={displayedRecipe.id} />
-      </View> :
-      null
-  );
+      </View>
+    );
+  };
 
   return (
     <Surface style={styles.screen}>
@@ -112,7 +135,7 @@ export const RecipeScreen = (props: Props) => {
           recipe={displayedRecipe}
           scaledServings={scaledServings}
           onScaledServingsChange={setScaledServings}
-          footer={renderOwnerActions()}
+          footer={renderFooterActions()}
           nutrition={{loadDetails: loadNutrition, onLinkChanged: reloadRecipe}}
         />
       }
@@ -128,6 +151,18 @@ export const RecipeScreen = (props: Props) => {
       {/* Within reach instead of halfway down the page, between ingredients and steps */}
       {displayedRecipe &&
         <Surface elevation={3} style={[styles.actionBar, {paddingBottom: insets.bottom + 12}]}>
+          {!mine &&
+            <Button
+              testID='save-copy-button'
+              mode="contained-tonal"
+              icon="bookmark-plus-outline"
+              style={styles.saveButton}
+              loading={saving}
+              disabled={saving}
+              onPress={saveACopy}>
+              {t('screens.recipe.saveACopy')}
+            </Button>
+          }
           <Button
             testID='guided-cooking-button'
             mode="contained"
@@ -149,6 +184,9 @@ const styles = StyleSheet.create({
   actionBar: {
     paddingHorizontal: 16,
     paddingTop: 12,
+  },
+  saveButton: {
+    marginBottom: 8,
   },
   exportRow: {
     alignItems: 'center',
