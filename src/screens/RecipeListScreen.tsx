@@ -3,18 +3,21 @@ import {CompositeScreenProps} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Appbar, FAB, Surface} from 'react-native-paper';
+import {Appbar, Divider, FAB, Menu, Surface} from 'react-native-paper';
+import AppPersistence from '../AppPersistence';
 import {RecipeList} from '../components/RecipeList';
 import {Option, SelectionPopupModal} from '../components/SelectionPopupModal';
-import {Recipe, RecipeGroup} from '../dao/RestAPI';
+import {Household, Recipe, RecipeGroup} from '../dao/RestAPI';
 import {findRecipeGroupByOption, moveRecipesToGroup, toRecipeGroupOptions} from '../helper/recipeGroups';
 import {useOnlineGuard} from '../helper/useOnlineGuard';
 import {VibrationUtils} from '../helper/VibrationUtil';
 import {setAppbarOptions} from '../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
-import {updateRecipe} from '../redux/features/recipesSlice';
+import {ownRecipes, updateRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
+import {HouseholdCookbookList} from './households/HouseholdCookbookList';
+import {useHouseholds} from './households/useHouseholds';
 
 
 type Props = CompositeScreenProps<
@@ -31,6 +34,21 @@ const RecipeListScreen = (props: Props) => {
   const {t} = useTranslation('translation');
 
   const [fabOpen, setFabOpen] = useState(false);
+  // Undefined for your own cookbook.
+  const [shownHouseholdId, setShownHouseholdId] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    AppPersistence.getShownCookbook().then(setShownHouseholdId);
+  }, []);
+  const showCookbook = (householdId: string | undefined) => {
+    setShownHouseholdId(householdId);
+    AppPersistence.setShownCookbook(householdId);
+  };
+  const {households} = useHouseholds();
+  // Resolved against the list, so a household left meanwhile falls back to your own cookbook. A
+  // recipe group is always your own, whatever the list shows.
+  const shownHousehold = props.route.params?.shownRecipeGroupId === undefined ?
+    households.find((household) => household.id === shownHouseholdId) :
+    undefined;
 
   const dispatch = useAppDispatch();
 
@@ -38,7 +56,7 @@ const RecipeListScreen = (props: Props) => {
 
 
   const allRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
-  const allRecipes = useAppSelector((state) => state.recipes.recipes);
+  const allRecipes = useAppSelector((state) => ownRecipes(state.recipes.recipes));
   const shownRecipeGroup = useAppSelector((state) => state.recipes.recipeGroups.find((recipeGroup) => recipeGroup.id === props.route.params?.shownRecipeGroupId));
 
   const [selectedRecipes, setSelectedRecipes] = useState(new Set<number>());
@@ -90,15 +108,21 @@ const RecipeListScreen = (props: Props) => {
         });
       } else {
         setAppbarOptions(mainStackNav, {
-          title: t('screens.overview.myRecipes'),
+          title: shownHousehold ? shownHousehold.name : t('screens.overview.myRecipes'),
           leading: undefined,
-          actions: undefined,
+          actions: households.length === 0 ? undefined : () => (
+            <CookbookMenu
+              households={households}
+              shownHouseholdId={shownHouseholdId}
+              onSelect={showCookbook} />
+          ),
         });
       }
     };
     adjustActionbar();
     return props.navigation.addListener('focus', adjustActionbar);
-  }, [props.navigation, shownRecipeGroup, multiSelectionModeActive, selectedRecipes]);
+  }, [props.navigation, shownRecipeGroup, multiSelectionModeActive, selectedRecipes,
+    households, shownHousehold, shownHouseholdId]);
 
   // Memoize so RecipeList can React.memo its rows without busting on every parent
   // re-render (which the searchbar, multi-select state, etc. trigger).
@@ -142,6 +166,11 @@ const RecipeListScreen = (props: Props) => {
   return (
     <>
       <Surface testID="recipeListScreen" style={CentralStyles.fullscreen}>
+        {shownHousehold ?
+          <HouseholdCookbookList
+            householdId={shownHousehold.id}
+            onRecipeClick={(recipe) => props.navigation.getParent()?.getParent()
+                ?.navigate('RecipeScreen', {recipeId: recipe.id})} /> :
         <RecipeList
           // Route params coming from deep links are strings; from in-app
           // navigation they're numbers. Coerce once here.
@@ -161,7 +190,7 @@ const RecipeListScreen = (props: Props) => {
           }}
           multiSelectionModeActive={multiSelectionModeActive}
           onRecipeSelected={onRecipeSelected}
-          selectedRecipes={selectedRecipes} />
+          selectedRecipes={selectedRecipes} />}
 
         <FAB.Group
           icon="plus"
@@ -227,5 +256,58 @@ const RecipeListScreen = (props: Props) => {
   );
 };
 
+
+/**
+ * Which cookbook the list shows. A component of its own because app bar actions cannot hold hooks.
+ *
+ * @param {object} props the households to offer, which one is shown, and what to do about it
+ * @return {JSX.Element} the app bar action and its menu
+ */
+const CookbookMenu = (props: {
+  households: Household[],
+  shownHouseholdId: string | undefined,
+  onSelect: (householdId: string | undefined) => void,
+}) => {
+  const {t} = useTranslation('translation');
+  const theme = useAppTheme();
+  const [open, setOpen] = useState(false);
+
+  const select = (householdId: string | undefined) => {
+    props.onSelect(householdId);
+    setOpen(false);
+  };
+
+  const tick = (householdId: string | undefined) =>
+    props.shownHouseholdId === householdId ? 'check' : undefined;
+
+  return (
+    <Menu
+      visible={open}
+      onDismiss={() => setOpen(false)}
+      anchor={
+        <Appbar.Action
+          testID="cookbookMenuButton"
+          icon="book-open-variant"
+          color={theme.colors.onPrimary}
+          accessibilityLabel={t('screens.overview.chooseCookbook')}
+          onPress={() => setOpen(true)} />
+      }>
+      <Menu.Item
+        title={t('screens.overview.myRecipes')}
+        leadingIcon="account"
+        trailingIcon={tick(undefined)}
+        onPress={() => select(undefined)} />
+      <Divider />
+      {props.households.map((household) => (
+        <Menu.Item
+          key={household.id}
+          title={household.name}
+          leadingIcon="account-group"
+          trailingIcon={tick(household.id)}
+          onPress={() => select(household.id)} />
+      ))}
+    </Menu>
+  );
+};
 
 export default RecipeListScreen;

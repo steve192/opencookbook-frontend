@@ -5,13 +5,16 @@ import {Appbar, Button, Icon, Modal, Portal, Text, TextInput, TouchableRipple} f
 import {RecipeList} from '../../components/RecipeList';
 import {Recipe, RecipeGroup} from '../../dao/RestAPI';
 import {overlayStyles, useAppTheme} from '../../styles/CentralStyles';
+import {HouseholdCookbookList} from '../households/HouseholdCookbookList';
 
 interface Props {
   visible: boolean;
   /** The day being planned, shown as the header subtitle */
   dayLabel?: string;
+  /** For a household plan only its cookbook is offered, so every member can open the meal. */
+  householdId?: string | null;
   onClose: () => void;
-  onRecipeSelected: (recipe: Recipe) => void;
+  onRecipeSelected: (recipe: Pick<Recipe, 'id' | 'title'>) => void;
   onSimpleRecipeSelected: (name: string) => void;
 }
 
@@ -69,6 +72,12 @@ export const RecipeSelectionPopup = (props: Props) => {
   );
 
   const renderContent = () => {
+    if (selectionType === 'normal' && props.householdId) {
+      return (
+        <HouseholdCookbookList householdId={props.householdId} onRecipeClick={props.onRecipeSelected} />
+      );
+    }
+
     if (selectionType === 'normal') {
       return (
         <RecipeList

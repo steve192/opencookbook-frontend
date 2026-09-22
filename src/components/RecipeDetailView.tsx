@@ -67,6 +67,11 @@ export const RecipeDetailView = (props: Props) => {
 
     return (
       <View style={styles.facts}>
+        {props.recipe.ownerDisplayName &&
+          <Chip icon="account" compact>
+            {t('screens.households.ownedBy', {name: props.recipe.ownerDisplayName})}
+          </Chip>
+        }
         {totalTime &&
           <Chip icon="clock-outline" compact>{t('screens.recipe.totalTime', {duration: totalTime})}</Chip>
         }

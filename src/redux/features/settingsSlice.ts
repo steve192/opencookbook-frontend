@@ -9,6 +9,8 @@ export interface SettingsState {
     isOnline: boolean;
     /** Whether this instance publishes recipes at all. Operators can turn it off. */
     sharingEnabled: boolean;
+    /** Whether this instance has households. Operators can turn them off. */
+    householdsEnabled: boolean;
     /** Whether this instance can read a recipe from a photograph. */
     ocrImportEnabled: boolean;
 }
@@ -20,6 +22,7 @@ const initialState: SettingsState = {
   // Assumed until the instance says otherwise, so a failed or slow lookup does not take a
   // working feature away.
   sharingEnabled: true,
+  householdsEnabled: true,
   // The opposite default to sharing: most instances have no machine learning subsystem, and
   // offering a scan that cannot work is worse than offering it a moment late.
   ocrImportEnabled: false,
@@ -38,6 +41,9 @@ export const authSlice = createSlice({
     changeSharingEnabled: (state, action: PayloadAction<boolean>) => {
       state.sharingEnabled = action.payload;
     },
+    changeHouseholdsEnabled: (state, action: PayloadAction<boolean>) => {
+      state.householdsEnabled = action.payload;
+    },
     changeOcrImportEnabled: (state, action: PayloadAction<boolean>) => {
       state.ocrImportEnabled = action.payload;
     },
@@ -49,7 +55,7 @@ export const authSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const {changeTheme, changeBackendUrl, changeSharingEnabled, changeOcrImportEnabled,
-  changeOnlineState} = authSlice.actions;
+export const {changeTheme, changeBackendUrl, changeSharingEnabled, changeHouseholdsEnabled,
+  changeOcrImportEnabled, changeOnlineState} = authSlice.actions;
 
 export default authSlice.reducer;

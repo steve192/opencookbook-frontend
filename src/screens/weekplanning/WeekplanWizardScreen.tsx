@@ -27,6 +27,7 @@ import {ExtrasSection} from './wizard/ExtrasSection';
 import {FoodSection} from './wizard/FoodSection';
 import {HouseholdSection} from './wizard/HouseholdSection';
 import {WeekSection} from './wizard/WeekSection';
+import {useHouseholds} from '../households/useHouseholds';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'WeekplanWizardScreen'>;
 
@@ -56,16 +57,19 @@ export const WeekplanWizardScreen = (props: Props) => {
   const [guidedStep, setGuidedStep] = useState<number>();
   const [expanded, setExpanded] = useState<SectionKey>();
   const [planning, setPlanning] = useState(false);
+  // Undefined for your own plan.
+  const householdId = props.route.params.householdId;
+  const {households} = useHouseholds();
 
   useEffect(() => {
-    RestAPI.getPlanningProfiles()
+    RestAPI.getPlanningProfiles(householdId)
         .then((profiles) => profiles.find((saved) => saved.defaultProfile) ?? profiles[0])
         .catch(() => undefined)
         .then((saved) => {
           setProfile(saved ?? newPlanningProfile(t('screens.planning.defaultProfileName')));
           setGuidedStep(saved ? undefined : 0);
         });
-  }, [t]);
+  }, [t, householdId]);
 
   if (!profile) {
     return <Surface style={styles.screen}><ActivityIndicator style={styles.loading} /></Surface>;
@@ -74,10 +78,10 @@ export const WeekplanWizardScreen = (props: Props) => {
   const plan = async () => {
     setPlanning(true);
     try {
-      const saved = await RestAPI.savePlanningProfile({...profile, defaultProfile: true});
+      const saved = await RestAPI.savePlanningProfile({...profile, defaultProfile: true}, householdId);
       const draft = await RestAPI.generatePlanDraft(saved.id!, toDayKey(period.days[0]), period.days.length,
-          period.awayDays);
-      props.navigation.replace('PlanDraftScreen', {draftId: draft.id});
+          period.awayDays, householdId);
+      props.navigation.replace('PlanDraftScreen', {draftId: draft.id, householdId: householdId});
     } catch (e) {
       SnackbarUtil.show({message: t(errorMessageKey(e, 'screens.planning.planFailed'))});
       setPlanning(false);
@@ -94,7 +98,7 @@ export const WeekplanWizardScreen = (props: Props) => {
     return {
       household: <HouseholdSection {...sectionProps} />,
       food: <FoodSection {...sectionProps} ingredients={ingredients} />,
-      extras: <ExtrasSection {...sectionProps} />,
+      extras: <ExtrasSection {...sectionProps} offerHouseholdRecipes={!householdId && households.length > 0} />,
       week: <WeekSection {...sectionProps} period={period} ingredients={ingredients} />,
     }[section];
   };

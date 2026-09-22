@@ -29,6 +29,8 @@ import {
 } from '../../helper/weekplanDay';
 import {buildWeekplanPrintHtml} from '../../helper/weekplanPrint';
 import {useWeekplanWeek} from '../../helper/useWeekplanWeek';
+import {PlanTargetDialog} from '../../components/PlanTargetDialog';
+import {useHouseholds} from '../households/useHouseholds';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps} from '../../navigation/NavigationRoutes';
 import {updateSingleWeekplanDay} from '../../redux/features/weeklyRecipesSlice';
@@ -56,6 +58,10 @@ export const WeeklyRecipeListScreen = (props: Props) => {
 
   const [recipeSelectionVisible, setRecipeSelectionVisible] = useState(false);
   const [selectedWeekplanDay, setSelectedWeekplanDay] = useState<WeekplanDay>();
+  // The plans of the day a meal is being added to, while the plan is being chosen.
+  const [targetChoices, setTargetChoices] = useState<WeekplanDay[] | undefined>(undefined);
+  const [planTargetOpen, setPlanTargetOpen] = useState(false);
+  const {households} = useHouseholds();
 
   const {today, weekStart, days, plans, loading, reload} = useWeekplanWeek(weekOffset);
   const weekStartKey = toDayKey(weekStart);
@@ -67,7 +73,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   const week = useMemo(
       () => days.map((date, index) => ({
         date: date,
-        plan: plans[index],
+        dayPlans: plans[index],
         weekdayName: dayOfWeekLabel(t, DAYS_OF_WEEK[index]),
       })),
       [days, plans, t],
@@ -80,10 +86,10 @@ export const WeeklyRecipeListScreen = (props: Props) => {
       title: weekTitle(),
       subtitle: formatWeekRange(weekStart),
       emptyLabel: t('screens.weekplan.noMealsPlanned'),
-      days: week.map(({date, plan, weekdayName}) => ({
+      days: week.map(({date, dayPlans, weekdayName}) => ({
         weekday: weekdayName,
         date: formatDayAndMonth(date),
-        meals: plan.recipes.map((meal) => meal.title),
+        meals: dayPlans.flatMap((plan) => plan.recipes.map((meal) => meal.title)),
       })),
     });
 
@@ -113,7 +119,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
               icon="creation"
               color={theme.colors.onPrimary}
               accessibilityLabel={t('screens.planning.planWeek')}
-              onPress={() => props.navigation.navigate('WeekplanWizardScreen', {weekOffset})} />}
+              onPress={() => planWeek()} />}
             <Appbar.Action
               icon="printer-outline"
               color={theme.colors.onPrimary}
@@ -144,7 +150,44 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     setRecipeSelectionVisible(true);
   };
 
-  const addPickedRecipe = (recipe: Recipe) => {
+  const planWeek = () => {
+    if (households.length === 0) {
+      props.navigation.navigate('WeekplanWizardScreen', {weekOffset});
+      return;
+    }
+    setPlanTargetOpen(true);
+  };
+
+  /**
+   * Writing goes to one plan, so adding a meal asks which when there is a choice.
+   *
+   * @param {WeekplanDay[]} dayPlans every plan that day already has
+   */
+  const chooseTargetPlan = (dayPlans: WeekplanDay[]) => {
+    if (households.length === 0) {
+      openRecipeSelection(dayPlans[0]);
+      return;
+    }
+    setTargetChoices(dayPlans);
+  };
+
+  const onTargetChosen = (householdId: string | undefined) => {
+    const dayPlans = targetChoices ?? [];
+    setTargetChoices(undefined);
+    const dayKey = dayPlans[0]?.day;
+    if (!dayKey) {
+      return;
+    }
+    const existing = dayPlans.find((plan) => (plan.householdId ?? undefined) === householdId);
+    openRecipeSelection(existing ?? {
+      day: dayKey,
+      recipes: [],
+      householdId: householdId,
+      householdName: households.find((household) => household.id === householdId)?.name,
+    });
+  };
+
+  const addPickedRecipe = (recipe: Pick<Recipe, 'id' | 'title'>) => {
     selectedWeekplanDay && persist(withRecipeAdded(selectedWeekplanDay, recipe));
     setRecipeSelectionVisible(false);
   };
@@ -191,7 +234,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
         <View style={styles.weekLabel}>
           <Text variant="titleMedium" style={styles.weekTitle}>{weekTitle()}</Text>
           <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>
-            {formatWeekRange(weekStart)} · {t('screens.weekplan.mealsPlanned', {count: countMeals(plans)})}
+            {formatWeekRange(weekStart)} · {t('screens.weekplan.mealsPlanned', {count: countMeals(plans.flat())})}
           </Text>
         </View>
         <IconButton
@@ -214,24 +257,40 @@ export const WeeklyRecipeListScreen = (props: Props) => {
       <ScrollView
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}>
-        {week.map(({date, plan, weekdayName}) => (
+        {week.map(({date, dayPlans, weekdayName}) => (
           <WeekplanDayCard
-            key={plan.day}
+            key={dayPlans[0].day}
             date={date}
             weekdayName={weekdayName}
             isToday={isSameDay(date, today)}
             isPast={date.diffDays(today) > 0}
-            meals={plan.recipes}
-            onAddPress={() => openRecipeSelection(plan)}
+            plans={dayPlans}
+            onAddPress={() => chooseTargetPlan(dayPlans)}
             onMealPress={openRecipe}
-            onMealMove={(from, to) => moveMeal(plan, from, to)}
-            onMealRemovePress={(mealIndex) => removeMeal(plan, mealIndex)} />
+            onMealMove={moveMeal}
+            onMealRemovePress={removeMeal} />
         ))}
       </ScrollView>
+
+      <PlanTargetDialog
+        visible={planTargetOpen}
+        title={t('screens.weekplan.whichPlanToGenerate')}
+        households={households}
+        onDismiss={() => setPlanTargetOpen(false)}
+        onChoose={(householdId) =>
+          props.navigation.navigate('WeekplanWizardScreen', {weekOffset, householdId})} />
+
+      <PlanTargetDialog
+        visible={targetChoices !== undefined}
+        title={t('screens.weekplan.whichPlanToAddTo')}
+        households={households}
+        onDismiss={() => setTargetChoices(undefined)}
+        onChoose={onTargetChosen} />
 
       <RecipeSelectionPopup
         visible={recipeSelectionVisible}
         dayLabel={selectedWeekplanDay ? formatWeekdayAndDate(new XDate(selectedWeekplanDay.day)) : ''}
+        householdId={selectedWeekplanDay?.householdId}
         onClose={() => setRecipeSelectionVisible(false)}
         onRecipeSelected={addPickedRecipe}
         onSimpleRecipeSelected={addSpontaneousMeal}

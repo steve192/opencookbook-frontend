@@ -33,6 +33,12 @@ export const MESSAGE_KEYS = {
   RATE_LIMITED: 'errors.rateLimited',
   MAIL_DELIVERY_FAILED: 'errors.mailFailed',
 
+  HOUSEHOLD_FULL: 'screens.households.full',
+  TOO_MANY_HOUSEHOLDS: 'screens.households.tooMany',
+  TOO_MANY_INVITES: 'screens.households.tooManyInvites',
+  INVITE_INVALID: 'screens.households.inviteInvalid',
+  ALREADY_A_MEMBER: 'screens.households.alreadyMember',
+
   IMPORT_URL_INVALID: 'errors.importUrlInvalid',
   IMPORT_NOT_SUPPORTED: 'errors.importNotSupported',
   IMPORT_FAILED: 'errors.importFailed',

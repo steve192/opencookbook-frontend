@@ -133,7 +133,8 @@
       "importRecipe": "Import recipe",
       "addRecipeGroup": "Add recipe group",
       "noRecipesMessage": "Looks like you have not added any recipes yet",
-      "searchPlaceholder": "Enter search term"
+      "searchPlaceholder": "Enter search term",
+      "chooseCookbook": "Choose cookbook"
     },
     "settings": {
       "screenTitle": "Settings",
@@ -159,7 +160,12 @@
       "deleteScanDataQuestion": "Delete every photo you contributed towards improving recognition? Your recipes are not affected.",
       "deleteScanDataDone": "The photos were deleted",
       "planning": "Planning",
-      "askPlanningDetails": "Ask about planning details after an import"
+      "askPlanningDetails": "Ask about planning details after an import",
+      "displayName": "Display name",
+      "displayNameExplanation": "What fellow household members see instead of your e-mail address.",
+      "displayNameSaved": "Display name saved",
+      "account": "Account",
+      "householdsSubtitle": "Share a cookbook and a week plan"
     },
     "import": {
       "URLToImport": "URL to import",
@@ -265,7 +271,14 @@
         "stoppedSharing": "The link no longer works",
         "linkCopied": "Link copied",
         "shareFailed": "The recipe could not be shared"
-      }
+      },
+      "deleteImpactHouseholds_one": "It is in {{count}} household.",
+      "deleteImpactHouseholds_other": "It is in {{count}} households.",
+      "deleteImpactPlanned_one": "It is planned {{count}} time.",
+      "deleteImpactPlanned_other": "It is planned {{count}} times.",
+      "saveACopy": "Save to my recipes",
+      "savedACopy": "Saved as your own recipe",
+      "saveACopyFailed": "That recipe could not be copied."
     },
     "guidedCooking": {
       "stepProgress": "Step {{current}} of {{total}}",
@@ -309,7 +322,10 @@
       "print": "Print this week",
       "printFailed": "Printing failed",
       "moveMealUp": "Move up",
-      "moveMealDown": "Move down"
+      "moveMealDown": "Move down",
+      "myPlan": "My plan",
+      "whichPlanToGenerate": "Which plan to propose?",
+      "whichPlanToAddTo": "Add to which plan?"
     },
     "sharedRecipe": {
       "screenTitle": "Shared recipe",
@@ -430,7 +446,11 @@
       "summaryKcal": "about {{kcal}} kcal",
       "summaryAnything": "Anything from your cookbook",
       "failed": "Suggestions could not be loaded",
-      "doesNotUse": "Does not use: {{ingredients}}"
+      "doesNotUse": "Does not use: {{ingredients}}",
+      "cookbooks": "Cookbooks",
+      "includeHouseholds": "Suggest household recipes too",
+      "includeHouseholdsHint": "As well as your own: {{names}}.",
+      "summaryWithHouseholds": "with household recipes"
     },
     "planning": {
       "wizardTitle": "Plan your week",
@@ -500,6 +520,7 @@
       "summaryCooldown_other": "no repeats within {{count}} weeks",
       "summaryLeftovers": "leftovers",
       "summaryVariety": "variety",
+      "summaryWithHouseholds": "with household recipes",
       "whichWeek": "Which week",
       "planWeek": "Plan a week",
       "workdays": "Monday to Friday",
@@ -515,19 +536,78 @@
       "rerollNotAFullMeal": "Not a full meal",
       "leftoversHint": "A recipe that makes enough for two meals is cooked double and eaten again for lunch or dinner the next day.",
       "spreadVarietyHint": "Avoids the same main ingredient, and where possible the same recipe group, on neighbouring days.",
+      "includeHouseholdRecipes": "Include household recipes",
+      "includeHouseholdRecipesHint": "Also plan with the recipes your households share.",
       "calories": "Calories",
       "kcalSplit": "Split: {{split}} kcal per serving",
       "kcalPerMeal": "Set per meal",
       "kcalEven": "Share evenly",
       "kcalPerMealHint": "A meal left empty shares what the day has left.",
       "summaryKcalPerMeal": "calories per meal"
+    },
+    "households": {
+      "screenTitle": "Households",
+      "listTitle": "Your households",
+      "empty": "You are not in a household yet. A household is a small private group with one shared cookbook and one shared week.",
+      "create": "Start a household",
+      "createTitle": "Start a household",
+      "nameLabel": "Name",
+      "shareMyRecipes_one": "Share my {{count}} recipe and every recipe I add later",
+      "shareMyRecipes_other": "Share my {{count}} recipes and every recipe I add later",
+      "shareExplanation": "Everyone in the household can read what you share, and save copies. You can switch it off at any time.",
+      "members": "Members",
+      "cookbook": "Cookbook",
+      "recipeCount_one": "{{count}} recipe",
+      "recipeCount_other": "{{count}} recipes",
+      "memberCount_one": "{{count}} member",
+      "memberCount_other": "{{count}} members",
+      "invite": "Invite somebody",
+      "revokeInvite": "Revoke",
+      "revokeInviteTitle": "Revoke this link?",
+      "revokeInviteMessage": "Anybody who already has it will not be able to join.",
+      "invitesTitle": "Open invites",
+      "inviteExpires": "Valid until {{date}}",
+      "leave": "Leave household",
+      "leaveTitle": "Leave {{name}}?",
+      "leaveMessage": "Your recipes leave with you, and your meals are removed from its week. Nothing of yours is deleted.",
+      "remove": "Remove",
+      "removeTitle": "Remove {{name}}?",
+      "removeMessage": "Their recipes leave the household with them. Nothing of theirs is deleted.",
+      "ownedBy": "by {{name}}",
+      "byYou": "by you",
+      "joinTitle": "Join {{name}}?",
+      "joinExplanation": "You will be able to read every recipe the members share, and plan the week together.",
+      "join": "Join",
+      "joined": "You joined {{name}}",
+      "inviteInvalid": "This invitation is not valid any more. It may have been revoked or have expired.",
+      "full": "That household has no room for another member.",
+      "tooMany": "You are in as many households as this server allows.",
+      "alreadyMember": "You are already in that household.",
+      "loadFailed": "The household could not be loaded.",
+      "saveFailed": "That change could not be saved.",
+      "tooManyInvites": "That household has as many open invitations as this server allows.",
+      "defaultName": "{{name}}’s household",
+      "createMessage": "What should it be called? You can change the name at any time.",
+      "renameTitle": "Rename household",
+      "memberSharing": "Shares their cookbook",
+      "memberNotSharing": "Does not share their cookbook",
+      "youShare": "You share your cookbook",
+      "youDoNotShare": "You do not share your cookbook",
+      "shareInvite": "Share link"
+    },
+    "onboarding": {
+      "title": "Welcome",
+      "intro": "What should we call you?",
+      "nameLabel": "Name",
+      "save": "Get started",
+      "failed": "That name could not be saved."
     }
   },
   "nutrition": {
     "summaryPerServing": "≈ {{energy}} per serving",
     "summaryTotal": "≈ {{energy}} in total",
     "summaryWithMissing": "{{value}} · incomplete",
-    "summaryAddMissing": "Too little known – complete the ingredients",
+    "summaryAddMissing": "Too little known: complete the ingredients",
     "summaryIncomplete": "Too little known",
     "sheetTitle": "Nutrition",
     "estimateNotice": "An estimate from the ingredients and their amounts. Real values depend on variety, size and preparation.",

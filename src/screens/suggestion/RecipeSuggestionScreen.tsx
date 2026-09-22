@@ -32,9 +32,12 @@ import {
   withIngredientToggled,
   withMealTypeWanted,
   withMode,
+  usesHouseholdRecipes,
+  withHouseholdRecipes,
   withTargetKcal,
 } from '../../helper/recipeSuggestion';
 import {useOwnIngredients} from '../../helper/useOwnIngredients';
+import {useHouseholds} from '../households/useHouseholds';
 import {toDayKey} from '../../helper/weekplan';
 import {emptyWeekplanDay, withRecipeAdded} from '../../helper/weekplanDay';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
@@ -50,6 +53,7 @@ export const RecipeSuggestionScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const dispatch = useAppDispatch();
   const ingredients = useOwnIngredients();
+  const {households} = useHouseholds();
 
   const [request, setRequest] = useState(() => initialSuggestionRequest(new XDate().getHours()));
   const [suggestions, setSuggestions] = useState<RecipeSuggestions>();
@@ -117,6 +121,22 @@ export const RecipeSuggestionScreen = (props: Props) => {
         isChosen={(minutes) => request.maxTotalTimeMinutes === minutes}
         label={(minutes) => t('screens.suggestion.minutes', {minutes})}
         onToggle={(minutes) => setRequest(withToggled(request, 'maxTotalTimeMinutes', minutes))} />
+      {households.length > 0 &&
+        <QuestionSection title={t('screens.suggestion.cookbooks')}>
+          <View style={styles.switchRow}>
+            <View style={styles.switchText}>
+              <Text variant="bodyLarge">{t('screens.suggestion.includeHouseholds')}</Text>
+              <HintText>
+                {t('screens.suggestion.includeHouseholdsHint',
+                    {names: households.map((household) => household.name).join(', ')})}
+              </HintText>
+            </View>
+            <Switch
+              value={usesHouseholdRecipes(request)}
+              onValueChange={(include) => setRequest(withHouseholdRecipes(request, include))} />
+          </View>
+        </QuestionSection>
+      }
       {renderMoreFilters()}
     </>
   );

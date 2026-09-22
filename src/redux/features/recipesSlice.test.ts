@@ -8,7 +8,7 @@ vi.mock('../../AppPersistence', () => ({
   default: {storeRecipesOffline: vi.fn(), storeRecipeGroupsOffline: vi.fn()},
 }));
 
-const {createRecipe, createRecipeGroup, importRecipe, updateRecipe} = await import('./recipesSlice');
+const {createRecipe, createRecipeGroup, importRecipe, ownRecipes, updateRecipe} = await import('./recipesSlice');
 const reducer = (await import('./recipesSlice')).default;
 const AppPersistence = (await import('../../AppPersistence')).default;
 
@@ -116,5 +116,22 @@ describe('recipesSlice', () => {
 
       expect(reducer(existing, fulfilled(updateRecipe, unknown, unknown)).recipes).toHaveLength(1);
     });
+  });
+});
+
+describe('telling your own cookbook from what a household lends you', () => {
+  const foreign = (id: number, title: string): Recipe =>
+    ({...recipe(id, title), mine: false, ownerDisplayName: 'Anna'});
+
+  it('keeps your own', () => {
+    expect(ownRecipes([recipe(1, 'Cake')]).map((r) => r.id)).toEqual([1]);
+  });
+
+  it('drops one a household only makes readable', () => {
+    expect(ownRecipes([recipe(1, 'Cake'), foreign(2, 'Annas Lasagne')]).map((r) => r.id)).toEqual([1]);
+  });
+
+  it('keeps a recipe that says nothing, which is every recipe stored before households existed', () => {
+    expect(ownRecipes([recipe(1, 'Cake')])).toHaveLength(1);
   });
 });

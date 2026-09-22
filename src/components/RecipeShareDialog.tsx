@@ -7,7 +7,7 @@ import {errorMessageKey} from '../helper/apiErrorMessage';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {PromptUtil} from '../helper/Prompt';
 import {formatShareExpiry} from '../helper/recipeSharing';
-import {shareRecipeLink} from '../helper/shareLink';
+import {shareLink} from '../helper/shareLink';
 import {useOnlineGuard} from '../helper/useOnlineGuard';
 import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
 
@@ -65,7 +65,7 @@ export const RecipeShareDialog = (props: Props) => {
     try {
       const created = share ?? await RestAPI.shareRecipe(props.recipeId);
       setShare(created);
-      const outcome = await shareRecipeLink(props.recipeTitle, created.shareUrl);
+      const outcome = await shareLink(props.recipeTitle, created.shareUrl);
 
       // Out of the way first, then say what happened - a snackbar underneath this dialog is
       // no feedback at all.

@@ -18,13 +18,13 @@ import {moveItem} from './listOrder';
 export const emptyWeekplanDay = (dayKey: string): WeekplanDay => ({day: dayKey, recipes: []});
 
 /**
- * Appends one of the user's saved recipes.
+ * Appends a saved recipe - your own, or one from the household cookbook of a household plan.
  *
  * @param {WeekplanDay} day day to add to
  * @param {Recipe} recipe recipe that was picked
  * @return {WeekplanDay} a new day including that recipe
  */
-export const withRecipeAdded = (day: WeekplanDay, recipe: Recipe): WeekplanDay => ({
+export const withRecipeAdded = (day: WeekplanDay, recipe: Pick<Recipe, 'id' | 'title'>): WeekplanDay => ({
   ...day,
   recipes: [...day.recipes, {id: recipe.id, title: recipe.title, type: 'NORMAL_RECIPE'}],
 });

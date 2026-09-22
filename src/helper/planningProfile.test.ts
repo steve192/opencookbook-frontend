@@ -185,6 +185,12 @@ describe('section summaries', () => {
     expect(extrasSummary(t, {...newPlanningProfile('x'), leftoversAllowed: false})).toBe(
         'screens.planning.summaryCooldown:2 · screens.planning.summaryVariety');
   });
+
+  it('mentions household recipes only when included', () => {
+    expect(extrasSummary(t, newPlanningProfile('x'))).not.toContain('summaryWithHouseholds');
+    expect(extrasSummary(t, {...newPlanningProfile('x'), includeHouseholdRecipes: true}))
+        .toContain('screens.planning.summaryWithHouseholds');
+  });
 });
 
 describe('calories per meal', () => {

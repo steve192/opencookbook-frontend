@@ -13,8 +13,8 @@ export interface WeekplanWeek {
   weekStart: XDate;
   /** The seven days of the shown week */
   days: XDate[];
-  /** The plan of each of those days, in the same order and never missing */
-  plans: WeekplanDay[];
+  /** Per day: your own plan first and never missing, then each household plan with meals that day. */
+  plans: WeekplanDay[][];
   loading: boolean;
   reload: () => void;
 }
@@ -38,12 +38,18 @@ export const useWeekplanWeek = (weekOffset: number): WeekplanWeek => {
   const weekStartKey = toDayKey(weekStart);
   const days = useMemo(() => weekDays(weekStart), [weekStartKey]);
 
-  // A day the server does not know about yet is an empty plan, not a missing one,
-  // so callers never have to deal with undefined.
+  // A day the server does not know about yet is an empty plan, not a missing one, so callers never
+  // have to deal with undefined.
   const plans = useMemo(
-      () => days.map((date) =>
-        weekplanDays.find((weekplanDay) => weekplanDay.day === toDayKey(date)) ??
-          emptyWeekplanDay(toDayKey(date))),
+      () => days.map((date) => {
+        const dayKey = toDayKey(date);
+        const onThatDay = weekplanDays.filter((weekplanDay) => weekplanDay.day === dayKey);
+        const own = onThatDay.find((weekplanDay) => !weekplanDay.householdId) ??
+          emptyWeekplanDay(dayKey);
+        const shared = onThatDay.filter((weekplanDay) =>
+          weekplanDay.householdId && weekplanDay.recipes.length > 0);
+        return [own, ...shared];
+      }),
       [days, weekplanDays],
   );
 

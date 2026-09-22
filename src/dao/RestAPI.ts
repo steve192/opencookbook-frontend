@@ -46,6 +46,10 @@ export interface Recipe {
     dishRole?: DishRole | null;
     /** Absent where the instance does not estimate nutrition. */
     nutrition?: NutritionSummary | null;
+    /** Whether you may edit it; absent where nobody in particular is reading, as in a share. */
+    mine?: boolean | null;
+    /** Who wrote it, for a recipe read through a household. Absent for your own. */
+    ownerDisplayName?: string | null;
 }
 
 /** Grams, except energy. */
@@ -137,14 +141,21 @@ export interface WeekplanDayRecipeRequest {
 export interface WeekplanDay {
     day: string,
     recipes: WeekplanDayRecipeInfo[]
+    /** Which plan the day belongs to; absent for your own. */
+    householdId?: string | null;
+    householdName?: string | null;
 }
 export interface UserInfo {
   email: string;
+  /** Null while the account never set one; fellow household members then see a masked address. */
+  displayName?: string | null;
+  onboarded?: boolean;
 }
 
 export interface InstanceInfo {
   termsOfService: string;
   sharingEnabled: boolean;
+  householdsEnabled: boolean;
   /**
    * Whether this instance can read a recipe from a photograph. False when the operator has no
    * machine learning subsystem, switched scanning off, or has one that is unreachable.
@@ -198,6 +209,63 @@ export interface RecipeShare {
   /** When the link stops working, as an ISO instant. Fixed when it was created. */
   expiresAt: string;
   accessCount: number;
+}
+
+/**
+ * The query parameter that says which plan a scoped request is about.
+ *
+ * @param {string} householdId the household, or nothing for your own plan
+ * @return {string} the query string, empty for your own
+ */
+const householdScope = (householdId?: string | null): string =>
+  householdId ? `?household=${householdId}` : '';
+
+export interface HouseholdMember {
+  userId: number;
+  /** A name the account chose, or its address with the local part masked. Never the address. */
+  displayName: string;
+  shareRecipes: boolean;
+  /** Whether this is you, so leaving and being removed can be told apart. */
+  me: boolean;
+}
+
+export interface Household {
+  id: string;
+  name: string;
+  /** Whether your own cookbook is in this household. All of it or none of it. */
+  shareRecipes: boolean;
+  memberCount: number;
+  /** Null in a listing, where only the household itself is asked about. */
+  recipeCount?: number | null;
+  members?: HouseholdMember[] | null;
+}
+
+export interface HouseholdInvite {
+  token: string;
+  link: string;
+  expiresAt: string;
+}
+
+/** One line of a household cookbook: a summary, not the whole recipe. */
+export interface HouseholdRecipe {
+  id: number;
+  title: string;
+  titleImageUuid?: string;
+  ownerDisplayName: string;
+  /** Whether the viewer owns it, which is also whether they may edit it. */
+  mine: boolean;
+}
+
+/** One page of a household cookbook, with whether there is another behind it. */
+export interface HouseholdRecipePage {
+  recipes: HouseholdRecipe[];
+  last: boolean;
+}
+
+/** What deleting a recipe would take with it. */
+export interface RecipeDeletionImpact {
+  households: number;
+  plannedMeals: number;
 }
 
 export interface BringExportData {
@@ -263,6 +331,8 @@ export interface RecipeSuggestionRequest {
   mealTypes?: MealType[];
   targetKcalPerServing?: number | null;
   macroStyle?: MacroStyle | null;
+  /** Also draw on the household cookbooks you may read; left out means no. */
+  includeHouseholdRecipes?: boolean;
   limit?: number;
   /** Repeat a seed to get that result set back; leave it out for a new draw. */
   seed?: number | null;
@@ -336,6 +406,8 @@ export interface PlanningProfile {
   cooldownWeeks?: number;
   leftoversAllowed?: boolean;
   spreadVariety?: boolean;
+  /** A personal plan also draws on the household cookbooks you may read; ignored for a household's. */
+  includeHouseholdRecipes?: boolean;
   meals: PlanningMeal[];
   pantry?: PantryEntry[];
   avoidedIngredientIds?: number[];
@@ -397,12 +469,14 @@ class RestAPI {
     AppPersistence.storeUserInfoOffline(response.data);
     return response?.data;
   }
-  static async setWeekplanRecipes(date: string, recipes: WeekplanDayRecipeRequest[]): Promise<WeekplanDay> {
-    const response = await this.put(`/weekplan/${date}`, {recipes: recipes});
+  static async setWeekplanRecipes(date: string, recipes: WeekplanDayRecipeRequest[],
+      householdId?: string | null): Promise<WeekplanDay> {
+    const response = await this.put(`/weekplan/${date}${householdScope(householdId)}`, {recipes: recipes});
     return response?.data;
   }
   static async getWeekplanDays(from: XDate, to: XDate): Promise<WeekplanDay[]> {
-    const response = await this.get(`/weekplan/${from.toString('yyyy-MM-dd')}/to/${to.toString('yyyy-MM-dd')}`);
+    const response = await this.get(
+        `/weekplan/${from.toString('yyyy-MM-dd')}/to/${to.toString('yyyy-MM-dd')}?allPlans=true`);
 
     // Add type recipe to recipe objects
     return response?.data.map((weekplanDay: WeekplanDay) => {
@@ -493,19 +567,22 @@ class RestAPI {
     return response?.data;
   }
 
-  static async getPlanningProfiles(): Promise<PlanningProfile[]> {
-    const response = await this.get('/planning/profiles');
+  static async getPlanningProfiles(householdId?: string | null): Promise<PlanningProfile[]> {
+    const response = await this.get('/planning/profiles' + householdScope(householdId));
     return response?.data;
   }
 
   /**
    * @param {PlanningProfile} profile the answers; created when it has no id, changed otherwise
+   * @param {string} householdId whose plan; nothing for your own
    * @return {Promise<PlanningProfile>} the profile as saved
    */
-  static async savePlanningProfile(profile: PlanningProfile): Promise<PlanningProfile> {
+  static async savePlanningProfile(profile: PlanningProfile,
+      householdId?: string | null): Promise<PlanningProfile> {
+    const scope = householdScope(householdId);
     const response = profile.id === undefined ?
-      await this.post('/planning/profiles', profile) :
-      await this.put(`/planning/profiles/${profile.id}`, profile);
+      await this.post('/planning/profiles' + scope, profile) :
+      await this.put(`/planning/profiles/${profile.id}${scope}`, profile);
     return response?.data;
   }
 
@@ -514,17 +591,25 @@ class RestAPI {
    * @param {string} startDate the first day, as a day key
    * @param {number} days how many days from there
    * @param {string[]} skippedDates days the cook is not at home; nothing is planned for them
+   * @param {string} householdId whose plan; nothing for your own
    * @return {Promise<PlanDraft>} the proposed week
    */
   static async generatePlanDraft(
       profileId: number, startDate: string, days: number, skippedDates: string[],
+      householdId?: string | null,
   ): Promise<PlanDraft> {
-    const response = await this.post('/planning/drafts', {profileId, startDate, days, skippedDates});
+    const response = await this.post('/planning/drafts' + householdScope(householdId),
+        {profileId, startDate, days, skippedDates});
     return response?.data;
   }
 
-  static async getPlanDraft(draftId: number): Promise<PlanDraft> {
-    const response = await this.get(`/planning/drafts/${draftId}`);
+  /**
+   * @param {number} draftId the proposed week
+   * @param {string} householdId whose plan; nothing for your own
+   * @return {Promise<PlanDraft>} the week
+   */
+  static async getPlanDraft(draftId: number, householdId?: string | null): Promise<PlanDraft> {
+    const response = await this.get(`/planning/drafts/${draftId}${householdScope(householdId)}`);
     return response?.data;
   }
 
@@ -534,15 +619,27 @@ class RestAPI {
    * @param {number} draftId the proposed week
    * @param {number} slotId the meal
    * @param {RerollReason} [reason] why the recipe was passed over, which steers the replacement
+   * @param {string} householdId whose plan; nothing for your own
    * @return {Promise<PlanDraft>} the week after the change
    */
-  static async rerollPlanSlot(draftId: number, slotId: number, reason?: RerollReason): Promise<PlanDraft> {
-    const response = await this.post(`/planning/drafts/${draftId}/slots/${slotId}/reroll`, {reason});
+  static async rerollPlanSlot(draftId: number, slotId: number, reason?: RerollReason,
+      householdId?: string | null): Promise<PlanDraft> {
+    const response = await this.post(
+        `/planning/drafts/${draftId}/slots/${slotId}/reroll${householdScope(householdId)}`, {reason});
     return response?.data;
   }
 
-  static async setPlanSlotLocked(draftId: number, slotId: number, locked: boolean): Promise<PlanDraft> {
-    const response = await this.post(`/planning/drafts/${draftId}/slots/${slotId}/lock`, {locked});
+  /**
+   * @param {number} draftId the proposed week
+   * @param {number} slotId the meal
+   * @param {boolean} locked whether it stays as it is when the week is drawn again
+   * @param {string} householdId whose plan; nothing for your own
+   * @return {Promise<PlanDraft>} the week after the change
+   */
+  static async setPlanSlotLocked(draftId: number, slotId: number, locked: boolean,
+      householdId?: string | null): Promise<PlanDraft> {
+    const response = await this.post(
+        `/planning/drafts/${draftId}/slots/${slotId}/lock${householdScope(householdId)}`, {locked});
     return response?.data;
   }
 
@@ -551,10 +648,13 @@ class RestAPI {
    *
    * @param {number} draftId the proposed week
    * @param {number} slotId the meal
+   * @param {string} householdId whose plan; nothing for your own
    * @return {Promise<PlanDraft>} the week after the change
    */
-  static async togglePlanSlotGap(draftId: number, slotId: number): Promise<PlanDraft> {
-    const response = await this.post(`/planning/drafts/${draftId}/slots/${slotId}/toggle-gap`, {});
+  static async togglePlanSlotGap(draftId: number, slotId: number,
+      householdId?: string | null): Promise<PlanDraft> {
+    const response = await this.post(
+        `/planning/drafts/${draftId}/slots/${slotId}/toggle-gap${householdScope(householdId)}`, {});
     return response?.data;
   }
 
@@ -562,10 +662,12 @@ class RestAPI {
    * A new draw for every meal that is not locked.
    *
    * @param {number} draftId the proposed week
+   * @param {string} householdId whose plan; nothing for your own
    * @return {Promise<PlanDraft>} the week after the change
    */
-  static async rerollPlanDraft(draftId: number): Promise<PlanDraft> {
-    const response = await this.post(`/planning/drafts/${draftId}/reroll`, {});
+  static async rerollPlanDraft(draftId: number, householdId?: string | null): Promise<PlanDraft> {
+    const response = await this.post(
+        `/planning/drafts/${draftId}/reroll${householdScope(householdId)}`, {});
     return response?.data;
   }
 
@@ -573,15 +675,167 @@ class RestAPI {
    * Adds the week's meals to the weekplan; meals planned by hand stay.
    *
    * @param {number} draftId the proposed week
+   * @param {string} householdId whose plan; nothing for your own
    * @return {Promise<PlanDraft>} the week, now accepted
    */
-  static async acceptPlanDraft(draftId: number): Promise<PlanDraft> {
-    const response = await this.post(`/planning/drafts/${draftId}/accept`, {});
+  static async acceptPlanDraft(draftId: number, householdId?: string | null): Promise<PlanDraft> {
+    const response = await this.post(
+        `/planning/drafts/${draftId}/accept${householdScope(householdId)}`, {});
     return response?.data;
   }
 
-  static async discardPlanDraft(draftId: number): Promise<void> {
-    await this.delete(`/planning/drafts/${draftId}`);
+  static async discardPlanDraft(draftId: number, householdId?: string | null): Promise<void> {
+    await this.delete(`/planning/drafts/${draftId}${householdScope(householdId)}`);
+  }
+
+  /**
+   * @return {Promise<Household[]>} the caller's households
+   */
+  static async getHouseholds(): Promise<Household[]> {
+    return (await this.get('/households'))?.data;
+  }
+
+  /**
+   * @param {string} householdId which household
+   * @return {Promise<Household>} it, with its members and the size of its cookbook
+   */
+  static async getHousehold(householdId: string): Promise<Household> {
+    return (await this.get(`/households/${householdId}`))?.data;
+  }
+
+  /**
+   * @param {string} name what to call it
+   * @param {boolean} shareRecipes whether your own cookbook goes in
+   * @return {Promise<Household>} the new household, with you as its first member
+   */
+  static async createHousehold(name: string, shareRecipes: boolean): Promise<Household> {
+    return (await this.post('/households', {name: name, shareRecipes: shareRecipes}))?.data;
+  }
+
+  /**
+   * @param {string} householdId which household
+   * @param {string} name the new name
+   * @return {Promise<Household>} it, renamed
+   */
+  static async renameHousehold(householdId: string, name: string): Promise<Household> {
+    return (await this.put(`/households/${householdId}`, {name: name}))?.data;
+  }
+
+  /**
+   * Puts your whole cookbook into a household, or takes it back out.
+   *
+   * @param {string} householdId which household
+   * @param {boolean} shareRecipes whether your recipes are in it
+   * @return {Promise<Household>} it, with the switch as it now stands
+   */
+  static async setHouseholdSharing(householdId: string, shareRecipes: boolean): Promise<Household> {
+    return (await this.put(`/households/${householdId}/sharing`, {shareRecipes: shareRecipes}))?.data;
+  }
+
+  /**
+   * Leaves a household, or removes somebody else.
+   *
+   * @param {string} householdId which household
+   * @param {number} memberUserId who goes
+   */
+  static async removeHouseholdMember(householdId: string, memberUserId: number): Promise<void> {
+    await this.delete(`/households/${householdId}/members/${memberUserId}`);
+  }
+
+  /**
+   * @param {string} householdId which household
+   * @return {Promise<HouseholdInvite>} a link that lets whoever holds it join
+   */
+  static async createHouseholdInvite(householdId: string): Promise<HouseholdInvite> {
+    return (await this.post(`/households/${householdId}/invites`, {}))?.data;
+  }
+
+  /**
+   * @param {string} householdId which household
+   * @return {Promise<HouseholdInvite[]>} its links that are still valid
+   */
+  static async getHouseholdInvites(householdId: string): Promise<HouseholdInvite[]> {
+    return (await this.get(`/households/${householdId}/invites`))?.data;
+  }
+
+  /**
+   * @param {string} householdId which household
+   * @param {string} inviteId the link to stop
+   */
+  static async revokeHouseholdInvite(householdId: string, inviteId: string): Promise<void> {
+    await this.delete(`/households/${householdId}/invites/${inviteId}`);
+  }
+
+  /**
+   * What an invite leads to: the household's name, and nothing else.
+   *
+   * @param {string} token the invite token
+   * @return {Promise<string>} the household's name
+   */
+  static async previewHouseholdInvite(token: string): Promise<string> {
+    return (await this.get(`/household-invites/${token}`))?.data?.householdName;
+  }
+
+  /**
+   * @param {string} token the invite token
+   * @param {boolean} shareRecipes whether your cookbook comes with you
+   * @return {Promise<Household>} the household you joined
+   */
+  static async acceptHouseholdInvite(token: string, shareRecipes: boolean): Promise<Household> {
+    return (await this.post(`/household-invites/${token}/accept`, {shareRecipes: shareRecipes}))?.data;
+  }
+
+  /**
+   * One page of a household's cookbook.
+   *
+   * @param {string} householdId which household
+   * @param {number} page which page, from zero
+   * @param {string} search matched like the search of your own cookbook; empty for everything
+   * @return {Promise<HouseholdRecipePage>} that page of its recipes, as summaries
+   */
+  static async getHouseholdRecipes(householdId: string, page = 0, search = ''): Promise<HouseholdRecipePage> {
+    const query = search ? `&search=${encodeURIComponent(search)}` : '';
+    return (await this.get(`/households/${householdId}/recipes?page=${page}${query}`))?.data;
+  }
+
+  /**
+   * Copies a recipe somebody else owns into your own cookbook.
+   *
+   * @param {number} recipeId which recipe
+   * @return {Promise<Recipe>} your copy
+   */
+  static async saveRecipeCopy(recipeId: number): Promise<Recipe> {
+    return (await this.post(`/recipes/${recipeId}/import`, {}))?.data;
+  }
+
+  /**
+   * What deleting one of your recipes would affect, for the warning shown first.
+   *
+   * @param {number} recipeId the recipe about to be deleted
+   * @return {Promise<RecipeDeletionImpact>} how many households and planned meals it would leave
+   */
+  static async getRecipeDeletionImpact(recipeId: number): Promise<RecipeDeletionImpact> {
+    return (await this.get(`/recipes/${recipeId}/impact`))?.data;
+  }
+
+  /**
+   * The name fellow household members see. Blank clears it.
+   *
+   * @param {string} displayName what to be called
+   * @return {Promise<UserInfo>} the account as it now stands
+   */
+  static async setDisplayName(displayName: string): Promise<UserInfo> {
+    return (await this.put('/users/self/displayName', {displayName: displayName}))?.data;
+  }
+
+  /**
+   * Finishes the first-run setup with the name it asked for.
+   *
+   * @param {string} displayName the name chosen during setup
+   * @return {Promise<UserInfo>} the account, set up
+   */
+  static async completeOnboarding(displayName: string): Promise<UserInfo> {
+    return (await this.post('/users/self/onboarding', {displayName: displayName}))?.data;
   }
 
   /**

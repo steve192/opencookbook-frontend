@@ -366,5 +366,6 @@ export const extrasSummary = (t: TFunction, profile: PlanningProfile): string =>
     cooldown > 0 && t('screens.planning.summaryCooldown', {count: cooldown}),
     (profile.leftoversAllowed ?? true) && t('screens.planning.summaryLeftovers'),
     (profile.spreadVariety ?? true) && t('screens.planning.summaryVariety'),
+    profile.includeHouseholdRecipes && t('screens.planning.summaryWithHouseholds'),
   ]);
 };

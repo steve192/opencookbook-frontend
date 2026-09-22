@@ -3,7 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Icon, Surface, Text, TouchableRipple} from 'react-native-paper';
 import XDate from 'xdate';
-import {WeekplanDayRecipeInfo} from '../../dao/RestAPI';
+import {WeekplanDay, WeekplanDayRecipeInfo} from '../../dao/RestAPI';
 import {formatMonth} from '../../helper/weekplan';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {WeekplanMealRow} from './WeekplanMealRow';
@@ -13,11 +13,12 @@ interface Props {
   weekdayName: string;
   isToday: boolean;
   isPast: boolean;
-  meals: WeekplanDayRecipeInfo[];
+  /** Your own plan first, then one entry per household with something on this day. */
+  plans: WeekplanDay[];
   onAddPress: () => void;
   onMealPress: (meal: WeekplanDayRecipeInfo) => void;
-  onMealRemovePress: (index: number) => void;
-  onMealMove: (fromIndex: number, toIndex: number) => void;
+  onMealRemovePress: (plan: WeekplanDay, index: number) => void;
+  onMealMove: (plan: WeekplanDay, fromIndex: number, toIndex: number) => void;
 }
 
 // A single day of the week, as one card: the date, everything planned for it and
@@ -27,8 +28,9 @@ export const WeekplanDayCard = (props: Props) => {
   const {t} = useTranslation('translation');
 
   const monthLabel = formatMonth(props.date);
-  const summary = props.meals.length > 0 ?
-    t('screens.weekplan.mealsPlanned', {count: props.meals.length}) :
+  const plannedCount = props.plans.reduce((total, plan) => total + plan.recipes.length, 0);
+  const summary = plannedCount > 0 ?
+    t('screens.weekplan.mealsPlanned', {count: plannedCount}) :
     t('screens.weekplan.noMealsPlanned');
 
   return (
@@ -70,16 +72,26 @@ export const WeekplanDayCard = (props: Props) => {
         }
       </View>
 
-      {props.meals.map((meal, index) => (
-        <WeekplanMealRow
-          key={`${meal.type}-${meal.id}-${index}`}
-          title={meal.title}
-          imageUuid={meal.titleImageUuid}
-          reorderable={props.meals.length > 1}
-          onPress={meal.type === 'NORMAL_RECIPE' ? () => props.onMealPress(meal) : undefined}
-          onMoveUpPress={index > 0 ? () => props.onMealMove(index, index - 1) : undefined}
-          onMoveDownPress={index < props.meals.length - 1 ? () => props.onMealMove(index, index + 1) : undefined}
-          onRemovePress={() => props.onMealRemovePress(index)} />
+      {props.plans.map((plan) => (
+        <View key={plan.householdId ?? 'mine'}>
+          {plan.householdName &&
+            <Text variant="labelSmall" style={[styles.planLabel, {color: theme.colors.primaryText}]}>
+              {plan.householdName}
+            </Text>
+          }
+          {plan.recipes.map((meal, index) => (
+            <WeekplanMealRow
+              key={`${meal.type}-${meal.id}-${index}`}
+              title={meal.title}
+              imageUuid={meal.titleImageUuid}
+              reorderable={plan.recipes.length > 1}
+              onPress={meal.type === 'NORMAL_RECIPE' ? () => props.onMealPress(meal) : undefined}
+              onMoveUpPress={index > 0 ? () => props.onMealMove(plan, index, index - 1) : undefined}
+              onMoveDownPress={index < plan.recipes.length - 1 ?
+                () => props.onMealMove(plan, index, index + 1) : undefined}
+              onRemovePress={() => props.onMealRemovePress(plan, index)} />
+          ))}
+        </View>
       ))}
 
       <TouchableRipple style={styles.addRow} onPress={props.onAddPress}>
@@ -140,6 +152,11 @@ const styles = StyleSheet.create({
   todayPillText: {
     fontSize: 11,
     fontWeight: 'bold',
+  },
+  planLabel: {
+    fontWeight: '600',
+    marginTop: 6,
+    marginLeft: 4,
   },
   addRow: {
     borderRadius: 10,

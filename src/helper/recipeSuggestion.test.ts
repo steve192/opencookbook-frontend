@@ -11,6 +11,8 @@ import {
   offersMode,
   withIngredientToggled,
   withMealTypeWanted,
+  usesHouseholdRecipes,
+  withHouseholdRecipes,
   withMode,
   withTargetKcal,
 } from './recipeSuggestion';
@@ -130,5 +132,28 @@ describe('forNewDraw', () => {
 
     expect(forNewDraw(asked).seed).toBeNull();
     expect(forNewDraw(asked).diet).toBe('VEGAN');
+  });
+});
+
+describe('household recipes in the pool', () => {
+  it('leaves them out unless asked for', () => {
+    expect(usesHouseholdRecipes(emptySuggestionRequest())).toBe(false);
+    expect(usesHouseholdRecipes(withHouseholdRecipes(emptySuggestionRequest(), false))).toBe(false);
+  });
+
+  it('draws on them when asked for', () => {
+    const request = withHouseholdRecipes(emptySuggestionRequest(), true);
+
+    expect(usesHouseholdRecipes(request)).toBe(true);
+    expect(request.includeHouseholdRecipes).toBe(true);
+  });
+
+  it('is only mentioned in the summary when it widened the pool', () => {
+    const t = ((key: string) => key) as unknown as TFunction;
+
+    expect(answersSummary(t, withHouseholdRecipes(emptySuggestionRequest(), true), []))
+        .toBe('screens.suggestion.summaryWithHouseholds');
+    expect(answersSummary(t, emptySuggestionRequest(), []))
+        .toBe('screens.suggestion.summaryAnything');
   });
 });

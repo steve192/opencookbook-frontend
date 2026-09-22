@@ -29,10 +29,15 @@ import {RecipeImportBrowser} from '../screens/RecipeImportBrowser';
 import RecipeListScreen from '../screens/RecipeListScreen';
 import {RecipeScreen} from '../screens/RecipeScreen';
 import {RecipeScanScreen} from '../screens/ocr/RecipeScanScreen';
+import {OnboardingScreen} from '../screens/onboarding/OnboardingScreen';
+import {useOnboarding} from '../screens/onboarding/useOnboarding';
 import {RecipeSuggestionScreen} from '../screens/suggestion/RecipeSuggestionScreen';
 import {PlanDraftScreen} from '../screens/weekplanning/PlanDraftScreen';
 import {WeekplanWizardScreen} from '../screens/weekplanning/WeekplanWizardScreen';
 import {SharedRecipeScreen} from '../screens/SharedRecipeScreen';
+import {HouseholdInviteScreen} from '../screens/households/HouseholdInviteScreen';
+import {HouseholdListScreen} from '../screens/households/HouseholdListScreen';
+import {HouseholdScreen} from '../screens/households/HouseholdScreen';
 import {SettingsScreen} from '../screens/SettingsScreen';
 import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
@@ -151,6 +156,21 @@ const BottomTabNavigation = () => {
 
 const MainStackNavigation = () => {
   const {t} = useTranslation('translation');
+  const {onboarded, markOnboarded} = useOnboarding();
+
+  if (onboarded === undefined) {
+    return <SplashScreen />;
+  }
+
+  // Outside the navigator: there is nothing to go back to.
+  if (!onboarded) {
+    return (
+      <KeyboardAvoidingView style={CentralStyles.fullscreen}>
+        <OnboardingScreen onDone={markOnboarded} />
+      </KeyboardAvoidingView>
+    );
+  }
+
   return (
     <KeyboardAvoidingView style={CentralStyles.fullscreen}>
       <MainStack.Navigator
@@ -195,6 +215,21 @@ const MainStackNavigation = () => {
           name="GuidedCookingScreen"
           component={GuidedCookingScreen}
           options={{title: t('navigation.screenTitleGuidedCooking')}}
+        />
+        <MainStack.Screen
+          name="HouseholdListScreen"
+          component={HouseholdListScreen}
+          options={{title: t('screens.households.listTitle')}}
+        />
+        <MainStack.Screen
+          name="HouseholdScreen"
+          component={HouseholdScreen}
+          options={{title: t('screens.households.screenTitle')}}
+        />
+        <MainStack.Screen
+          name="HouseholdInviteScreen"
+          component={HouseholdInviteScreen}
+          options={{title: t('screens.households.screenTitle')}}
         />
         <MainStack.Screen
           name="RecipeSuggestionScreen"
@@ -345,6 +380,9 @@ const MainNavigation = () => {
               TermsOfServiceScreen: 'tos',
               SharedRecipeScreen: 'share/:shareId',
               default: {
+                // Beneath any linked screen, so it has somewhere to go back to. The login stack
+                // has no such route and drops it.
+                initialRouteName: 'OverviewScreen',
                 screens: {
                   LoginScreen: 'login',
                   SignupScreen: 'signup',
@@ -353,6 +391,9 @@ const MainNavigation = () => {
                   RecipeWizardScreen: 'editRecipe',
                   ImportScreen: 'import',
                   RecipeScanScreen: 'scanRecipe',
+                  HouseholdListScreen: 'households',
+                  HouseholdScreen: 'household',
+                  HouseholdInviteScreen: 'household-invite/:token',
                   OverviewScreen: {
                     screens: {
                       SettingsScreen: 'settings',
