@@ -34,7 +34,7 @@ jobs:
       # blows past that, so reclaim ~30 GB by removing preinstalled tooling we
       # don't need for this build.
       - name: Free runner disk
-        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # main
+        uses: jlumbroso/free-disk-space@36e9a5af4eddb91fc11aec4c6f6f79b3cc0cb523 # main
         with:
           tool-cache: true
           android: true
