@@ -1,8 +1,14 @@
 import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
+import {AppState} from 'react-native';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
-import {elapsedTimerKeys} from '../helper/cookingTimers';
-import {clearOrphanedRunningNotifications, clearRunningTimerNotification} from '../helper/timerNotifications';
+import {elapsedTimerKeys, timerNotificationTexts} from '../helper/cookingTimers';
+import {
+  clearOrphanedRunningNotifications,
+  clearRunningTimerNotification,
+  ringPendingAlertNow,
+  upgradeTimersToAlarms,
+} from '../helper/timerNotifications';
 import {VibrationUtils} from '../helper/VibrationUtil';
 import {timerStopped} from '../redux/features/timersSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
@@ -38,8 +44,10 @@ export const CookingTimerWatcher = () => {
     const tick = setInterval(() => {
       elapsedTimerKeys(timers, Date.now()).forEach((key) => {
         const timer = timers[key];
-        // The alert has fired by now; the reminder that it was running has served its purpose
+        // The reminder that it was running has served its purpose
         clearRunningTimerNotification(key);
+        // A notification Android is holding back rings now, rather than minutes late
+        ringPendingAlertNow(key);
         VibrationUtils.longPressFeedbackVibration();
         SnackbarUtil.show({
           message: t('screens.guidedCooking.timerDoneFor', {
@@ -53,6 +61,15 @@ export const CookingTimerWatcher = () => {
     }, TICK_MS);
     return () => clearInterval(tick);
   }, [timers, dispatch, t]);
+
+  // Coming back is how the user returns from allowing alarms, and the timers already running
+  // should ring on time from then on too.
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      state === 'active' && upgradeTimersToAlarms(timers, (timer) => timerNotificationTexts(t, timer));
+    });
+    return () => subscription.remove();
+  }, [timers, t]);
 
   return null;
 };

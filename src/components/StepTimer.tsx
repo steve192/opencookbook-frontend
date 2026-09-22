@@ -2,10 +2,10 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Platform, StyleSheet, View} from 'react-native';
 import {Button, Icon, Text} from 'react-native-paper';
-import {formatEndTime, secondsRemaining, timerKey} from '../helper/cookingTimers';
+import {secondsRemaining, timerKey, timerNotificationTexts} from '../helper/cookingTimers';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {formatCountdown, StepDuration} from '../helper/recipeDuration';
-import {startTimerNotifications, stopTimerNotifications} from '../helper/timerNotifications';
+import {openAlarmSettings, startTimerNotifications, stopTimerNotifications} from '../helper/timerNotifications';
 import {timerStarted, timerStopped} from '../redux/features/timersSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {useAppTheme} from '../styles/CentralStyles';
@@ -48,33 +48,29 @@ export const StepTimer = (props: Props) => {
       return;
     }
 
-    const endsAt = Date.now() + props.duration.seconds * 1000;
-    dispatch(timerStarted({
-      key,
-      timer: {
-        label: props.duration.label,
-        endsAt,
-        recipeTitle: props.recipeTitle,
-        stepIndex: props.stepIndex,
-      },
-    }));
+    const started = {
+      label: props.duration.label,
+      endsAt: Date.now() + props.duration.seconds * 1000,
+      recipeTitle: props.recipeTitle,
+      stepIndex: props.stepIndex,
+    };
+    dispatch(timerStarted({key, timer: started}));
     setNow(Date.now());
 
     // The shade carries the timer while it runs and the alert when it is up, so putting the
     // phone down is safe. Both are posted by the system rather than kept alive by the app.
-    const where = {recipe: props.recipeTitle, step: props.stepIndex + 1};
-    startTimerNotifications(key, endsAt, {
-      runningTitle: t('screens.guidedCooking.timerRunningTitle', {label: props.duration.label}),
-      runningBody: t('screens.guidedCooking.timerRunningBody', {time: formatEndTime(endsAt), ...where}),
-      alertTitle: t('screens.guidedCooking.timerNotificationTitle', {label: props.duration.label}),
-      alertBody: t('screens.guidedCooking.timerNotificationBody', where),
-      stopLabel: t('screens.guidedCooking.stopAlarm'),
-      openLabel: t('screens.guidedCooking.openRecipe'),
-    }, {recipeId: props.recipeId, stepIndex: props.stepIndex}).then((announcement) => {
-      // Said out loud rather than left to be discovered when the timer goes off quietly: a
-      // notification's sound is silenced by a phone set to vibrate, an alarm's is not.
+    startTimerNotifications(key, started.endsAt, timerNotificationTexts(t, started), {
+      recipeId: props.recipeId,
+      stepIndex: props.stepIndex,
+    }).then((announcement) => {
+      // Said out loud rather than left to be discovered when the timer rings late or not at
+      // all. Almost always the missing alarm grant, which the user can give from here.
       if (Platform.OS === 'android' && announcement !== 'alarm') {
-        SnackbarUtil.show({message: t('screens.guidedCooking.alarmUnavailable')});
+        SnackbarUtil.show({
+          message: t('screens.guidedCooking.alarmUnavailable'),
+          action: t('screens.guidedCooking.allowAlarms'),
+          onAction: openAlarmSettings,
+        });
       }
     });
   };

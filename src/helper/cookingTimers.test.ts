@@ -1,3 +1,4 @@
+import {TFunction} from 'i18next';
 import {describe, expect, it} from 'vitest';
 import {
   CookingTimers,
@@ -9,6 +10,7 @@ import {
   runningTimerCount,
   secondsRemaining,
   timerKey,
+  timerNotificationTexts,
 } from './cookingTimers';
 
 const NOW = 1_700_000_000_000;
@@ -108,6 +110,20 @@ describe('formatEndTime', () => {
   it('pads a single digit hour', () => {
     const at = new Date(2026, 7, 31, 9, 5, 0).getTime();
     expect(formatEndTime(at, 'de-DE')).toBe('09:05');
+  });
+});
+
+describe('timerNotificationTexts', () => {
+  const t = ((key: string, options?: Record<string, unknown>) =>
+    options ? `${key}:${Object.values(options).join()}` : key) as unknown as TFunction;
+
+  // Built from the stored timer alone, because an alarm may be booked long after the screen is gone
+  it('says which timer, recipe and step it is, counting steps from one', () => {
+    const texts = timerNotificationTexts(t, timer(300));
+    expect(texts.alertTitle).toBe('screens.guidedCooking.timerNotificationTitle:5 minutes');
+    expect(texts.alertBody).toBe('screens.guidedCooking.timerNotificationBody:Lasagne,3');
+    expect(texts.runningBody).toBe(
+        `screens.guidedCooking.timerRunningBody:${formatEndTime(NOW + 300_000)},Lasagne,3`);
   });
 });
 

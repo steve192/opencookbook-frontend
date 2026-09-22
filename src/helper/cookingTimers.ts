@@ -1,3 +1,6 @@
+import {TFunction} from 'i18next';
+import type {TimerNotificationTexts} from './timerNotifications';
+
 /** Where a timer notification should take you when it is tapped. */
 export interface TimerNotificationTarget {
   recipeId: number;
@@ -106,6 +109,28 @@ export const runningTimerCount = (timers: CookingTimers, now: number): number =>
  */
 export const formatEndTime = (endsAt: number, locale?: string): string =>
   new Date(endsAt).toLocaleTimeString(locale, {hour: '2-digit', minute: '2-digit'});
+
+/**
+ * What a timer's reminder, alert and alarm say.
+ *
+ * Built from the stored timer alone, so an alarm can still be booked for it after the screen
+ * that started it is gone.
+ *
+ * @param {TFunction} t the translation function of the caller
+ * @param {CookingTimer} timer the timer being announced
+ * @return {TimerNotificationTexts} the texts for every way it announces itself
+ */
+export const timerNotificationTexts = (t: TFunction, timer: CookingTimer): TimerNotificationTexts => {
+  const where = {recipe: timer.recipeTitle, step: timer.stepIndex + 1};
+  return {
+    runningTitle: t('screens.guidedCooking.timerRunningTitle', {label: timer.label}),
+    runningBody: t('screens.guidedCooking.timerRunningBody', {time: formatEndTime(timer.endsAt), ...where}),
+    alertTitle: t('screens.guidedCooking.timerNotificationTitle', {label: timer.label}),
+    alertBody: t('screens.guidedCooking.timerNotificationBody', where),
+    stopLabel: t('screens.guidedCooking.stopAlarm'),
+    openLabel: t('screens.guidedCooking.openRecipe'),
+  };
+};
 
 /**
  * Reads the step a timer notification was started from.

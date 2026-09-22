@@ -300,7 +300,8 @@
       "timerRunningTitle": "Timer läuft - {{label}}",
       "timerRunningBody": "Endet um {{time}} · {{recipe}}, Schritt {{step}}",
       "stopAlarm": "Stopp",
-      "alarmUnavailable": "Kein Alarm verfügbar - dieser Timer zeigt nur eine Benachrichtigung",
+      "alarmUnavailable": "Erlaube Wecker, damit Timer auch bei geschlossener App pünktlich klingeln",
+      "allowAlarms": "Erlauben",
       "openRecipe": "Öffnen"
     },
     "weekplan": {

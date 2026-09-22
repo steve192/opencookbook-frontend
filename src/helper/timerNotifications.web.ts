@@ -1,4 +1,4 @@
-import {TimerNotificationTarget} from './cookingTimers';
+import {CookingTimer, CookingTimers, TimerNotificationTarget} from './cookingTimers';
 import {TimerAnnouncement, TimerNotificationTexts} from './timerNotifications';
 
 /**
@@ -56,3 +56,29 @@ export const useTimerNotificationTap = (onTap: (target: TimerNotificationTarget)
  */
 // eslint-disable-next-line no-unused-vars
 export const clearOrphanedRunningNotifications = async (activeTimerKeys: string[]): Promise<void> => undefined;
+
+/**
+ * There are no alarms here to allow.
+ *
+ * @return {Promise<void>} resolves immediately
+ */
+export const openAlarmSettings = async (): Promise<void> => undefined;
+
+/**
+ * @param {string} timerKey unused
+ * @return {Promise<void>} resolves immediately, nothing was booked to ring
+ */
+// eslint-disable-next-line no-unused-vars
+export const ringPendingAlertNow = async (timerKey: string): Promise<void> => undefined;
+
+/**
+ * @param {CookingTimers} timers unused
+ * @param {Function} textsFor unused
+ * @return {Promise<void>} resolves immediately, there are no alarms to book
+ */
+// eslint-disable-next-line no-unused-vars
+export const upgradeTimersToAlarms = async (
+    timers: CookingTimers,
+    // eslint-disable-next-line no-unused-vars
+    textsFor: (timer: CookingTimer) => TimerNotificationTexts,
+): Promise<void> => undefined;

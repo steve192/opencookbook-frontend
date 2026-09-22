@@ -1,8 +1,15 @@
 import * as Notifications from 'expo-notifications';
 import {useEffect, useRef} from 'react';
 import {AppState, Platform} from 'react-native';
-import ExpoAlarm from 'react-native-alarm-scheduler';
-import {parseTimerKey, readTimerNotificationTarget, TimerNotificationTarget} from './cookingTimers';
+import AlarmScheduler from 'react-native-alarm-scheduler';
+import {
+  CookingTimer,
+  CookingTimers,
+  hasElapsed,
+  parseTimerKey,
+  readTimerNotificationTarget,
+  TimerNotificationTarget,
+} from './cookingTimers';
 
 /**
  * The fallback alert, for when an alarm cannot be scheduled.
@@ -120,6 +127,41 @@ export const ensureTimerNotificationsReady = async (): Promise<boolean> => {
 };
 
 /**
+ * Whether an alarm can be booked to ring at the moment its timer is due.
+ *
+ * That takes the exact alarm grant ("Alarms & reminders"), which Android 14 and later no
+ * longer give on install. Without it the library still schedules, but inexactly: Android
+ * delivers it minutes late, and may not let it start the service that rings at all.
+ *
+ * @return {Promise<boolean>} true if alarms ring on time
+ */
+const canRingOnTime = async (): Promise<boolean> => {
+  if (Platform.OS !== 'android') {
+    return false;
+  }
+  try {
+    return (await AlarmScheduler.getPermissionsAsync()).canScheduleExactAlarms;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Opens the system page where the user allows the app to set alarms.
+ *
+ * Only ever on request: it leaves the app, and it returns before the user has answered.
+ *
+ * @return {Promise<void>} resolves once the page was asked to open
+ */
+export const openAlarmSettings = async (): Promise<void> => {
+  try {
+    await AlarmScheduler.openAlarmSettingsAsync();
+  } catch {
+    // No such page on this device
+  }
+};
+
+/**
  * Rings the timer like an alarm clock.
  *
  * An alarm is not a notification: it plays its own sound on the alarm stream, which a phone
@@ -140,21 +182,14 @@ const scheduleAlarm = async (
 ): Promise<boolean> => {
   // Android only for now: iOS schedules through AlarmKit, which needs its own usage
   // description and iOS 26, so it keeps the notification until that is set up.
-  if (Platform.OS !== 'android') {
+  // An inexact alarm is not booked at all: it is what rang long after the timer was done,
+  // or never. The caller falls back and tells the user how to allow alarms.
+  if (!(await canRingOnTime())) {
     return false;
   }
   try {
-    // Deliberately not gated on the exact alarm permission. Without it the library still
-    // schedules, degrading from setAlarmClock to an inexact alarm, and either way the same
-    // service does the ringing - so the sound survives. Refusing to try because a permission
-    // was missing is what left the timer merely vibrating: it fell back to a notification,
-    // whose sound is exactly what a phone set to vibrate suppresses.
-    //
-    // requestPermissionsAsync is not called here either: it launches a system settings
-    // screen and returns before the user has answered, so it would interrupt cooking every
-    // time a timer started and still report the old answer.
     const ringsAt = new Date(endsAt);
-    await ExpoAlarm.scheduleAlarmAsync({
+    await AlarmScheduler.scheduleAlarmAsync({
       id: timerKey,
       // The timestamp is what actually schedules a one off alarm; the clock time is what
       // the api asks for and has to agree with it.
@@ -195,10 +230,85 @@ const cancelAlarm = async (timerKey: string): Promise<void> => {
     return;
   }
   try {
-    await ExpoAlarm.cancelAlarmAsync(timerKey);
-    await ExpoAlarm.completeNativeAlarmAsync(timerKey);
+    await AlarmScheduler.cancelAlarmAsync(timerKey);
+    await AlarmScheduler.completeNativeAlarmAsync(timerKey);
   } catch {
     // Never scheduled, already rung, or already stopped
+  }
+};
+
+/**
+ * Posts the reminder that a timer is running.
+ *
+ * @param {string} timerKey identifies the timer
+ * @param {TimerNotificationTexts} texts what the reminder says
+ * @param {TimerNotificationTarget} target the step to open when it is tapped
+ * @return {Promise<void>} resolves once it is posted, or could not be
+ */
+const postRunningReminder = async (
+    timerKey: string,
+    texts: TimerNotificationTexts,
+    target: TimerNotificationTarget,
+): Promise<void> => {
+  try {
+    await Notifications.scheduleNotificationAsync({
+      identifier: runningId(timerKey),
+      content: {
+        title: texts.runningTitle,
+        body: texts.runningBody,
+        sound: false,
+        data: {kind: 'running' satisfies TimerNotificationKind, ...target},
+        // Dismissible on purpose. An ongoing notification cannot be swiped away, so one
+        // left behind by an app that was killed mid timer would sit there for good.
+        sticky: false,
+        autoDismiss: false,
+      },
+      trigger: {channelId: RUNNING_CHANNEL_ID},
+    });
+  } catch (error) {
+    console.warn('Could not post the running cooking timer notification', error);
+  }
+};
+
+/**
+ * Books a notification for when the timer is due, where an alarm cannot be booked.
+ *
+ * Without the exact alarm grant this one is inexact too, so {@link ringPendingAlertNow} rings
+ * it on time instead whenever the app is open to notice.
+ *
+ * @param {string} timerKey identifies the timer
+ * @param {number} endsAt when the timer is due, as a timestamp
+ * @param {TimerNotificationTexts} texts what the notification says
+ * @param {TimerNotificationTarget} target the step to open when it is tapped
+ * @return {Promise<boolean>} whether it was booked
+ */
+const scheduleAlert = async (
+    timerKey: string,
+    endsAt: number,
+    texts: TimerNotificationTexts,
+    target: TimerNotificationTarget,
+): Promise<boolean> => {
+  try {
+    await Notifications.scheduleNotificationAsync({
+      identifier: alertId(timerKey),
+      content: {
+        title: texts.alertTitle,
+        body: texts.alertBody,
+        // `true` is the documented way to ask for the default sound. A string here is read
+        // as a custom sound file on iOS, which is the same trap as the channel above.
+        sound: true,
+        data: {kind: 'alert' satisfies TimerNotificationKind, ...target},
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: endsAt,
+        channelId: ALERT_CHANNEL_ID,
+      },
+    });
+    return true;
+  } catch (error) {
+    console.warn('Could not schedule the cooking timer notification', error);
+    return false;
   }
 };
 
@@ -222,50 +332,89 @@ export const startTimerNotifications = async (
     texts: TimerNotificationTexts,
     target: TimerNotificationTarget,
 ): Promise<TimerAnnouncement> => {
-  if (!(await ensureTimerNotificationsReady())) {
-    return 'none';
+  const notificationsAllowed = await ensureTimerNotificationsReady();
+  if (notificationsAllowed) {
+    await postRunningReminder(timerKey, texts, target);
+  }
+  // Not held back by the notification permission: the alarm rings without it
+  if (await scheduleAlarm(timerKey, endsAt, texts, target)) {
+    return 'alarm';
+  }
+  // Where an alarm cannot be scheduled, a notification is the loudest thing available
+  if (notificationsAllowed && await scheduleAlert(timerKey, endsAt, texts, target)) {
+    return 'notification';
+  }
+  return 'none';
+};
+
+/**
+ * Rings a timer's booked notification now, for a timer the app has just seen run out.
+ *
+ * Without the exact alarm grant Android delivers the booked one minutes after the timer is
+ * done. Once the app has noticed, there is nothing to wait for.
+ *
+ * @param {string} timerKey the timer that is due
+ * @return {Promise<void>} resolves once it rang, or there was nothing waiting
+ */
+export const ringPendingAlertNow = async (timerKey: string): Promise<void> => {
+  try {
+    const pending = (await Notifications.getAllScheduledNotificationsAsync())
+        .find((request) => request.identifier === alertId(timerKey));
+    if (!pending) {
+      return;
+    }
+    await Notifications.cancelScheduledNotificationAsync(pending.identifier);
+    await Notifications.scheduleNotificationAsync({
+      identifier: pending.identifier,
+      content: {
+        title: pending.content.title ?? undefined,
+        body: pending.content.body ?? undefined,
+        sound: true,
+        data: pending.content.data,
+      },
+      trigger: {channelId: ALERT_CHANNEL_ID},
+    });
+  } catch {
+    // Already delivered, nothing left to ring
+  }
+};
+
+/**
+ * Books alarms for running timers that had to make do with a notification.
+ *
+ * Meant for whenever the app comes back, since that is how the user returns from allowing
+ * alarms: timers started before then should ring on time as well.
+ *
+ * @param {CookingTimers} timers all running timers
+ * @param {Function} textsFor what the alarm of a timer says
+ * @return {Promise<void>} resolves once every one that can be is booked
+ */
+export const upgradeTimersToAlarms = async (
+    timers: CookingTimers,
+    // eslint-disable-next-line no-unused-vars
+    textsFor: (timer: CookingTimer) => TimerNotificationTexts,
+): Promise<void> => {
+  const now = Date.now();
+  const running = Object.keys(timers).filter((key) => !hasElapsed(timers[key], now));
+  if (running.length === 0 || !(await canRingOnTime())) {
+    return;
   }
   try {
-    await Notifications.scheduleNotificationAsync({
-      identifier: runningId(timerKey),
-      content: {
-        title: texts.runningTitle,
-        body: texts.runningBody,
-        sound: false,
-        data: {kind: 'running' satisfies TimerNotificationKind, ...target},
-        // Dismissible on purpose. An ongoing notification cannot be swiped away, so one
-        // left behind by an app that was killed mid timer would sit there for good.
-        sticky: false,
-        autoDismiss: false,
-      },
-      trigger: {channelId: RUNNING_CHANNEL_ID},
-    });
-
-    if (await scheduleAlarm(timerKey, endsAt, texts, target)) {
-      return 'alarm';
-    }
-
-    // Where an alarm cannot be scheduled, a notification is the loudest thing available
-    await Notifications.scheduleNotificationAsync({
-      identifier: alertId(timerKey),
-      content: {
-        title: texts.alertTitle,
-        body: texts.alertBody,
-        // `true` is the documented way to ask for the default sound. A string here is read
-        // as a custom sound file on iOS, which is the same trap as the channel above.
-        sound: true,
-        data: {kind: 'alert' satisfies TimerNotificationKind, ...target},
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: endsAt,
-        channelId: ALERT_CHANNEL_ID,
-      },
-    });
-    return 'notification';
-  } catch (error) {
-    console.warn('Could not post the cooking timer notifications', error);
-    return 'none';
+    const booked = new Map((await AlarmScheduler.getScheduledAlarmsAsync())
+        .map((alarm) => [alarm.id, alarm.timestamp]));
+    await Promise.all(running.map(async (key) => {
+      const timer = timers[key];
+      const target = parseTimerKey(key);
+      // Compared by time, because an alarm under this key may be left from an earlier run
+      if (!target || booked.get(key) === timer.endsAt) {
+        return;
+      }
+      if (await scheduleAlarm(key, timer.endsAt, textsFor(timer), target)) {
+        await Notifications.cancelScheduledNotificationAsync(alertId(key));
+      }
+    }));
+  } catch {
+    // The notifications stay, they are still better than nothing
   }
 };
 
@@ -362,8 +511,8 @@ export const useTimerNotificationTap = (onTap: (target: TimerNotificationTarget)
 
     const readHandoff = async () => {
       try {
-        const handoff = await ExpoAlarm.getPendingNativeAlarmHandoffAsync();
-        const context = handoff ? null : await ExpoAlarm.getCurrentAlarmContextAsync();
+        const handoff = await AlarmScheduler.getPendingNativeAlarmHandoffAsync();
+        const context = handoff ? null : await AlarmScheduler.getCurrentAlarmContextAsync();
         const alarmId = handoff?.alarmId ?? context?.id;
         if (!alarmId) {
           return;
@@ -371,14 +520,14 @@ export const useTimerNotificationTap = (onTap: (target: TimerNotificationTarget)
         // "Open" hands off to the app but deliberately keeps ringing until the app says it
         // has taken over - that is what completing it means. Without this the alarm carries
         // on sounding behind the step it just opened.
-        await ExpoAlarm.completeNativeAlarmAsync(alarmId);
+        await AlarmScheduler.completeNativeAlarmAsync(alarmId);
 
         // The alarm is scheduled under the timer's own key, so the step is in the id
         const target = parseTimerKey(alarmId);
         if (target) {
           onTap(target);
         }
-        await ExpoAlarm.clearPendingNativeAlarmHandoffAsync();
+        await AlarmScheduler.clearPendingNativeAlarmHandoffAsync();
       } catch {
         // Nothing was handed off
       }

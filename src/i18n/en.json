@@ -300,7 +300,8 @@
       "timerRunningTitle": "Timer running - {{label}}",
       "timerRunningBody": "Ends at {{time}} · {{recipe}}, step {{step}}",
       "stopAlarm": "Stop",
-      "alarmUnavailable": "No alarm available - this timer will only show a notification",
+      "alarmUnavailable": "Allow alarms so timers also ring on time while the app is closed",
+      "allowAlarms": "Allow",
       "openRecipe": "Open"
     },
     "weekplan": {
