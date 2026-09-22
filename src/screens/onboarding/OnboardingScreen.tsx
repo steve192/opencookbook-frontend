@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, View} from 'react-native';
+import {ScrollView, StyleSheet} from 'react-native';
 import {Avatar, Button, Surface, Text, TextInput} from 'react-native-paper';
 import RestAPI from '../../dao/RestAPI';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
@@ -36,8 +36,10 @@ export const OnboardingScreen = (props: Props) => {
   };
 
   return (
-    <Surface style={[CentralStyles.fullscreen, styles.centered]}>
-      <View style={CentralStyles.contentContainer}>
+    <Surface style={CentralStyles.fullscreen}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={[CentralStyles.contentContainer, styles.centered]}>
         <Avatar.Icon
           style={styles.icon}
           size={96}
@@ -66,14 +68,15 @@ export const OnboardingScreen = (props: Props) => {
           onPress={save}>
           {t('screens.onboarding.save')}
         </Button>
-      </View>
+      </ScrollView>
     </Surface>
   );
 };
 
 const styles = StyleSheet.create({
+  // Centred while it fits, scrollable once the keyboard leaves too little room.
   centered: {
-    justifyContent: 'center',
+    flexGrow: 1,
   },
   icon: {
     alignSelf: 'center',

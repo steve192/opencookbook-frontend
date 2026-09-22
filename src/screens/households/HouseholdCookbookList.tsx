@@ -1,8 +1,8 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {FlatList, View} from 'react-native';
+import {FlatList, StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Text} from 'react-native-paper';
-import {RecipeSearchbar} from '../../components/RecipeSearchbar';
+import {RECIPE_SEARCHBAR_SPACE, RecipeSearchbar} from '../../components/RecipeSearchbar';
 import {RecipeTile} from '../../components/RecipeTile';
 import RestAPI, {HouseholdRecipe} from '../../dao/RestAPI';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
@@ -61,17 +61,14 @@ export const HouseholdCookbookList = (props: Props) => {
     <View
       style={CentralStyles.fullscreen}
       onLayout={(event) => setColumns(columnsFor(event.nativeEvent.layout.width))}>
-      <View style={CentralStyles.contentContainer}>
-        <RecipeSearchbar onSearch={setSearch} />
-      </View>
-
       {loading && recipes.length === 0 ?
-        <ActivityIndicator style={CentralStyles.elementSpacing} /> :
+        <ActivityIndicator style={[CentralStyles.elementSpacing, styles.belowSearchbar]} /> :
         <FlatList
           // FlatList rebuilds its layout from scratch when the column count changes, which it only
           // notices through the key.
           key={columns}
           numColumns={columns}
+          contentContainerStyle={styles.belowSearchbar}
           data={recipes}
           keyExtractor={(recipe) => String(recipe.id)}
           onRefresh={load}
@@ -104,6 +101,14 @@ export const HouseholdCookbookList = (props: Props) => {
             </View>
           )} />
       }
+
+      <RecipeSearchbar onSearch={setSearch} />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  belowSearchbar: {
+    paddingTop: RECIPE_SEARCHBAR_SPACE,
+  },
+});

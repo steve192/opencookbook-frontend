@@ -12,7 +12,7 @@ import {ListRow, listRowHasChanged, RecipeGroupRow, RecipeRow, toRecipeGroupRow,
 import {columnsFor, RECIPE_TILE_HEIGHT} from '../helper/recipeGrid';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 import {RecipeImageComponent} from './RecipeImageComponent';
-import {RecipeSearchbar} from './RecipeSearchbar';
+import {RECIPE_SEARCHBAR_SPACE, RecipeSearchbar} from './RecipeSearchbar';
 import {RecipeTile} from './RecipeTile';
 
 interface Props {
@@ -222,9 +222,7 @@ export const RecipeList = (props: Props) => {
 
       { showNoItemsNotice && renderNoItemsNotice()}
 
-      <View style={[CentralStyles.contentContainer, styles.searchContainer]}>
-        <RecipeSearchbar onSearch={setSearchString} style={styles.searchbar} />
-      </View>
+      <RecipeSearchbar onSearch={setSearchString} />
     </View>
   );
 };
@@ -238,14 +236,6 @@ const styles = StyleSheet.create({
     minWidth: 1,
   },
   list: {
-    flex: 1,
-  },
-  searchContainer: {
-    position: 'absolute',
-    top: 0,
-    height: 100,
-  },
-  searchbar: {
     flex: 1,
   },
   recipeCard: {
@@ -291,7 +281,7 @@ class LayoutUtil {
         (type, dim, index) => {
           if (type === 'first') {
             dim.width = componentWidth;
-            dim.height = 100; // Height of search bar
+            dim.height = RECIPE_SEARCHBAR_SPACE;
             return;
           }
           dim.width = componentWidth / numberOfColumns;
