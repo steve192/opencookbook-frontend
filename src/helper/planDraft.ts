@@ -16,7 +16,8 @@ export interface DraftDay {
  * @return {DraftDay[]} its days in order, each with its meals in the order of a day
  */
 export const draftDays = (draft: PlanDraft): DraftDay[] => {
-  const dates = [...new Set(draft.slots.map((slot) => slot.date))].sort();
+  const dates = [...new Set(draft.slots.map((slot) => slot.date))]
+      .sort((left, right) => left.localeCompare(right));
   return dates.map((date) => ({
     date,
     slots: draft.slots

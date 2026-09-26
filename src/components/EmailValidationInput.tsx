@@ -14,7 +14,7 @@ interface Props {
 
 // Enough to catch a typo, not a judgement on what an address may look like: the server
 // validates for real, and an over-strict pattern here only ever turns away real addresses.
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/;
 
 const isEmailValid = (email: string): boolean => EMAIL_PATTERN.test(email.toLowerCase());
 

@@ -19,6 +19,13 @@ import {useOwnRecipeCount} from './useOwnRecipeCount';
 type Props = NativeStackScreenProps<MainNavigationProps, 'HouseholdScreen'>;
 
 /**
+ * @param {HouseholdInvite} revoked the invite that no longer works
+ * @return {Function} drops it from the invites on screen
+ */
+const without = (revoked: HouseholdInvite) => (existing: HouseholdInvite[]): HouseholdInvite[] =>
+  existing.filter((candidate) => candidate.token !== revoked.token);
+
+/**
  * One household: its members, your sharing switches and its invite links. There are no roles.
  *
  * @param {Props} props the household to show
@@ -102,8 +109,7 @@ export const HouseholdScreen = (props: Props) => {
       cancel: t('common.cancel'),
       onConfirm: () => change(async () => {
         await RestAPI.revokeHouseholdInvite(householdId, openInvite.token);
-        setInvites((existing) =>
-          existing.filter((candidate) => candidate.token !== openInvite.token));
+        setInvites(without(openInvite));
       }),
     });
   }, [change, householdId, t]);

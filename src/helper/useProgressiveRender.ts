@@ -1,13 +1,12 @@
 import {useEffect, useState} from 'react';
-import {InteractionManager} from 'react-native';
 
 /**
  * How many items of a long list to render right now.
  *
  * A recipe with fifteen ingredients and ten steps mounts more than fifty text inputs, which
  * blocks the thread long enough to be felt as the screen opening frozen. This renders enough
- * to fill the screen straight away and the rest once the navigation animation has finished,
- * so the form is usable immediately and fills in behind you.
+ * to fill the screen straight away and the rest once that has been painted, so the form is
+ * usable immediately and fills in behind you.
  *
  * It replaces a blanket spinner over the whole screen: the same work is done, but it no
  * longer happens between tapping edit and seeing anything at all. Once the list has been
@@ -24,8 +23,8 @@ export const useProgressiveRender = (total: number, initialCount: number): numbe
     if (renderEverything) {
       return;
     }
-    const task = InteractionManager.runAfterInteractions(() => setRenderEverything(true));
-    return () => task.cancel();
+    const task = setTimeout(() => setRenderEverything(true), 0);
+    return () => clearTimeout(task);
   }, [renderEverything]);
 
   return renderEverything ? total : Math.min(initialCount, total);
