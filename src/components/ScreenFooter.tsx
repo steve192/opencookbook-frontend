@@ -11,8 +11,10 @@ export const ScreenFooter = (props: Props) => {
   const theme = useAppTheme();
   return (
     <View style={[styles.footer, {borderTopColor: theme.colors.outlineVariant}]}>
-      {React.Children.toArray(props.children).filter(Boolean).map((action, index) => (
-        <View key={index} style={styles.action}>{action}</View>
+      {/* toArray drops the conditional actions and keys what is left by its original slot,
+          so an action appearing or going away does not shift the identity of its neighbours. */}
+      {React.Children.toArray(props.children).map((action) => (
+        <View key={(action as React.ReactElement).key} style={styles.action}>{action}</View>
       ))}
     </View>
   );

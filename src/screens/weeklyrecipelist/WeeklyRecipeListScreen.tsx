@@ -46,6 +46,15 @@ type Props =
         NativeStackScreenProps<MainNavigationProps, 'OverviewScreen'>
     >;
 
+/**
+ * Every meal of a day, across the plans it may be spread over.
+ *
+ * @param {WeekplanDay[]} dayPlans the plans that day appears on
+ * @return {string[]} the meals, in the order they are planned
+ */
+const mealTitles = (dayPlans: WeekplanDay[]): string[] =>
+  dayPlans.flatMap((plan) => plan.recipes.map((meal) => meal.title));
+
 export const WeeklyRecipeListScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
@@ -89,7 +98,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
       days: week.map(({date, dayPlans, weekdayName}) => ({
         weekday: weekdayName,
         date: formatDayAndMonth(date),
-        meals: dayPlans.flatMap((plan) => plan.recipes.map((meal) => meal.title)),
+        meals: mealTitles(dayPlans),
       })),
     });
 

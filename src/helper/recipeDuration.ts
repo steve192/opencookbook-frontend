@@ -43,14 +43,17 @@ const UNIT_SECONDS: Record<string, number> = {
 };
 
 /**
- * A number, optionally a range, then a word.
+ * Optionally the lower bound of a range and its separator, then a number, then a word.
  *
  * Whether the word is a unit is decided in code rather than spelled out as an alternation
  * of every spelling. That keeps the pattern simple enough to reason about - it runs over
  * imported recipe text, which is as long and as odd as the site it came from - and puts the
  * vocabulary somewhere it can be read and extended.
+ *
+ * Every repetition is bounded, well above anything a recipe writes but low enough that a
+ * step of nothing but digits cannot make the engine backtrack over the whole text.
  */
-const DURATION_PATTERN = /(\d+(?:[.,]\d+)?)\s*(?:(?:[-–—]|bis|to)\s*\d+(?:[.,]\d+)?\s*)?([a-zA-Z]+)\b/g;
+const DURATION_PATTERN = /(?:(\d[\d.,]{0,15})\s{0,3}(?:[-–—]|bis|to)\s{0,3})?(\d[\d.,]{0,15})\s{0,3}([a-zA-Z]{1,12})\b/g;
 
 /** Anything shorter than this is not worth a timer. */
 const SHORTEST_TIMER_SECONDS = 60;
@@ -86,13 +89,13 @@ export const findStepDurations = (step: string): StepDuration[] => {
   const durations: StepDuration[] = [];
   const seen = new Set<number>();
 
-  for (const match of step.matchAll(DURATION_PATTERN)) {
-    const seconds = toSeconds(match[1], match[2]);
+  for (const [text, rangeStart, amount, unit] of step.matchAll(DURATION_PATTERN)) {
+    const seconds = toSeconds(rangeStart ?? amount, unit);
     if (seconds === undefined || seconds < SHORTEST_TIMER_SECONDS || seen.has(seconds)) {
       continue;
     }
     seen.add(seconds);
-    durations.push({label: match[0].trim(), seconds});
+    durations.push({label: text.trim(), seconds});
   }
   return durations;
 };
