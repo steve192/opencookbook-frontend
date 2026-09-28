@@ -74,13 +74,13 @@ const RecipeListScreen = (props: Props) => {
       if (multiSelectionModeActive) {
         setAppbarOptions(mainStackNav, {
           title: selectedRecipes.size + ' ' + t('common.selected'),
-          actions: () => (
+          actions: (
             <Appbar.Action
               icon="group"
               color={theme.colors.onPrimary}
               onPress={() => setRecipeGroupSelectionOpened(true)} />
           ),
-          leading: () => (
+          leading: (
             <Appbar.Action
               icon="close"
               color={theme.colors.onPrimary}
@@ -94,12 +94,12 @@ const RecipeListScreen = (props: Props) => {
         // false at this depth.
         setAppbarOptions(mainStackNav, {
           title: shownRecipeGroup.title,
-          leading: () => (
+          leading: (
             <Appbar.BackAction
               color={theme.colors.onPrimary}
               onPress={() => props.navigation.goBack()} />
           ),
-          actions: () => (
+          actions: (
             <Appbar.Action
               icon="pencil-outline"
               color={theme.colors.onPrimary}
@@ -110,7 +110,7 @@ const RecipeListScreen = (props: Props) => {
         setAppbarOptions(mainStackNav, {
           title: shownHousehold ? shownHousehold.name : t('screens.overview.myRecipes'),
           leading: undefined,
-          actions: households.length === 0 ? undefined : () => (
+          actions: households.length === 0 ? undefined : (
             <CookbookMenu
               households={households}
               shownHouseholdId={shownHouseholdId}

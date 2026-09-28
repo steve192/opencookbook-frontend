@@ -27,6 +27,7 @@ export const ShoppingItemDialog = ({item, onDismiss, onSave, onRemove}: Props) =
   const [spec, setSpec] = useState(item.spec ?? '');
   const [aisle, setAisle] = useState<Aisle>(item.aisle);
   const [aisleMenuOpen, setAisleMenuOpen] = useState(false);
+  const aisleName = (shown: Aisle) => t(`aisles.${shown}`);
 
   const sourceLabel = (source: ShoppingItemSource) => source.planDate ?
     `${source.title} (${formatShortWeekday(new XDate(source.planDate), i18n.language)})` : source.title;
@@ -55,12 +56,12 @@ export const ShoppingItemDialog = ({item, onDismiss, onSave, onRemove}: Props) =
               onDismiss={() => setAisleMenuOpen(false)}
               anchor={
                 <Button mode="outlined" onPress={() => setAisleMenuOpen(true)}
-                  icon={() => <ShoppingIcon icon={null} aisle={aisle} size={20} />}>
-                  {`${t('screens.shopping.aisle')}: ${t(`aisles.${aisle}`)}`}
+                  icon={aisleIcon(aisle)}>
+                  {`${t('screens.shopping.aisle')}: ${aisleName(aisle)}`}
                 </Button>}>
               {AISLES.map((option) => (
-                <Menu.Item key={option} title={t(`aisles.${option}`)}
-                  leadingIcon={() => <ShoppingIcon icon={null} aisle={option} size={20} />}
+                <Menu.Item key={option} title={aisleName(option)}
+                  leadingIcon={aisleIcon(option)}
                   onPress={() => {
                     setAisle(option);
                     setAisleMenuOpen(false);
@@ -87,6 +88,10 @@ export const ShoppingItemDialog = ({item, onDismiss, onSave, onRemove}: Props) =
       </Dialog>
     </Portal>
   );
+};
+
+const aisleIcon = (aisle: Aisle) => function AisleIcon() {
+  return <ShoppingIcon icon={null} aisle={aisle} size={20} />;
 };
 
 const styles = StyleSheet.create({

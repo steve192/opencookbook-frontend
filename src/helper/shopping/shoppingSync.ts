@@ -75,9 +75,9 @@ export const syncShoppingList = (listId: number): Thunk => async (dispatch, getS
     if ((getState().shopping.sync[listId]?.pending.length ?? 0) > 0) {
       syncAgain.add(listId);
     }
-  } catch (unreachable) {
+  } catch (error) {
     // Offline or the server is down: what is pending stays and goes with the next sync.
-    console.info('Shopping list sync postponed', unreachable);
+    console.info('Shopping list sync postponed', error);
   } finally {
     inFlight.delete(listId);
     if (syncAgain.delete(listId)) {

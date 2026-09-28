@@ -4,10 +4,10 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Keyboard, RefreshControl, ScrollView, StyleSheet} from 'react-native';
-import {Appbar, Menu, Searchbar, Surface, Text} from 'react-native-paper';
+import {Appbar, Searchbar, Surface, Text} from 'react-native-paper';
 import {ShoppingItemTile} from '../../components/shopping/ShoppingItemTile';
 import {ShoppingListMenu} from '../../components/shopping/ShoppingListMenu';
-import {ShoppingItem, ShoppingOp, ShoppingTile} from '../../dao/RestAPI';
+import {ShoppingItem, ShoppingList, ShoppingOp, ShoppingTile} from '../../dao/RestAPI';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {parseQuickAdd} from '../../helper/shopping/quickAdd';
 import {tileNamed} from '../../helper/shopping/tiles';
@@ -63,6 +63,13 @@ export const ShoppingListScreen = (props: Props) => {
     }
   }, [isOnline, activeListId]);
 
+  const chooseList = (list: ShoppingList) => {
+    dispatch(shoppingListChosen(list.id));
+    dispatch(syncShoppingList(list.id));
+  };
+
+  const manageLists = () => props.navigation.navigate('ShoppingListsScreen');
+
   useEffect(() => {
     const applyHeaderOptions = () => {
       if (!props.navigation.isFocused()) {
@@ -71,24 +78,14 @@ export const ShoppingListScreen = (props: Props) => {
       setAppbarOptions(props.navigation.getParent(), {
         title: activeList ? nameOf(activeList) : t('screens.shopping.screenTitle'),
         leading: undefined,
-        actions: () => (
+        actions: (
           <ShoppingListMenu
             lists={lists}
             selectedId={activeListId}
-            anchor={(open) => <Appbar.Action icon="format-list-bulleted" color={theme.colors.onPrimary}
+            renderAnchor={(open) => <Appbar.Action icon="format-list-bulleted" color={theme.colors.onPrimary}
               accessibilityLabel={t('screens.shopping.switchList')} onPress={open} />}
-            onChoose={(list) => {
-              dispatch(shoppingListChosen(list.id));
-              dispatch(syncShoppingList(list.id));
-            }}>
-            {(close) => (
-              <Menu.Item title={t('screens.shopping.manageLists')} leadingIcon="cog-outline"
-                onPress={() => {
-                  close();
-                  props.navigation.navigate('ShoppingListsScreen');
-                }} />
-            )}
-          </ShoppingListMenu>
+            onChoose={chooseList}
+            extraItems={[{title: t('screens.shopping.manageLists'), icon: 'cog-outline', onPress: manageLists}]} />
         ),
       });
     };

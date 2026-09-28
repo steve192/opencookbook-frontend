@@ -3,6 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {Dialog, List, Portal} from 'react-native-paper';
 import {Household} from '../dao/RestAPI';
 import {overlayStyles} from '../styles/CentralStyles';
+import {iconSide} from './listSides';
 
 interface Props {
   visible: boolean;
@@ -35,13 +36,13 @@ export const PlanTargetDialog = (props: Props) => {
           <List.Item
             testID="planTargetMine"
             title={t('screens.weekplan.myPlan')}
-            left={(iconProps) => <List.Icon {...iconProps} icon="account" />}
+            left={iconSide('account')}
             onPress={() => choose(undefined)} />
           {props.households.map((household) => (
             <List.Item
               key={household.id}
               title={household.name}
-              left={(iconProps) => <List.Icon {...iconProps} icon="account-group" />}
+              left={iconSide('account-group')}
               onPress={() => choose(household.id)} />
           ))}
         </Dialog.Content>
@@ -52,7 +53,7 @@ export const PlanTargetDialog = (props: Props) => {
 
 interface PlanTargetQuestion {
   title: string;
-  then: (householdId: string | undefined) => void;
+  onChosen: (householdId: string | undefined) => void;
 }
 
 /**
@@ -64,15 +65,15 @@ interface PlanTargetQuestion {
  */
 export const usePlanTarget = (households: Household[]) => {
   const [question, setQuestion] = useState<PlanTargetQuestion>();
-  const choose = (title: string, then: PlanTargetQuestion['then']) =>
-    households.length === 0 ? then(undefined) : setQuestion({title, then});
+  const choose = (title: string, onChosen: PlanTargetQuestion['onChosen']) =>
+    households.length === 0 ? onChosen(undefined) : setQuestion({title, onChosen});
   const dialog = (
     <PlanTargetDialog
       visible={question !== undefined}
       title={question?.title ?? ''}
       households={households}
       onDismiss={() => setQuestion(undefined)}
-      onChoose={(householdId) => question?.then(householdId)} />
+      onChoose={(householdId) => question?.onChosen(householdId)} />
   );
   return {choose, dialog};
 };

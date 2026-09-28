@@ -25,9 +25,9 @@ export const PaperStackHeader = (nav: NativeStackHeaderProps) => {
           color={theme.colors.onPrimary}
           onPress={() => nav.navigation.goBack()} />
       ) : null}
-      {leading?.()}
+      {leading}
       <Appbar.Content color={theme.colors.onPrimary} title={nav.options.title} />
-      {actions?.()}
+      {actions}
     </Appbar.Header>
   );
 };

@@ -92,7 +92,7 @@ const lineOf = (key: string, needs: Need[], locale: string): SheetLine => {
   return {
     key,
     name: needs[0].name,
-    spec: [amountSpec(needs, locale), ...typedSpecs].reduce<string | null>(joinSpecs, null),
+    spec: [amountSpec(needs, locale), ...typedSpecs].reduce<string | null>((joined, spec) => joinSpecs(joined, spec), null),
     aisle: placed?.aisle ?? 'OTHER',
     icon: placed?.icon ?? null,
     staple: needs.some((need) => need.line?.staple),

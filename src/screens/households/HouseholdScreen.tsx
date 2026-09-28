@@ -82,7 +82,7 @@ export const HouseholdScreen = (props: Props) => {
   useEffect(() => {
     setAppbarOptions(props.navigation, {
       title: household?.name ?? t('screens.households.screenTitle'),
-      actions: () => (
+      actions: (
         <Appbar.Action
           testID="householdRenameButton"
           icon="pencil-outline"

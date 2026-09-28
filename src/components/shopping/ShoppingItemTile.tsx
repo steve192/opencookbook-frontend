@@ -23,8 +23,12 @@ export const TILE_SIZE = 96;
 // One thing on a list, or to add to one: tapped to tick off or add, long pressed for details.
 export const ShoppingItemTile = (props: Props) => {
   const theme = useAppTheme();
-  const background = props.highlighted ? theme.colors.primaryContainer :
-    props.muted ? theme.colors.surfaceVariant : theme.colors.secondaryContainer;
+  let background = theme.colors.secondaryContainer;
+  if (props.highlighted) {
+    background = theme.colors.primaryContainer;
+  } else if (props.muted) {
+    background = theme.colors.surfaceVariant;
+  }
   return (
     <TouchableRipple
       style={[styles.tile, {backgroundColor: background, opacity: props.muted ? 0.7 : 1}]}

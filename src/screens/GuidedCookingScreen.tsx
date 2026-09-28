@@ -99,7 +99,7 @@ const GuidedCooking = (props: Props & {recipe: Recipe}) => {
       // scroll, so a long recipe pushed the later steps off the screen. A count says the
       // same thing in constant space, and also says how much is left.
       title: t('screens.guidedCooking.stepProgress', {current: currentStep + 1, total: stepCount}),
-      actions: () => (
+      actions: (
         <Appbar.Action
           icon="format-size"
           color={theme.colors.onPrimary}

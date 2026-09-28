@@ -12,9 +12,9 @@ import {ReactNode} from 'react';
 export interface AppbarOptions {
   title?: string;
   /** Shown at the left, in place of the back action. */
-  leading?: () => ReactNode;
+  leading?: ReactNode;
   /** Shown at the right. */
-  actions?: () => ReactNode;
+  actions?: ReactNode;
 }
 
 interface OptionsSink {

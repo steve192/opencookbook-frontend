@@ -2,8 +2,9 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView} from 'react-native';
-import {Button, IconButton, List, Surface} from 'react-native-paper';
+import {Button, List, Surface} from 'react-native-paper';
 import {usePlanTarget} from '../../components/PlanTargetDialog';
+import {actionsSide, iconSide, SideAction} from '../../components/listSides';
 import {ScreenFooter} from '../../components/ScreenFooter';
 import RestAPI, {ShoppingList} from '../../dao/RestAPI';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
@@ -66,6 +67,12 @@ export const ShoppingListsScreen = (props: Props) => {
     onConfirm: () => run(() => RestAPI.deleteShoppingList(list)),
   });
 
+  // A default list can be renamed but never deleted.
+  const actionsOf = (list: ShoppingList): SideAction[] => [
+    {icon: 'pencil-outline', label: t('screens.shopping.rename'), onPress: () => rename(list)},
+    ...(list.defaultList ? [] :
+      [{icon: 'delete-outline', label: t('screens.shopping.deleteList'), onPress: () => remove(list)}]),
+  ];
 
   return (
     <Surface style={CentralStyles.fullscreen}>
@@ -75,16 +82,8 @@ export const ShoppingListsScreen = (props: Props) => {
             key={list.id}
             title={nameOf(list)}
             description={list.householdName ?? undefined}
-            left={(iconProps) => <List.Icon {...iconProps} icon={listIcon(list)} />}
-            right={() => (
-              <>
-                <IconButton icon="pencil-outline" accessibilityLabel={t('screens.shopping.rename')}
-                  onPress={() => rename(list)} />
-                {!list.defaultList &&
-                  <IconButton icon="delete-outline" accessibilityLabel={t('screens.shopping.deleteList')}
-                    onPress={() => remove(list)} />}
-              </>
-            )} />
+            left={iconSide(listIcon(list))}
+            right={actionsSide(actionsOf(list))} />
         ))}
       </ScrollView>
       <ScreenFooter>

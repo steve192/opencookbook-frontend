@@ -4,7 +4,6 @@
  * it with a number, and `editing: "false"`, which is true.
  */
 
-const number = (value: string): number => Number(value);
 const flag = (value: string): boolean => value === 'true';
 
 export const LINKING_SCREENS = {
@@ -20,18 +19,18 @@ export const LINKING_SCREENS = {
       LoginScreen: 'login',
       SignupScreen: 'signup',
       RequestPasswordResetScreen: 'requestResetPassword',
-      RecipeScreen: {path: 'recipe', parse: {recipeId: number}},
-      RecipeWizardScreen: {path: 'editRecipe', parse: {recipeId: number, editing: flag, hasDraft: flag}},
-      RecipeGroupEditScreen: {path: 'editRecipeGroup', parse: {recipeGroupId: number, editing: flag}},
-      WeekplanWizardScreen: {path: 'planWeek', parse: {weekOffset: number}},
-      PlanDraftScreen: {path: 'planDraft', parse: {draftId: number}},
-      GuidedCookingScreen: {path: 'cook', parse: {recipeId: number, scaledServings: number, initialStep: number}},
+      RecipeScreen: {path: 'recipe', parse: {recipeId: Number}},
+      RecipeWizardScreen: {path: 'editRecipe', parse: {recipeId: Number, editing: flag, hasDraft: flag}},
+      RecipeGroupEditScreen: {path: 'editRecipeGroup', parse: {recipeGroupId: Number, editing: flag}},
+      WeekplanWizardScreen: {path: 'planWeek', parse: {weekOffset: Number}},
+      PlanDraftScreen: {path: 'planDraft', parse: {draftId: Number}},
+      GuidedCookingScreen: {path: 'cook', parse: {recipeId: Number, scaledServings: Number, initialStep: Number}},
       ImportScreen: 'import',
       RecipeScanScreen: 'scanRecipe',
       HouseholdListScreen: 'households',
       HouseholdScreen: 'household',
       HouseholdInviteScreen: 'household-invite/:token',
-      ShoppingImportScreen: {path: 'addToShoppingList', parse: {recipeId: number, servings: number}},
+      ShoppingImportScreen: {path: 'addToShoppingList', parse: {recipeId: Number, servings: Number}},
       ShoppingListsScreen: 'shoppingLists',
       StaplesScreen: 'settings/shopping/usuallyAtHome',
       OpenSourceLicensesScreen: 'settings/licenses',
@@ -47,7 +46,7 @@ export const LINKING_SCREENS = {
           ShoppingScreen: 'shopping',
           RecipesListScreen: {
             screens: {
-              RecipeListDetailScreen: {path: 'myRecipes', parse: {shownRecipeGroupId: number}},
+              RecipeListDetailScreen: {path: 'myRecipes', parse: {shownRecipeGroupId: Number}},
             },
           },
         },

@@ -3,12 +3,15 @@ import {useTranslation} from 'react-i18next';
 import {Avatar, Dialog, List, Portal, Text} from 'react-native-paper';
 import {ShoppingProvider} from '../../dao/RestAPI';
 import {overlayStyles} from '../../styles/CentralStyles';
+import {iconSide} from '../listSides';
 
 interface Props {
   visible: boolean;
   onDismiss: () => void;
   onChoose: (provider: ShoppingProvider) => void;
 }
+
+const BringLogo = () => <Avatar.Image size={40} source={require('../../../assets/Bring_Logo_big.png')} />;
 
 // Asked on the first shopping import: the built-in list, or Bring.
 export const ProviderDialog = (props: Props) => {
@@ -26,13 +29,13 @@ export const ProviderDialog = (props: Props) => {
             title={t('screens.shopping.provider.cookpal')}
             description={t('screens.shopping.provider.cookpalDescription')}
             descriptionNumberOfLines={3}
-            left={(iconProps) => <List.Icon {...iconProps} icon="cart-outline" />}
+            left={iconSide('cart-outline')}
             onPress={() => choose('COOKPAL')} />
           <List.Item
             title={t('screens.shopping.provider.bring')}
             description={t('screens.shopping.provider.bringDescription')}
             descriptionNumberOfLines={3}
-            left={() => <Avatar.Image size={40} source={require('../../../assets/Bring_Logo_big.png')} />}
+            left={BringLogo}
             onPress={() => choose('BRING')} />
           <Text variant="bodySmall">{t('screens.shopping.provider.explanation')}</Text>
         </Dialog.Content>

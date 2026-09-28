@@ -165,7 +165,7 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
             key="target"
             lists={lists}
             selectedId={targetListId}
-            anchor={(open) => (
+            renderAnchor={(open) => (
               <Button mode="outlined" icon="format-list-bulleted" onPress={open}>
                 {targetList ? nameOf(targetList) : t('screens.shopping.import.target')}
               </Button>

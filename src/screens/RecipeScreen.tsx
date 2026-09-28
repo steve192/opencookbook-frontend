@@ -62,7 +62,7 @@ export const RecipeScreen = (props: Props) => {
   useEffect(() => {
     setAppbarOptions(props.navigation, {
       title: displayedRecipe ? displayedRecipe.title : t('screens.recipe.loading'),
-      actions: () => (
+      actions: (
         // Both act on a recipe that is not there yet during a cold start - a deep link straight
         // to this screen renders before the fetch comes back. Both are the owner's alone.
         <>

@@ -18,11 +18,17 @@ interface Props {
 export const SheetLineRow = ({line, ticked, onList, onToggle}: Props) => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
+  const onListNote = () => {
+    if (onList === undefined) {
+      return null;
+    }
+    return onList ? t('screens.shopping.import.alreadyOnList', {spec: onList}) :
+      t('screens.shopping.import.alreadyOnListPlain');
+  };
   const notes = [
     line.sources.length > 1 ? t('screens.shopping.import.forMeals', {count: line.sources.length}) : null,
     line.staple ? t('screens.shopping.import.staple') : null,
-    onList === undefined ? null : onList ? t('screens.shopping.import.alreadyOnList', {spec: onList}) :
-      t('screens.shopping.import.alreadyOnListPlain'),
+    onListNote(),
   ].filter(Boolean).join(' · ');
 
   return (

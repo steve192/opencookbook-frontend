@@ -122,7 +122,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
         title: t('screens.weekplan.screenTitle'),
         // The recipe list leaves a back action here while it shows a group
         leading: undefined,
-        actions: () => (
+        actions: (
           <>
             {plannable.length > 0 && <Appbar.Action
               icon="creation"
@@ -166,7 +166,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
 
   // One plan at a time: its servings and its list differ from another plan's.
   const shopWeek = () => planTarget.choose(t('screens.shopping.import.whichPlan'), (householdId) =>
-    shoppingImport.start({kind: 'week', from: toDayKey(days[0]), to: toDayKey(days[days.length - 1]), householdId}));
+    shoppingImport.start({kind: 'week', from: toDayKey(days[0]), to: toDayKey(days.at(-1)!), householdId}));
 
   const planWeek = () => planTarget.choose(t('screens.weekplan.whichPlanToGenerate'), (householdId) =>
     props.navigation.navigate('WeekplanWizardScreen', {weekOffset, householdId}));

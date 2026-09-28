@@ -2,13 +2,14 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet} from 'react-native';
-import {IconButton, List, Surface, Text} from 'react-native-paper';
+import {List, Surface, Text} from 'react-native-paper';
 import RestAPI, {Staple} from '../../dao/RestAPI';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {useOnlineGuard} from '../../helper/useOnlineGuard';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
+import {actionsSide} from '../../components/listSides';
 import {LoadingScreen} from '../../components/LoadingScreen';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'StaplesScreen'>;
@@ -31,7 +32,7 @@ export const StaplesScreen = (_props: Props) => {
       return;
     }
     RestAPI.forgetStaple(staple.id)
-        .then(() => setStaples((current) => current?.filter((other) => other.id !== staple.id)))
+        .then(() => setStaples((current) => without(current, staple)))
         .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
   };
 
@@ -49,13 +50,17 @@ export const StaplesScreen = (_props: Props) => {
           <List.Item
             key={staple.id}
             title={staple.name}
-            right={() => <IconButton icon="close" accessibilityLabel={t('screens.shopping.forgetStaple')}
-              onPress={() => forget(staple)} />} />
+            right={actionsSide([
+              {icon: 'close', label: t('screens.shopping.forgetStaple'), onPress: () => forget(staple)},
+            ])} />
         ))}
       </ScrollView>
     </Surface>
   );
 };
+
+const without = (staples: Staple[] | undefined, forgotten: Staple) =>
+  staples?.filter((staple) => staple.id !== forgotten.id);
 
 const styles = StyleSheet.create({
   intro: {margin: 16},

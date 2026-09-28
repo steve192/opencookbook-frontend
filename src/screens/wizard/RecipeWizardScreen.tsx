@@ -226,7 +226,7 @@ const RecipeWizardScreen = (props: Props) => {
   useLayoutEffect(() => {
     setAppbarOptions(props.navigation, {
       title: props.route.params?.editing ? t('screens.editRecipe.screenTitleEdit') : t('screens.editRecipe.screenTitleCreate'),
-      actions: () => (
+      actions: (
         <>
           <Appbar.Action
             icon="content-save-outline"
