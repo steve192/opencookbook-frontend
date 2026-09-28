@@ -3,6 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Divider, Icon, IconButton, Text, TouchableRipple} from 'react-native-paper';
 import {IngredientUse} from '../dao/RestAPI';
+import {formatAmount, servingFactor} from '../helper/servings';
 import {useAppTheme} from '../styles/CentralStyles';
 
 
@@ -27,19 +28,10 @@ interface Props {
 
 export const IngredientList = (props: Props) => {
   const theme = useAppTheme();
-  const {t} = useTranslation('translation');
+  const {t, i18n} = useTranslation('translation');
 
-  const getServingMultiplier = () => {
-    if (!props.servings || props.servings < 1) {
-      // If servings are not defined, handle as 1 serving
-      return 1;
-    }
-    return props.scaledServings / props.servings;
-  };
-
-  const scaleIngredient = (originalAmount: number) => {
-    return Math.round(originalAmount * getServingMultiplier() * 10) / 10;
-  };
+  const scaleIngredient = (originalAmount: number) =>
+    formatAmount(originalAmount * servingFactor(props.servings, props.scaledServings), i18n.language);
 
   const updateServings = (newServings:number) => {
     props.onServingScaleChange?.(newServings);

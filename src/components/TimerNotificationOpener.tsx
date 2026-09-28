@@ -26,7 +26,7 @@ export const TimerNotificationOpener = () => {
       navigationRef.navigate('default', {
         screen: 'GuidedCookingScreen',
         params: {
-          recipe,
+          recipeId: target.recipeId,
           // What the servings were scaled to is not worth carrying through a notification,
           // so cooking opens at what the recipe itself says.
           scaledServings: recipe.servings,

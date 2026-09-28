@@ -7,9 +7,12 @@ const setIsOnline = vi.fn();
 vi.mock('../../dao/RestAPI', () => ({
   default: {setIsOnline: (value: boolean) => setIsOnline(value)},
 }));
+// Reached through authSlice; does not resolve under the node test environment.
+vi.mock('../../AppPersistence', () => ({default: {clearOfflineData: () => undefined}}));
 
+const {logout} = await import('./authSlice');
 const {changeBackendUrl, changeHouseholdsEnabled, changeOcrImportEnabled, changeOnlineState,
-  changeSharingEnabled,
+  changeSharingEnabled, changeShoppingProvider,
   changeTheme} =
   await import('./settingsSlice');
 const reducer = (await import('./settingsSlice')).default;
@@ -70,6 +73,11 @@ describe('settingsSlice', () => {
       householdsEnabled: true,
       ocrImportEnabled: false,
     });
+  });
+
+  it('forgets the shopping provider on logout, so the next account is read anew', () => {
+    const chosen = reducer(initialState(), changeShoppingProvider('BRING'));
+    expect(reducer(chosen, logout()).shoppingProvider).toBeUndefined();
   });
 
   // The online flag is mirrored into RestAPI because the request layer reads it

@@ -29,8 +29,9 @@ import {
 } from '../../helper/weekplanDay';
 import {buildWeekplanPrintHtml} from '../../helper/weekplanPrint';
 import {useWeekplanWeek} from '../../helper/useWeekplanWeek';
-import {PlanTargetDialog} from '../../components/PlanTargetDialog';
+import {usePlanTarget} from '../../components/PlanTargetDialog';
 import {useHouseholds} from '../households/useHouseholds';
+import {useShoppingImport} from '../../helper/shopping/useShoppingImport';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps} from '../../navigation/NavigationRoutes';
 import {updateSingleWeekplanDay} from '../../redux/features/weeklyRecipesSlice';
@@ -67,10 +68,9 @@ export const WeeklyRecipeListScreen = (props: Props) => {
 
   const [recipeSelectionVisible, setRecipeSelectionVisible] = useState(false);
   const [selectedWeekplanDay, setSelectedWeekplanDay] = useState<WeekplanDay>();
-  // The plans of the day a meal is being added to, while the plan is being chosen.
-  const [targetChoices, setTargetChoices] = useState<WeekplanDay[] | undefined>(undefined);
-  const [planTargetOpen, setPlanTargetOpen] = useState(false);
   const {households} = useHouseholds();
+  const planTarget = usePlanTarget(households);
+  const shoppingImport = useShoppingImport();
 
   const {today, weekStart, days, plans, loading, reload} = useWeekplanWeek(weekOffset);
   const weekStartKey = toDayKey(weekStart);
@@ -122,13 +122,18 @@ export const WeeklyRecipeListScreen = (props: Props) => {
         title: t('screens.weekplan.screenTitle'),
         // The recipe list leaves a back action here while it shows a group
         leading: undefined,
-        actions: () => (
+        actions: (
           <>
             {plannable.length > 0 && <Appbar.Action
               icon="creation"
               color={theme.colors.onPrimary}
               accessibilityLabel={t('screens.planning.planWeek')}
               onPress={() => planWeek()} />}
+            <Appbar.Action
+              icon="cart-plus"
+              color={theme.colors.onPrimary}
+              accessibilityLabel={t('screens.shopping.import.addWeek')}
+              onPress={() => shopWeek()} />
             <Appbar.Action
               icon="printer-outline"
               color={theme.colors.onPrimary}
@@ -146,7 +151,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
       // old screen only ever loaded once on mount.
       reload();
     });
-  }, [props.navigation, t, theme, reload, printWeek, plannable, weekOffset]);
+  }, [props.navigation, t, theme, reload, printWeek, plannable, weekOffset, households, shoppingImport.provider]);
 
   // Every change goes through the same path: build the new day, then persist it.
   const persist = (day: WeekplanDay) => dispatch(updateSingleWeekplanDay(day));
@@ -159,13 +164,12 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     setRecipeSelectionVisible(true);
   };
 
-  const planWeek = () => {
-    if (households.length === 0) {
-      props.navigation.navigate('WeekplanWizardScreen', {weekOffset});
-      return;
-    }
-    setPlanTargetOpen(true);
-  };
+  // One plan at a time: its servings and its list differ from another plan's.
+  const shopWeek = () => planTarget.choose(t('screens.shopping.import.whichPlan'), (householdId) =>
+    shoppingImport.start({kind: 'week', from: toDayKey(days[0]), to: toDayKey(days.at(-1)!), householdId}));
+
+  const planWeek = () => planTarget.choose(t('screens.weekplan.whichPlanToGenerate'), (householdId) =>
+    props.navigation.navigate('WeekplanWizardScreen', {weekOffset, householdId}));
 
   /**
    * Writing goes to one plan, so adding a meal asks which when there is a choice.
@@ -173,16 +177,10 @@ export const WeeklyRecipeListScreen = (props: Props) => {
    * @param {WeekplanDay[]} dayPlans every plan that day already has
    */
   const chooseTargetPlan = (dayPlans: WeekplanDay[]) => {
-    if (households.length === 0) {
-      openRecipeSelection(dayPlans[0]);
-      return;
-    }
-    setTargetChoices(dayPlans);
+    planTarget.choose(t('screens.weekplan.whichPlanToAddTo'), (householdId) => openPlanOf(dayPlans, householdId));
   };
 
-  const onTargetChosen = (householdId: string | undefined) => {
-    const dayPlans = targetChoices ?? [];
-    setTargetChoices(undefined);
+  const openPlanOf = (dayPlans: WeekplanDay[], householdId: string | undefined) => {
     const dayKey = dayPlans[0]?.day;
     if (!dayKey) {
       return;
@@ -281,20 +279,8 @@ export const WeeklyRecipeListScreen = (props: Props) => {
         ))}
       </ScrollView>
 
-      <PlanTargetDialog
-        visible={planTargetOpen}
-        title={t('screens.weekplan.whichPlanToGenerate')}
-        households={households}
-        onDismiss={() => setPlanTargetOpen(false)}
-        onChoose={(householdId) =>
-          props.navigation.navigate('WeekplanWizardScreen', {weekOffset, householdId})} />
-
-      <PlanTargetDialog
-        visible={targetChoices !== undefined}
-        title={t('screens.weekplan.whichPlanToAddTo')}
-        households={households}
-        onDismiss={() => setTargetChoices(undefined)}
-        onChoose={onTargetChosen} />
+      {planTarget.dialog}
+      {shoppingImport.dialog}
 
       <RecipeSelectionPopup
         visible={recipeSelectionVisible}

@@ -1,4 +1,6 @@
+const {execFileSync} = require('child_process');
 const http = require('http');
+const path = require('path');
 const https = require('https');
 const {getDefaultConfig} = require('expo/metro-config');
 
@@ -48,6 +50,13 @@ const relayToBackend = (request, response) => {
 
   request.pipe(upstream);
 };
+
+// Generated on every start, so a dependency or catalogue update flows through without a manual step;
+// both scripts return at once when nothing changed. Synchronous, because the files must exist before
+// Metro resolves the modules that load them.
+for (const script of ['generate-open-source-components.mjs', 'shopping-icons.mjs']) {
+  execFileSync(process.execPath, [path.join(__dirname, 'scripts', script)], {stdio: 'inherit'});
+}
 
 const config = getDefaultConfig(__dirname);
 

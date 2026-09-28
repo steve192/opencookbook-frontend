@@ -21,6 +21,16 @@ export interface RecipesState {
 export const ownRecipes = (recipes: Recipe[]): Recipe[] =>
   recipes.filter((recipe) => recipe.mine !== false);
 
+/**
+ * A recipe the store has fetched, own or read through a household.
+ *
+ * @param {object} state the store's state
+ * @param {number} recipeId which recipe
+ * @return {Recipe | undefined} the recipe, until it has been fetched undefined
+ */
+export const selectRecipe = (state: {recipes: RecipesState}, recipeId: number): Recipe | undefined =>
+  state.recipes.recipes.find((recipe) => recipe.id === recipeId);
+
 const initialState: RecipesState = {
   recipes: [],
   recipeGroups: [],

@@ -52,7 +52,6 @@
         "react-native-worklets",
         "@react-native-async-storage/async-storage",
         "@react-native-community/netinfo",
-        "@react-native-picker/picker",
         "@babel/core",
         "babel-preset-expo",
         "typescript",

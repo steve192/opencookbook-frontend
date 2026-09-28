@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Dialog, List, Portal} from 'react-native-paper';
 import {Household} from '../dao/RestAPI';
 import {overlayStyles} from '../styles/CentralStyles';
+import {iconSide} from './listSides';
 
 interface Props {
   visible: boolean;
@@ -35,17 +36,44 @@ export const PlanTargetDialog = (props: Props) => {
           <List.Item
             testID="planTargetMine"
             title={t('screens.weekplan.myPlan')}
-            left={(iconProps) => <List.Icon {...iconProps} icon="account" />}
+            left={iconSide('account')}
             onPress={() => choose(undefined)} />
           {props.households.map((household) => (
             <List.Item
               key={household.id}
               title={household.name}
-              left={(iconProps) => <List.Icon {...iconProps} icon="account-group" />}
+              left={iconSide('account-group')}
               onPress={() => choose(household.id)} />
           ))}
         </Dialog.Content>
       </Dialog>
     </Portal>
   );
+};
+
+interface PlanTargetQuestion {
+  title: string;
+  onChosen: (householdId: string | undefined) => void;
+}
+
+/**
+ * Asks which plan something goes on, only when there is a choice: without households it is your own.
+ * One dialog serves every question a screen asks.
+ *
+ * @param {Household[]} households the households the person is in
+ * @return {object} choose, which asks the given question and calls back with the plan, and the dialog to render
+ */
+export const usePlanTarget = (households: Household[]) => {
+  const [question, setQuestion] = useState<PlanTargetQuestion>();
+  const choose = (title: string, onChosen: PlanTargetQuestion['onChosen']) =>
+    households.length === 0 ? onChosen(undefined) : setQuestion({title, onChosen});
+  const dialog = (
+    <PlanTargetDialog
+      visible={question !== undefined}
+      title={question?.title ?? ''}
+      households={households}
+      onDismiss={() => setQuestion(undefined)}
+      onChoose={(householdId) => question?.onChosen(householdId)} />
+  );
+  return {choose, dialog};
 };

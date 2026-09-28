@@ -13,7 +13,7 @@ import {shareLink} from '../../helper/shareLink';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
-import {SwitchRow} from './SwitchRow';
+import {SwitchRow} from '../../components/SwitchRow';
 import {useOwnRecipeCount} from './useOwnRecipeCount';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'HouseholdScreen'>;
@@ -82,7 +82,7 @@ export const HouseholdScreen = (props: Props) => {
   useEffect(() => {
     setAppbarOptions(props.navigation, {
       title: household?.name ?? t('screens.households.screenTitle'),
-      actions: () => (
+      actions: (
         <Appbar.Action
           testID="householdRenameButton"
           icon="pencil-outline"
