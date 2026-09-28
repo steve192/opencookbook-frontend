@@ -3,6 +3,8 @@ import {Buffer} from 'buffer';
 import {Platform} from 'react-native';
 import XDate from 'xdate';
 import AppPersistence from '../AppPersistence';
+import {Aisle} from './aisles';
+import {OpenSourceSection} from '../legal/openSourceComponents';
 
 
 export interface Ingredient {
@@ -150,6 +152,127 @@ export interface UserInfo {
   /** Null while the account never set one; fellow household members then see a masked address. */
   displayName?: string | null;
   onboarded?: boolean;
+  /** Null until the first shopping import asked where the list should go. */
+  shoppingProvider?: ShoppingProvider | null;
+}
+
+export type ShoppingProvider = 'COOKPAL' | 'BRING';
+
+export interface ShoppingList {
+  id: number;
+  /** Null for an unrenamed default list, which the app names itself. */
+  name: string | null;
+  defaultList: boolean;
+  /** Null for your own list; sent along with every call about it. */
+  householdId: string | null;
+  householdName: string | null;
+  version: number;
+}
+
+export interface ShoppingItemSource {
+  title: string;
+  /** Null for a recipe added from the recipe screen. */
+  planDate: string | null;
+}
+
+export interface ShoppingItem {
+  id: string;
+  name: string;
+  spec: string | null;
+  aisle: Aisle;
+  aisleManual: boolean;
+  /** A Fluent Emoji name; null shows the aisle's. */
+  icon: string | null;
+  status: 'ACTIVE' | 'BOUGHT';
+  boughtAt: string | null;
+  /** A display name; null once that account is gone. */
+  addedBy: string | null;
+  sources: ShoppingItemSource[];
+  deleted: boolean;
+  version: number;
+}
+
+export interface ShoppingChanges {
+  version: number;
+  /** The items are the whole list and replace what the device has. */
+  full: boolean;
+  items: ShoppingItem[];
+}
+
+interface ShoppingOpBase {
+  opId: string;
+  /** Chosen on the device, so an item added offline can be changed before it was ever synced. */
+  itemId: string;
+}
+
+/** One change made on the device, possibly offline, applied by the server in the order made. */
+export type ShoppingOp =
+  | ShoppingOpBase & {type: 'ADD', name: string, spec?: string | null, aisle?: Aisle | null, icon?: string | null,
+      sources?: ShoppingItemSource[]}
+  | ShoppingOpBase & {type: 'UPDATE', name?: string, spec?: string, aisle?: Aisle}
+  | ShoppingOpBase & {type: 'BUY'}
+  | ShoppingOpBase & {type: 'RESTORE', spec?: string | null}
+  | ShoppingOpBase & {type: 'DELETE'};
+
+/** Something to tap when adding to a list; per language, the name to show comes first. */
+export interface ShoppingTile {
+  key: string;
+  aisle: Aisle;
+  icon: string | null;
+  names: Record<string, string[]>;
+}
+
+/** What adding to a list needs, kept on the device for adding offline. */
+export interface ShoppingVocabulary {
+  tiles: ShoppingTile[];
+  /** Normalised, of every language. */
+  unitWords: string[];
+}
+
+/** One ingredient of one meal as the recipe states it. */
+export interface PreviewLine {
+  name: string;
+  nameKey: string;
+  amount: number | null;
+  unit: string | null;
+  /** "g" or "ml" across metric units, otherwise the unit itself. */
+  mergeUnit: string;
+  /** Turns the amount into mergeUnit. */
+  mergeFactor: number;
+  aisle: Aisle;
+  icon: string | null;
+  staple: boolean;
+}
+
+export interface PreviewMeal {
+  entryId: string;
+  date: string | null;
+  title: string;
+  recipeId: number | null;
+  spontaneous: boolean;
+  recipeServings: number;
+  defaultServings: number;
+  lines: PreviewLine[];
+}
+
+/** A line as the import sheet finished it. */
+export interface ImportLine {
+  name: string;
+  spec?: string | null;
+  aisle?: Aisle | null;
+  icon?: string | null;
+  sources: ShoppingItemSource[];
+}
+
+/** A line an import offered, and whether it was taken; how staples are learned. */
+export interface ShownLine {
+  name: string;
+  ticked: boolean;
+}
+
+export interface Staple {
+  id: number;
+  name: string;
 }
 
 export interface InstanceInfo {
@@ -212,13 +335,24 @@ export interface RecipeShare {
 }
 
 /**
+ * A query string of the parameters that have a value.
+ *
+ * @param {object} params names and values; null and undefined are left out
+ * @return {string} the query string, empty if nothing is left
+ */
+const query = (params: Record<string, string | number | null | undefined>): string => {
+  const present = Object.entries(params).filter(([, value]) => value !== null && value !== undefined);
+  return present.length === 0 ? '' :
+    '?' + present.map(([name, value]) => `${name}=${encodeURIComponent(String(value))}`).join('&');
+};
+
+/**
  * The query parameter that says which plan a scoped request is about.
  *
  * @param {string} householdId the household, or nothing for your own plan
  * @return {string} the query string, empty for your own
  */
-const householdScope = (householdId?: string | null): string =>
-  householdId ? `?household=${householdId}` : '';
+const householdScope = (householdId?: string | null): string => query({household: householdId || null});
 
 export interface HouseholdMember {
   userId: number;
@@ -874,6 +1008,103 @@ class RestAPI {
 
   static async createBringExport(recipeId: number): Promise<string> {
     return (await this.post('/bringexport', {recipeId: recipeId})).data.exportId;
+  }
+
+  /**
+   * Hands finished lines to Bring, and says which offered lines were left out.
+   *
+   * @param {string} title what Bring shows as the recipe's name
+   * @param {number} servings what Bring shows as the yield; the amounts are final already
+   * @param {string[]} lines "500 g Mehl"
+   * @param {ShownLine[]} shown every line the sheet offered
+   * @return {Promise<string>} the export id Bring fetches the lines by
+   */
+  static async createBringExportOfLines(title: string, servings: number, lines: string[],
+      shown: ShownLine[]): Promise<string> {
+    return (await this.post('/bringexport/lines', {title, servings, lines, shown})).data.exportId;
+  }
+
+  static async setShoppingProvider(provider: ShoppingProvider): Promise<UserInfo> {
+    const response = await this.put('/users/self/shoppingProvider', {provider});
+    AppPersistence.storeUserInfoOffline(response.data);
+    return response.data;
+  }
+
+  /** Every list you can use, your own first; default lists are made on first asking. */
+  static async getShoppingLists(): Promise<ShoppingList[]> {
+    return (await this.get('/shopping/lists')).data;
+  }
+
+  static async createShoppingList(name: string, householdId: string | null): Promise<ShoppingList> {
+    return (await this.post(`/shopping/lists${householdScope(householdId)}`, {name})).data;
+  }
+
+  static async renameShoppingList(list: ShoppingList, name: string): Promise<ShoppingList> {
+    return (await this.put(`/shopping/lists/${list.id}${householdScope(list.householdId)}`, {name})).data;
+  }
+
+  static async deleteShoppingList(list: ShoppingList): Promise<void> {
+    await this.delete(`/shopping/lists/${list.id}${householdScope(list.householdId)}`);
+  }
+
+  static async getShoppingChanges(list: ShoppingList, since: number): Promise<ShoppingChanges> {
+    return (await this.get(`/shopping/lists/${list.id}/changes${query({household: list.householdId, since})}`)).data;
+  }
+
+  /**
+   * Sends what the device changed; a batch may be sent again, since the server skips ops it applied.
+   *
+   * @param {ShoppingList} list which list
+   * @param {number} since the version the device has
+   * @param {ShoppingOp[]} ops in the order they were made
+   * @return {Promise<ShoppingChanges>} what changed since that version, other devices' changes included
+   */
+  static async applyShoppingOps(list: ShoppingList, since: number, ops: ShoppingOp[]): Promise<ShoppingChanges> {
+    return (await this.post(`/shopping/lists/${list.id}/ops${query({household: list.householdId, since})}`,
+        {ops})).data;
+  }
+
+  static async importToShoppingList(list: ShoppingList, lines: ImportLine[], shown: ShownLine[]): Promise<ShoppingList> {
+    return (await this.post(`/shopping/lists/${list.id}/import${householdScope(list.householdId)}`,
+        {lines, shown})).data;
+  }
+
+  static async getShoppingVocabulary(): Promise<ShoppingVocabulary> {
+    return (await this.get('/shopping/vocabulary')).data;
+  }
+
+  /**
+   * The meals of one plan in a date range, with their ingredients unscaled.
+   *
+   * @param {string} from first day, yyyy-MM-dd
+   * @param {string} to last day, yyyy-MM-dd
+   * @param {string} householdId the household's plan, or nothing for your own
+   * @return {Promise<PreviewMeal[]>} the meals in plan order
+   */
+  static async getWeekImportPreview(from: string, to: string, householdId?: string | null): Promise<PreviewMeal[]> {
+    return (await this.get(`/shopping/preview/week${query({from, to, household: householdId})}`)).data.meals;
+  }
+
+  static async getRecipeImportPreview(recipeId: number): Promise<PreviewMeal> {
+    return (await this.get(`/shopping/preview/recipe/${recipeId}`)).data.meals[0];
+  }
+
+  /** What the server is built from and the data its catalogue comes from; the app lists its own. */
+  static async getOpenSourceSections(): Promise<OpenSourceSection[]> {
+    return (await this.get('/open-source-components')).data.sections;
+  }
+
+  static async getStaples(): Promise<Staple[]> {
+    return (await this.get('/shopping/staples')).data;
+  }
+
+  static async forgetStaple(stapleId: number): Promise<void> {
+    await this.delete(`/shopping/staples/${stapleId}`);
+  }
+
+  /** The address the app listens on for list changes, while it is open. */
+  static async shoppingLiveUrl(): Promise<string> {
+    return (await this.url('/shopping/live')).replace(/^http/, 'ws');
   }
 
   static async getInstanceInfo(): Promise<InstanceInfo> {

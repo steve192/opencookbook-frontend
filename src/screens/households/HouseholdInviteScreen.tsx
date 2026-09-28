@@ -8,7 +8,7 @@ import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
-import {SwitchRow} from './SwitchRow';
+import {SwitchRow} from '../../components/SwitchRow';
 import {useOwnRecipeCount} from './useOwnRecipeCount';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'HouseholdInviteScreen'>;

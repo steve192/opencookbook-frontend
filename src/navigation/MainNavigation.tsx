@@ -38,11 +38,24 @@ import {SharedRecipeScreen} from '../screens/SharedRecipeScreen';
 import {HouseholdInviteScreen} from '../screens/households/HouseholdInviteScreen';
 import {HouseholdListScreen} from '../screens/households/HouseholdListScreen';
 import {HouseholdScreen} from '../screens/households/HouseholdScreen';
-import {SettingsScreen} from '../screens/SettingsScreen';
+import {AccountSettingsScreen} from '../screens/settings/AccountSettingsScreen';
+import {AppearanceSettingsScreen} from '../screens/settings/AppearanceSettingsScreen';
+import {OpenSourceLicensesScreen} from '../screens/settings/OpenSourceLicensesScreen';
+import {PlanningSettingsScreen} from '../screens/settings/PlanningSettingsScreen';
+import {ScanningSettingsScreen} from '../screens/settings/ScanningSettingsScreen';
+import {SettingsScreen} from '../screens/settings/SettingsScreen';
+import {ShoppingSettingsScreen} from '../screens/settings/ShoppingSettingsScreen';
+import {ShoppingImportScreen} from '../screens/shopping/ShoppingImportScreen';
+import {ShoppingListScreen} from '../screens/shopping/ShoppingListScreen';
+import {ShoppingListsScreen} from '../screens/shopping/ShoppingListsScreen';
+import {StaplesScreen} from '../screens/shopping/StaplesScreen';
+import {ShoppingSyncRunner} from '../components/shopping/ShoppingSyncRunner';
+import {useShoppingProvider} from '../helper/shopping/useShoppingProvider';
 import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
+import {LINKING_SCREENS} from './linking';
 import {navigationRef} from './navigationRef';
 import {PaperStackHeader} from './PaperStackHeader';
 import {
@@ -114,6 +127,8 @@ const tabBarIcon = (name: MaterialCommunityIconName): TabBarIconRenderer =>
 const BottomTabNavigation = () => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
+  // Somebody who shops with Bring has no use for the built-in list.
+  const {provider} = useShoppingProvider();
   return (
     <BottomTab.Navigator
       backBehavior="history"
@@ -142,6 +157,14 @@ const BottomTabNavigation = () => {
           title: t('screens.weekplan.screenTitle'),
           tabBarIcon: tabBarIcon('calendar'),
         }} />
+      {provider !== 'BRING' &&
+        <BottomTab.Screen
+          name="ShoppingScreen"
+          component={ShoppingListScreen}
+          options={{
+            title: t('screens.shopping.screenTitle'),
+            tabBarIcon: tabBarIcon('cart-outline'),
+          }} />}
       <BottomTab.Screen
         name="SettingsScreen"
         component={SettingsScreen}
@@ -173,6 +196,7 @@ const MainStackNavigation = () => {
 
   return (
     <KeyboardAvoidingView style={CentralStyles.fullscreen}>
+      <ShoppingSyncRunner />
       <MainStack.Navigator
         screenOptions={{
           header: (nav) => <PaperStackHeader {...nav} />,
@@ -250,6 +274,51 @@ const MainStackNavigation = () => {
           name="RecipeScreen"
           component={RecipeScreen}
           options={{title: t('screens.recipe.loading')}}
+        />
+        <MainStack.Screen
+          name="ShoppingImportScreen"
+          component={ShoppingImportScreen}
+          options={{title: t('screens.shopping.import.title')}}
+        />
+        <MainStack.Screen
+          name="ShoppingListsScreen"
+          component={ShoppingListsScreen}
+          options={{title: t('screens.shopping.listsTitle')}}
+        />
+        <MainStack.Screen
+          name="StaplesScreen"
+          component={StaplesScreen}
+          options={{title: t('screens.shopping.staplesTitle')}}
+        />
+        <MainStack.Screen
+          name="OpenSourceLicensesScreen"
+          component={OpenSourceLicensesScreen}
+          options={{title: t('screens.licenses.title')}}
+        />
+        <MainStack.Screen
+          name="AccountSettingsScreen"
+          component={AccountSettingsScreen}
+          options={{title: t('screens.settings.account')}}
+        />
+        <MainStack.Screen
+          name="ShoppingSettingsScreen"
+          component={ShoppingSettingsScreen}
+          options={{title: t('screens.shopping.provider.setting')}}
+        />
+        <MainStack.Screen
+          name="PlanningSettingsScreen"
+          component={PlanningSettingsScreen}
+          options={{title: t('screens.settings.planning')}}
+        />
+        <MainStack.Screen
+          name="ScanningSettingsScreen"
+          component={ScanningSettingsScreen}
+          options={{title: t('screens.settings.scanning')}}
+        />
+        <MainStack.Screen
+          name="AppearanceSettingsScreen"
+          component={AppearanceSettingsScreen}
+          options={{title: t('screens.settings.appearance')}}
         />
       </MainStack.Navigator>
     </KeyboardAvoidingView>
@@ -373,44 +442,9 @@ const MainNavigation = () => {
         }}
         linking={{
           prefixes: [createURL('/'), 'https://beta.cookpal.io/'],
-          config: {
-            screens: {
-              AccountActivationScreen: 'activateAccount',
-              PasswordResetScreen: 'resetPassword',
-              TermsOfServiceScreen: 'tos',
-              SharedRecipeScreen: 'share/:shareId',
-              default: {
-                // Beneath any linked screen, so it has somewhere to go back to. The login stack
-                // has no such route and drops it.
-                initialRouteName: 'OverviewScreen',
-                screens: {
-                  LoginScreen: 'login',
-                  SignupScreen: 'signup',
-                  RequestPasswordResetScreen: 'requestResetPassword',
-                  RecipeScreen: 'recipe',
-                  RecipeWizardScreen: 'editRecipe',
-                  ImportScreen: 'import',
-                  RecipeScanScreen: 'scanRecipe',
-                  HouseholdListScreen: 'households',
-                  HouseholdScreen: 'household',
-                  HouseholdInviteScreen: 'household-invite/:token',
-                  OverviewScreen: {
-                    screens: {
-                      SettingsScreen: 'settings',
-                      WeeklyScreen: 'weekly',
-                      RecipesListScreen: {
-                        screens: {
-                          RecipeListDetailScreen: 'myRecipes',
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-            },
           // The linking config mixes BaseNavigatorProps + nested stack routes; the
           // generated PathConfig type doesn't model that union, so cast to any here.
-          } as any,
+          config: {screens: LINKING_SCREENS} as any,
         }}
       >
         {baseNavigator}

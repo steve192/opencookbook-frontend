@@ -6,7 +6,22 @@ import {Recipe, RecipeGroup, UserInfo} from './dao/RestAPI';
 
 export default class AppPersistence {
   static async clearOfflineData() {
-    await AsyncStorage.multiRemove(['offline_userinfo', 'offline_recipes', 'offline_recipegroups', 'offline_userinfo']);
+    await AsyncStorage.multiRemove(['offline_userinfo', 'offline_recipes', 'offline_recipegroups', 'offline_userinfo',
+      'offline_shopping']);
+  }
+
+  /**
+   * On every platform: a shopping list is used in the shop, where the connection is worst.
+   *
+   * @param {object} shopping what to keep of the shopping state
+   */
+  static async storeShoppingOffline(shopping: object) {
+    await AsyncStorage.setItem('offline_shopping', JSON.stringify(shopping));
+  }
+
+  static async getShoppingOffline<T>(): Promise<T | null> {
+    const stored = await AsyncStorage.getItem('offline_shopping');
+    return stored === null ? null : JSON.parse(stored);
   }
   static async getRecipeGroupsOffline(): Promise<RecipeGroup[]> {
     const recipeGroups = await AsyncStorage.getItem('offline_recipegroups');

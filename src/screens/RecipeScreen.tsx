@@ -6,8 +6,8 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Appbar, Button, Surface} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {BringImportButton} from '../components/BringExportButton';
 import {RecipeDetailView} from '../components/RecipeDetailView';
+import {AddToShoppingListButton} from '../components/shopping/AddToShoppingListButton';
 import {RecipeShareDialog} from '../components/RecipeShareDialog';
 import RestAPI from '../dao/RestAPI';
 import {errorMessageKey} from '../helper/apiErrorMessage';
@@ -15,7 +15,7 @@ import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {useOnlineGuard} from '../helper/useOnlineGuard';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {setAppbarOptions} from '../navigation/appbarOptions';
-import {fetchSingleRecipe} from '../redux/features/recipesSlice';
+import {fetchSingleRecipe, selectRecipe} from '../redux/features/recipesSlice';
 import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import {useAppTheme} from '../styles/CentralStyles';
 
@@ -26,7 +26,7 @@ export const RecipeScreen = (props: Props) => {
   const insets = useSafeAreaInsets();
   const requireOnline = useOnlineGuard();
 
-  const displayedRecipe = useAppSelector((state) => state.recipes.recipes.find((recipe) => recipe.id === props.route.params.recipeId));
+  const displayedRecipe = useAppSelector((state) => selectRecipe(state, props.route.params.recipeId));
   const sharingEnabled = useAppSelector((state) => state.settings.sharingEnabled);
   const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 1);
   const [sharingOpen, setSharingOpen] = useState(false);
@@ -123,7 +123,7 @@ export const RecipeScreen = (props: Props) => {
     }
     return (
       <View style={styles.exportRow}>
-        <BringImportButton style={styles.exportButton} recipeId={displayedRecipe.id} />
+        <AddToShoppingListButton style={styles.exportButton} recipeId={displayedRecipe.id} servings={scaledServings} />
       </View>
     );
   };
@@ -168,7 +168,7 @@ export const RecipeScreen = (props: Props) => {
             mode="contained"
             icon="chef-hat"
             disabled={displayedRecipe.preparationSteps.length === 0}
-            onPress={() => props.navigation.navigate('GuidedCookingScreen', {recipe: displayedRecipe, scaledServings: scaledServings})}>
+            onPress={() => props.navigation.navigate('GuidedCookingScreen', {recipeId, scaledServings})}>
             {t('screens.recipe.startCookingButton')}
           </Button>
         </Surface>

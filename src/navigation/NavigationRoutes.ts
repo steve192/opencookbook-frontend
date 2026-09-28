@@ -1,5 +1,5 @@
 import {NavigatorScreenParams} from '@react-navigation/native';
-import {Recipe} from '../dao/RestAPI';
+import {ShoppingImportTarget} from '../helper/shopping/importTarget';
 
 export type BaseNavigatorProps = {
     AccountActivationScreen: { activationId: string}
@@ -35,16 +35,27 @@ export type MainNavigationProps = {
     RecipeScreen: { recipeId: number }
     ImportScreen: { importUrl?: string },
     RecipeGroupEditScreen: { recipeGroupId?: number, editing: boolean}
-    GuidedCookingScreen: { recipe: Recipe, scaledServings: number, initialStep?: number }
+    /** By id rather than the recipe itself: parameters go into the address bar, where a recipe is "[object Object]". */
+    GuidedCookingScreen: { recipeId: number, scaledServings: number, initialStep?: number }
     HouseholdListScreen: undefined
     HouseholdScreen: { householdId: string }
     /** Opening an invitation link. The token is the invitation. */
     HouseholdInviteScreen: { token: string }
+    ShoppingImportScreen: ShoppingImportTarget
+    ShoppingListsScreen: undefined
+    StaplesScreen: undefined
+    OpenSourceLicensesScreen: undefined
+    AccountSettingsScreen: undefined
+    ShoppingSettingsScreen: undefined
+    PlanningSettingsScreen: undefined
+    ScanningSettingsScreen: undefined
+    AppearanceSettingsScreen: undefined
 };
 
 export type OverviewNavigationProps = {
     RecipesListScreen: NavigatorScreenParams<RecipeScreenNavigation>,
     WeeklyScreen: undefined,
+    ShoppingScreen: undefined,
     SettingsScreen: undefined,
 }
 

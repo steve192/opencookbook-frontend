@@ -13,7 +13,7 @@ import {shareLink} from '../../helper/shareLink';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
-import {SwitchRow} from './SwitchRow';
+import {SwitchRow} from '../../components/SwitchRow';
 import {useOwnRecipeCount} from './useOwnRecipeCount';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'HouseholdScreen'>;

@@ -1,0 +1,17 @@
+{
+  "FRUIT_VEG": "carrot",
+  "BREAD_BAKERY": "baguette_bread",
+  "DAIRY_EGGS": "glass_of_milk",
+  "MEAT_FISH": "cut_of_meat",
+  "DELI": "bacon",
+  "FROZEN": "ice",
+  "PASTA_RICE_GRAINS": "spaghetti",
+  "BAKING": "cupcake",
+  "CANNED_JARS": "canned_food",
+  "OILS_SPICES_SAUCES": "salt",
+  "SWEETS_SNACKS": "chocolate_bar",
+  "BEVERAGES": "cup_with_straw",
+  "HOUSEHOLD": "basket",
+  "DRUGSTORE": "lotion_bottle",
+  "OTHER": "shopping_cart"
+}

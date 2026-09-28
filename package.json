@@ -19,7 +19,8 @@
     "lint": "eslint src --ext .ts,.tsx",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "shopping-icons:sync": "node scripts/shopping-icons.mjs --from-catalogue ../opencookbook-apiserver"
   },
   "dependencies": {
     "@eva-design/eva": "2.2.0",
@@ -27,7 +28,6 @@
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/netinfo": "12.0.1",
-    "@react-native-picker/picker": "2.11.4",
     "@react-navigation/bottom-tabs": "7.19.2",
     "@react-navigation/elements": "2.9.43",
     "@react-navigation/native": "7.4.1",
@@ -40,6 +40,7 @@
     "expo-application": "57.0.3",
     "expo-build-properties": "57.0.22",
     "expo-constants": "~57.0.16",
+    "expo-crypto": "57.0.3",
     "expo-dev-client": "57.0.19",
     "expo-file-system": "~57.0.6",
     "expo-font": "~57.0.2",
@@ -83,6 +84,7 @@
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@expo/ngrok": "^4.1.0",
+    "@iconify-json/fluent-emoji-flat": "1.2.6",
     "@types/react": "~19.2.10",
     "@types/react-dom": "~19.2.0",
     "@typescript-eslint/eslint-plugin": "8.70.0",
@@ -92,6 +94,7 @@
     "eslint": "8.57.1",
     "eslint-config-google": "0.14.0",
     "eslint-plugin-react": "7.37.5",
+    "sharp": "0.34.4",
     "typescript": "~6.0.3",
     "vitest": "5.0.1",
     "workbox-cli": "7.4.1"

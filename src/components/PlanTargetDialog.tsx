@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Dialog, List, Portal} from 'react-native-paper';
 import {Household} from '../dao/RestAPI';
@@ -48,4 +48,31 @@ export const PlanTargetDialog = (props: Props) => {
       </Dialog>
     </Portal>
   );
+};
+
+interface PlanTargetQuestion {
+  title: string;
+  then: (householdId: string | undefined) => void;
+}
+
+/**
+ * Asks which plan something goes on, only when there is a choice: without households it is your own.
+ * One dialog serves every question a screen asks.
+ *
+ * @param {Household[]} households the households the person is in
+ * @return {object} choose, which asks the given question and calls back with the plan, and the dialog to render
+ */
+export const usePlanTarget = (households: Household[]) => {
+  const [question, setQuestion] = useState<PlanTargetQuestion>();
+  const choose = (title: string, then: PlanTargetQuestion['then']) =>
+    households.length === 0 ? then(undefined) : setQuestion({title, then});
+  const dialog = (
+    <PlanTargetDialog
+      visible={question !== undefined}
+      title={question?.title ?? ''}
+      households={households}
+      onDismiss={() => setQuestion(undefined)}
+      onChoose={(householdId) => question?.then(householdId)} />
+  );
+  return {choose, dialog};
 };

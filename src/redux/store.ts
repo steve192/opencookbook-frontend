@@ -1,8 +1,10 @@
 import {configureStore} from '@reduxjs/toolkit';
+import {persistShopping} from '../helper/shopping/shoppingSync';
 import authSlice from './features/authSlice';
 import imagesSlice from './features/imagesSlice';
 import recipesSlice from './features/recipesSlice';
 import settingsSlice from './features/settingsSlice';
+import shoppingSlice from './features/shoppingSlice';
 import timersSlice from './features/timersSlice';
 import weeklyRecipesSlice from './features/weeklyRecipesSlice';
 
@@ -14,8 +16,11 @@ export const store = configureStore({
     recipes: recipesSlice,
     images: imagesSlice,
     timers: timersSlice,
+    shopping: shoppingSlice,
   },
 });
+
+persistShopping(store);
 
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

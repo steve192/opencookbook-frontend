@@ -1,5 +1,6 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import RestAPI from '../../dao/RestAPI';
+import RestAPI, {ShoppingProvider} from '../../dao/RestAPI';
+import {logout} from './authSlice';
 
 
 type themes = 'light' | 'dark' | 'system';
@@ -13,6 +14,8 @@ export interface SettingsState {
     householdsEnabled: boolean;
     /** Whether this instance can read a recipe from a photograph. */
     ocrImportEnabled: boolean;
+    /** Where shopping imports go; null until the first import asked, undefined until the account is read. */
+    shoppingProvider: ShoppingProvider | null | undefined;
 }
 
 const initialState: SettingsState = {
@@ -26,6 +29,7 @@ const initialState: SettingsState = {
   // The opposite default to sharing: most instances have no machine learning subsystem, and
   // offering a scan that cannot work is worse than offering it a moment late.
   ocrImportEnabled: false,
+  shoppingProvider: undefined,
 };
 
 export const authSlice = createSlice({
@@ -47,15 +51,24 @@ export const authSlice = createSlice({
     changeOcrImportEnabled: (state, action: PayloadAction<boolean>) => {
       state.ocrImportEnabled = action.payload;
     },
+    changeShoppingProvider: (state, action: PayloadAction<ShoppingProvider | null>) => {
+      state.shoppingProvider = action.payload;
+    },
     changeOnlineState: (state, action: PayloadAction<boolean>) => {
       state.isOnline = action.payload;
       RestAPI.setIsOnline(action.payload);
     },
   },
+  extraReducers: (builder) => {
+    // The provider is the account's: whoever signs in next is read anew.
+    builder.addCase(logout, (state) => {
+      state.shoppingProvider = undefined;
+    });
+  },
 });
 
 // Action creators are generated for each case reducer function
 export const {changeTheme, changeBackendUrl, changeSharingEnabled, changeHouseholdsEnabled,
-  changeOcrImportEnabled, changeOnlineState} = authSlice.actions;
+  changeOcrImportEnabled, changeOnlineState, changeShoppingProvider} = authSlice.actions;
 
 export default authSlice.reducer;

@@ -1,0 +1,57 @@
+/**
+ * The address of every screen on the web. Everything in an address is text, so a number or a flag a
+ * screen takes is parsed back here; without that a reload handed `recipeId: "3"` to a screen comparing
+ * it with a number, and `editing: "false"`, which is true.
+ */
+
+const number = (value: string): number => Number(value);
+const flag = (value: string): boolean => value === 'true';
+
+export const LINKING_SCREENS = {
+  AccountActivationScreen: 'activateAccount',
+  PasswordResetScreen: 'resetPassword',
+  TermsOfServiceScreen: 'tos',
+  SharedRecipeScreen: 'share/:shareId',
+  default: {
+    // Beneath any linked screen, so it has somewhere to go back to. The login stack
+    // has no such route and drops it.
+    initialRouteName: 'OverviewScreen',
+    screens: {
+      LoginScreen: 'login',
+      SignupScreen: 'signup',
+      RequestPasswordResetScreen: 'requestResetPassword',
+      RecipeScreen: {path: 'recipe', parse: {recipeId: number}},
+      RecipeWizardScreen: {path: 'editRecipe', parse: {recipeId: number, editing: flag, hasDraft: flag}},
+      RecipeGroupEditScreen: {path: 'editRecipeGroup', parse: {recipeGroupId: number, editing: flag}},
+      WeekplanWizardScreen: {path: 'planWeek', parse: {weekOffset: number}},
+      PlanDraftScreen: {path: 'planDraft', parse: {draftId: number}},
+      GuidedCookingScreen: {path: 'cook', parse: {recipeId: number, scaledServings: number, initialStep: number}},
+      ImportScreen: 'import',
+      RecipeScanScreen: 'scanRecipe',
+      HouseholdListScreen: 'households',
+      HouseholdScreen: 'household',
+      HouseholdInviteScreen: 'household-invite/:token',
+      ShoppingImportScreen: {path: 'addToShoppingList', parse: {recipeId: number, servings: number}},
+      ShoppingListsScreen: 'shoppingLists',
+      StaplesScreen: 'settings/shopping/usuallyAtHome',
+      OpenSourceLicensesScreen: 'settings/licenses',
+      AccountSettingsScreen: 'settings/account',
+      ShoppingSettingsScreen: 'settings/shopping',
+      PlanningSettingsScreen: 'settings/planning',
+      ScanningSettingsScreen: 'settings/scanning',
+      AppearanceSettingsScreen: 'settings/appearance',
+      OverviewScreen: {
+        screens: {
+          SettingsScreen: 'settings',
+          WeeklyScreen: 'weekly',
+          ShoppingScreen: 'shopping',
+          RecipesListScreen: {
+            screens: {
+              RecipeListDetailScreen: {path: 'myRecipes', parse: {shownRecipeGroupId: number}},
+            },
+          },
+        },
+      },
+    },
+  },
+};

@@ -11,7 +11,8 @@ import {SectionTitle} from '../components/SectionTitle';
 import {StepProgressBar} from '../components/StepProgressBar';
 import {StepTimer} from '../components/StepTimer';
 import {ViewPager} from '../components/ViewPager';
-import {IngredientUse} from '../dao/RestAPI';
+import {LoadingScreen} from '../components/LoadingScreen';
+import {IngredientUse, Recipe} from '../dao/RestAPI';
 import {runningTimerCount} from '../helper/cookingTimers';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {findIngredientsWithoutStep, matchIngredientsInStep} from '../helper/ingredientMatching';
@@ -19,7 +20,8 @@ import {useCheckedIngredients} from '../helper/useCheckedIngredients';
 import {findStepDurations} from '../helper/recipeDuration';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {setAppbarOptions} from '../navigation/appbarOptions';
-import {useAppSelector} from '../redux/hooks';
+import {fetchSingleRecipe, selectRecipe} from '../redux/features/recipesSlice';
+import {useAppDispatch, useAppSelector} from '../redux/hooks';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
@@ -27,12 +29,35 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 /** Cooking happens at arm's length, so the smallest option is already fairly large. */
 const TEXT_SIZES = [18, 22, 27];
 
+// Loads the recipe first: after a reload, or from a timer notification, nothing is in the store yet.
 export const GuidedCookingScreen = (props: Props) => {
+  const {recipeId} = props.route.params;
+  const dispatch = useAppDispatch();
+  const recipe = useAppSelector((state) => selectRecipe(state, recipeId));
+
+  useEffect(() => {
+    if (!recipe) {
+      dispatch(fetchSingleRecipe(recipeId)).then((result) => {
+        if (result.meta.requestStatus === 'rejected') {
+          props.navigation.goBack();
+        }
+      });
+    }
+  }, [recipeId]);
+
+  if (!recipe) {
+    return <LoadingScreen />;
+  }
+  return <GuidedCooking {...props} recipe={recipe} />;
+};
+
+const GuidedCooking = (props: Props & {recipe: Recipe}) => {
+  const {recipe} = props;
   // A timer notification opens the step it was started from, so the screen does not always
   // begin at the beginning.
   const [currentStep, setCurrentStep] = useState<number>(() => Math.max(
       0,
-      Math.min(props.route.params.initialStep ?? 0, props.route.params.recipe.preparationSteps.length - 1),
+      Math.min(props.route.params.initialStep ?? 0, recipe.preparationSteps.length - 1),
   ));
   const [textSizeIndex, setTextSizeIndex] = useState<number>(0);
   const [showOtherIngredients, setShowOtherIngredients] = useState(false);
@@ -43,7 +68,6 @@ export const GuidedCookingScreen = (props: Props) => {
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
 
-  const recipe = props.route.params.recipe;
   const steps = recipe.preparationSteps;
   const stepCount = steps.length;
   useKeepAwake();

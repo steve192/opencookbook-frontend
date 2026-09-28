@@ -22,3 +22,8 @@ ios/
 # Test + coverage output
 test-results/
 coverage/
+
+# Generated on every Metro start; see metro.config.js
+assets/shopping-icons/
+src/**/*.generated.js
+src/**/*.generated.json

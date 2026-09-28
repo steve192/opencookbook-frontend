@@ -6,7 +6,7 @@ import AppPersistence from '../../AppPersistence';
 import RestAPI from '../../dao/RestAPI';
 import {login, logout} from '../../redux/features/authSlice';
 import {changeBackendUrl, changeHouseholdsEnabled, changeOcrImportEnabled, changeOnlineState,
-  changeSharingEnabled} from '../../redux/features/settingsSlice';
+  changeSharingEnabled, changeShoppingProvider} from '../../redux/features/settingsSlice';
 import {useAppDispatch} from '../../redux/hooks';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
@@ -50,6 +50,7 @@ export const SplashScreen = () => {
       RestAPI.getUserInfo().then((userinfo) => {
         if (userinfo.email) {
           console.info('got userinfo, logging in');
+          dispatch(changeShoppingProvider(userinfo.shoppingProvider ?? null));
           dispatch(login());
         } else {
           console.error('invalid userinfo', userinfo);

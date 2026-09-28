@@ -35,6 +35,7 @@ export const MESSAGE_KEYS = {
 
   HOUSEHOLD_FULL: 'screens.households.full',
   TOO_MANY_HOUSEHOLDS: 'screens.households.tooMany',
+  TOO_MANY_SHOPPING_LISTS: 'screens.shopping.tooManyLists',
   TOO_MANY_INVITES: 'screens.households.tooManyInvites',
   INVITE_INVALID: 'screens.households.inviteInvalid',
   ALREADY_A_MEMBER: 'screens.households.alreadyMember',
