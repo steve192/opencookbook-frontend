@@ -4,7 +4,9 @@ import {StyleSheet, View} from 'react-native';
 import {Icon, Surface, Text, TouchableRipple} from 'react-native-paper';
 import XDate from 'xdate';
 import {WeekplanDay, WeekplanDayRecipeInfo} from '../../dao/RestAPI';
+import {useLeftoversLabel} from '../../helper/leftovers';
 import {formatMonth} from '../../helper/weekplan';
+import {LeftoverSource} from '../../helper/weekplanDay';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {WeekplanMealRow} from './WeekplanMealRow';
 
@@ -19,6 +21,10 @@ interface Props {
   onMealPress: (meal: WeekplanDayRecipeInfo) => void;
   onMealRemovePress: (plan: WeekplanDay, index: number) => void;
   onMealMove: (plan: WeekplanDay, fromIndex: number, toIndex: number) => void;
+  /** What the plan cooked in the week before the day, which a meal can be leftovers of. */
+  leftoverSourcesOf: (plan: WeekplanDay) => LeftoverSource[];
+  /** @param cookedOn the day the meal is leftovers of, or null to cook it on its own day */
+  onLeftoverChange: (plan: WeekplanDay, index: number, cookedOn: string | null) => void;
 }
 
 // A single day of the week, as one card: the date, everything planned for it and
@@ -26,6 +32,16 @@ interface Props {
 export const WeekplanDayCard = (props: Props) => {
   const theme = useAppTheme();
   const {t} = useTranslation('translation');
+  const leftoversLabel = useLeftoversLabel();
+
+  const leftoversOf = (plan: WeekplanDay, meal: WeekplanDayRecipeInfo, index: number) => {
+    if (meal.leftoverOf) {
+      return {active: true, onToggle: () => props.onLeftoverChange(plan, index, null)};
+    }
+    const source = meal.type === 'NORMAL_RECIPE' ?
+      props.leftoverSourcesOf(plan).find((each) => each.recipeId === meal.id) : undefined;
+    return source && {active: false, onToggle: () => props.onLeftoverChange(plan, index, source.cookedOn)};
+  };
 
   const monthLabel = formatMonth(props.date);
   const plannedCount = props.plans.reduce((total, plan) => total + plan.recipes.length, 0);
@@ -83,6 +99,8 @@ export const WeekplanDayCard = (props: Props) => {
             <WeekplanMealRow
               key={`${meal.type}-${meal.id}-${index}`}
               title={meal.title}
+              note={meal.leftoverOf ? leftoversLabel(meal.leftoverOf) : undefined}
+              leftovers={leftoversOf(plan, meal, index)}
               imageUuid={meal.titleImageUuid}
               reorderable={plan.recipes.length > 1}
               onPress={meal.type === 'NORMAL_RECIPE' ? () => props.onMealPress(meal) : undefined}

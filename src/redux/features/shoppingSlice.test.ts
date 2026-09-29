@@ -16,6 +16,8 @@ const item = (id: string): ShoppingItem => ({
   addedBy: null, sources: [], deleted: false, version: 1,
 });
 
+const NOW = '2026-10-05T10:00:00Z';
+
 const start = reducer(undefined, shoppingListsLoaded([list(1), list(2)]));
 
 describe('shoppingSlice', () => {
@@ -24,7 +26,7 @@ describe('shoppingSlice', () => {
   });
 
   it('forgets what it knew about a list that is gone', () => {
-    const synced = reducer(start, shoppingOpQueued({listId: 2, op: {opId: 'a', type: 'BUY', itemId: 'x'}}));
+    const synced = reducer(start, shoppingOpQueued({listId: 2, at: NOW, op: {opId: 'a', type: 'BUY', itemId: 'x'}}));
     expect(reducer(synced, shoppingListsLoaded([list(1)])).sync[2]).toBeUndefined();
   });
 
@@ -35,13 +37,14 @@ describe('shoppingSlice', () => {
   });
 
   it('drops only the ops an answer confirms', () => {
-    let state = reducer(start, shoppingOpQueued({listId: 1, op: {opId: 'a', type: 'ADD', itemId: 'x', name: 'Brot'}}));
-    state = reducer(state, shoppingOpQueued({listId: 1, op: {opId: 'b', type: 'BUY', itemId: 'x'}}));
+    let state = reducer(start, shoppingOpQueued({listId: 1, at: NOW,
+      op: {opId: 'a', type: 'ADD', itemId: 'x', name: 'Brot'}}));
+    state = reducer(state, shoppingOpQueued({listId: 1, at: NOW, op: {opId: 'b', type: 'BUY', itemId: 'x'}}));
 
     state = reducer(state, shoppingChangesReceived({listId: 1, sent: 1,
       changes: {version: 3, full: false, items: [item('x')]}}));
 
-    expect(state.sync[1].pending.map((op) => op.opId)).toEqual(['b']);
+    expect(state.sync[1].pending.map((pending) => pending.op.opId)).toEqual(['b']);
     expect(state.sync[1].version).toBe(3);
     expect(Object.keys(state.sync[1].server)).toEqual(['x']);
   });

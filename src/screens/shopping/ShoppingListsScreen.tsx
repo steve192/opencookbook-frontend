@@ -75,7 +75,7 @@ export const ShoppingListsScreen = (props: Props) => {
   ];
 
   return (
-    <Surface style={CentralStyles.fullscreen}>
+    <Surface style={CentralStyles.screen}>
       <ScrollView>
         {lists.map((list) => (
           <List.Item

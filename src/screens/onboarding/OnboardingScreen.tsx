@@ -36,7 +36,7 @@ export const OnboardingScreen = (props: Props) => {
   };
 
   return (
-    <Surface style={CentralStyles.fullscreen}>
+    <Surface style={CentralStyles.screen}>
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[CentralStyles.contentContainer, styles.centered]}>

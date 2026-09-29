@@ -1,15 +1,12 @@
 import React from 'react';
 import {ImageBackground, StyleSheet, View} from 'react-native';
 import {SafeAreaInsetsContext} from 'react-native-safe-area-context';
-import CentralStyles from '../../styles/CentralStyles';
-import {KeyboardAvoidingView} from 'react-native-keyboard-controller';
+import {KeyboardAvoidingScreen} from '../../components/KeyboardAvoidingScreen';
 
 
 export const LoginBackdrop = (props: {children:React.ReactNode}) => {
   return (
-    <KeyboardAvoidingView
-      style={CentralStyles.fullscreen}
-    >
+    <KeyboardAvoidingScreen>
       <ImageBackground
         style={styles.container}
         source={require('../../../assets/login-screen.jpg')}>
@@ -22,7 +19,7 @@ export const LoginBackdrop = (props: {children:React.ReactNode}) => {
           </>
         </View>
       </ImageBackground>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingScreen>
   );
 };
 

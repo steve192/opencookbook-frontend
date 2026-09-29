@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {ShoppingItem, ShoppingOp} from '../../dao/RestAPI';
-import {ItemMap, recentlyBought, visibleItems, withChanges, withOp} from './listItems';
+import {activeItems, ItemMap, recentlyBought, timedPending, visibleItems, withChanges, withOp} from './listItems';
 
 const NOW = '2026-10-05T10:00:00Z';
 
@@ -50,7 +50,7 @@ describe('listItems', () => {
 
   it('lays what the device did over what the server said', () => {
     const shown = visibleItems({server: listOf(item('a', 'Brot')), version: 1,
-      pending: [add('b', 'Butter'), {opId: '2', type: 'DELETE', itemId: 'a'}]}, NOW);
+      pending: [{op: add('b', 'Butter'), at: NOW}, {op: {opId: '2', type: 'DELETE', itemId: 'a'}, at: NOW}]});
     expect(Object.values(shown).map((each) => each.name)).toEqual(['Butter']);
   });
 
@@ -65,5 +65,34 @@ describe('listItems', () => {
     const items = listOf(item('a', 'Alt', {status: 'BOUGHT', boughtAt: '2026-10-01T00:00:00Z'}),
         item('b', 'Neu', {status: 'BOUGHT', boughtAt: '2026-10-04T00:00:00Z'}), item('c', 'Offen'));
     expect(recentlyBought(items).map((each) => each.name)).toEqual(['Neu', 'Alt']);
+  });
+
+  it('compares instants as times, however many fraction digits they were written with', () => {
+    const items = listOf(item('a', 'Device', {addedAt: '2026-10-05T10:00:00.500Z'}),
+        item('b', 'Server', {addedAt: '2026-10-05T10:00:00Z'}));
+    expect(activeItems(items).map((each) => each.name)).toEqual(['Server', 'Device']);
+  });
+
+  it('shows what was added last at the end, asking for more or bringing back included', () => {
+    const items = listOf(item('a', 'Milch', {addedAt: '2026-10-01T00:00:00Z'}),
+        item('b', 'Brot', {addedAt: '2026-10-02T00:00:00Z'}),
+        item('c', 'Eier', {status: 'BOUGHT', addedAt: '2026-09-01T00:00:00Z'}));
+    const names = (held: ItemMap) => activeItems(held).map((each) => each.name);
+
+    expect(names(items)).toEqual(['Milch', 'Brot']);
+    expect(names(withOp(items, add('x', 'milch', '1 l'), NOW))).toEqual(['Brot', 'Milch']);
+    expect(names(withOp(items, {opId: '1', type: 'RESTORE', itemId: 'c'}, NOW))).toEqual(['Milch', 'Brot', 'Eier']);
+  });
+
+  it('orders changes made offline by when they were made', () => {
+    const shown = visibleItems({server: {}, version: 1, pending: [
+      {op: add('a', 'Brot'), at: '2026-10-05T10:00:00Z'}, {op: add('b', 'Butter'), at: '2026-10-05T10:00:01Z'}]});
+    expect(activeItems(shown).map((each) => each.name)).toEqual(['Brot', 'Butter']);
+  });
+
+  it('gives pending ops stored without a time the time they are read back', () => {
+    const op = add('a', 'Brot');
+    expect(timedPending([op, {op, at: NOW}], '2026-10-06T00:00:00Z'))
+        .toEqual([{op, at: '2026-10-06T00:00:00Z'}, {op, at: NOW}]);
   });
 });

@@ -5,7 +5,7 @@ import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
 
 // The frame every settings screen shares: scrolling, and as wide as the rest of the app's content.
 export const SettingsPage = ({children}: {children: React.ReactNode}) => (
-  <Surface style={CentralStyles.fullscreen}>
+  <Surface style={CentralStyles.screen}>
     <ScrollView contentContainerStyle={[CentralStyles.contentContainer, styles.page]}>{children}</ScrollView>
   </Surface>
 );

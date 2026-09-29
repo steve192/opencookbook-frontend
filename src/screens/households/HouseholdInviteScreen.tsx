@@ -50,7 +50,7 @@ export const HouseholdInviteScreen = (props: Props) => {
 
   if (invalid) {
     return (
-      <Surface style={CentralStyles.fullscreen}>
+      <Surface style={CentralStyles.screen}>
         <View style={CentralStyles.contentContainer}>
           <Text>{t('screens.households.inviteInvalid')}</Text>
         </View>
@@ -60,14 +60,14 @@ export const HouseholdInviteScreen = (props: Props) => {
 
   if (!householdName) {
     return (
-      <Surface style={CentralStyles.fullscreen}>
+      <Surface style={CentralStyles.screen}>
         <ActivityIndicator style={CentralStyles.elementSpacing} />
       </Surface>
     );
   }
 
   return (
-    <Surface style={CentralStyles.fullscreen}>
+    <Surface style={CentralStyles.screen}>
       <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
         <Text variant="titleLarge">{t('screens.households.joinTitle', {name: householdName})}</Text>
         <Text style={CentralStyles.elementSpacing}>{t('screens.households.joinExplanation')}</Text>

@@ -1,10 +1,11 @@
 import {describe, expect, it} from 'vitest';
 import {PreviewMeal} from '../../dao/RestAPI';
 import {SheetLine} from './importLines';
-import {importRequest, initialChoices} from './importSheet';
+import {importRequest, initialChoices, isShoppedFor} from './importSheet';
 
 const meal = (date: string | null, defaultServings = 2): PreviewMeal => ({
   entryId: date ?? 'recipe', date, title: 'Meal', recipeId: 1, spontaneous: false, recipeServings: 4, defaultServings,
+  leftoverOf: null,
   lines: [],
 });
 
@@ -27,5 +28,13 @@ describe('importSheet', () => {
     expect(request.lines.map((sent) => sent.name)).toEqual(['Mehl']);
     expect(request.shown).toEqual([
       {name: 'Mehl', ticked: true}, {name: 'Salz', ticked: false}, {name: 'Öl', ticked: false}]);
+  });
+});
+
+describe('isShoppedFor', () => {
+  it('is a recipe that is neither leftovers nor a meal without a recipe', () => {
+    expect(isShoppedFor(meal('2026-10-05'))).toBe(true);
+    expect(isShoppedFor({...meal('2026-10-06'), leftoverOf: '2026-10-05'})).toBe(false);
+    expect(isShoppedFor({...meal('2026-10-06'), spontaneous: true})).toBe(false);
   });
 });

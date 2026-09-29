@@ -1,9 +1,8 @@
 import React from 'react';
-import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
-import {Text} from 'react-native-paper';
 import {Aisle} from '../../dao/aisles';
 import {groupByAisle} from '../../helper/shopping/aisles';
+import {AisleHeading} from './AisleHeading';
 
 interface Props<T> {
   items: T[];
@@ -12,12 +11,11 @@ interface Props<T> {
 
 // Items under a heading per aisle, in the order a shop is walked.
 export const AisleSections = <T extends {aisle: Aisle}>({items, renderItems}: Props<T>) => {
-  const {t} = useTranslation('translation');
   return (
     <>
       {groupByAisle(items).map((group) => (
         <View key={group.aisle} style={styles.section}>
-          <Text variant="labelLarge" style={styles.heading}>{t(`aisles.${group.aisle}`)}</Text>
+          <AisleHeading aisle={group.aisle} style={styles.heading} />
           {renderItems(group.items)}
         </View>
       ))}

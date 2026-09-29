@@ -1,11 +1,13 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
-import {Checkbox, Chip, Text, TextInput} from 'react-native-paper';
+import {Checkbox, Chip, Icon, Text, TextInput} from 'react-native-paper';
 import XDate from 'xdate';
 import {CountStepper} from '../../../components/CountStepper';
+import {LEFTOVERS_ICON, useLeftoversLabel} from '../../../helper/leftovers';
 import {MealChoice} from '../../../helper/shopping/importLines';
 import {formatWeekdayAndDate} from '../../../helper/weekplan';
+import {useAppTheme} from '../../../styles/CentralStyles';
 
 interface Props {
   choice: MealChoice;
@@ -17,6 +19,8 @@ const MAX_SERVINGS = 50;
 // One meal of the sheet: whether it is shopped for, for how many, and for a meal without a recipe, what.
 export const MealChoiceRow = ({choice, onChange}: Props) => {
   const {t, i18n} = useTranslation('translation');
+  const theme = useAppTheme();
+  const leftoversLabel = useLeftoversLabel();
   const [typing, setTyping] = useState('');
   const {meal} = choice;
 
@@ -26,6 +30,22 @@ export const MealChoiceRow = ({choice, onChange}: Props) => {
       setTyping('');
     }
   };
+
+  if (meal.leftoverOf) {
+    return (
+      <View style={[styles.row, styles.meal]}>
+        <View style={styles.leftoverIcon}>
+          <Icon source={LEFTOVERS_ICON} size={22} color={theme.colors.onSurfaceVariant} />
+        </View>
+        <View style={styles.grow}>
+          <Text variant="bodyLarge">{meal.title}</Text>
+          <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>
+            {t('screens.shopping.import.leftoversNothingToBuy', {leftovers: leftoversLabel(meal.leftoverOf)})}
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.meal}>
@@ -79,6 +99,8 @@ const styles = StyleSheet.create({
   meal: {paddingVertical: 4},
   row: {flexDirection: 'row', alignItems: 'center'},
   grow: {flex: 1},
+  // As wide as a checkbox, so titles line up.
+  leftoverIcon: {width: 36, alignItems: 'center'},
   typed: {marginLeft: 40, gap: 6},
   chips: {flexDirection: 'row', flexWrap: 'wrap', gap: 6},
 });

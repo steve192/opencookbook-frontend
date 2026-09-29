@@ -81,7 +81,7 @@ export const RecipeGroupEditScreen = (props: Props) => {
   );
 
   return (
-    <Surface style={CentralStyles.fullscreen}>
+    <Surface style={CentralStyles.screen}>
       <View style={CentralStyles.contentContainer}>
         <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>{t('screens.createGroup.groupName')}</Text>
         <TextInput

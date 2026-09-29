@@ -22,6 +22,9 @@ export const initialChoices = (meals: PreviewMeal[], today: string,
     typedItems: [],
   }));
 
+// Neither a meal without a recipe nor leftovers.
+export const isShoppedFor = (meal: PreviewMeal): boolean => !meal.spontaneous && !meal.leftoverOf;
+
 export const isTicked = (line: SheetLine, ticks: Ticks): boolean => ticks[line.key] ?? !line.staple;
 
 /**

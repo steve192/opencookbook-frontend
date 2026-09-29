@@ -1,5 +1,6 @@
-import {ShoppingTile} from '../../dao/RestAPI';
+import {ShoppingItem, ShoppingTile} from '../../dao/RestAPI';
 import {nameKey} from './names';
+import {parseQuickAdd} from './quickAdd';
 
 /**
  * A tile's name in the given language, or in any when it has none there.
@@ -59,4 +60,22 @@ export const searchTiles = (tiles: ShoppingTile[], typed: string, language: stri
 export const tileNamed = (tiles: ShoppingTile[], name: string): ShoppingTile | undefined => {
   const key = nameKey(name);
   return tiles.find((tile) => Object.values(tile.names).some((names) => names.some((other) => nameKey(other) === key)));
+};
+
+export interface TypedEntry {
+  name: string;
+  spec: string | null;
+  tile?: ShoppingTile;
+  recent?: ShoppingItem;
+}
+
+// The typed item, with the tile and recent purchase of exactly that name, if any.
+export const typedEntry = (typed: string, unitWords: ReadonlySet<string>, tiles: ShoppingTile[],
+    bought: ShoppingItem[]): TypedEntry | undefined => {
+  const {name, spec} = parseQuickAdd(typed, unitWords);
+  if (name.length === 0) {
+    return undefined;
+  }
+  const key = nameKey(name);
+  return {name, spec, tile: tileNamed(tiles, name), recent: bought.find((item) => nameKey(item.name) === key)};
 };

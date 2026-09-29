@@ -13,7 +13,7 @@ import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {openBringImport} from '../../helper/bringExport';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {bringLine, MealChoice, sheetLines} from '../../helper/shopping/importLines';
-import {importRequest, initialChoices, isTicked, Ticks} from '../../helper/shopping/importSheet';
+import {importRequest, initialChoices, isShoppedFor, isTicked, Ticks} from '../../helper/shopping/importSheet';
 import {defaultListFor} from '../../helper/shopping/lists';
 import {activeItems, visibleItems} from '../../helper/shopping/listItems';
 import {nameKey} from '../../helper/shopping/names';
@@ -88,7 +88,7 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
   // What the target list already holds, so a line can say so.
   const onTargetList = useMemo(() => {
     const held = targetListId === undefined ? undefined : sync[targetListId];
-    const items = activeItems(visibleItems(held, new Date().toISOString()));
+    const items = activeItems(visibleItems(held));
     return new Map(items.map((item) => [nameKey(item.name), item.spec]));
   }, [sync, targetListId]);
 
@@ -109,7 +109,7 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
     setSending(true);
     try {
       if (provider === 'BRING') {
-        const servings = choices?.find((choice) => choice.included && !choice.meal.spontaneous)?.servings ?? 1;
+        const servings = choices?.find((choice) => choice.included && isShoppedFor(choice.meal))?.servings ?? 1;
         await openBringImport(await RestAPI.createBringExportOfLines(bringTitle(), servings,
             tickedLines.map(bringLine), request.shown));
       } else if (targetList) {
@@ -132,7 +132,7 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
   }
 
   return (
-    <Surface style={CentralStyles.fullscreen}>
+    <Surface style={CentralStyles.screen}>
       <ScrollView contentContainerStyle={styles.content}>
         <SectionTitle>{t('screens.shopping.import.meals')}</SectionTitle>
         {choices.length === 0 && <Text>{t('screens.shopping.import.noMeals')}</Text>}

@@ -128,6 +128,10 @@ export interface WeekplanDayRecipeInfo {
     title: string;
     type: 'SIMPLE_RECIPE' | 'NORMAL_RECIPE'
     titleImageUuid?: string;
+    /** Servings cooked; null for leftovers. Sent as null, the recipe's own servings. */
+    servings?: number | null;
+    /** The day (yyyy-MM-dd) whose cooking this meal eats the leftovers of. */
+    leftoverOf?: string | null;
 }
 
 /**
@@ -139,6 +143,8 @@ export interface WeekplanDayRecipeRequest {
     id?: number | string;
     type: 'SIMPLE_RECIPE' | 'NORMAL_RECIPE'
     title?: string;
+    servings?: number | null;
+    leftoverOf?: string | null;
 }
 export interface WeekplanDay {
     day: string,
@@ -185,6 +191,8 @@ export interface ShoppingItem {
   icon: string | null;
   status: 'ACTIVE' | 'BOUGHT';
   boughtAt: string | null;
+  /** When it was last put on the list; missing on items this device stored before it was sent. */
+  addedAt?: string;
   /** A display name; null once that account is gone. */
   addedBy: string | null;
   sources: ShoppingItemSource[];
@@ -252,6 +260,8 @@ export interface PreviewMeal {
   spontaneous: boolean;
   recipeServings: number;
   defaultServings: number;
+  /** The day whose cooking this meal eats; nothing is bought for it. */
+  leftoverOf: string | null;
   lines: PreviewLine[];
 }
 

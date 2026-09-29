@@ -56,7 +56,7 @@ export const OpenSourceLicensesScreen = () => {
       [app, server, query]);
 
   return (
-    <Surface style={CentralStyles.fullscreen}>
+    <Surface style={CentralStyles.screen}>
       <SectionList
         sections={sections}
         keyExtractor={(component, index) => `${component.name}-${index}`}

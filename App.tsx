@@ -2,6 +2,7 @@
 /* eslint-disable react/display-name */
 import React from 'react';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {KeyboardProvider} from 'react-native-keyboard-controller';
 import {Provider as PaperProvider} from 'react-native-paper';
 import {enableScreens} from 'react-native-screens';
 import {Provider, useSelector} from 'react-redux';
@@ -28,9 +29,11 @@ export default () => {
   return (
     // Gestures are only recognised inside this, so it sits above everything that might use one.
     <GestureHandlerRootView style={styles.root}>
-      <Provider store={store}>
-        <ReduxWrappedApp />
-      </Provider>
+      <KeyboardProvider>
+        <Provider store={store}>
+          <ReduxWrappedApp />
+        </Provider>
+      </KeyboardProvider>
     </GestureHandlerRootView>
   );
 };

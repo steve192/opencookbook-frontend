@@ -3,26 +3,35 @@ import {CompositeScreenProps} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Keyboard, RefreshControl, ScrollView, StyleSheet} from 'react-native';
-import {Appbar, Searchbar, Surface, Text} from 'react-native-paper';
-import {ShoppingItemTile} from '../../components/shopping/ShoppingItemTile';
+import {Pressable, RefreshControl, ScrollView, StyleSheet, View} from 'react-native';
+import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
+import {Appbar, Surface, Text} from 'react-native-paper';
+import {TileLook} from '../../components/shopping/FlyingTile';
 import {ShoppingListMenu} from '../../components/shopping/ShoppingListMenu';
-import {ShoppingItem, ShoppingList, ShoppingOp, ShoppingTile} from '../../dao/RestAPI';
+import {useTileFlights} from '../../components/shopping/useTileFlights';
+import {ShoppingItem, ShoppingList, ShoppingTile} from '../../dao/RestAPI';
+import {newClientId} from '../../helper/clientId';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
-import {parseQuickAdd} from '../../helper/shopping/quickAdd';
-import {tileNamed} from '../../helper/shopping/tiles';
+import {activeItems, recentlyBought, visibleItems} from '../../helper/shopping/listItems';
+import {changeShoppingList, loadShoppingLists, ShoppingChange, syncShoppingList} from '../../helper/shopping/shoppingSync';
+import {boughtKey, listKey, sheetKey, sourceKeyOf} from '../../helper/shopping/tileKeys';
+import {TILE_AREA_PADDING} from '../../helper/shopping/tileLayout';
+import {typedEntry} from '../../helper/shopping/tiles';
 import {useListName} from '../../helper/shopping/useListName';
 import {useShoppingVocabulary} from '../../helper/shopping/useShoppingVocabulary';
-import {activeItems, recentlyBought, visibleItems} from '../../helper/shopping/listItems';
-import {changeShoppingList, loadShoppingLists, newClientId, syncShoppingList} from '../../helper/shopping/shoppingSync';
+import {useStableCallback} from '../../helper/useStableCallback';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps} from '../../navigation/NavigationRoutes';
 import {shoppingListChosen} from '../../redux/features/shoppingSlice';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
-import {QuickAddPanel} from './QuickAddPanel';
+import {ItemTile} from './ItemTile';
+import {QuickAddField} from './QuickAddField';
+import {QuickAddSheet} from './QuickAddSheet';
 import {ItemEdit, ShoppingItemDialog} from './ShoppingItemDialog';
-import {TileGrid} from './TileGrid';
+import {TILE_LAYOUT, TileGrid} from './TileGrid';
+import {useFollowNewest} from './useFollowNewest';
+import {useQuickAdd} from './useQuickAdd';
 
 type Props =
     CompositeScreenProps<
@@ -41,15 +50,16 @@ export const ShoppingListScreen = (props: Props) => {
   const held = useAppSelector((state) => activeListId === null ? undefined : state.shopping.sync[activeListId]);
   const {tiles, unitWords} = useShoppingVocabulary();
 
-  const [typed, setTyped] = useState('');
-  const [adding, setAdding] = useState(false);
   const [openItem, setOpenItem] = useState<ShoppingItem>();
   const [refreshing, setRefreshing] = useState(false);
+  const quickAdd = useQuickAdd(props.navigation);
+  const follow = useFollowNewest(quickAdd.adding, LIST_END_PADDING);
+  const flights = useTileFlights();
 
   const activeList = lists.find((list) => list.id === activeListId);
   const nameOf = useListName();
   const items = useMemo(
-      () => visibleItems(held, new Date().toISOString()), [held]);
+      () => visibleItems(held), [held]);
   const active = useMemo(() => activeItems(items), [items]);
   const bought = useMemo(() => recentlyBought(items), [items]);
 
@@ -96,91 +106,98 @@ export const ShoppingListScreen = (props: Props) => {
     });
   }, [props.navigation, lists, activeList, activeListId, theme, refresh]);
 
-  const change = (op: ShoppingOp) => activeListId !== null && dispatch(changeShoppingList(activeListId, op));
+  const change = (op: ShoppingChange) => activeListId !== null && dispatch(changeShoppingList(activeListId, op));
 
-  const add = (name: string, spec: string | null, tile?: ShoppingTile) => {
-    change({opId: newClientId(), type: 'ADD', itemId: newClientId(), name, spec,
-      aisle: tile?.aisle ?? null, icon: tile?.icon ?? null});
-    setTyped('');
-  };
+  const addFrom = (sourceKey: string, look: TileLook, op: ShoppingChange) =>
+    flights.launch(sheetKey(sourceKey), listKey(look.name), look, () => {
+      change(op);
+      quickAdd.next();
+    }, follow.reveal);
 
-  /** What was typed, split into name and amount, placed like its tile when it names one. */
+  const add = (name: string, spec: string | null, tile: ShoppingTile | undefined, sourceKey: string) =>
+    addFrom(sourceKey, {name, spec, icon: tile?.icon ?? null, aisle: tile?.aisle ?? 'OTHER'},
+        {type: 'ADD', itemId: newClientId(), name, spec, aisle: tile?.aisle ?? null, icon: tile?.icon ?? null});
+
+  const restoreFrom = (item: ShoppingItem, sourceKey: string) =>
+    addFrom(sourceKey, lookOf(item), {type: 'RESTORE', itemId: item.id});
+
   const addTyped = () => {
-    const {name, spec} = parseQuickAdd(typed, unitWords);
-    if (name.length > 0) {
-      add(name, spec, tileNamed(tiles, name));
+    const entry = typedEntry(quickAdd.typed, unitWords, tiles, bought);
+    if (entry) {
+      add(entry.name, entry.spec, entry.tile, sourceKeyOf(entry));
     }
   };
 
   const tick = (item: ShoppingItem) => {
-    change({opId: newClientId(), type: 'BUY', itemId: item.id});
+    flights.launch(listKey(item.name), boughtKey(item.name), lookOf(item),
+        () => change({type: 'BUY', itemId: item.id}));
     SnackbarUtil.show({
       message: t('screens.shopping.ticked', {name: item.name}),
       action: t('common.undo'),
-      onAction: () => change({opId: newClientId(), type: 'RESTORE', itemId: item.id, spec: item.spec}),
+      onAction: () => restore(item, item.spec),
     });
   };
 
-  const restore = (item: ShoppingItem) => {
-    change({opId: newClientId(), type: 'RESTORE', itemId: item.id});
-    setTyped('');
-  };
+  // Without a spec, as bought again; undoing a tick keeps it.
+  const restore = (item: ShoppingItem, spec?: string | null) =>
+    flights.launch(boughtKey(item.name), listKey(item.name), lookOf(item),
+        () => change({type: 'RESTORE', itemId: item.id, spec}));
+
+  const onTick = useStableCallback(tick);
+  const onRestore = useStableCallback((item: ShoppingItem) => restore(item));
 
   const save = (item: ShoppingItem, changes: ItemEdit) => {
     if (changes.name !== undefined || changes.spec !== undefined || changes.aisle !== undefined) {
-      change({opId: newClientId(), type: 'UPDATE', itemId: item.id, ...changes});
+      change({type: 'UPDATE', itemId: item.id, ...changes});
     }
   };
 
   const remove = (item: ShoppingItem) => {
-    change({opId: newClientId(), type: 'DELETE', itemId: item.id});
+    change({type: 'DELETE', itemId: item.id});
     SnackbarUtil.show({message: t('screens.shopping.itemRemoved', {name: item.name})});
   };
 
-  const stopAdding = () => {
-    setAdding(false);
-    setTyped('');
-    Keyboard.dismiss();
-  };
-
   return (
-    <Surface style={CentralStyles.fullscreen}>
-      <Searchbar
-        style={styles.search}
-        placeholder={t('screens.shopping.addPlaceholder')}
-        icon={adding ? 'arrow-left' : 'plus'}
-        onIconPress={adding ? stopAdding : () => setAdding(true)}
-        value={typed}
-        onFocus={() => setAdding(true)}
-        onChangeText={setTyped}
-        onSubmitEditing={addTyped} />
+    <Surface style={CentralStyles.screen}>
       {!isOnline && <Text variant="bodySmall" style={styles.hint}>{t('screens.shopping.offlineHint')}</Text>}
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => {
-          setRefreshing(true);
-          refresh().finally(() => setRefreshing(false));
-        }} />}>
-        {adding ?
-          <QuickAddPanel typed={typed} tiles={tiles} unitWords={unitWords} active={active} bought={bought} onAdd={add}
-            onAddTyped={addTyped} onRestore={restore} /> :
-          <>
-            {active.length === 0 && <Text style={styles.hint}>{t('screens.shopping.empty')}</Text>}
-            <TileGrid byAisle items={active} keyOf={(item) => item.id} renderTile={(item) => (
-              <ShoppingItemTile name={item.name} spec={item.spec} icon={item.icon} aisle={item.aisle}
-                onPress={() => tick(item)} onLongPress={() => setOpenItem(item)} />
+      <View ref={follow.areaRef} style={styles.listArea} collapsable={false}>
+        <ScrollView
+          {...follow.listProps}
+          contentContainerStyle={styles.content}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => {
+            setRefreshing(true);
+            refresh().finally(() => setRefreshing(false));
+          }} />}>
+          {active.length === 0 && !quickAdd.adding && <Text style={styles.hint}>{t('screens.shopping.empty')}</Text>}
+          <TileGrid byAisle={!quickAdd.adding} animated items={active} keyOf={(item) => item.id}
+            still={(item) => flights.isMoving(listKey(item.name))}
+            renderTile={(item) => (
+              <ItemTile item={item} hidden={flights.isMoving(listKey(item.name))}
+                viewRef={flights.register(listKey(item.name))} onPress={onTick} onLongPress={setOpenItem} />
             )} />
-            {bought.length > 0 &&
-              <>
-                <Text variant="titleSmall" style={styles.recent}>{t('screens.shopping.recentlyBought')}</Text>
-                <TileGrid items={bought} keyOf={(item) => item.id} renderTile={(item) => (
-                  <ShoppingItemTile name={item.name} icon={item.icon} aisle={item.aisle} muted
-                    onPress={() => restore(item)} onLongPress={() => setOpenItem(item)} />
+          {!quickAdd.adding &&
+            <Animated.View layout={TILE_LAYOUT} entering={FadeIn} exiting={FadeOut}>
+              {bought.length > 0 &&
+                <Text variant="titleSmall" style={styles.recent}>{t('screens.shopping.recentlyBought')}</Text>}
+              {/* Mounted while empty too, so the first tile ticked off already animates into it. */}
+              <TileGrid animated items={bought} keyOf={(item) => item.id}
+                still={(item) => flights.isMoving(boughtKey(item.name))}
+                renderTile={(item) => (
+                  <ItemTile item={item} muted hidden={flights.isMoving(boughtKey(item.name))}
+                    viewRef={flights.register(boughtKey(item.name))} onPress={onRestore} onLongPress={setOpenItem} />
                 )} />
-              </>}
-          </>}
-      </ScrollView>
+            </Animated.View>}
+        </ScrollView>
+        {quickAdd.adding &&
+          <Pressable style={StyleSheet.absoluteFill} accessibilityRole="button" accessibilityLabel={t('common.done')}
+            onPress={quickAdd.stop} />}
+      </View>
+      {quickAdd.adding &&
+        <QuickAddSheet typed={quickAdd.typed} tiles={tiles} unitWords={unitWords} active={active} bought={bought}
+          onAdd={add} onRestore={restoreFrom} registerSource={(key) => flights.register(sheetKey(key))} />}
+      <QuickAddField inputRef={quickAdd.fieldRef} typed={quickAdd.typed} onType={quickAdd.setTyped}
+        onFocus={quickAdd.start} onSubmit={addTyped} adding={quickAdd.adding} onDone={quickAdd.stop} />
+      {flights.copies}
       {openItem &&
         <ShoppingItemDialog
           item={openItem}
@@ -191,9 +208,14 @@ export const ShoppingListScreen = (props: Props) => {
   );
 };
 
+const lookOf = (item: ShoppingItem): TileLook =>
+  ({name: item.name, spec: item.spec, icon: item.icon, aisle: item.aisle});
+
+const LIST_END_PADDING = 32;
+
 const styles = StyleSheet.create({
-  search: {margin: 12, marginBottom: 4},
-  content: {padding: 12, paddingBottom: 32},
-  hint: {marginHorizontal: 12, marginVertical: 8},
+  listArea: {flex: 1},
+  content: {padding: TILE_AREA_PADDING, paddingBottom: LIST_END_PADDING},
+  hint: {marginHorizontal: TILE_AREA_PADDING, marginVertical: 8},
   recent: {marginTop: 16, marginBottom: 8},
 });

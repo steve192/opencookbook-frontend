@@ -3,9 +3,8 @@ import {StyleSheet} from 'react-native';
 import {ActivityIndicator, Surface} from 'react-native-paper';
 import CentralStyles from '../styles/CentralStyles';
 
-// A whole screen waiting for what it shows.
 export const LoadingScreen = () => (
-  <Surface style={[CentralStyles.fullscreen, styles.centered]}><ActivityIndicator /></Surface>
+  <Surface style={[CentralStyles.screen, styles.centered]}><ActivityIndicator /></Surface>
 );
 
 const styles = StyleSheet.create({

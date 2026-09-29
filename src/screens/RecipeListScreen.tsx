@@ -165,7 +165,7 @@ const RecipeListScreen = (props: Props) => {
 
   return (
     <>
-      <Surface testID="recipeListScreen" style={CentralStyles.fullscreen}>
+      <Surface testID="recipeListScreen" style={CentralStyles.screen}>
         {shownHousehold ?
           <HouseholdCookbookList
             householdId={shownHousehold.id}

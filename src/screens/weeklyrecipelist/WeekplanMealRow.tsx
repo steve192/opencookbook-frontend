@@ -3,10 +3,15 @@ import {useTranslation} from 'react-i18next';
 import {Pressable, StyleSheet, View} from 'react-native';
 import {Icon, IconButton, Text} from 'react-native-paper';
 import {RecipeImageComponent} from '../../components/RecipeImageComponent';
+import {LEFTOVERS_ICON, LEFTOVERS_ICON_ACTIVE} from '../../helper/leftovers';
 import {useAppTheme} from '../../styles/CentralStyles';
 
 interface Props {
   title: string;
+  /** Shown under the title, e.g. which day leftovers are from. */
+  note?: string;
+  /** For a recipe that is, or can be, leftovers of an earlier day. */
+  leftovers?: {active: boolean, onToggle: () => void};
   /** Undefined for spontaneous meals, which have no recipe behind them */
   imageUuid?: string;
   onPress?: () => void;
@@ -66,11 +71,24 @@ export const WeekplanMealRow = (props: Props) => {
             </View>
           }
         </View>
-        <Text numberOfLines={2} style={styles.title}>{props.title}</Text>
+        <View style={styles.texts}>
+          <Text numberOfLines={2} style={styles.title}>{props.title}</Text>
+          {props.note &&
+            <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>{props.note}</Text>}
+        </View>
         {props.onPress &&
           <Icon source="chevron-right" size={20} color={theme.colors.onSurfaceVariant} />
         }
       </Pressable>
+      {props.leftovers &&
+        <IconButton
+          icon={props.leftovers.active ? LEFTOVERS_ICON_ACTIVE : LEFTOVERS_ICON}
+          size={18}
+          selected={props.leftovers.active}
+          iconColor={props.leftovers.active ? theme.colors.primary : theme.colors.onSurfaceVariant}
+          accessibilityLabel={t(props.leftovers.active ? 'screens.weekplan.cookFresh' : 'screens.weekplan.markLeftovers')}
+          onPress={props.leftovers.onToggle} />
+      }
       {props.reorderable &&
         <View style={styles.reorderColumn}>
           {renderReorderButton({
@@ -118,8 +136,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
+  texts: {
     flex: 1,
+  },
+  title: {
     fontWeight: '600',
   },
   reorderColumn: {
