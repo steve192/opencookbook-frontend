@@ -37,11 +37,11 @@ const RecipeListScreen = (props: Props) => {
   // Undefined for your own cookbook.
   const [shownHouseholdId, setShownHouseholdId] = useState<string | undefined>(undefined);
   useEffect(() => {
-    AppPersistence.getShownCookbook().then(setShownHouseholdId);
+    void AppPersistence.getShownCookbook().then(setShownHouseholdId);
   }, []);
   const showCookbook = (householdId: string | undefined) => {
     setShownHouseholdId(householdId);
-    AppPersistence.setShownCookbook(householdId);
+    void AppPersistence.setShownCookbook(householdId);
   };
   const {households} = useHouseholds();
   // Resolved against the list, so a household left meanwhile falls back to your own cookbook. A

@@ -7,7 +7,7 @@ import {useTilePositions} from './tilePositions';
 const nextFrame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
 const samePlace = (first: PageRect | undefined, second: PageRect | undefined) =>
-  first !== undefined && second !== undefined && first.x === second.x && first.y === second.y;
+  first !== undefined && first.x === second?.x && first.y === second?.y;
 
 // How long a target may take to be laid out: longer on a phone, where layout comes back from the native side.
 const MAX_FRAMES_TO_PLACE = 20;
@@ -44,7 +44,7 @@ export const useTileFlights = () => {
 
   // The flight is shown a frame before the change, so a source the change removes is hidden instead of animating out.
   const launch = async (sourceKey: string, targetKey: string, tile: TileLook, change: () => void,
-      reveal: Reveal = async (target) => target) => {
+      reveal: Reveal = (target) => Promise.resolve(target)) => {
     const from = await positions.measure(sourceKey);
     if (!from) {
       change();

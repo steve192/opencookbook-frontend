@@ -372,7 +372,7 @@ const MainNavigation = () => {
     }
     setInitializersRun(true);
 
-    (async () => {
+    void (async () => {
       NetInfo.addEventListener((state) => {
         if (Platform.OS === 'android') {
           dispatch(changeOnlineState(state.isInternetReachable === true));
@@ -384,7 +384,7 @@ const MainNavigation = () => {
       // Check for new app versions
       const info = await NetInfo.fetch();
       if (info.isInternetReachable) {
-        offerUpdate(t);
+        await offerUpdate(t);
       }
     })();
   }, []);

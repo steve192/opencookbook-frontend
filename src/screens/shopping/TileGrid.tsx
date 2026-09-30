@@ -42,13 +42,17 @@ export const TileGrid = <T extends {aisle: Aisle}>(props: Props<T>) => {
       </Animated.View> :
       <View key={key} style={{width: cellWidth}}>{content}</View>;
 
+  const tileCell = (item: T, tileWidth: number) => {
+    const key = props.keyOf(item);
+    return cell(key, tileWidth, still.has(key) ? STILL_ANIMATIONS : TILE_ANIMATIONS, props.renderTile(item));
+  };
+
   const grid = (tileWidth: number) => (
     <View style={styles.grid}>
       {tileCells(props.items, !!props.byAisle).map((each) => 'heading' in each ?
         cell(headingKey(each.heading), '100%', HEADING_ANIMATIONS,
             <AisleHeading aisle={each.heading} inGrid />) :
-        cell(props.keyOf(each.item), tileWidth, still.has(props.keyOf(each.item)) ? STILL_ANIMATIONS : TILE_ANIMATIONS,
-            props.renderTile(each.item)))}
+        tileCell(each.item, tileWidth))}
     </View>
   );
 

@@ -82,7 +82,7 @@ export const syncShoppingList = (listId: number): Thunk => async (dispatch, getS
   } finally {
     inFlight.delete(listId);
     if (syncAgain.delete(listId)) {
-      dispatch(syncShoppingList(listId));
+      void dispatch(syncShoppingList(listId));
     }
   }
 };
@@ -97,13 +97,13 @@ export type ShoppingChange = DistributiveOmit<ShoppingOp, 'opId'>;
  * @param {ShoppingChange} change the change
  * @return {Thunk} the change
  */
-export const changeShoppingList = (listId: number, change: ShoppingChange): Thunk => async (dispatch) => {
+export const changeShoppingList = (listId: number, change: ShoppingChange) => (dispatch: AppDispatch) => {
   const op: ShoppingOp = {...change, opId: newClientId()};
   dispatch(shoppingOpQueued({listId, op, at: new Date().toISOString()}));
   clearTimeout(flushTimers.get(listId));
   flushTimers.set(listId, setTimeout(() => {
     flushTimers.delete(listId);
-    dispatch(syncShoppingList(listId));
+    void dispatch(syncShoppingList(listId));
   }, FLUSH_DELAY_MILLIS));
 };
 

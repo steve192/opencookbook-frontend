@@ -75,7 +75,7 @@ export const ShoppingListScreen = (props: Props) => {
 
   const chooseList = (list: ShoppingList) => {
     dispatch(shoppingListChosen(list.id));
-    dispatch(syncShoppingList(list.id));
+    void dispatch(syncShoppingList(list.id));
   };
 
   const manageLists = () => props.navigation.navigate('ShoppingListsScreen');
@@ -102,7 +102,7 @@ export const ShoppingListScreen = (props: Props) => {
     applyHeaderOptions();
     return props.navigation.addListener('focus', () => {
       applyHeaderOptions();
-      refresh();
+      void refresh();
     });
   }, [props.navigation, lists, activeList, activeListId, theme, refresh]);
 
@@ -124,12 +124,12 @@ export const ShoppingListScreen = (props: Props) => {
   const addTyped = () => {
     const entry = typedEntry(quickAdd.typed, unitWords, tiles, bought);
     if (entry) {
-      add(entry.name, entry.spec, entry.tile, sourceKeyOf(entry));
+      void add(entry.name, entry.spec, entry.tile, sourceKeyOf(entry));
     }
   };
 
   const tick = (item: ShoppingItem) => {
-    flights.launch(listKey(item.name), boughtKey(item.name), lookOf(item),
+    void flights.launch(listKey(item.name), boughtKey(item.name), lookOf(item),
         () => change({type: 'BUY', itemId: item.id}));
     SnackbarUtil.show({
       message: t('screens.shopping.ticked', {name: item.name}),
@@ -166,7 +166,7 @@ export const ShoppingListScreen = (props: Props) => {
           contentContainerStyle={styles.content}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => {
             setRefreshing(true);
-            refresh().finally(() => setRefreshing(false));
+            void refresh().finally(() => setRefreshing(false));
           }} />}>
           {active.length === 0 && !quickAdd.adding && <Text style={styles.hint}>{t('screens.shopping.empty')}</Text>}
           <TileGrid byAisle={!quickAdd.adding} animated items={active} keyOf={(item) => item.id}

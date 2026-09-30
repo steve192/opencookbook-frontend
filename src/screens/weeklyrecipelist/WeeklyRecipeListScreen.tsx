@@ -203,23 +203,29 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   };
 
   const addPickedRecipe = (recipe: Pick<Recipe, 'id' | 'title'>) => {
-    selectedWeekplanDay && persist(withRecipeAdded(selectedWeekplanDay, recipe));
+    if (selectedWeekplanDay) {
+      void persist(withRecipeAdded(selectedWeekplanDay, recipe));
+    }
     setRecipeSelectionVisible(false);
   };
 
   const addLeftovers = (source: LeftoverSource) => {
-    selectedWeekplanDay && persist(withLeftoversAdded(selectedWeekplanDay, source));
+    if (selectedWeekplanDay) {
+      void persist(withLeftoversAdded(selectedWeekplanDay, source));
+    }
     setRecipeSelectionVisible(false);
   };
 
   const changeLeftover = (day: WeekplanDay, index: number, cookedOn: string | null) => {
     if (requireOnline()) {
-      persist(withLeftoverOf(day, index, cookedOn));
+      void persist(withLeftoverOf(day, index, cookedOn));
     }
   };
 
   const addSpontaneousMeal = (title: string) => {
-    selectedWeekplanDay && persist(withSimpleMealAdded(selectedWeekplanDay, title));
+    if (selectedWeekplanDay) {
+      void persist(withSimpleMealAdded(selectedWeekplanDay, title));
+    }
     setRecipeSelectionVisible(false);
   };
 
@@ -227,7 +233,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     if (!requireOnline()) {
       return;
     }
-    persist(withMealRemoved(day, index));
+    void persist(withMealRemoved(day, index));
 
     // Removing is a single tap now, so it has to be undoable
     SnackbarUtil.show({
@@ -241,7 +247,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     if (!requireOnline()) {
       return;
     }
-    persist(withMealMoved(day, fromIndex, toIndex));
+    void persist(withMealMoved(day, fromIndex, toIndex));
   };
 
   const openRecipe = (meal: WeekplanDayRecipeInfo) => {

@@ -48,7 +48,7 @@ export const useWebFlip = (enabled: boolean, still: ReadonlySet<string>): (key: 
       element.style.transform = `translate(${dx}px, ${dy}px)`;
     });
     // One layout for all of them, so the transition starts from the old place.
-    void moved[0].element.offsetWidth;
+    moved[0].element.getBoundingClientRect();
     moved.forEach(({element}) => {
       element.style.transition = TRANSITION;
       element.style.transform = '';

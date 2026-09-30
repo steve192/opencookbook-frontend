@@ -115,7 +115,7 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
       } else if (targetList) {
         await RestAPI.importToShoppingList(targetList, request.lines, request.shown);
         dispatch(shoppingListChosen(targetList.id));
-        dispatch(syncShoppingList(targetList.id));
+        void dispatch(syncShoppingList(targetList.id));
         SnackbarUtil.show({message: t('screens.shopping.import.added',
             {count: request.lines.length, list: nameOf(targetList)})});
       }
