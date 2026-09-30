@@ -39,6 +39,7 @@ export const LINKING_SCREENS = {
       PlanningSettingsScreen: 'settings/planning',
       ScanningSettingsScreen: 'settings/scanning',
       AppearanceSettingsScreen: 'settings/appearance',
+      ApiKeysScreen: 'settings/apiKeys',
       OverviewScreen: {
         screens: {
           SettingsScreen: 'settings',

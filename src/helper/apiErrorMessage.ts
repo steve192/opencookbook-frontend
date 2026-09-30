@@ -18,6 +18,7 @@ export const MESSAGE_KEYS = {
   FILE_TOO_LARGE: 'errors.fileTooLarge',
 
   AUTHENTICATION_REQUIRED: 'errors.authenticationRequired',
+  REAUTHENTICATION_REQUIRED: 'errors.authenticationRequired',
   INVALID_CREDENTIALS: 'errors.invalidCredentials',
   ACCOUNT_NOT_ACTIVATED: 'errors.accountNotActivated',
   ACCESS_DENIED: 'errors.accessDenied',
@@ -36,6 +37,7 @@ export const MESSAGE_KEYS = {
   HOUSEHOLD_FULL: 'screens.households.full',
   TOO_MANY_HOUSEHOLDS: 'screens.households.tooMany',
   TOO_MANY_SHOPPING_LISTS: 'screens.shopping.tooManyLists',
+  TOO_MANY_API_KEYS: 'screens.apiKeys.tooMany',
   TOO_MANY_INVITES: 'screens.households.tooManyInvites',
   INVITE_INVALID: 'screens.households.inviteInvalid',
   ALREADY_A_MEMBER: 'screens.households.alreadyMember',

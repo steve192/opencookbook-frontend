@@ -2,6 +2,7 @@ import {describe, expect, it} from 'vitest';
 import {NutritionLine, NutritionSummary, Nutrients} from '../dao/RestAPI';
 import de from '../i18n/de.json';
 import en from '../i18n/en.json';
+import {translationAt} from '../i18n/translationAt';
 import {canWeighPieces, formatEstimate, formatNutrient, lineNoteKeys, linesWarningFirst, NUTRIENT_ROWS, nutritionColumns,
   scaleNutrients} from './nutrition';
 
@@ -112,9 +113,6 @@ describe('lineNoteKeys', () => {
 // The keys are put together from what the server sends, so a missing translation would only show
 // as the key itself on screen.
 describe('every nutrition label can be said out loud', () => {
-  const resolve = (translations: object, key: string): unknown => key.split('.').reduce<unknown>(
-      (branch, segment) => (branch && typeof branch === 'object' ? (branch as Record<string, unknown>)[segment] : undefined),
-      translations);
   const statuses: NutritionLine['status'][] = ['EXCLUDED', 'UNLINKED', 'UNIT_UNKNOWN', 'NO_PORTION', 'NO_AMOUNT'];
   const keys = [
     ...NUTRIENT_ROWS.map((row) => row.labelKey),
@@ -124,7 +122,7 @@ describe('every nutrition label can be said out loud', () => {
   ];
 
   it.each(keys)('%s exists in English and German', (key) => {
-    expect(resolve(en, key)).toBeTypeOf('string');
-    expect(resolve(de, key)).toBeTypeOf('string');
+    expect(translationAt(en, key)).toBeTypeOf('string');
+    expect(translationAt(de, key)).toBeTypeOf('string');
   });
 });

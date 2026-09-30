@@ -4,7 +4,6 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
 import {useDispatch} from 'react-redux';
-import AppPersistence from '../../AppPersistence';
 import {CustomCard} from '../../components/CustomCard';
 import RestAPI from '../../dao/RestAPI';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
@@ -70,9 +69,8 @@ export const AccountSettingsScreen = (_props: Props) => {
     });
   };
 
-  const performLogout = () => {
-    AppPersistence.setAuthToken('');
-    AppPersistence.setRefreshToken('');
+  const performLogout = async () => {
+    await RestAPI.logout();
     dispatch(logout());
   };
 

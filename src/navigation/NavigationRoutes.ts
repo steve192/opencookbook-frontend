@@ -50,6 +50,7 @@ export type MainNavigationProps = {
     PlanningSettingsScreen: undefined
     ScanningSettingsScreen: undefined
     AppearanceSettingsScreen: undefined
+    ApiKeysScreen: undefined
 };
 
 export type OverviewNavigationProps = {

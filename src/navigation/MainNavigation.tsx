@@ -39,6 +39,7 @@ import {HouseholdInviteScreen} from '../screens/households/HouseholdInviteScreen
 import {HouseholdListScreen} from '../screens/households/HouseholdListScreen';
 import {HouseholdScreen} from '../screens/households/HouseholdScreen';
 import {AccountSettingsScreen} from '../screens/settings/AccountSettingsScreen';
+import {ApiKeysScreen} from '../screens/settings/ApiKeysScreen';
 import {AppearanceSettingsScreen} from '../screens/settings/AppearanceSettingsScreen';
 import {OpenSourceLicensesScreen} from '../screens/settings/OpenSourceLicensesScreen';
 import {PlanningSettingsScreen} from '../screens/settings/PlanningSettingsScreen';
@@ -319,6 +320,11 @@ const MainStackNavigation = () => {
           name="AppearanceSettingsScreen"
           component={AppearanceSettingsScreen}
           options={{title: t('screens.settings.appearance')}}
+        />
+        <MainStack.Screen
+          name="ApiKeysScreen"
+          component={ApiKeysScreen}
+          options={{title: t('screens.apiKeys.title')}}
         />
       </MainStack.Navigator>
     </KeyboardAvoidingScreen>

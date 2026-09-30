@@ -178,7 +178,35 @@
       "scanningSubtitle": "Fotos gescannter Rezepte und was mit ihnen passiert",
       "appearance": "Darstellung",
       "appearanceSubtitle": "Hell, dunkel oder wie das System",
-      "appVersion": "App-Version {{version}}"
+      "appVersion": "App-Version {{version}}",
+      "apiKeysSubtitle": "Andere Dienste dein Konto nutzen lassen"
+    },
+    "apiKeys": {
+      "title": "API-Schlüssel",
+      "explanation": "Mit einem API-Schlüssel kann ein anderer Dienst dein Konto ohne dein Passwort nutzen. Er kann nur, was du beim Erstellen ankreuzt, und du kannst ihn jederzeit widerrufen.",
+      "empty": "Du hast noch keine API-Schlüssel.",
+      "create": "API-Schlüssel erstellen",
+      "name": "Wofür ist er?",
+      "features": {
+        "shopping": "Einkaufslisten"
+      },
+      "scopes": {
+        "shoppingRead": "Einkaufslisten lesen",
+        "shoppingWrite": "Einträge hinzufügen, abhaken und entfernen"
+      },
+      "created": "Erstellt am {{date}}",
+      "lastUsed": "zuletzt genutzt {{date}}",
+      "neverUsed": "noch nie genutzt",
+      "revoke": "Widerrufen",
+      "revokeTitle": "API-Schlüssel widerrufen?",
+      "revokeMessage": "Dienste, die \"{{name}}\" nutzen, verlieren sofort den Zugriff.",
+      "createdTitle": "Dein neuer API-Schlüssel",
+      "createdMessage": "Kopiere den Schlüssel für \"{{name}}\" jetzt. Er wird nur dieses eine Mal angezeigt; geht er verloren, erstelle einen neuen.",
+      "copy": "Kopieren",
+      "copied": "Schlüssel kopiert",
+      "copyFailed": "Der Schlüssel konnte nicht kopiert werden. Markiere ihn oben und kopiere ihn selbst.",
+      "share": "Teilen",
+      "tooMany": "Du hast so viele API-Schlüssel, wie dieser Server erlaubt. Widerrufe einen, den du nicht mehr brauchst."
     },
     "import": {
       "URLToImport": "URL zum importieren",
