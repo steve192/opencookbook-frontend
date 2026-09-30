@@ -178,7 +178,35 @@
       "scanningSubtitle": "Photos of scanned recipes and what happens to them",
       "appearance": "Appearance",
       "appearanceSubtitle": "Light, dark or like the system",
-      "appVersion": "App version {{version}}"
+      "appVersion": "App version {{version}}",
+      "apiKeysSubtitle": "Let other services use your account"
+    },
+    "apiKeys": {
+      "title": "API keys",
+      "explanation": "An API key lets another service use your account without your password. It can only do what you tick when creating it, and you can revoke it at any time.",
+      "empty": "You have no API keys yet.",
+      "create": "Create API key",
+      "name": "What is it for?",
+      "features": {
+        "shopping": "Shopping lists"
+      },
+      "scopes": {
+        "shoppingRead": "Read shopping lists",
+        "shoppingWrite": "Add, tick off and remove items"
+      },
+      "created": "Created {{date}}",
+      "lastUsed": "last used {{date}}",
+      "neverUsed": "never used",
+      "revoke": "Revoke",
+      "revokeTitle": "Revoke API key?",
+      "revokeMessage": "Services using \"{{name}}\" lose access immediately.",
+      "createdTitle": "Your new API key",
+      "createdMessage": "Copy the key for \"{{name}}\" now. It is shown only this once; if you lose it, create a new one.",
+      "copy": "Copy",
+      "copied": "Key copied",
+      "copyFailed": "The key could not be copied. Select it above and copy it yourself.",
+      "share": "Share",
+      "tooMany": "You have as many API keys as this server allows. Revoke one you no longer use."
     },
     "import": {
       "URLToImport": "URL to import",

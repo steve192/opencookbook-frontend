@@ -1,9 +1,11 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import RestAPI, {ShoppingProvider} from '../../dao/RestAPI';
+import RestAPI, {InstanceInfo, ShoppingProvider} from '../../dao/RestAPI';
 import {logout} from './authSlice';
 
 
 type themes = 'light' | 'dark' | 'system';
+type InstanceFeatures =
+  Pick<InstanceInfo, 'sharingEnabled' | 'householdsEnabled' | 'ocrImportEnabled' | 'apiKeysEnabled'>;
 export interface SettingsState {
     theme: themes;
     backendUrl: string;
@@ -14,6 +16,8 @@ export interface SettingsState {
     householdsEnabled: boolean;
     /** Whether this instance can read a recipe from a photograph. */
     ocrImportEnabled: boolean;
+    /** Whether accounts on this instance may create api keys. */
+    apiKeysEnabled: boolean;
     /** Where shopping imports go; null until the first import asked, undefined until the account is read. */
     shoppingProvider: ShoppingProvider | null | undefined;
 }
@@ -29,10 +33,12 @@ const initialState: SettingsState = {
   // The opposite default to sharing: most instances have no machine learning subsystem, and
   // offering a scan that cannot work is worse than offering it a moment late.
   ocrImportEnabled: false,
+  // Off until the instance says so, as for scanning.
+  apiKeysEnabled: false,
   shoppingProvider: undefined,
 };
 
-export const authSlice = createSlice({
+export const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
@@ -42,14 +48,11 @@ export const authSlice = createSlice({
     changeBackendUrl: (state, action: PayloadAction<string>) => {
       state.backendUrl = action.payload;
     },
-    changeSharingEnabled: (state, action: PayloadAction<boolean>) => {
-      state.sharingEnabled = action.payload;
-    },
-    changeHouseholdsEnabled: (state, action: PayloadAction<boolean>) => {
-      state.householdsEnabled = action.payload;
-    },
-    changeOcrImportEnabled: (state, action: PayloadAction<boolean>) => {
-      state.ocrImportEnabled = action.payload;
+    applyInstanceInfo: (state, action: PayloadAction<InstanceFeatures>) => {
+      state.sharingEnabled = action.payload.sharingEnabled;
+      state.householdsEnabled = action.payload.householdsEnabled;
+      state.ocrImportEnabled = action.payload.ocrImportEnabled;
+      state.apiKeysEnabled = action.payload.apiKeysEnabled ?? false;
     },
     changeShoppingProvider: (state, action: PayloadAction<ShoppingProvider | null>) => {
       state.shoppingProvider = action.payload;
@@ -68,7 +71,7 @@ export const authSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const {changeTheme, changeBackendUrl, changeSharingEnabled, changeHouseholdsEnabled,
-  changeOcrImportEnabled, changeOnlineState, changeShoppingProvider} = authSlice.actions;
+export const {changeTheme, changeBackendUrl, applyInstanceInfo, changeOnlineState, changeShoppingProvider} =
+  settingsSlice.actions;
 
-export default authSlice.reducer;
+export default settingsSlice.reducer;

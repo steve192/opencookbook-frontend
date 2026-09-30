@@ -1,7 +1,5 @@
 import {shareMessage} from './recipeSharing';
-// Type only, and erased at compile time: on web this module resolves to itself, so an import
-// that survived to runtime would be a cycle. Mirrors how timerNotifications.web.ts is written.
-import type {ShareOutcome} from './shareLink';
+import {ShareOutcome, shareText} from './shareText';
 
 /**
  * Hands a share link to the browser.
@@ -27,6 +25,5 @@ export const shareLink = async (title: string, url: string): Promise<ShareOutcom
     }
   }
 
-  await navigator.clipboard.writeText(message);
-  return 'copied';
+  return shareText(message);
 };

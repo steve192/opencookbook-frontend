@@ -23,12 +23,13 @@ type Props =
 
 type SettingsRoute =
   'AccountSettingsScreen' | 'HouseholdListScreen' | 'ShoppingSettingsScreen' | 'PlanningSettingsScreen' |
-  'ScanningSettingsScreen' | 'AppearanceSettingsScreen' | 'OpenSourceLicensesScreen';
+  'ScanningSettingsScreen' | 'AppearanceSettingsScreen' | 'ApiKeysScreen' | 'OpenSourceLicensesScreen';
 
 export const SettingsScreen = (props: Props) => {
   const backendUrl = useSelector((state: RootState) => state.settings.backendUrl);
   const ocrImportEnabled = useSelector((state: RootState) => state.settings.ocrImportEnabled);
   const householdsEnabled = useSelector((state: RootState) => state.settings.householdsEnabled);
+  const apiKeysEnabled = useSelector((state: RootState) => state.settings.apiKeysEnabled);
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
   const userInfo = useUserInfo();
@@ -89,6 +90,12 @@ export const SettingsScreen = (props: Props) => {
         subtitle={t('screens.settings.appearanceSubtitle')}
         icon="palette-outline"
         onPress={open('AppearanceSettingsScreen')} />
+      {apiKeysEnabled &&
+        <SettingsEntry
+          title={t('screens.apiKeys.title')}
+          subtitle={t('screens.settings.apiKeysSubtitle')}
+          icon="key-variant"
+          onPress={open('ApiKeysScreen')} />}
       <SettingsEntry
         title={t('screens.licenses.title')}
         subtitle={t('screens.licenses.subtitle')}

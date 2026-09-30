@@ -294,6 +294,26 @@ export interface InstanceInfo {
    * machine learning subsystem, switched scanning off, or has one that is unreachable.
    */
   ocrImportEnabled: boolean;
+  /** Whether accounts may create api keys; absent on servers from before there were any. */
+  apiKeysEnabled?: boolean;
+}
+
+export type ApiScope = 'shopping:read' | 'shopping:write';
+
+export interface ApiKey {
+  id: number;
+  name: string;
+  /** The secret's first characters, to tell keys apart. */
+  displayPrefix: string;
+  scopes: ApiScope[];
+  createdOn: string;
+  /** Null until first used; precise to about a minute. */
+  lastUsedAt: string | null;
+}
+
+export interface IssuedApiKey {
+  key: ApiKey;
+  secret: string;
 }
 
 /** One area of a photograph holding a kind of content, as fractions of the picture. */
@@ -601,6 +621,7 @@ const imageDataUri = (data: ArrayBuffer): string =>
  */
 class RestAPI {
   private static isOnline = true;
+  private static renewal: Promise<void> | null = null;
 
   /** Called when the session cannot be renewed, so the app can send somebody back to login. */
   static onSessionExpired?: () => void;
@@ -830,6 +851,29 @@ class RestAPI {
 
   static async discardPlanDraft(draftId: number, householdId?: string | null): Promise<void> {
     await this.delete(`/planning/drafts/${draftId}${householdScope(householdId)}`);
+  }
+
+  /**
+   * @return {Promise<ApiKey[]>} the caller's api keys, newest first
+   */
+  static async getApiKeys(): Promise<ApiKey[]> {
+    return (await this.get('/api-keys'))?.data;
+  }
+
+  /**
+   * @param {string} name what the key is for
+   * @param {ApiScope[]} scopes what it may do
+   * @return {Promise<IssuedApiKey>} the key, with its secret this once
+   */
+  static async createApiKey(name: string, scopes: ApiScope[]): Promise<IssuedApiKey> {
+    return (await this.post('/api-keys', {name: name, scopes: scopes}))?.data;
+  }
+
+  /**
+   * @param {number} id which key; clients using it are signed out at their next request
+   */
+  static async revokeApiKey(id: number): Promise<void> {
+    await this.delete(`/api-keys/${id}`);
   }
 
   /**
@@ -1126,9 +1170,43 @@ class RestAPI {
   static async deleteRecipeGroup(groupId: number) {
     await this.delete('/recipe-groups/' + groupId);
   }
-  static async refreshToken() {
-    const response = await axios.post(await this.url('/users/refreshToken'), {refreshToken: await AppPersistence.getRefreshToken()});
+  /**
+   * Renews the access token. Each renewal also replaces the refresh token, so requests that all find
+   * their token expired at once share one renewal instead of each spending the refresh token.
+   *
+   * @return {Promise<void>} when the new tokens are stored
+   */
+  static refreshToken(): Promise<void> {
+    if (!this.renewal) {
+      this.renewal = this.renewTokens().finally(() => {
+        this.renewal = null;
+      });
+    }
+    return this.renewal;
+  }
+
+  private static async renewTokens() {
+    const response = await axios.post(await this.url('/users/refreshToken'),
+        {refreshToken: await AppPersistence.getRefreshToken(), rotate: true});
+    // Servers from before rotation answer without one and keep the old token valid. Stored first: kept
+    // after an interruption, a replaced refresh token would end the sign in at the next renewal.
+    if (response.data.refreshToken) {
+      await AppPersistence.setRefreshToken(response.data.refreshToken);
+    }
     await AppPersistence.setAuthToken(response.data.token);
+  }
+
+  /**
+   * Forgets the tokens and ends the sign in on the server as well. The server is not waited for: an
+   * unreachable one only means the sign in runs out on its own.
+   */
+  static async logout() {
+    const refreshToken = await AppPersistence.getRefreshToken();
+    await AppPersistence.setAuthToken('');
+    await AppPersistence.setRefreshToken('');
+    if (refreshToken) {
+      axios.post(await this.url('/users/logout'), {refreshToken: refreshToken}).catch(() => undefined);
+    }
   }
   static async createNewRecipeGroup(recipeGroup: RecipeGroup): Promise<RecipeGroup> {
     const response = await this.post('/recipe-groups', recipeGroup);
