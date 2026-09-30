@@ -1,2 +1,2 @@
 // The native app updates through expo-updates instead.
-export const registerServiceWorker = async (_onUpdateWaiting: (reload: () => void) => void) => undefined;
+export const registerServiceWorker = (_onUpdateWaiting: (reload: () => void) => void) => Promise.resolve();

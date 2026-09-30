@@ -54,6 +54,16 @@ const subscribe = (listener: () => void) => {
 };
 const current = () => installability;
 
+const installMethodOf = (deferredPrompt: BeforeInstallPromptEvent | null, standalone: boolean): PwaInstallMethod | null => {
+  if (standalone) {
+    return null;
+  }
+  if (deferredPrompt) {
+    return 'native';
+  }
+  return iosSafari ? 'ios-safari' : null;
+};
+
 export const usePwaInstallPrompt = (): PwaInstallPromptState => {
   const {deferredPrompt, standalone} = useSyncExternalStore(subscribe, current);
   const [dismissed, setDismissed] = useState<boolean | null>(null);
@@ -85,10 +95,7 @@ export const usePwaInstallPrompt = (): PwaInstallPromptState => {
     AsyncStorage.setItem(DONT_ASK_KEY, '1').catch(() => undefined);
   }, []);
 
-  let installMethod: PwaInstallMethod | null = null;
-  if (!standalone) {
-    installMethod = deferredPrompt ? 'native' : iosSafari ? 'ios-safari' : null;
-  }
+  const installMethod = installMethodOf(deferredPrompt, standalone);
   const canInstall = installMethod !== null;
   return {canInstall, installMethod, available: canInstall && dismissed === false, install, dismiss, dontAskAgain};
 };

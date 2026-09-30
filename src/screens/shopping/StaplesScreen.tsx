@@ -21,16 +21,16 @@ export const StaplesScreen = (_props: Props) => {
   const {t} = useTranslation('translation');
   const online = useIsOnline();
   const insets = useSafeAreaInsets();
-  const {data: staples, error, refetch} = useGetStaplesQuery();
+  const {data: staples, error: loadError, refetch} = useGetStaplesQuery();
   const [forgetStaple] = useForgetStapleMutation();
 
   const forget = (staple: Staple) => {
     forgetStaple(staple.id).unwrap()
-        .catch((failure) => SnackbarUtil.show({message: t(errorMessageKey(failure))}));
+        .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
   };
 
   if (!staples) {
-    return <QueryFallback error={error} onRetry={refetch} />;
+    return <QueryFallback error={loadError} onRetry={refetch} />;
   }
 
   return (

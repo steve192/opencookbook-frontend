@@ -26,7 +26,7 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'HouseholdListScreen'>;
 export const HouseholdListScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const online = useIsOnline();
-  const {data: households, error, refetch} = useGetHouseholdsQuery();
+  const {data: households, error: loadError, refetch} = useGetHouseholdsQuery();
   const {data: userInfo} = useGetUserInfoQuery();
   const [createHousehold, {isLoading: creating}] = useCreateHouseholdMutation();
 
@@ -34,8 +34,8 @@ export const HouseholdListScreen = (props: Props) => {
     try {
       const household = await createHousehold({name, shareRecipes: true}).unwrap();
       props.navigation.navigate('HouseholdScreen', {householdId: household.id});
-    } catch (failure) {
-      SnackbarUtil.show({message: t(errorMessageKey(failure, 'screens.households.saveFailed'))});
+    } catch (error) {
+      SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.households.saveFailed'))});
     }
   }, [props.navigation, t]);
 
@@ -55,7 +55,7 @@ export const HouseholdListScreen = (props: Props) => {
   }, [createNamed, userInfo, t]);
 
   if (!households) {
-    return <QueryFallback error={error} onRetry={refetch} />;
+    return <QueryFallback error={loadError} onRetry={refetch} />;
   }
 
   return (

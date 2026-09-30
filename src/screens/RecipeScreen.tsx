@@ -122,7 +122,7 @@ export const RecipeScreen = (props: Props) => {
           onScaledServingsChange={setScaledServings}
           footer={renderFooterActions()}
           nutrition={{canCorrect: mine,
-            sheet: (sheetProps) => <RecipeNutritionSheet {...sheetProps} recipeId={recipeId} />}}
+            renderSheet: (sheetProps) => <RecipeNutritionSheet {...sheetProps} recipeId={recipeId} />}}
         />
       }
 

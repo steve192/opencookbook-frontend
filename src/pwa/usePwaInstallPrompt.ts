@@ -4,7 +4,7 @@ const NOTHING_TO_INSTALL: PwaInstallPromptState = {
   canInstall: false,
   installMethod: null,
   available: false,
-  install: async () => 'unavailable',
+  install: () => Promise.resolve('unavailable'),
   dismiss: () => undefined,
   dontAskAgain: () => undefined,
 };

@@ -127,7 +127,7 @@ export const SharedRecipeScreen = (props: Props) => {
           scaledServings={scaledServings}
           onScaledServingsChange={setScaledServings}
           nutrition={{canCorrect: false,
-            sheet: (sheetProps) => <SharedNutritionSheet {...sheetProps} shareId={shareId} />}}
+            renderSheet: (sheetProps) => <SharedNutritionSheet {...sheetProps} shareId={shareId} />}}
         />
       </SharedImageAccess>
 

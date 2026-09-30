@@ -41,10 +41,10 @@ export const baseQuery: BaseQueryFn<ApiRequest, unknown, ApiError> = async (requ
   try {
     const response = await sendRequest(config, request.anonymous);
     return {data: response.data};
-  } catch (thrown) {
-    if (wasUnreachable(thrown)) {
+  } catch (error) {
+    if (wasUnreachable(error)) {
       api.dispatch(wentOffline('unreachable'));
     }
-    return {error: toApiError(thrown)};
+    return {error: toApiError(error)};
   }
 };

@@ -42,7 +42,7 @@ export const HouseholdScreen = (props: Props) => {
   const householdId = props.route.params.householdId;
   const online = useIsOnline();
 
-  const {data: household, error, refetch} = useGetHouseholdQuery(householdId);
+  const {data: household, error: loadError, refetch} = useGetHouseholdQuery(householdId);
   const invites = useGetHouseholdInvitesQuery(householdId).data ?? [];
   const recipeCount = useCookbookRecipes(householdId).data?.length ?? 0;
   const ownRecipeCount = useOwnRecipeCount();
@@ -58,8 +58,8 @@ export const HouseholdScreen = (props: Props) => {
     try {
       await action();
       return true;
-    } catch (failure) {
-      SnackbarUtil.show({message: t(errorMessageKey(failure, 'screens.households.saveFailed'))});
+    } catch (error) {
+      SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.households.saveFailed'))});
       return false;
     }
   }, [t]);
@@ -124,7 +124,7 @@ export const HouseholdScreen = (props: Props) => {
   });
 
   if (!household) {
-    return <QueryFallback error={error} onRetry={refetch} />;
+    return <QueryFallback error={loadError} onRetry={refetch} />;
   }
 
   const me = household.members?.find((member) => member.me);

@@ -27,7 +27,7 @@ export const HouseholdInviteScreen = (props: Props) => {
   const token = props.route.params.token;
 
   const online = useIsOnline();
-  const {data: householdName, error, refetch} = usePreviewHouseholdInviteQuery(token);
+  const {data: householdName, error: loadError, refetch} = usePreviewHouseholdInviteQuery(token);
   const [acceptHouseholdInvite, {isLoading: joining}] = useAcceptHouseholdInviteMutation();
   const recipeCount = useOwnRecipeCount();
   const [shareRecipes, setShareRecipes] = useState(true);
@@ -37,13 +37,13 @@ export const HouseholdInviteScreen = (props: Props) => {
       const household = await acceptHouseholdInvite({token, shareRecipes}).unwrap();
       SnackbarUtil.show({message: t('screens.households.joined', {name: householdName})});
       props.navigation.replace('HouseholdScreen', {householdId: household.id});
-    } catch (failure) {
-      SnackbarUtil.show({message: t(errorMessageKey(failure, 'screens.households.inviteInvalid'))});
+    } catch (error) {
+      SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.households.inviteInvalid'))});
     }
   }, [householdName, props.navigation, shareRecipes, t, token]);
 
   // The server answered: the invite is not valid, as opposed to the server not being reached.
-  if (error && answeredByServer(error)) {
+  if (loadError && answeredByServer(loadError)) {
     return (
       <Surface style={CentralStyles.screen}>
         <View style={CentralStyles.contentContainer}>
@@ -54,7 +54,7 @@ export const HouseholdInviteScreen = (props: Props) => {
   }
 
   if (!householdName) {
-    return <QueryFallback error={error} onRetry={refetch} />;
+    return <QueryFallback error={loadError} onRetry={refetch} />;
   }
 
   return (

@@ -27,8 +27,10 @@ export const registerOfflineListeners = () => {
     predicate: (_action, current, previous) => selectIsOnline(previous) && !selectIsOnline(current),
     effect: async (_action, listenerApi) => {
       listenerApi.cancelActiveListeners();
-      for (let attempt = 0; !selectIsOnline(listenerApi.getState()); attempt++) {
+      let attempt = 0;
+      while (!selectIsOnline(listenerApi.getState())) {
         await listenerApi.condition(probeRequested.match, PROBE_DELAYS_MILLIS[attempt] ?? STEADY_PROBE_MILLIS);
+        attempt++;
         if (await serverReachable()) {
           listenerApi.dispatch(wentOnline());
         }

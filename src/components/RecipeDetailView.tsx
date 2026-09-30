@@ -33,7 +33,7 @@ interface Props {
   nutrition?: {
     /** Whether the lines may be corrected, which only a recipe of your own may. */
     canCorrect: boolean;
-    sheet: (sheetProps: NutritionSheetProps) => ReactNode;
+    renderSheet: (sheetProps: NutritionSheetProps) => ReactNode;
   };
 }
 
@@ -176,8 +176,8 @@ export const RecipeDetailView = (props: Props) => {
         {renderStepsSection()}
         {props.footer}
       </View>
-      {nutritionOpen && props.recipe.nutrition && props.nutrition &&
-        props.nutrition.sheet({
+      {nutritionOpen && props.recipe.nutrition &&
+        props.nutrition?.renderSheet({
           summary: props.recipe.nutrition,
           scaledServings: props.scaledServings,
           onDismiss: () => setNutritionOpen(false),

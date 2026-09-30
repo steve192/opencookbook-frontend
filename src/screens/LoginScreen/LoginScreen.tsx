@@ -72,7 +72,9 @@ const LoginScreen = ({route, navigation}: Props) => {
         <Card>
           <TextInput label="Server URL" value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
           <Button onPress={() => {
-            dispatch(switchServer(serverUrl)).then(() => setSettingsModalVisible(false));
+            dispatch(switchServer(serverUrl))
+                .then(() => setSettingsModalVisible(false))
+                .catch((error) => console.error('Saving the server address failed', error));
           }}>
             {t('common.save')}
           </Button>

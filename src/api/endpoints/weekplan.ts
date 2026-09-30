@@ -11,6 +11,16 @@ const toRequestMeal = (meal: WeekplanDayRecipeInfo): WeekplanDayRecipeRequest =>
     {id: meal.id, type: meal.type, servings: meal.servings, leftoverOf: meal.leftoverOf} :
     {id: meal.id, type: meal.type, title: meal.title};
 
+// The saved day replaces the cached one in place, so the day's plans keep their order.
+const withDayReplaced = (saved: WeekplanDay) => (week: WeekplanDay[]) => {
+  const cachedAt = week.findIndex((cached) => planKey(cached) === planKey(saved));
+  if (cachedAt === -1) {
+    week.push(saved);
+  } else {
+    week[cachedAt] = saved;
+  }
+};
+
 const weekplanApi = api.injectEndpoints({
   endpoints: (builder) => ({
     // Every plan of the week that starts on this Monday.
@@ -21,18 +31,10 @@ const weekplanApi = api.injectEndpoints({
     setWeekplanDay: builder.mutation<WeekplanDay, WeekplanDay>({
       query: (day) => ({url: `/weekplan/${day.day}${householdScope(day.householdId)}`, method: 'PUT',
         body: {recipes: day.recipes.map(toRequestMeal)}}),
-      // The saved day replaces the cached one in place, so the day's plans keep their order.
       // A failure is the caller's to report.
       onQueryStarted: (day, {dispatch, queryFulfilled}) => {
         queryFulfilled.then(({data: saved}) => dispatch(weekplanApi.util.updateQueryData('getWeekplanWeek',
-            weekKeyOf(day.day), (week) => {
-              const cachedAt = week.findIndex((cached) => planKey(cached) === planKey(day));
-              if (cachedAt === -1) {
-                week.push(saved);
-              } else {
-                week[cachedAt] = saved;
-              }
-            })),
+            weekKeyOf(day.day), withDayReplaced(saved))),
         () => undefined);
       },
     }),

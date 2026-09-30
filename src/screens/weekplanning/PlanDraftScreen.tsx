@@ -53,7 +53,7 @@ export const PlanDraftScreen = (props: Props) => {
 
   useEffect(() => props.navigation.addListener('beforeRemove', () => {
     if (!accepted.current) {
-      discardPlanDraft(ref);
+      void discardPlanDraft(ref);
     }
   }), [props.navigation, ref]);
 
@@ -76,6 +76,11 @@ export const PlanDraftScreen = (props: Props) => {
       askForPlanningDetails(slot.recipe, {always: true});
     }
   };
+
+  const lock = (slot: PlanSlot, locked: boolean) =>
+    change(() => setPlanSlotLocked({...ref, slotId: slot.id, locked}).unwrap());
+
+  const toggleGap = (slot: PlanSlot) => change(() => togglePlanSlotGap({...ref, slotId: slot.id}).unwrap());
 
   const accept = () => change(async () => {
     await acceptPlanDraft(ref).unwrap();
@@ -109,8 +114,8 @@ export const PlanDraftScreen = (props: Props) => {
                   busy={controlsDisabled}
                   onOpenRecipe={(recipeId) => props.navigation.navigate('RecipeScreen', {recipeId})}
                   onReroll={(reason) => reroll(slot, reason)}
-                  onLock={(locked) => change(() => setPlanSlotLocked({...ref, slotId: slot.id, locked}).unwrap())}
-                  onToggleGap={() => change(() => togglePlanSlotGap({...ref, slotId: slot.id}).unwrap())} />
+                  onLock={(locked) => lock(slot, locked)}
+                  onToggleGap={() => toggleGap(slot)} />
               ))}
             </View>
           ))}

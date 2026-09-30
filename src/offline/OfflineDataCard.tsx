@@ -27,7 +27,7 @@ export const OfflineDataCard = () => {
 
   const syncNow = () => {
     setSyncing(true);
-    dispatch(syncForOffline()).finally(() => setSyncing(false));
+    void dispatch(syncForOffline()).finally(() => setSyncing(false));
   };
 
   const synced = lastSyncedAt === null ? null : new XDate(lastSyncedAt);

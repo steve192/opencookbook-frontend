@@ -11,9 +11,9 @@ const keepNewest = (directory: Directory) => directory.list()
     .slice(FULL_IMAGES_KEPT)
     .forEach((file) => file.delete());
 
-export const cachedImage = async (request: ImageRequest): Promise<string | undefined> => {
+export const cachedImage = (request: ImageRequest): Promise<string | undefined> => {
   const file = fileOf(request);
-  return file.exists ? file.uri : undefined;
+  return Promise.resolve(file.exists ? file.uri : undefined);
 };
 
 export const downloadToCache = async (request: ImageRequest): Promise<string> => {
@@ -34,9 +34,10 @@ export const prefetchImage = async (request: ImageRequest) => {
   }
 };
 
-export const clearImageCache = async () => {
+export const clearImageCache = () => {
   const directory = root();
   if (directory.exists) {
     directory.delete();
   }
+  return Promise.resolve();
 };
