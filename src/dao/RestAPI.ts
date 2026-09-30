@@ -189,6 +189,8 @@ export interface ShoppingItem {
   aisleManual: boolean;
   /** A Fluent Emoji name; null shows the aisle's. */
   icon: string | null;
+  /** Shown first within its aisle until bought; missing on items this device stored before it was sent. */
+  prioritized?: boolean;
   status: 'ACTIVE' | 'BOUGHT';
   boughtAt: string | null;
   /** When it was last put on the list; missing on items this device stored before it was sent. */
@@ -216,8 +218,8 @@ interface ShoppingOpBase {
 /** One change made on the device, possibly offline, applied by the server in the order made. */
 export type ShoppingOp =
   | ShoppingOpBase & {type: 'ADD', name: string, spec?: string | null, aisle?: Aisle | null, icon?: string | null,
-      sources?: ShoppingItemSource[]}
-  | ShoppingOpBase & {type: 'UPDATE', name?: string, spec?: string, aisle?: Aisle}
+      sources?: ShoppingItemSource[], prioritized?: boolean}
+  | ShoppingOpBase & {type: 'UPDATE', name?: string, spec?: string, aisle?: Aisle, prioritized?: boolean}
   | ShoppingOpBase & {type: 'BUY'}
   | ShoppingOpBase & {type: 'RESTORE', spec?: string | null}
   | ShoppingOpBase & {type: 'DELETE'};

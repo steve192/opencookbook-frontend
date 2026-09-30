@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Text, TouchableRipple} from 'react-native-paper';
+import {Icon, Text, TouchableRipple} from 'react-native-paper';
 import {Aisle} from '../../dao/aisles';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {ShoppingIcon} from './ShoppingIcon';
@@ -14,6 +14,9 @@ interface Props {
   muted?: boolean;
   /** Already on the list, while adding. */
   highlighted?: boolean;
+  /** Picked, as for moving. */
+  selected?: boolean;
+  prioritized?: boolean;
   onPress?: () => void;
   onLongPress?: () => void;
   /** For measuring the tile's position. */
@@ -26,7 +29,7 @@ interface Props {
 export const ShoppingItemTile = (props: Props) => {
   const theme = useAppTheme();
   let background = theme.colors.secondaryContainer;
-  if (props.highlighted) {
+  if (props.highlighted || props.selected) {
     background = theme.colors.primaryContainer;
   } else if (props.muted) {
     background = theme.colors.surfaceVariant;
@@ -38,6 +41,7 @@ export const ShoppingItemTile = (props: Props) => {
         borderless
         accessibilityRole="button"
         accessibilityLabel={props.spec ? `${props.name}, ${props.spec}` : props.name}
+        accessibilityState={{selected: props.selected}}
         onPress={props.onPress}
         onLongPress={props.onLongPress}>
         <View style={styles.content}>
@@ -47,15 +51,29 @@ export const ShoppingItemTile = (props: Props) => {
             <Text variant="labelSmall" numberOfLines={1} style={{color: theme.colors.onSurfaceVariant}}>
               {props.spec}
             </Text>}
+          {props.selected &&
+            <View style={[styles.badge, styles.start]}>
+              <Icon source="check-circle" size={BADGE_SIZE} color={theme.colors.primary} />
+            </View>}
+          {props.prioritized &&
+            <View style={[styles.badge, styles.end]}>
+              <Icon source={PRIORITY_ICON} size={BADGE_SIZE} color={theme.colors.error} />
+            </View>}
         </View>
       </TouchableRipple>
     </View>
   );
 };
 
+export const PRIORITY_ICON = 'fire';
+const BADGE_SIZE = 18;
+
 const styles = StyleSheet.create({
   tile: {minHeight: 96, borderRadius: 12},
   content: {flex: 1, alignItems: 'center', justifyContent: 'center', padding: 6, gap: 2},
   name: {textAlign: 'center'},
   hidden: {opacity: 0},
+  badge: {position: 'absolute', top: 4},
+  start: {left: 4},
+  end: {right: 4},
 });

@@ -7,6 +7,7 @@ interface Props {
   item: ShoppingItem;
   /** Recently bought: quieter, and without the amount. */
   muted?: boolean;
+  selected?: boolean;
   hidden: boolean;
   viewRef: (view: View | null) => void;
   onPress: (item: ShoppingItem) => void;
@@ -14,10 +15,11 @@ interface Props {
 }
 
 // Memoised, so typing or a flight re-renders only the tiles whose item changed; the callbacks must be stable.
-export const ItemTile = React.memo(function ItemTile({item, muted, hidden, viewRef, onPress, onLongPress}: Props) {
+export const ItemTile = React.memo(function ItemTile(
+    {item, muted, selected, hidden, viewRef, onPress, onLongPress}: Props) {
   return (
     <ShoppingItemTile name={item.name} spec={muted ? null : item.spec} icon={item.icon} aisle={item.aisle}
-      muted={muted} hidden={hidden} viewRef={viewRef}
+      muted={muted} selected={selected} prioritized={item.prioritized} hidden={hidden} viewRef={viewRef}
       onPress={() => onPress(item)} onLongPress={() => onLongPress(item)} />
   );
 });
