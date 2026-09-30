@@ -22,6 +22,11 @@ import {
 import {DAYS_OF_WEEK, dayOfWeekLabel} from '../../helper/daysOfWeek';
 import {
   countMeals,
+  isPlanOf,
+  LeftoverSource,
+  leftoverSources,
+  withLeftoverOf,
+  withLeftoversAdded,
   withMealMoved,
   withMealRemoved,
   withRecipeAdded,
@@ -35,7 +40,7 @@ import {useShoppingImport} from '../../helper/shopping/useShoppingImport';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps} from '../../navigation/NavigationRoutes';
 import {updateSingleWeekplanDay} from '../../redux/features/weeklyRecipesSlice';
-import {useAppDispatch} from '../../redux/hooks';
+import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {RecipeSelectionPopup} from './RecipeSelectionPopup';
 import {WeekplanDayCard} from './WeekplanDayCard';
@@ -60,6 +65,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
   const dispatch = useAppDispatch();
+  const loadedDays = useAppSelector((state) => state.weeklyRecipes.weekplanDays);
   const requireOnline = useOnlineGuard();
 
   // Which week is on screen, relative to the week containing today. Negative
@@ -87,6 +93,8 @@ export const WeeklyRecipeListScreen = (props: Props) => {
       })),
       [days, plans, t],
   );
+
+  const leftoverSourcesOf = (plan: WeekplanDay) => leftoverSources(loadedDays, plan);
 
   const weekTitle = useCallback(() => weekOffsetLabel(t, weekOffset, weekStart), [weekOffset, weekStartKey, t]);
 
@@ -185,7 +193,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     if (!dayKey) {
       return;
     }
-    const existing = dayPlans.find((plan) => (plan.householdId ?? undefined) === householdId);
+    const existing = dayPlans.find((plan) => isPlanOf(plan, householdId));
     openRecipeSelection(existing ?? {
       day: dayKey,
       recipes: [],
@@ -195,12 +203,29 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   };
 
   const addPickedRecipe = (recipe: Pick<Recipe, 'id' | 'title'>) => {
-    selectedWeekplanDay && persist(withRecipeAdded(selectedWeekplanDay, recipe));
+    if (selectedWeekplanDay) {
+      void persist(withRecipeAdded(selectedWeekplanDay, recipe));
+    }
     setRecipeSelectionVisible(false);
   };
 
+  const addLeftovers = (source: LeftoverSource) => {
+    if (selectedWeekplanDay) {
+      void persist(withLeftoversAdded(selectedWeekplanDay, source));
+    }
+    setRecipeSelectionVisible(false);
+  };
+
+  const changeLeftover = (day: WeekplanDay, index: number, cookedOn: string | null) => {
+    if (requireOnline()) {
+      void persist(withLeftoverOf(day, index, cookedOn));
+    }
+  };
+
   const addSpontaneousMeal = (title: string) => {
-    selectedWeekplanDay && persist(withSimpleMealAdded(selectedWeekplanDay, title));
+    if (selectedWeekplanDay) {
+      void persist(withSimpleMealAdded(selectedWeekplanDay, title));
+    }
     setRecipeSelectionVisible(false);
   };
 
@@ -208,7 +233,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     if (!requireOnline()) {
       return;
     }
-    persist(withMealRemoved(day, index));
+    void persist(withMealRemoved(day, index));
 
     // Removing is a single tap now, so it has to be undoable
     SnackbarUtil.show({
@@ -222,7 +247,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
     if (!requireOnline()) {
       return;
     }
-    persist(withMealMoved(day, fromIndex, toIndex));
+    void persist(withMealMoved(day, fromIndex, toIndex));
   };
 
   const openRecipe = (meal: WeekplanDayRecipeInfo) => {
@@ -275,7 +300,9 @@ export const WeeklyRecipeListScreen = (props: Props) => {
             onAddPress={() => chooseTargetPlan(dayPlans)}
             onMealPress={openRecipe}
             onMealMove={moveMeal}
-            onMealRemovePress={removeMeal} />
+            onMealRemovePress={removeMeal}
+            leftoverSourcesOf={leftoverSourcesOf}
+            onLeftoverChange={changeLeftover} />
         ))}
       </ScrollView>
 
@@ -289,6 +316,8 @@ export const WeeklyRecipeListScreen = (props: Props) => {
         onClose={() => setRecipeSelectionVisible(false)}
         onRecipeSelected={addPickedRecipe}
         onSimpleRecipeSelected={addSpontaneousMeal}
+        leftoverSources={selectedWeekplanDay ? leftoverSourcesOf(selectedWeekplanDay) : []}
+        onLeftoversSelected={addLeftovers}
       />
     </Surface>
   );

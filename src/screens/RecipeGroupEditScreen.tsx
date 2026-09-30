@@ -37,7 +37,7 @@ export const RecipeGroupEditScreen = (props: Props) => {
     const action = existingRecipeGroup ?
       updateRecipeGroup(recipeGroupData) :
       createRecipeGroup(recipeGroupData);
-    dispatch(action).finally(() => {
+    void dispatch(action).finally(() => {
       setPending(false);
       props.navigation.goBack();
     });
@@ -45,7 +45,7 @@ export const RecipeGroupEditScreen = (props: Props) => {
 
   const performDelete = () => {
     if (!recipeGroupData.id) return;
-    dispatch(deleteRecipeGroup(recipeGroupData.id)).then(() => {
+    void dispatch(deleteRecipeGroup(recipeGroupData.id)).then(() => {
       // After deleting, leave the (now-stale) group view and land back on the
       // top-level "My recipes" list.
       props.navigation.navigate('OverviewScreen', {
@@ -81,7 +81,7 @@ export const RecipeGroupEditScreen = (props: Props) => {
   );
 
   return (
-    <Surface style={CentralStyles.fullscreen}>
+    <Surface style={CentralStyles.screen}>
       <View style={CentralStyles.contentContainer}>
         <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>{t('screens.createGroup.groupName')}</Text>
         <TextInput

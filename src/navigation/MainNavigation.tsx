@@ -11,7 +11,7 @@ import {TFunction} from 'i18next';
 import React, {useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Platform} from 'react-native';
-import {KeyboardAvoidingView} from 'react-native-keyboard-controller';
+import {KeyboardAvoidingScreen} from '../components/KeyboardAvoidingScreen';
 import AppPersistence from '../AppPersistence';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {changeOnlineState} from '../redux/features/settingsSlice';
@@ -54,7 +54,7 @@ import {useShoppingProvider} from '../helper/shopping/useShoppingProvider';
 import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
-import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
+import {useAppTheme} from '../styles/CentralStyles';
 import {LINKING_SCREENS} from './linking';
 import {navigationRef} from './navigationRef';
 import {PaperStackHeader} from './PaperStackHeader';
@@ -188,14 +188,14 @@ const MainStackNavigation = () => {
   // Outside the navigator: there is nothing to go back to.
   if (!onboarded) {
     return (
-      <KeyboardAvoidingView style={CentralStyles.fullscreen}>
+      <KeyboardAvoidingScreen>
         <OnboardingScreen onDone={markOnboarded} />
-      </KeyboardAvoidingView>
+      </KeyboardAvoidingScreen>
     );
   }
 
   return (
-    <KeyboardAvoidingView style={CentralStyles.fullscreen}>
+    <KeyboardAvoidingScreen>
       <ShoppingSyncRunner />
       <MainStack.Navigator
         screenOptions={{
@@ -321,7 +321,7 @@ const MainStackNavigation = () => {
           options={{title: t('screens.settings.appearance')}}
         />
       </MainStack.Navigator>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingScreen>
   );
 };
 
@@ -372,7 +372,7 @@ const MainNavigation = () => {
     }
     setInitializersRun(true);
 
-    (async () => {
+    void (async () => {
       NetInfo.addEventListener((state) => {
         if (Platform.OS === 'android') {
           dispatch(changeOnlineState(state.isInternetReachable === true));
@@ -384,7 +384,7 @@ const MainNavigation = () => {
       // Check for new app versions
       const info = await NetInfo.fetch();
       if (info.isInternetReachable) {
-        offerUpdate(t);
+        await offerUpdate(t);
       }
     })();
   }, []);

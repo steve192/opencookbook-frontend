@@ -12,8 +12,21 @@ export interface ListSync {
   /** The server version those items are at; 0 before the first sync. */
   version: number;
   /** What this device changed and the server has not confirmed yet, oldest first. */
-  pending: ShoppingOp[];
+  pending: PendingOp[];
 }
+
+export interface PendingOp {
+  op: ShoppingOp;
+  /** When it was made on the device, as an ISO instant. */
+  at: string;
+}
+
+/** A list as any app version stored it; older ones kept pending ops without their time. */
+export type StoredListSync = Omit<ListSync, 'pending'> & {pending: (PendingOp | ShoppingOp)[]};
+
+// Pending ops stored without a time count as made now.
+export const timedPending = (stored: StoredListSync['pending'], now: string): PendingOp[] =>
+  stored.map((entry) => ('op' in entry ? entry : {op: entry, at: now}));
 
 /** What "recently bought" keeps, as the server does. */
 export const RECENTLY_BOUGHT_KEPT = 60;
@@ -40,18 +53,21 @@ export const withChanges = (items: ItemMap, changes: ShoppingChanges): ItemMap =
 const withNameKey = (items: ItemMap, key: string): ShoppingItem | undefined =>
   Object.values(items).find((item) => nameKey(item.name) === key);
 
-const added = (items: ItemMap, op: Extract<ShoppingOp, {type: 'ADD'}>, addedBy: string | null): ShoppingItem => {
+const added = (items: ItemMap, op: Extract<ShoppingOp, {type: 'ADD'}>, now: string,
+    addedBy: string | null): ShoppingItem => {
   const existing = withNameKey(items, nameKey(op.name));
   if (existing?.status === 'ACTIVE') {
-    return {...existing, spec: joinSpecs(existing.spec, op.spec), sources: [...existing.sources, ...(op.sources ?? [])]};
+    return {...existing, spec: joinSpecs(existing.spec, op.spec), sources: [...existing.sources, ...(op.sources ?? [])],
+      addedAt: now};
   }
   if (existing) {
-    return {...existing, status: 'ACTIVE', boughtAt: null, spec: joinSpecs(null, op.spec), sources: op.sources ?? []};
+    return {...existing, status: 'ACTIVE', boughtAt: null, spec: joinSpecs(null, op.spec), sources: op.sources ?? [],
+      addedAt: now};
   }
   return {
     id: op.itemId, name: op.name.trim(), spec: joinSpecs(null, op.spec), aisle: op.aisle ?? 'OTHER', aisleManual: false,
-    icon: op.icon ?? null, status: 'ACTIVE', boughtAt: null, addedBy, sources: op.sources ?? [], deleted: false,
-    version: 0,
+    icon: op.icon ?? null, status: 'ACTIVE', boughtAt: null, addedAt: now, addedBy, sources: op.sources ?? [],
+    deleted: false, version: 0,
   };
 };
 
@@ -78,7 +94,7 @@ const updated = (items: ItemMap, item: ShoppingItem, op: Extract<ShoppingOp, {ty
  */
 export const withOp = (items: ItemMap, op: ShoppingOp, now: string, addedBy: string | null = null): ItemMap => {
   if (op.type === 'ADD') {
-    const item = added(items, op, addedBy);
+    const item = added(items, op, now, addedBy);
     return {...items, [item.id]: item};
   }
   const item = items[op.itemId];
@@ -92,7 +108,8 @@ export const withOp = (items: ItemMap, op: ShoppingOp, now: string, addedBy: str
       return item.status === 'ACTIVE' ? {...items, [item.id]: {...item, status: 'BOUGHT', boughtAt: now}} : items;
     case 'RESTORE':
       return item.status === 'BOUGHT' ?
-        {...items, [item.id]: {...item, status: 'ACTIVE', boughtAt: null, spec: joinSpecs(null, op.spec), sources: []}} :
+        {...items, [item.id]: {...item, status: 'ACTIVE', boughtAt: null, addedAt: now, spec: joinSpecs(null, op.spec),
+          sources: []}} :
         items;
     case 'DELETE': {
       const rest = {...items};
@@ -102,18 +119,17 @@ export const withOp = (items: ItemMap, op: ShoppingOp, now: string, addedBy: str
   }
 };
 
-/**
- * What to show: what the server said, with what this device did since laid over it.
- *
- * @param {ListSync} held the list as this device holds it, if at all
- * @param {string} now when, for ticks made meanwhile
- * @return {ItemMap} the list as the person expects it
- */
-export const visibleItems = (held: ListSync | undefined, now: string): ItemMap =>
-  (held?.pending ?? []).reduce((items, op) => withOp(items, op, now), held?.server ?? {});
+// What the server said, with this device's unconfirmed changes laid over it.
+export const visibleItems = (held: ListSync | undefined): ItemMap =>
+  (held?.pending ?? []).reduce((items, pending) => withOp(items, pending.op, pending.at), held?.server ?? {});
 
+// Compared as times: the server writes microseconds, the device milliseconds.
+const timeOf = (instant: string | null | undefined): number => (instant ? Date.parse(instant) : 0);
+
+// Oldest first, so what was added last is at the end.
 export const activeItems = (items: ItemMap): ShoppingItem[] =>
-  Object.values(items).filter((item) => item.status === 'ACTIVE');
+  Object.values(items).filter((item) => item.status === 'ACTIVE')
+      .sort((first, second) => timeOf(first.addedAt) - timeOf(second.addedAt));
 
 /**
  * The newest purchases first, for putting back with one tap.
@@ -123,5 +139,5 @@ export const activeItems = (items: ItemMap): ShoppingItem[] =>
  */
 export const recentlyBought = (items: ItemMap): ShoppingItem[] =>
   Object.values(items).filter((item) => item.status === 'BOUGHT')
-      .sort((first, second) => (second.boughtAt ?? '').localeCompare(first.boughtAt ?? ''))
+      .sort((first, second) => timeOf(second.boughtAt) - timeOf(first.boughtAt))
       .slice(0, RECENTLY_BOUGHT_KEPT);

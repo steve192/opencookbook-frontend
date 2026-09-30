@@ -24,3 +24,14 @@ export const iconOf = (icon: string | null | undefined, aisle: Aisle): string =>
 export const groupByAisle = <T extends {aisle: Aisle}>(items: T[]): AisleGroup<T>[] =>
   AISLES.map((aisle) => ({aisle, items: items.filter((item) => item.aisle === aisle)}))
       .filter((group) => group.items.length > 0);
+
+export type TileCell<T> = {heading: Aisle} | {item: T};
+
+export const headingKey = (aisle: Aisle): string => `aisle:${aisle}`;
+
+// Headings are cells too, so an item keeps its cell when the grouping changes.
+export const tileCells = <T extends {aisle: Aisle}>(items: T[], byAisle: boolean): TileCell<T>[] =>
+  byAisle ?
+    groupByAisle(items).flatMap((group): TileCell<T>[] =>
+      [{heading: group.aisle}, ...group.items.map((item) => ({item}))]) :
+    items.map((item) => ({item}));

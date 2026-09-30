@@ -1,6 +1,7 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import RestAPI, {WeekplanDay, WeekplanDayRecipeInfo, WeekplanDayRecipeRequest} from '../../dao/RestAPI';
 import {toDayKey} from '../../helper/weekplan';
+import {planKey} from '../../helper/weekplanDay';
 
 /**
  * Reduces a stored meal to what the endpoint expects. A saved recipe is
@@ -11,17 +12,8 @@ import {toDayKey} from '../../helper/weekplan';
  */
 const toRequestMeal = (meal: WeekplanDayRecipeInfo): WeekplanDayRecipeRequest =>
   meal.type === 'NORMAL_RECIPE' ?
-    {id: meal.id, type: meal.type} :
+    {id: meal.id, type: meal.type, servings: meal.servings, leftoverOf: meal.leftoverOf} :
     {id: meal.id, type: meal.type, title: meal.title};
-
-
-/**
- * A day exists once per plan, so the day alone does not identify one.
- *
- * @param {WeekplanDay} day the day to key
- * @return {string} a key unique across plans
- */
-const planKey = (day: WeekplanDay): string => `${day.householdId ?? ''}|${day.day}`;
 
 export interface WeeklyRecipesState {
     weekplanDays: WeekplanDay[];

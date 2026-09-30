@@ -3,6 +3,9 @@ import {Recipe, WeekplanDay} from '../dao/RestAPI';
 import {
   countMeals,
   emptyWeekplanDay,
+  leftoverSources,
+  withLeftoverOf,
+  withLeftoversAdded,
   withMealMoved,
   withMealRemoved,
   withRecipeAdded,
@@ -110,5 +113,36 @@ describe('weekplanDay', () => {
     it('is zero without days', () => {
       expect(countMeals([])).toBe(0);
     });
+  });
+});
+
+describe('leftovers', () => {
+  const cooked = (day: string, id: number, title: string, extra: Partial<WeekplanDay['recipes'][0]> = {},
+      householdId?: string): WeekplanDay => ({day, householdId, recipes: [{id, title, type: 'NORMAL_RECIPE', ...extra}]});
+  const thursday = emptyWeekplanDay('2026-09-24');
+
+  it('offers the recipes cooked in the same plan during the week before, the latest first', () => {
+    const days = [
+      cooked('2026-09-16', 1, 'Too long ago'),
+      cooked('2026-09-21', 2, 'Curry'),
+      cooked('2026-09-23', 3, 'Couscous'),
+      cooked('2026-09-23', 4, 'Also leftovers', {leftoverOf: '2026-09-22'}),
+      cooked('2026-09-23', 5, 'Another plan', {}, 'household'),
+      cooked('2026-09-24', 6, 'Same day'),
+    ];
+
+    expect(leftoverSources(days, thursday).map((source) => source.title)).toEqual(['Couscous', 'Curry']);
+  });
+
+  it('plans leftovers as the recipe, eaten from the day it was cooked', () => {
+    const day = withLeftoversAdded(thursday, {recipeId: 3, title: 'Couscous', cookedOn: '2026-09-23'});
+    expect(day.recipes).toEqual([{id: 3, title: 'Couscous', type: 'NORMAL_RECIPE', leftoverOf: '2026-09-23'}]);
+  });
+
+  it('turns a meal into leftovers and back, dropping what it was cooked for', () => {
+    const day = cooked('2026-09-24', 3, 'Couscous', {servings: 4});
+    const leftovers = withLeftoverOf(day, 0, '2026-09-23');
+    expect(leftovers.recipes[0]).toMatchObject({leftoverOf: '2026-09-23', servings: null});
+    expect(withLeftoverOf(leftovers, 0, null).recipes[0].leftoverOf).toBeNull();
   });
 });

@@ -57,14 +57,14 @@ export const HouseholdListScreen = (props: Props) => {
 
   if (loading) {
     return (
-      <Surface style={CentralStyles.fullscreen}>
+      <Surface style={CentralStyles.screen}>
         <ActivityIndicator style={CentralStyles.elementSpacing} />
       </Surface>
     );
   }
 
   return (
-    <Surface style={CentralStyles.fullscreen}>
+    <Surface style={CentralStyles.screen}>
       <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
         {households.length === 0 &&
           <Text style={CentralStyles.elementSpacing}>{t('screens.households.empty')}</Text>}

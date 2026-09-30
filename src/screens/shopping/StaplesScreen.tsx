@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet} from 'react-native';
 import {List, Surface, Text} from 'react-native-paper';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RestAPI, {Staple} from '../../dao/RestAPI';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
@@ -18,6 +19,7 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'StaplesScreen'>;
 export const StaplesScreen = (_props: Props) => {
   const {t} = useTranslation('translation');
   const requireOnline = useOnlineGuard();
+  const insets = useSafeAreaInsets();
   const [staples, setStaples] = useState<Staple[]>();
 
   useEffect(() => {
@@ -41,8 +43,8 @@ export const StaplesScreen = (_props: Props) => {
   }
 
   return (
-    <Surface style={CentralStyles.fullscreen}>
-      <ScrollView>
+    <Surface style={CentralStyles.screen}>
+      <ScrollView contentContainerStyle={{paddingBottom: insets.bottom}}>
         <Text variant="bodyMedium" style={styles.intro}>
           {staples.length === 0 ? t('screens.shopping.noStaples') : t('screens.shopping.staplesSubtitle')}
         </Text>

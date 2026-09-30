@@ -1,9 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, View} from 'react-native';
-import {Appbar, Button, Icon, Modal, Portal, Text, TextInput, TouchableRipple} from 'react-native-paper';
+import {ScrollView, StyleSheet, View} from 'react-native';
+import {Appbar, Button, Icon, List, Modal, Portal, Text, TextInput, TouchableRipple} from 'react-native-paper';
+import XDate from 'xdate';
+import {iconSide} from '../../components/listSides';
 import {RecipeList} from '../../components/RecipeList';
 import {Recipe, RecipeGroup} from '../../dao/RestAPI';
+import {LEFTOVERS_ICON} from '../../helper/leftovers';
+import {formatWeekdayAndDate} from '../../helper/weekplan';
+import {LEFTOVER_DAYS, LeftoverSource} from '../../helper/weekplanDay';
 import {overlayStyles, useAppTheme} from '../../styles/CentralStyles';
 import {HouseholdCookbookList} from '../households/HouseholdCookbookList';
 
@@ -16,14 +21,19 @@ interface Props {
   onClose: () => void;
   onRecipeSelected: (recipe: Pick<Recipe, 'id' | 'title'>) => void;
   onSimpleRecipeSelected: (name: string) => void;
+  /** Recipes cooked in the week before, in the same plan. */
+  leftoverSources: LeftoverSource[];
+  onLeftoversSelected: (source: LeftoverSource) => void;
 }
 
+type SelectionType = 'simple' | 'normal' | 'leftovers';
+
 export const RecipeSelectionPopup = (props: Props) => {
-  const [selectionType, setSelectionType] = useState<undefined | 'simple' | 'normal'>(undefined);
+  const [selectionType, setSelectionType] = useState<SelectionType>();
   const [shownRecipeGroup, setShownRecipeGroup] = useState<RecipeGroup>();
   const [simpleRecipeName, setSimpleRecipeName] = useState('');
 
-  const {t} = useTranslation('translation');
+  const {t, i18n} = useTranslation('translation');
   const theme = useAppTheme();
 
   useEffect(() => {
@@ -48,11 +58,12 @@ export const RecipeSelectionPopup = (props: Props) => {
     if (shownRecipeGroup) return shownRecipeGroup.title;
     if (selectionType === 'normal') return t('screens.recipeselectionpopup.normal');
     if (selectionType === 'simple') return t('screens.recipeselectionpopup.simple');
+    if (selectionType === 'leftovers') return t('screens.recipeselectionpopup.leftovers');
     return t('screens.recipeselectionpopup.title');
   };
 
   const renderModeOption = (
-      type: 'normal' | 'simple',
+      type: SelectionType,
       icon: string,
       title: string,
       description: string,
@@ -112,6 +123,24 @@ export const RecipeSelectionPopup = (props: Props) => {
       );
     }
 
+    if (selectionType === 'leftovers') {
+      return (
+        <ScrollView contentContainerStyle={styles.leftovers}>
+          {props.leftoverSources.length === 0 &&
+            <Text variant="bodyMedium">{t('screens.recipeselectionpopup.noLeftovers', {days: LEFTOVER_DAYS})}</Text>}
+          {props.leftoverSources.map((source) => (
+            <List.Item
+              key={`${source.cookedOn}-${source.recipeId}`}
+              title={source.title}
+              description={t('screens.recipeselectionpopup.cookedOn',
+                  {day: formatWeekdayAndDate(new XDate(source.cookedOn), i18n.language)})}
+              left={iconSide(LEFTOVERS_ICON)}
+              onPress={() => props.onLeftoversSelected(source)} />
+          ))}
+        </ScrollView>
+      );
+    }
+
     return (
       <View style={styles.modeChooser}>
         {renderModeOption(
@@ -124,6 +153,11 @@ export const RecipeSelectionPopup = (props: Props) => {
             'lightning-bolt-outline',
             t('screens.recipeselectionpopup.simple'),
             t('screens.recipeselectionpopup.simpledescription'))}
+        {renderModeOption(
+            'leftovers',
+            LEFTOVERS_ICON,
+            t('screens.recipeselectionpopup.leftovers'),
+            t('screens.recipeselectionpopup.leftoversdescription', {days: LEFTOVER_DAYS}))}
       </View>
     );
   };
@@ -211,6 +245,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 16,
+  },
+  leftovers: {
+    padding: 8,
   },
   simpleSaveButton: {
     marginTop: 20,

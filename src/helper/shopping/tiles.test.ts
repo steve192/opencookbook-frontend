@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
-import {ShoppingTile} from '../../dao/RestAPI';
-import {searchTiles, tileName, tileNamed} from './tiles';
+import {ShoppingItem, ShoppingTile} from '../../dao/RestAPI';
+import {searchTiles, tileName, tileNamed, typedEntry} from './tiles';
 
 const tile = (key: string, de: string[], en: string[]): ShoppingTile =>
   ({key, aisle: 'OTHER', icon: null, names: {de, en}});
@@ -32,5 +32,16 @@ describe('tiles', () => {
   it('knows a tile by any of its names', () => {
     expect(tileNamed(TILES, 'weizenmehl')?.key).toBe('flour');
     expect(tileNamed(TILES, 'Zauberpulver')).toBeUndefined();
+  });
+
+  it('reads the field as one item, with the tile or recent purchase already standing for it', () => {
+    const units = new Set(['kg']);
+    const eggs = {id: 'e', name: 'Eier'} as ShoppingItem;
+
+    expect(typedEntry('2 kg Mehl', units, TILES, [])).toEqual({name: 'Mehl', spec: '2 kg', tile: TILES[2],
+      recent: undefined});
+    expect(typedEntry('eier', units, TILES, [eggs])).toMatchObject({name: 'eier', tile: undefined, recent: eggs});
+    expect(typedEntry('Zauberpulver', units, TILES, [])).toMatchObject({tile: undefined, recent: undefined});
+    expect(typedEntry('  ', units, TILES, [])).toBeUndefined();
   });
 });

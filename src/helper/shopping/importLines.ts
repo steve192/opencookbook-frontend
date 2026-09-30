@@ -1,5 +1,6 @@
 import {Aisle} from '../../dao/aisles';
 import {PreviewLine, PreviewMeal, ShoppingItemSource} from '../../dao/RestAPI';
+import {uniqueBy} from '../arrays';
 import {formatAmount, servingFactor} from '../servings';
 import {nameKey} from './names';
 import {parseQuickAdd} from './quickAdd';
@@ -83,8 +84,7 @@ const amountSpec = (needs: Need[], locale: string): string | null => {
 };
 
 const uniqueSources = (needs: Need[]): ShoppingItemSource[] =>
-  needs.map((need) => need.source).filter((source, index, all) =>
-    all.findIndex((other) => other.title === source.title && other.planDate === source.planDate) === index);
+  uniqueBy(needs.map((need) => need.source), (source) => `${source.planDate}:${source.title}`);
 
 const lineOf = (key: string, needs: Need[], locale: string): SheetLine => {
   const placed = needs.find((need) => need.line)?.line;

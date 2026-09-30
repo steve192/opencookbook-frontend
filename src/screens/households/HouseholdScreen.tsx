@@ -140,7 +140,7 @@ export const HouseholdScreen = (props: Props) => {
 
   if (!household) {
     return (
-      <Surface style={CentralStyles.fullscreen}>
+      <Surface style={CentralStyles.screen}>
         <ActivityIndicator style={CentralStyles.elementSpacing} />
       </Surface>
     );
@@ -149,7 +149,7 @@ export const HouseholdScreen = (props: Props) => {
   const me = household.members?.find((member) => member.me);
 
   return (
-    <Surface style={CentralStyles.fullscreen}>
+    <Surface style={CentralStyles.screen}>
       <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
         <Card style={CentralStyles.elementSpacing}>
           <Card.Title title={t('screens.households.cookbook')}

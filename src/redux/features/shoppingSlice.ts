@@ -1,6 +1,6 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {ShoppingChanges, ShoppingList, ShoppingOp, ShoppingTile, ShoppingVocabulary} from '../../dao/RestAPI';
-import {ListSync, withChanges} from '../../helper/shopping/listItems';
+import {ShoppingChanges, ShoppingList, ShoppingTile, ShoppingVocabulary} from '../../dao/RestAPI';
+import {ListSync, PendingOp, withChanges} from '../../helper/shopping/listItems';
 import {logout} from './authSlice';
 
 export interface ShoppingState {
@@ -42,8 +42,9 @@ const shoppingSlice = createSlice({
     shoppingListChosen: (state, action: PayloadAction<number>) => {
       state.activeListId = action.payload;
     },
-    shoppingOpQueued: (state, action: PayloadAction<{listId: number, op: ShoppingOp}>) => {
-      syncOf(state, action.payload.listId).pending.push(action.payload.op);
+    shoppingOpQueued: (state, action: PayloadAction<{listId: number} & PendingOp>) => {
+      const {listId, op, at} = action.payload;
+      syncOf(state, listId).pending.push({op, at});
     },
     // `sent`: how many of the oldest pending ops the answer confirms.
     shoppingChangesReceived: (state, action: PayloadAction<{listId: number, changes: ShoppingChanges, sent: number}>) => {

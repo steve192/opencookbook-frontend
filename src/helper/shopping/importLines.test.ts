@@ -11,7 +11,7 @@ const line = (name: string, amount: number | null, unit: string, mergeUnit: stri
 
 const meal = (title: string, recipeServings: number, lines: PreviewLine[], date = '2026-10-05'): PreviewMeal => ({
   entryId: title, date, title, recipeId: lines.length ? 1 : null, spontaneous: lines.length === 0,
-  recipeServings, defaultServings: recipeServings, lines,
+  recipeServings, defaultServings: recipeServings, leftoverOf: null, lines,
 });
 
 const choose = (preview: PreviewMeal, servings = preview.recipeServings, typedItems: string[] = []): MealChoice =>

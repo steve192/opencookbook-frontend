@@ -217,7 +217,10 @@ export default StyleSheet.create({
     paddingHorizontal: 16,
     maxWidth: 500,
   },
+  // Fills its parent; a screen inside the navigator uses screen instead.
   fullscreen: {width: '100%', height: '100%'},
+  // The root of a screen: a percentage height ignores the header and cuts off the bottom.
+  screen: {flex: 1},
 });
 
 export const overlayStyles = StyleSheet.create({

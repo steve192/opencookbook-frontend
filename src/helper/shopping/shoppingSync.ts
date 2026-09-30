@@ -1,7 +1,7 @@
 import {AxiosError} from 'axios';
-import {randomUUID} from 'expo-crypto';
 import AppPersistence from '../../AppPersistence';
 import RestAPI, {ShoppingList, ShoppingOp} from '../../dao/RestAPI';
+import {newClientId} from '../clientId';
 import {
   ShoppingState,
   shoppingChangesReceived,
@@ -11,8 +11,12 @@ import {
   shoppingVocabularyLoaded,
 } from '../../redux/features/shoppingSlice';
 import type {AppDispatch, RootState} from '../../redux/store';
+import {DistributiveOmit} from '../types';
+import {StoredListSync, timedPending} from './listItems';
 
 type Thunk<T = void> = (dispatch: AppDispatch, getState: () => RootState) => Promise<T>;
+
+type StoredShopping = Partial<Omit<ShoppingState, 'sync'>> & {sync?: Record<number, StoredListSync>};
 
 /** Several taps in a row go to the server as one batch. */
 const FLUSH_DELAY_MILLIS = 300;
@@ -29,9 +33,6 @@ const listOf = (state: RootState, listId: number): ShoppingList | undefined =>
 // A batch the server refuses as malformed would be refused for ever, so it is dropped instead.
 const isRefused = (error: unknown) => (error as AxiosError)?.response?.status === 400;
 const isGone = (error: unknown) => (error as AxiosError)?.response?.status === 404;
-
-// For op and item ids, which the device chooses so it can refer to them offline.
-export const newClientId = (): string => randomUUID();
 
 /**
  * Sends what this device changed on a list and takes in what others changed. Safe to call at any
@@ -55,7 +56,7 @@ export const syncShoppingList = (listId: number): Thunk => async (dispatch, getS
   inFlight.add(listId);
   try {
     const known = getState().shopping.sync[listId];
-    const batch = (known?.pending ?? []).slice(0, MAX_OPS_PER_BATCH);
+    const batch = (known?.pending ?? []).slice(0, MAX_OPS_PER_BATCH).map((pending) => pending.op);
     const since = known?.version ?? 0;
     try {
       const changes = batch.length > 0 ?
@@ -81,24 +82,28 @@ export const syncShoppingList = (listId: number): Thunk => async (dispatch, getS
   } finally {
     inFlight.delete(listId);
     if (syncAgain.delete(listId)) {
-      dispatch(syncShoppingList(listId));
+      void dispatch(syncShoppingList(listId));
     }
   }
 };
+
+/** An op before it has its id. */
+export type ShoppingChange = DistributiveOmit<ShoppingOp, 'opId'>;
 
 /**
  * Makes a change at once on this device and sends it shortly after, together with any that follow.
  *
  * @param {number} listId which list
- * @param {ShoppingOp} op the change
+ * @param {ShoppingChange} change the change
  * @return {Thunk} the change
  */
-export const changeShoppingList = (listId: number, op: ShoppingOp): Thunk => async (dispatch) => {
-  dispatch(shoppingOpQueued({listId, op}));
+export const changeShoppingList = (listId: number, change: ShoppingChange) => (dispatch: AppDispatch) => {
+  const op: ShoppingOp = {...change, opId: newClientId()};
+  dispatch(shoppingOpQueued({listId, op, at: new Date().toISOString()}));
   clearTimeout(flushTimers.get(listId));
   flushTimers.set(listId, setTimeout(() => {
     flushTimers.delete(listId);
-    dispatch(syncShoppingList(listId));
+    void dispatch(syncShoppingList(listId));
   }, FLUSH_DELAY_MILLIS));
 };
 
@@ -148,8 +153,11 @@ export const loadShoppingVocabulary = (): Thunk => async (dispatch) => {
  * @return {Thunk} the reading
  */
 export const hydrateShopping = (): Thunk => async (dispatch) => {
-  const stored = await AppPersistence.getShoppingOffline<Partial<ShoppingState>>().catch(() => null);
-  dispatch(shoppingHydrated(stored));
+  const stored = await AppPersistence.getShoppingOffline<StoredShopping>().catch(() => null);
+  const now = new Date().toISOString();
+  const sync = stored?.sync && Object.fromEntries(Object.entries(stored.sync)
+      .map(([listId, held]) => [listId, {...held, pending: timedPending(held.pending, now)}]));
+  dispatch(shoppingHydrated(stored && {...stored, sync}));
 };
 
 /**

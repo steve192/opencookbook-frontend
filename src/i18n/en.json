@@ -35,6 +35,8 @@
     "appVersion": "Version {{version}}",
     "appVersionWithBuild": "Version {{version}} (build {{build}})",
     "undo": "Undo",
+    "done": "Done",
+    "leftoversFrom": "Leftovers from {{day}}",
     "dismiss": "Dismiss",
     "experimental": "experimental",
     "mealTypeCoverageWarning": "{{untagged}} of your {{total}} recipes do not say which meals they suit. Until they do, suggestions and plans can only guess - set the meals when editing a recipe."
@@ -90,7 +92,11 @@
       "normaldescription": "Add one of your saved recipes",
       "title": "Add to the plan",
       "close": "Close",
-      "back": "Back"
+      "back": "Back",
+      "leftovers": "Leftovers",
+      "leftoversdescription": "Eat what is left of a recipe cooked in the past {{days}} days",
+      "noLeftovers": "No recipe of this plan was cooked in the {{days}} days before.",
+      "cookedOn": "Cooked on {{day}}"
     },
     "resetPassword": {
       "successRequestSent": {
@@ -333,7 +339,9 @@
       "moveMealDown": "Move down",
       "myPlan": "My plan",
       "whichPlanToGenerate": "Which plan to propose?",
-      "whichPlanToAddTo": "Add to which plan?"
+      "whichPlanToAddTo": "Add to which plan?",
+      "markLeftovers": "Leftovers of an earlier day",
+      "cookFresh": "Cooked on this day"
     },
     "sharedRecipe": {
       "screenTitle": "Shared recipe",
@@ -624,8 +632,7 @@
       "deleteListMessage": "Delete \"{{name}}\" and everything on it?",
       "tooManyLists": "There are as many shopping lists here as this server allows.",
       "addPlaceholder": "Add an item",
-      "addTyped": "Add \"{{name}}\"",
-      "empty": "The list is empty. Add something above.",
+      "empty": "The list is empty. Add something below.",
       "recentlyBought": "Recently bought",
       "ticked": "{{name}} ticked off",
       "offlineHint": "Offline. Your changes are sent once you are back online.",
@@ -680,7 +687,8 @@
         "added_other": "{{count}} items added to {{list}}",
         "failed": "Could not add to the shopping list.",
         "loadFailed": "Could not load the meals.",
-        "weekTitle": "Week of {{date}}"
+        "weekTitle": "Week of {{date}}",
+        "leftoversNothingToBuy": "{{leftovers}}, nothing to buy"
       }
     },
     "licenses": {

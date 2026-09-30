@@ -128,6 +128,10 @@ export interface WeekplanDayRecipeInfo {
     title: string;
     type: 'SIMPLE_RECIPE' | 'NORMAL_RECIPE'
     titleImageUuid?: string;
+    /** Servings cooked; null for leftovers. Sent as null, the recipe's own servings. */
+    servings?: number | null;
+    /** The day (yyyy-MM-dd) whose cooking this meal eats the leftovers of. */
+    leftoverOf?: string | null;
 }
 
 /**
@@ -139,6 +143,8 @@ export interface WeekplanDayRecipeRequest {
     id?: number | string;
     type: 'SIMPLE_RECIPE' | 'NORMAL_RECIPE'
     title?: string;
+    servings?: number | null;
+    leftoverOf?: string | null;
 }
 export interface WeekplanDay {
     day: string,
@@ -185,6 +191,8 @@ export interface ShoppingItem {
   icon: string | null;
   status: 'ACTIVE' | 'BOUGHT';
   boughtAt: string | null;
+  /** When it was last put on the list; missing on items this device stored before it was sent. */
+  addedAt?: string;
   /** A display name; null once that account is gone. */
   addedBy: string | null;
   sources: ShoppingItemSource[];
@@ -252,6 +260,8 @@ export interface PreviewMeal {
   spontaneous: boolean;
   recipeServings: number;
   defaultServings: number;
+  /** The day whose cooking this meal eats; nothing is bought for it. */
+  leftoverOf: string | null;
   lines: PreviewLine[];
 }
 
@@ -600,7 +610,7 @@ class RestAPI {
   }
   static async getUserInfo(): Promise<UserInfo> {
     const response = await this.get('/users/self');
-    AppPersistence.storeUserInfoOffline(response.data);
+    void AppPersistence.storeUserInfoOffline(response.data);
     return response?.data;
   }
   static async setWeekplanRecipes(date: string, recipes: WeekplanDayRecipeRequest[],
@@ -1026,7 +1036,7 @@ class RestAPI {
 
   static async setShoppingProvider(provider: ShoppingProvider): Promise<UserInfo> {
     const response = await this.put('/users/self/shoppingProvider', {provider});
-    AppPersistence.storeUserInfoOffline(response.data);
+    void AppPersistence.storeUserInfoOffline(response.data);
     return response.data;
   }
 
@@ -1140,8 +1150,8 @@ class RestAPI {
     return response?.data;
   }
 
-  static async getUnits(): Promise<string[]> {
-    return [
+  static getUnits(): Promise<string[]> {
+    return Promise.resolve([
       '',
       'Becher',
       'Beet/e',
@@ -1264,7 +1274,7 @@ class RestAPI {
       'Wurzel/n',
       'Zehe/n',
       'Zweig/e',
-    ];
+    ]);
   }
   static async deleteRecipe(recipe: Recipe): Promise<void> {
     await this.delete('/recipes/' + recipe.id);
@@ -1339,9 +1349,8 @@ class RestAPI {
       imageUris: string[], payload: string, trainingConsent: boolean,
   ): Promise<RecipeScanJob> {
     const formData = new FormData();
-    for (const uri of imageUris) {
-      formData.append('images', await this.imagePart(uri));
-    }
+    const parts = await Promise.all(imageUris.map((uri) => this.imagePart(uri)));
+    parts.forEach((part) => formData.append('images', part));
     formData.append('payload', payload);
     formData.append('trainingConsent', String(trainingConsent));
 
@@ -1493,15 +1502,15 @@ class RestAPI {
       password: password,
     });
 
-    AppPersistence.setAuthToken(response.data.token);
-    AppPersistence.setRefreshToken(response.data.refreshToken);
+    await AppPersistence.setAuthToken(response.data.token);
+    await AppPersistence.setRefreshToken(response.data.refreshToken);
   }
 
   static async activateAccount(activationId: string) {
     const response = await axios.get(await this.url('/users/activate?activationId=' + activationId));
 
-    AppPersistence.setAuthToken(response.data.token);
-    AppPersistence.setRefreshToken(response.data.refreshToken);
+    await AppPersistence.setAuthToken(response.data.token);
+    await AppPersistence.setRefreshToken(response.data.refreshToken);
   }
 
   static async requestPasswordReset(emailAddress: string) {
@@ -1606,7 +1615,7 @@ class RestAPI {
 
   private static offlineGetStore(apiPath: string, response: AxiosResponse<any, any>) {
     if (apiPath === '/recipes') {
-      AppPersistence.storeRecipesOffline(response.data);
+      void AppPersistence.storeRecipesOffline(response.data);
     }
   }
 

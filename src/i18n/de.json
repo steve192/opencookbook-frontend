@@ -35,6 +35,8 @@
     "appVersion": "Version {{version}}",
     "appVersionWithBuild": "Version {{version}} (Build {{build}})",
     "undo": "Rückgängig",
+    "done": "Fertig",
+    "leftoversFrom": "Reste von {{day}}",
     "dismiss": "Schließen",
     "experimental": "experimentell",
     "mealTypeCoverageWarning": "{{untagged}} von {{total}} Rezepten sagen nicht, zu welchen Mahlzeiten sie passen. Solange das fehlt, können Vorschläge und Pläne nur raten - lege die Mahlzeiten beim Bearbeiten eines Rezepts fest."
@@ -90,7 +92,11 @@
       "normaldescription": "Füge eines deiner gespeicherten Rezepte hinzu",
       "title": "Zum Plan hinzufügen",
       "close": "Schließen",
-      "back": "Zurück"
+      "back": "Zurück",
+      "leftovers": "Reste",
+      "leftoversdescription": "Reste eines Rezepts essen, das in den letzten {{days}} Tagen gekocht wurde",
+      "noLeftovers": "In den {{days}} Tagen davor wurde in diesem Plan kein Rezept gekocht.",
+      "cookedOn": "Gekocht am {{day}}"
     },
     "resetPassword": {
       "successRequestSent": {
@@ -333,7 +339,9 @@
       "moveMealDown": "Nach unten",
       "myPlan": "Mein Plan",
       "whichPlanToGenerate": "Welchen Plan vorschlagen?",
-      "whichPlanToAddTo": "Zu welchem Plan hinzufügen?"
+      "whichPlanToAddTo": "Zu welchem Plan hinzufügen?",
+      "markLeftovers": "Reste eines früheren Tages",
+      "cookFresh": "An diesem Tag gekocht"
     },
     "sharedRecipe": {
       "screenTitle": "Geteiltes Rezept",
@@ -624,8 +632,7 @@
       "deleteListMessage": "\"{{name}}\" mit allem darauf löschen?",
       "tooManyLists": "Hier gibt es so viele Einkaufslisten, wie dieser Server erlaubt.",
       "addPlaceholder": "Artikel hinzufügen",
-      "addTyped": "\"{{name}}\" hinzufügen",
-      "empty": "Die Liste ist leer. Füge oben etwas hinzu.",
+      "empty": "Die Liste ist leer. Füge unten etwas hinzu.",
       "recentlyBought": "Zuletzt gekauft",
       "ticked": "{{name}} abgehakt",
       "offlineHint": "Offline. Deine Änderungen werden gesendet, sobald du wieder online bist.",
@@ -680,7 +687,8 @@
         "added_other": "{{count}} Artikel zu {{list}} hinzugefügt",
         "failed": "Konnte nicht auf die Einkaufsliste gesetzt werden.",
         "loadFailed": "Die Mahlzeiten konnten nicht geladen werden.",
-        "weekTitle": "Woche vom {{date}}"
+        "weekTitle": "Woche vom {{date}}",
+        "leftoversNothingToBuy": "{{leftovers}}, nichts zu kaufen"
       }
     },
     "licenses": {
