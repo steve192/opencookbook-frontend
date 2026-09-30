@@ -1,4 +1,4 @@
-import {Recipe} from '../dao/RestAPI';
+import {Recipe} from '../api/types/recipes';
 import {suitsOf} from './recipeSuits';
 
 /** From this share of recipes saying neither their meals nor that they are no dish, meal filters and ranking mostly guess. */

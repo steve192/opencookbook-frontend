@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {columnsFor, columnWidth} from './recipeGrid';
+import {columnsFor} from './recipeGrid';
 
 describe('columnsFor', () => {
   it('fits more tiles as the list gets wider', () => {
@@ -16,13 +16,5 @@ describe('columnsFor', () => {
 
   it('stops widening once the tiles would be too small to read', () => {
     expect(columnsFor(4000)).toBe(4);
-  });
-});
-
-describe('columnWidth', () => {
-  it('splits the width evenly, whatever a row happens to hold', () => {
-    expect(columnWidth(1)).toBe('100%');
-    expect(columnWidth(2)).toBe('50%');
-    expect(columnWidth(4)).toBe('25%');
   });
 });

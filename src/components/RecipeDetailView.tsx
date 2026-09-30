@@ -2,14 +2,14 @@ import React, {ReactNode, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Linking, ScrollView, StyleSheet, View} from 'react-native';
 import {Chip, Divider, List, Text} from 'react-native-paper';
-import {Recipe, RecipeNutrition} from '../dao/RestAPI';
+import {Recipe} from '../api/types/recipes';
 import {dietLabel} from '../helper/recipeDiet';
 import {formatNutrient} from '../helper/nutrition';
 import {formatDuration} from '../helper/recipeDuration';
 import {useCheckedIngredients} from '../helper/useCheckedIngredients';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 import {IngredientList} from './IngredientList';
-import {NutritionSheet} from './NutritionSheet';
+import {NutritionSheetProps} from './NutritionSheet';
 import {RecipeImageViewPager} from './RecipeImageViewPager';
 import {SectionTitle} from './SectionTitle';
 import {TextBullet} from './TextBullet';
@@ -30,10 +30,10 @@ interface Props {
    * What that is depends on whether this is your recipe or somebody else's.
    */
   footer?: ReactNode;
-  /** onLinkChanged only for the reader's own recipe. */
   nutrition?: {
-    loadDetails: () => Promise<RecipeNutrition>;
-    onLinkChanged?: () => void;
+    /** Whether the lines may be corrected, which only a recipe of your own may. */
+    canCorrect: boolean;
+    sheet: (sheetProps: NutritionSheetProps) => ReactNode;
   };
 }
 
@@ -101,7 +101,7 @@ export const RecipeDetailView = (props: Props) => {
     if (!summary || !props.nutrition) {
       return null;
     }
-    const canCorrect = props.nutrition.onLinkChanged !== undefined;
+    const {canCorrect} = props.nutrition;
     const energy = formatNutrient(summary.values.energyKcal, 'kcal', i18n.language);
     const value = t(summary.basis === 'SERVING' ? 'nutrition.summaryPerServing' : 'nutrition.summaryTotal', {energy});
     const description = {
@@ -177,12 +177,12 @@ export const RecipeDetailView = (props: Props) => {
         {props.footer}
       </View>
       {nutritionOpen && props.recipe.nutrition && props.nutrition &&
-        <NutritionSheet
-          summary={props.recipe.nutrition}
-          scaledServings={props.scaledServings}
-          loadDetails={props.nutrition.loadDetails}
-          onLinkChanged={props.nutrition.onLinkChanged}
-          onDismiss={() => setNutritionOpen(false)} />
+        props.nutrition.sheet({
+          summary: props.recipe.nutrition,
+          scaledServings: props.scaledServings,
+          onDismiss: () => setNutritionOpen(false),
+          canCorrect: props.nutrition.canCorrect,
+        })
       }
     </ScrollView>
   );

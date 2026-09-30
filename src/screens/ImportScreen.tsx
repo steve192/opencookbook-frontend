@@ -1,14 +1,15 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
+import {useGetAvailableImportHostsQuery, useImportRecipeMutation} from '../api/endpoints/recipes';
 import {useTranslation} from 'react-i18next';
 import {Platform, ScrollView, StyleSheet, View} from 'react-native';
 import {Button, Chip, Divider, HelperText, Icon, List, Surface, Text, TextInput} from 'react-native-paper';
-import RestAPI, {Recipe} from '../dao/RestAPI';
+import {Recipe} from '../api/types/recipes';
 import {askForPlanningDetails} from '../components/PlanningDetailsPrompt';
 import {errorMessageKey} from '../helper/apiErrorMessage';
+import {useInstanceFeatures} from '../helper/useInstanceFeatures';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
-import {importRecipe} from '../redux/features/recipesSlice';
-import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {useIsOnline} from '../offline/useIsOnline';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 
@@ -23,22 +24,16 @@ const extractUrl = (input: string): string => {
 
 export const ImportScreen = (props: Props) => {
   const [importURL, setImportURL] = useState<string>(props.route.params?.importUrl ?? '');
-  const [importPending, setImportPending] = useState<boolean>(false);
+  const [importRecipe, {isLoading: importPending}] = useImportRecipeMutation();
   const [importError, setImportError] = useState<string>('');
   const [importedRecipe, setImportedRecipe] = useState<Recipe | undefined>(undefined);
-  const [supportedHosts, setSupportedHosts] = useState<string[]>([]);
+  // The host list is a convenience only; without it importing still works.
+  const supportedHosts = useGetAvailableImportHostsQuery().data ?? [];
 
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
-  const dispatch = useAppDispatch();
-  const ocrImportEnabled = useAppSelector((state) => state.settings.ocrImportEnabled);
-
-  useEffect(() => {
-    RestAPI.getAvailableImportHosts()
-        .then(setSupportedHosts)
-        // The host list is a convenience only, a failure must not block importing
-        .catch(() => setSupportedHosts([]));
-  }, []);
+  const online = useIsOnline();
+  const {ocrImportEnabled} = useInstanceFeatures();
 
   // A deep link (e.g. sharing a recipe url into the app) can hand us a url after mount
   useEffect(() => {
@@ -50,22 +45,21 @@ export const ImportScreen = (props: Props) => {
   const urlLooksValid = extracted.length > 0;
   // Only complain about the input once the user actually typed something
   const showInvalidUrlHint = importURL.trim().length > 0 && !urlLooksValid;
-  const canImport = !importPending && urlLooksValid;
+  const canImport = online && !importPending && urlLooksValid;
 
   const startImport = () => {
     if (!canImport) return;
-    setImportPending(true);
     setImportedRecipe(undefined);
     setImportError('');
 
-    dispatch(importRecipe(extracted)).unwrap().then((recipe) => {
+    importRecipe(extracted).unwrap().then((recipe) => {
       setImportError('');
       setImportedRecipe(recipe);
       setImportURL('');
       askForPlanningDetails(recipe);
     }).catch((error) => {
       setImportError(t(errorMessageKey(error, 'errors.importFailed')));
-    }).finally(() => setImportPending(false));
+    });
   };
 
   const renderResult = () => {

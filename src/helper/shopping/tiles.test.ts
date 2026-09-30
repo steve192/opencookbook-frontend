@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {ShoppingItem, ShoppingTile} from '../../dao/RestAPI';
+import {ShoppingItem, ShoppingTile} from '../../api/types/shopping';
 import {searchTiles, tileName, tileNamed, typedEntry} from './tiles';
 
 const tile = (key: string, de: string[], en: string[]): ShoppingTile =>

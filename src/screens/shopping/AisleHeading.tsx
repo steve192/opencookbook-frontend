@@ -2,7 +2,7 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleProp, StyleSheet, TextStyle} from 'react-native';
 import {Text} from 'react-native-paper';
-import {Aisle} from '../../dao/aisles';
+import {Aisle} from '../../api/aisles';
 
 interface Props {
   aisle: Aisle;

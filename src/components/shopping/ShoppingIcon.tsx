@@ -1,6 +1,6 @@
 import React from 'react';
 import {Image, ImageSourcePropType} from 'react-native';
-import {Aisle} from '../../dao/aisles';
+import {Aisle} from '../../api/aisles';
 import {iconOf} from '../../helper/shopping/aisles';
 
 // Generated when Metro starts (see metro.config.js), so it is required rather than imported.

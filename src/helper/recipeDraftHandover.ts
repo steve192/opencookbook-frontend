@@ -3,7 +3,7 @@
  * navigation param lands in the address bar as `draftRecipe=%5Bobject%20Object%5D`.
  */
 
-import {Recipe} from '../dao/RestAPI';
+import {Recipe} from '../api/types/recipes';
 
 let waiting: Recipe | undefined;
 

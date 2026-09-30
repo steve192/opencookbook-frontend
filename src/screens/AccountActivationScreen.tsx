@@ -1,10 +1,11 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
+import {useActivateAccountMutation} from '../api/endpoints/account';
+import {hasStoredSignIn} from '../api/session';
 import {SuccessErrorBanner} from '../components/SuccessErrorBanner';
-import RestAPI from '../dao/RestAPI';
 import {BaseNavigatorProps} from '../navigation/NavigationRoutes';
-import {login, logout} from '../redux/features/authSlice';
+import {login} from '../redux/features/authSlice';
 import {useAppDispatch} from '../redux/hooks';
 import {LoginBackdrop} from './LoginScreen/LoginBackdrop';
 
@@ -16,6 +17,7 @@ export const AccountActivationScreen = (props: Props) => {
 
 
   const dispatch = useAppDispatch();
+  const [activateAccount] = useActivateAccountMutation();
 
   useEffect(() => {
     if (!props.route.params?.activationId) {
@@ -24,25 +26,18 @@ export const AccountActivationScreen = (props: Props) => {
     }
 
     const activationTimer = setTimeout(() => {
-      RestAPI.activateAccount(props.route.params.activationId).then(() => {
+      activateAccount(props.route.params.activationId).unwrap().then(() => {
         setActivationSuccess(true);
         dispatch(login());
         props.navigation.navigate('default');
-      }).catch(() => {
-        // Sometimes when this sceeen is accessed via deep links, the activity is mounted twice.
-        // In this case the activation link is already expired. Check if the user is logged in
-
-        RestAPI.getUserInfo().then((userinfo) => {
-          if (userinfo.email) {
-            console.info('got userinfo, logging in');
-            dispatch(login());
-            props.navigation.navigate('default');
-          }
-        }).catch((error) => {
-          console.error('Login failed', error);
-          dispatch(logout());
+      }).catch(async () => {
+        // A deep link can mount this screen twice, and the second one finds the link spent by the first.
+        if (await hasStoredSignIn()) {
+          dispatch(login());
+          props.navigation.navigate('default');
+        } else {
           setActivationError(true);
-        });
+        }
       });
     }, 1000);
 

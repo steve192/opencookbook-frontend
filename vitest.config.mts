@@ -13,6 +13,7 @@ export default defineConfig({
       include: ['src/**/*.ts'],
       exclude: [
         'src/**/*.test.ts',
+        'src/**/__mocks__/**',
         'src/navigation/NavigationRoutes.ts',
         'src/styles/**',
         'src/i18n/config.ts',

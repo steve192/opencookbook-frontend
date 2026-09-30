@@ -3,11 +3,13 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Image, Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native';
 import {Avatar, IconButton, Text} from 'react-native-paper';
-import RestAPI, {RecipeImage} from '../dao/RestAPI';
+import {useUploadImageMutation} from '../api/endpoints/recipes';
+import {RecipeImage} from '../api/types/recipes';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {PromptUtil} from '../helper/Prompt';
 import {TITLE_IMAGE_INDEX, moveImage} from '../helper/recipeImages';
+import {useIsOnline} from '../offline/useIsOnline';
 import {RecipeImageComponent} from './RecipeImageComponent';
 import {ViewPager} from './ViewPager';
 
@@ -26,6 +28,8 @@ export const RecipeImageViewPager = (props: Props) => {
   const [shownImageIndex, setShownImageIndex] = useState<number>(0);
 
   const {t} = useTranslation('translation');
+  const online = useIsOnline();
+  const [uploadImage] = useUploadImageMutation();
 
   // Clamp the active index when the image list changes (e.g. delete, swap, or
   // navigate to a different recipe).  Without this the indicator can read
@@ -52,7 +56,7 @@ export const RecipeImageViewPager = (props: Props) => {
     }
 
     try {
-      const uuid = await RestAPI.uploadImage(result.assets[0].uri);
+      const uuid = await uploadImage(result.assets[0].uri).unwrap();
       props.onImageAdded?.(uuid);
     } catch (error) {
       console.error('Error uploading image', error);
@@ -157,6 +161,8 @@ export const RecipeImageViewPager = (props: Props) => {
           <IconButton
             testID='recipe-image-viewpager-add'
             onPress={selectImage}
+            // Uploads at once; the rest of the editor waits for Save.
+            disabled={!online}
             style={styles.imageButton}
             icon="camera-outline"
           />

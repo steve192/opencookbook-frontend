@@ -1,20 +1,32 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {ActivityIndicator, Button, Surface, Text} from 'react-native-paper';
+import {Button, Surface, Text} from 'react-native-paper';
 import XDate from 'xdate';
+import {
+  DraftRef,
+  useAcceptPlanDraftMutation,
+  useDiscardPlanDraftMutation,
+  useGetPlanDraftQuery,
+  useRerollPlanDraftMutation,
+  useRerollPlanSlotMutation,
+  useSetPlanSlotLockedMutation,
+  useTogglePlanSlotGapMutation,
+} from '../../api/endpoints/planning';
+import {PlanSlot, RerollReason} from '../../api/types/planning';
 import {askForPlanningDetails} from '../../components/PlanningDetailsPrompt';
+import {QueryFallback} from '../../components/QueryFallback';
 import {HintText} from '../../components/QuestionSection';
 import {ScreenFooter} from '../../components/ScreenFooter';
 import {SectionTitle} from '../../components/SectionTitle';
-import RestAPI, {PlanDraft, PlanSlot, RerollReason} from '../../dao/RestAPI';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {draftDays, draftSummary, leftoverSource} from '../../helper/planDraft';
 import {concerns} from '../../helper/scoreReasons';
 import {formatWeekdayAndDate} from '../../helper/weekplan';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
+import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
 import {PlanSlotRow} from './PlanSlotRow';
 
@@ -25,54 +37,55 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'PlanDraftScreen'>;
 export const PlanDraftScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const {draftId, householdId} = props.route.params;
+  const ref: DraftRef = useMemo(() => ({draftId, householdId: householdId ?? null}), [draftId, householdId]);
+  const online = useIsOnline();
 
-  const [draft, setDraft] = useState<PlanDraft>();
-  const [busy, setBusy] = useState(false);
+  const {data: draft, error, refetch} = useGetPlanDraftQuery(ref);
+  const [rerollPlanSlot] = useRerollPlanSlotMutation();
+  const [setPlanSlotLocked] = useSetPlanSlotLockedMutation();
+  const [togglePlanSlotGap] = useTogglePlanSlotGapMutation();
+  const [rerollPlanDraft] = useRerollPlanDraftMutation();
+  const [acceptPlanDraft] = useAcceptPlanDraftMutation();
+  const [discardPlanDraft] = useDiscardPlanDraftMutation();
+  const [changing, setChanging] = useState(false);
+  const controlsDisabled = changing || !online;
   const accepted = useRef(false);
-
-  useEffect(() => {
-    RestAPI.getPlanDraft(draftId, householdId)
-        .then(setDraft)
-        .catch((e) => SnackbarUtil.show({message: t(errorMessageKey(e, 'screens.planning.loadFailed'))}));
-  }, [draftId, householdId, t]);
 
   useEffect(() => props.navigation.addListener('beforeRemove', () => {
     if (!accepted.current) {
-      RestAPI.discardPlanDraft(draftId, householdId).catch(() => undefined);
+      discardPlanDraft(ref);
     }
-  }), [props.navigation, draftId, householdId]);
+  }), [props.navigation, ref]);
 
-  const whileBusy = async (action: () => Promise<void>) => {
-    setBusy(true);
+  // Every change answers with the whole week, because one change can move others; it replaces the cached one.
+  const change = async (request: () => Promise<unknown>) => {
+    setChanging(true);
     try {
-      await action();
+      await request();
     } catch (e) {
       SnackbarUtil.show({message: t(errorMessageKey(e, 'screens.planning.changeFailed'))});
     } finally {
-      setBusy(false);
+      setChanging(false);
     }
   };
 
-  // Every change comes back as the whole week, because one change can move others.
-  const change = (request: () => Promise<PlanDraft>) => whileBusy(async () => setDraft(await request()));
-
   const reroll = async (slot: PlanSlot, reason?: RerollReason) => {
-    await change(() => RestAPI.rerollPlanSlot(draftId, slot.id, reason, householdId));
+    await change(() => rerollPlanSlot({...ref, slotId: slot.id, reason}).unwrap());
     // The cook just said what the recipe is; ask them to write it down so it is not planned as a meal again
     if (reason === 'NOT_A_FULL_MEAL' && slot.recipe) {
       askForPlanningDetails(slot.recipe, {always: true});
     }
   };
 
-  const accept = () => whileBusy(async () => {
-    await RestAPI.acceptPlanDraft(draftId, householdId);
+  const accept = () => change(async () => {
+    await acceptPlanDraft(ref).unwrap();
     accepted.current = true;
     SnackbarUtil.show({message: t('screens.planning.accepted')});
     props.navigation.goBack();
   });
 
   if (!draft) {
-    return <Surface style={styles.screen}><ActivityIndicator style={styles.loading} /></Surface>;
+    return <QueryFallback error={error} onRetry={refetch} />;
   }
 
   const repeats = draft.slots.some((slot) => concerns(slot.reasons).some((reason) => reason.term === 'cooldown'));
@@ -93,21 +106,21 @@ export const PlanDraftScreen = (props: Props) => {
                   key={slot.id}
                   slot={slot}
                   source={leftoverSource(draft, slot)}
-                  busy={busy}
+                  busy={controlsDisabled}
                   onOpenRecipe={(recipeId) => props.navigation.navigate('RecipeScreen', {recipeId})}
                   onReroll={(reason) => reroll(slot, reason)}
-                  onLock={(locked) => change(() => RestAPI.setPlanSlotLocked(draftId, slot.id, locked, householdId))}
-                  onToggleGap={() => change(() => RestAPI.togglePlanSlotGap(draftId, slot.id, householdId))} />
+                  onLock={(locked) => change(() => setPlanSlotLocked({...ref, slotId: slot.id, locked}).unwrap())}
+                  onToggleGap={() => change(() => togglePlanSlotGap({...ref, slotId: slot.id}).unwrap())} />
               ))}
             </View>
           ))}
         </View>
       </ScrollView>
       <ScreenFooter>
-        <Button mode="outlined" disabled={busy} onPress={() => change(() => RestAPI.rerollPlanDraft(draftId, householdId))}>
+        <Button mode="outlined" disabled={controlsDisabled} onPress={() => change(() => rerollPlanDraft(ref).unwrap())}>
           {t('screens.planning.rerollAll')}
         </Button>
-        <Button mode="contained" disabled={busy} loading={busy} onPress={accept}>
+        <Button mode="contained" disabled={controlsDisabled} loading={changing} onPress={accept}>
           {t('screens.planning.accept')}
         </Button>
       </ScreenFooter>
@@ -117,7 +130,6 @@ export const PlanDraftScreen = (props: Props) => {
 
 const styles = StyleSheet.create({
   screen: {flex: 1},
-  loading: {marginTop: 32},
   scrollContent: {paddingBottom: 16},
   content: {gap: 16, paddingTop: 16},
   day: {gap: 8},

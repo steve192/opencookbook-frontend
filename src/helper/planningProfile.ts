@@ -1,5 +1,6 @@
 import {TFunction} from 'i18next';
-import {DayOfWeek, Effort, MealType, PlanningMeal, PlanningProfile} from '../dao/RestAPI';
+import {DayOfWeek, Effort, PlanningMeal, PlanningProfile} from '../api/types/planning';
+import {MealType} from '../api/types/recipes';
 import {toggledIn, typedNumber} from './choices';
 import {WEEKEND, WORKDAYS, automaticDays, inWeekOrder} from './daysOfWeek';
 import {macroStyleLabel} from './macroStyles';

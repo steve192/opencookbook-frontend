@@ -3,16 +3,16 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, TextInput as RNTextInput, View} from 'react-native';
 import {Button, Card, IconButton, Modal, Portal, Text, TextInput} from 'react-native-paper';
-import {useDispatch} from 'react-redux';
 import Spacer from 'react-spacer';
-import AppPersistence from '../../AppPersistence';
+import {useSignInMutation} from '../../api/endpoints/account';
 import {FormErrorMessage} from '../../components/FormErrorMessage';
 import {PasswordInput} from '../../components/PasswordInput';
-import RestAPI from '../../dao/RestAPI';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {resolveAppVersion} from '../../helper/appVersion';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
+import {switchServer} from '../../redux/sessionThunks';
 import {login} from '../../redux/features/authSlice';
+import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles, {OwnColors} from '../../styles/CentralStyles';
 import {LoginBackdrop} from './LoginBackdrop';
 
@@ -23,13 +23,14 @@ const LoginScreen = ({route, navigation}: Props) => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [settingsModalVisible, setSettingsModalVisible] = useState<boolean>(false);
-  const [serverUrl, setServerUrl] = useState<string>('');
+  const backendUrl = useAppSelector((state) => state.settings.backendUrl);
+  const [serverUrl, setServerUrl] = useState<string>(backendUrl);
   const [apiErrorMessage, setApiErrorMessage] = useState<string>();
-  const [loginPending, setLoginPending] = useState<boolean>(false);
+  const [signIn, {isLoading: loginPending}] = useSignInMutation();
 
   const passwordInputRef = useRef<RNTextInput>(null);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const {t} = useTranslation('translation');
 
@@ -37,18 +38,13 @@ const LoginScreen = ({route, navigation}: Props) => {
     if (loginPending || !email || !password) {
       return;
     }
-    setLoginPending(true);
     setApiErrorMessage(undefined);
-    RestAPI.authenticate(email, password).then(() => {
-      dispatch(login());
-    }).catch((error) => {
-      setApiErrorMessage(t(errorMessageKey(error)));
-    }).finally(() => setLoginPending(false));
+    signIn({emailAddress: email, password}).unwrap()
+        .then(() => dispatch(login()))
+        .catch((error) => setApiErrorMessage(t(errorMessageKey(error))));
   };
 
-  useEffect(() => {
-    AppPersistence.getBackendURL().then(setServerUrl);
-  }, []);
+  useEffect(() => setServerUrl(backendUrl), [backendUrl]);
 
   // Translated here rather than in the helper so the app's typed translation
   // keys stay checked at the call site.
@@ -76,9 +72,7 @@ const LoginScreen = ({route, navigation}: Props) => {
         <Card>
           <TextInput label="Server URL" value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
           <Button onPress={() => {
-            AppPersistence.setBackendURL(serverUrl).then(() => {
-              setSettingsModalVisible(false);
-            });
+            dispatch(switchServer(serverUrl)).then(() => setSettingsModalVisible(false));
           }}>
             {t('common.save')}
           </Button>

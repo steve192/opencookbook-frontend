@@ -8,8 +8,12 @@ import {ActivityIndicator, Button, Card, IconButton, Surface, Text} from 'react-
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import AppPersistence from '../../AppPersistence';
 import {QuadCropper} from '../../components/QuadCropper';
-import {toApiError} from '../../dao/ApiError';
-import RestAPI, {RecipeScanJob} from '../../dao/RestAPI';
+import {toApiError} from '../../api/ApiError';
+import {
+  useCancelRecipeScanJobMutation, useDetectPageEdgesMutation, useLazyGetRecipeScanJobQuery, useRefineRecipeScanMutation,
+  useScanRecipeMutation,
+} from '../../api/endpoints/scan';
+import {RecipeScanJob} from '../../api/types/scan';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {PromptUtil} from '../../helper/Prompt';
 import {holdDraft} from '../../helper/recipeDraftHandover';
@@ -27,6 +31,7 @@ import {
 import {editedPage, noPages, scanPagesReducer} from '../../helper/recipeScanPages';
 import {rotationDegrees, Turn} from '../../helper/recipeScanRotation';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
+import {useIsOnline} from '../../offline/useIsOnline';
 import {BlockConfirmation} from './BlockConfirmation';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScanScreen'>;
@@ -48,6 +53,12 @@ export const RecipeScanScreen = (props: Props) => {
   const insets = useSafeAreaInsets();
 
   const [{pages, editing}, dispatch] = useReducer(scanPagesReducer, noPages);
+  const online = useIsOnline();
+  const [scanRecipe] = useScanRecipeMutation();
+  const [detectPageEdges] = useDetectPageEdgesMutation();
+  const [fetchScanJob] = useLazyGetRecipeScanJobQuery();
+  const [refineRecipeScan] = useRefineRecipeScanMutation();
+  const [cancelRecipeScanJob] = useCancelRecipeScanJobMutation();
   const [job, setJob] = useState<RecipeScanJob | undefined>(undefined);
   const [step, setStep] = useState<Step>('pages');
   const [failure, setFailure] = useState<ScanFailure | undefined>(undefined);
@@ -64,7 +75,7 @@ export const RecipeScanScreen = (props: Props) => {
     const abandoned = runningJobId.current;
     runningJobId.current = undefined;
     if (abandoned) {
-      RestAPI.cancelRecipeScanJob(abandoned).catch(() => undefined);
+      void cancelRecipeScanJob(abandoned);
     }
   };
 
@@ -107,7 +118,7 @@ export const RecipeScanScreen = (props: Props) => {
   // Asks the server where the page is, and moves that page's crop onto it.
   const findThePage = async (uri: string) => {
     try {
-      const detection = await RestAPI.detectPageEdges(uri);
+      const detection = await detectPageEdges(uri).unwrap();
       if (watching.current && detection.detected) {
         dispatch({type: 'detected', uri, crop: cropFromDetection(detection)});
       }
@@ -170,8 +181,8 @@ export const RecipeScanScreen = (props: Props) => {
     setJob(undefined);
     try {
       const payload = buildScanPayload(pages, i18n.language);
-      const started = await RestAPI.scanRecipe(
-          pages.map((entry) => entry.uri), payload, consent);
+      const started = await scanRecipe(
+          {imageUris: pages.map((entry) => entry.uri), payload, trainingConsent: consent}).unwrap();
       runningJobId.current = started.id;
       setJob(started);
       watch(started);
@@ -196,7 +207,7 @@ export const RecipeScanScreen = (props: Props) => {
       }
 
       try {
-        const current = await RestAPI.getRecipeScanJob(started.id);
+        const current = await fetchScanJob(started.id).unwrap();
         if (!watching.current) {
           return;
         }
@@ -245,7 +256,7 @@ export const RecipeScanScreen = (props: Props) => {
 
     setStep('scanning');
     try {
-      const corrected = await RestAPI.refineRecipeScan(job.id, buildCorrections(answers));
+      const corrected = await refineRecipeScan({jobId: job.id, corrections: buildCorrections(answers)}).unwrap();
       openInWizard(corrected.recipe ? corrected : job);
     } catch {
       // The reading itself succeeded; a failed correction should not throw that away.
@@ -300,7 +311,7 @@ export const RecipeScanScreen = (props: Props) => {
         {renderFailure()}
 
         <Button mode="contained" icon="text-recognition"
-          disabled={pages.length === 0} onPress={startScan}>
+          disabled={!online || pages.length === 0} onPress={startScan}>
           {t('screens.recipeScan.startScan')}
         </Button>
       </View>
@@ -356,7 +367,7 @@ export const RecipeScanScreen = (props: Props) => {
         <Text variant="titleSmall">{t('screens.recipeScan.failed')}</Text>
         <Text>{t(failure.messageKey)}</Text>
         {failure.retryable &&
-          <Button onPress={startScan}>{t('screens.recipeScan.tryAgain')}</Button>}
+          <Button disabled={!online} onPress={startScan}>{t('screens.recipeScan.tryAgain')}</Button>}
       </Card.Content>
     </Card>
   );

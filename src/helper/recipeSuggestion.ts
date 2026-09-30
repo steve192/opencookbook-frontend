@@ -1,10 +1,6 @@
 import {TFunction} from 'i18next';
-import {
-  MealType,
-  RecipeSuggestionRequest,
-  SuggestionMatchMode,
-  SuggestionPoolStats,
-} from '../dao/RestAPI';
+import {RecipeSuggestionRequest, SuggestionMatchMode, SuggestionPoolStats} from '../api/types/planning';
+import {MealType} from '../api/types/recipes';
 import {toggledIn, typedNumber} from './choices';
 import {macroStyleLabel} from './macroStyles';
 import {mealTypeAt, mealTypeLabel, toggledMealType} from './mealTypes';

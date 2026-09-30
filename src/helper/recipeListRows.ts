@@ -1,4 +1,5 @@
-import {Recipe, RecipeGroup} from '../dao/RestAPI';
+import {Recipe, RecipeGroup} from '../api/types/recipes';
+import {titleImageUuid} from './recipeImages';
 
 /**
  * A row of the recipe list carries everything that row shows.
@@ -25,7 +26,7 @@ export type ListRow = RecipeRow | RecipeGroupRow;
  * @return {RecipeRow} the row for it
  */
 export const toRecipeRow = (recipe: Recipe): RecipeRow =>
-  ({...recipe, coverImageUuid: recipe.images[0]?.uuid});
+  ({...recipe, coverImageUuid: titleImageUuid(recipe)});
 
 /**
  * A group as the list shows it: with the cover and the count of the recipes in it.
@@ -44,8 +45,31 @@ export const toRecipeGroupRow = (recipeGroup: RecipeGroup, recipes: Recipe[]): R
   return {
     ...recipeGroup,
     recipeCount: groupRecipes.length,
-    coverImageUuid: groupRecipes.find((recipe) => recipe.images.length > 0)?.images[0]?.uuid,
+    coverImageUuid: groupRecipes.map(titleImageUuid).find((uuid) => uuid !== undefined),
   };
+};
+
+/**
+ * The rows of a cookbook: inside a group, its recipes; otherwise the groups and the recipes in none of
+ * them, or every recipe while searching. Without groups, as in a household cookbook, every recipe.
+ *
+ * @param {Recipe[]} recipes the cookbook's recipes
+ * @param {RecipeGroup[]} groups the groups it shows
+ * @param {number} [shownGroupId] the group opened, if any
+ * @param {boolean} searching whether the rows are searched, which looks into the groups too
+ * @return {ListRow[]} the rows
+ */
+export const cookbookRows = (recipes: Recipe[], groups: RecipeGroup[], shownGroupId: number | undefined,
+    searching: boolean): ListRow[] => {
+  if (shownGroupId) {
+    return recipes.filter((recipe) => recipe.recipeGroups.some((group) => group.id === shownGroupId)).map(toRecipeRow);
+  }
+  const shownGroupIds = new Set(groups.map((group) => group.id));
+  const outsideShownGroups = (recipe: Recipe) => !recipe.recipeGroups.some((group) => shownGroupIds.has(group.id));
+  return [
+    ...groups.map((group) => toRecipeGroupRow(group, recipes)),
+    ...(searching ? recipes : recipes.filter(outsideShownGroups)).map(toRecipeRow),
+  ];
 };
 
 /**
@@ -54,7 +78,8 @@ export const toRecipeGroupRow = (recipeGroup: RecipeGroup, recipes: Recipe[]): R
  * A group and a recipe can carry the same id, and while searching both kinds share one
  * list, so the type is part of the comparison. So are the cover and the count: a group's
  * come from its recipes, which arrive in a fetch of their own, and leaving them out left
- * groups showing an empty cover until scrolling recycled the row.
+ * groups showing an empty cover until scrolling recycled the row. A household cookbook shows
+ * the owner's name as well.
  *
  * @param {ListRow} row1 the row as it was
  * @param {ListRow} row2 the row as it is now
@@ -65,4 +90,5 @@ export const listRowHasChanged = (row1: ListRow, row2: ListRow): boolean =>
   row1.id !== row2.id ||
   row1.title !== row2.title ||
   row1.coverImageUuid !== row2.coverImageUuid ||
-  (row1 as RecipeGroupRow).recipeCount !== (row2 as RecipeGroupRow).recipeCount;
+  (row1 as RecipeGroupRow).recipeCount !== (row2 as RecipeGroupRow).recipeCount ||
+  (row1 as RecipeRow).ownerDisplayName !== (row2 as RecipeRow).ownerDisplayName;

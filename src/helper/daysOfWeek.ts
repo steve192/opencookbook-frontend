@@ -1,5 +1,5 @@
 import {TFunction} from 'i18next';
-import {DayOfWeek} from '../dao/RestAPI';
+import {DayOfWeek} from '../api/types/planning';
 
 /** Monday first, as the weekplan and the server count them. */
 export const DAYS_OF_WEEK: DayOfWeek[] = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];

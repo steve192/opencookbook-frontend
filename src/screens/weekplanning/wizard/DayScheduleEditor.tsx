@@ -3,7 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {SegmentedButtons, Surface, Switch, Text} from 'react-native-paper';
 import {HintText} from '../../../components/QuestionSection';
-import {DayOfWeek} from '../../../dao/RestAPI';
+import {DayOfWeek} from '../../../api/types/planning';
 import {DAYS_OF_WEEK, dayOfWeekLabel, shortDayOfWeekLabel} from '../../../helper/daysOfWeek';
 import {mealTypeLabel} from '../../../helper/mealTypes';
 import {mealsOn, withCookedOnToggled, withMealEffort} from '../../../helper/planningProfile';

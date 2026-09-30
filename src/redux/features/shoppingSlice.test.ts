@@ -1,12 +1,7 @@
-import {describe, expect, it, vi} from 'vitest';
-import {ShoppingItem, ShoppingList} from '../../dao/RestAPI';
-
-// Reached through authSlice; does not resolve under the node test environment.
-vi.mock('../../AppPersistence', () => ({default: {clearOfflineData: () => undefined}}));
-
-const {logout} = await import('./authSlice');
-const {default: reducer, shoppingChangesReceived, shoppingListsLoaded, shoppingOpQueued} =
-  await import('./shoppingSlice');
+import {describe, expect, it} from 'vitest';
+import {ShoppingItem, ShoppingList} from '../../api/types/shopping';
+import {logout} from './authSlice';
+import reducer, {shoppingChangesReceived, shoppingListsLoaded, shoppingOpQueued} from './shoppingSlice';
 
 const list = (id: number): ShoppingList =>
   ({id, name: null, defaultList: id === 1, householdId: null, householdName: null, version: 0});
@@ -33,7 +28,6 @@ describe('shoppingSlice', () => {
   it('forgets every list when somebody signs out', () => {
     const state = reducer(start, logout());
     expect(state.lists).toEqual([]);
-    expect(state.hydrated).toBe(true);
   });
 
   it('drops only the ops an answer confirms', () => {

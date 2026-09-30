@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import type {RecipeImage} from '../dao/RestAPI';
+import type {RecipeImage} from '../api/types/recipes';
 import {TITLE_IMAGE_INDEX, moveImage} from './recipeImages';
 
 const images = (...uuids: string[]): RecipeImage[] => uuids.map((uuid) => ({uuid}));

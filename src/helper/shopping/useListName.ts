@@ -1,5 +1,5 @@
 import {useTranslation} from 'react-i18next';
-import {ShoppingList} from '../../dao/RestAPI';
+import {ShoppingList} from '../../api/types/shopping';
 import {listName} from './lists';
 
 /**

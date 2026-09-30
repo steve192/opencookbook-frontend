@@ -1,5 +1,5 @@
 import {beforeEach, describe, expect, it} from 'vitest';
-import {Recipe} from '../dao/RestAPI';
+import {Recipe} from '../api/types/recipes';
 import {holdDraft, takeDraft} from './recipeDraftHandover';
 
 const recipe = (title: string) => ({title} as Recipe);

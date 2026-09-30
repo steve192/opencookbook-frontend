@@ -4,7 +4,7 @@ import {StyleSheet, View} from 'react-native';
 import {Button, Text} from 'react-native-paper';
 import {RecipeFactChips} from '../../components/RecipeFactChips';
 import {RecipeRowCard} from '../../components/RecipeRowCard';
-import {SuggestedRecipe} from '../../dao/RestAPI';
+import {SuggestedRecipe} from '../../api/types/planning';
 import {useAppTheme} from '../../styles/CentralStyles';
 
 interface Props {
@@ -12,6 +12,8 @@ interface Props {
   onOpen: () => void;
   onAddToToday: () => void;
   added: boolean;
+  /** False while offline, or while today's plan is not known yet. */
+  canAdd: boolean;
 }
 
 export const SuggestionResultCard = (props: Props) => {
@@ -44,7 +46,7 @@ export const SuggestionResultCard = (props: Props) => {
           compact
           style={styles.addButton}
           onPress={props.onAddToToday}
-          disabled={props.added}>
+          disabled={props.added || !props.canAdd}>
           {t(props.added ? 'screens.suggestion.addedToWeekplan' : 'screens.suggestion.addToWeekplan')}
         </Button>
       </RecipeRowCard>

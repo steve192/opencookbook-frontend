@@ -6,7 +6,7 @@ import {Button, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {PasswordValidationInput} from '../components/PasswordValidationInput';
 import {SuccessErrorBanner} from '../components/SuccessErrorBanner';
-import RestAPI from '../dao/RestAPI';
+import {useResetPasswordMutation} from '../api/endpoints/account';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {BaseNavigatorProps} from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
@@ -20,20 +20,19 @@ export const PasswordResetScreen = (props: Props) => {
   const [passwordOk, setPasswordOk] = useState(false);
   const [error, setError] = useState<string>();
   const [success, setSuccess] = useState(false);
-  const [pending, setPending] = useState(false);
+  const [resetPasswordTo, {isLoading: pending}] = useResetPasswordMutation();
 
   const resetPassword = () => {
     if (pending || !props.route.params?.id || !passwordOk) {
       return;
     }
-    setPending(true);
     setError(undefined);
-    RestAPI.resetPassword(props.route.params.id, newPassword).then(() => {
+    resetPasswordTo({passwordResetId: props.route.params.id, newPassword}).unwrap().then(() => {
       setSuccess(true);
     }).catch((cause) => {
       setError(t(errorMessageKey(cause)));
       setSuccess(false);
-    }).finally(() => setPending(false));
+    });
   };
 
   // Replace the in-stack screen with the login flow so the user can't navigate

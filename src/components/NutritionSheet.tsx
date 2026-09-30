@@ -1,66 +1,48 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Linking, ScrollView, StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Button, Divider, Icon, IconButton, Modal, Portal, Text, TouchableRipple} from 'react-native-paper';
-import {NutritionLine, NutritionSummary, RecipeNutrition} from '../dao/RestAPI';
+import {NutritionLine, NutritionSummary, RecipeNutrition} from '../api/types/nutrition';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {canWeighPieces, formatEstimate, formatNutrient, lineNoteKeys, linesWarningFirst, NUTRIENT_ROWS, nutritionColumns} from '../helper/nutrition';
-import {useOnlineGuard} from '../helper/useOnlineGuard';
+import {useIsOnline} from '../offline/useIsOnline';
 import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
 import {IngredientLinkDialog} from './IngredientLinkDialog';
 import {OwnPortionDialog} from './OwnPortionDialog';
 
-interface Props {
+export interface NutritionSheetProps {
   summary: NutritionSummary;
   scaledServings: number;
-  loadDetails: () => Promise<RecipeNutrition>;
-  /** Only for the reader's own recipe, which they may correct. */
-  onLinkChanged?: () => void;
   onDismiss: () => void;
+  /** Only a recipe of your own can be corrected. */
+  canCorrect: boolean;
 }
 
-// Lines load when the sheet opens: most readers never open it.
+interface Props extends NutritionSheetProps {
+  /** The lines, undefined while they are not there. */
+  details?: RecipeNutrition;
+  error?: unknown;
+  onRetry: () => void;
+}
+
 export const NutritionSheet = (props: Props) => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
-  const requireOnline = useOnlineGuard();
+  const online = useIsOnline();
 
-  const [details, setDetails] = useState<RecipeNutrition>();
-  const [failure, setFailure] = useState<string>();
   const [correcting, setCorrecting] = useState<NutritionLine>();
   const [weighing, setWeighing] = useState<NutritionLine>();
 
-  const {loadDetails} = props;
-  const load = useCallback(() => {
-    setFailure(undefined);
-    loadDetails()
-        .then(setDetails)
-        .catch((e) => setFailure(t(errorMessageKey(e, 'nutrition.loadFailed'))));
-  }, [loadDetails]);
-
-  useEffect(load, [load]);
-
-  const canCorrect = props.onLinkChanged !== undefined;
+  const {details} = props;
+  const failure = !details && props.error ? t(errorMessageKey(props.error, 'nutrition.loadFailed')) : undefined;
+  const canCorrect = props.canCorrect && online;
   // Newer than props.summary after a correction.
   const summary = details?.summary ?? props.summary;
 
-  const correct = (line: NutritionLine) => {
-    if (requireOnline()) {
-      setCorrecting(line);
-    }
-  };
-
-  const weigh = (line: NutritionLine) => {
-    if (requireOnline()) {
-      setWeighing(line);
-    }
-  };
-
+  // A correction refreshes the lines and the recipe's summary by itself.
   const corrected = () => {
     setCorrecting(undefined);
     setWeighing(undefined);
-    load();
-    props.onLinkChanged?.();
   };
 
   return (
@@ -75,7 +57,7 @@ export const NutritionSheet = (props: Props) => {
         </View>
         <ScrollView contentContainerStyle={styles.body} testID='nutrition-sheet'>
           <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>{t('nutrition.estimateNotice')}</Text>
-          <SummaryNotice summary={summary} canCorrect={canCorrect} />
+          <SummaryNotice summary={summary} canCorrect={props.canCorrect} />
           {summary.status !== 'UNAVAILABLE' && <ValueTable summary={summary} scaledServings={props.scaledServings} />}
 
           <Divider />
@@ -84,7 +66,7 @@ export const NutritionSheet = (props: Props) => {
           {failure &&
             <View style={styles.failure}>
               <Text style={{color: theme.colors.error}}>{failure}</Text>
-              <Button icon="refresh" onPress={load}>{t('nutrition.retry')}</Button>
+              <Button icon="refresh" onPress={props.onRetry}>{t('nutrition.retry')}</Button>
             </View>
           }
           {!details && !failure && <ActivityIndicator animating={true} />}
@@ -92,8 +74,8 @@ export const NutritionSheet = (props: Props) => {
             <LineRow
               key={index}
               line={line}
-              onPress={canCorrect && line.ingredientId !== null ? () => correct(line) : undefined}
-              onWeigh={canCorrect && canWeighPieces(line) ? () => weigh(line) : undefined} />
+              onPress={canCorrect && line.ingredientId !== null ? () => setCorrecting(line) : undefined}
+              onWeigh={canCorrect && canWeighPieces(line) ? () => setWeighing(line) : undefined} />
           ))}
 
           <View style={styles.sources}>

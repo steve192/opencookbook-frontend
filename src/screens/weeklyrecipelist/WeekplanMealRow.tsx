@@ -11,11 +11,12 @@ interface Props {
   /** Shown under the title, e.g. which day leftovers are from. */
   note?: string;
   /** For a recipe that is, or can be, leftovers of an earlier day. */
-  leftovers?: {active: boolean, onToggle: () => void};
+  leftovers?: {active: boolean, onToggle?: () => void};
   /** Undefined for spontaneous meals, which have no recipe behind them */
   imageUuid?: string;
   onPress?: () => void;
-  onRemovePress: () => void;
+  /** Omitted while the meal cannot be removed */
+  onRemovePress?: () => void;
   /** Omitted for the first meal of a day, which cannot move further up */
   onMoveUpPress?: () => void;
   /** Omitted for the last meal of a day */
@@ -87,6 +88,7 @@ export const WeekplanMealRow = (props: Props) => {
           selected={props.leftovers.active}
           iconColor={props.leftovers.active ? theme.colors.primary : theme.colors.onSurfaceVariant}
           accessibilityLabel={t(props.leftovers.active ? 'screens.weekplan.cookFresh' : 'screens.weekplan.markLeftovers')}
+          disabled={!props.leftovers.onToggle}
           onPress={props.leftovers.onToggle} />
       }
       {props.reorderable &&
@@ -108,6 +110,7 @@ export const WeekplanMealRow = (props: Props) => {
         size={18}
         iconColor={theme.colors.onSurfaceVariant}
         accessibilityLabel={t('screens.weekplan.removeMeal')}
+        disabled={!props.onRemovePress}
         onPress={props.onRemovePress} />
     </View>
   );

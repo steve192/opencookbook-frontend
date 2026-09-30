@@ -1,6 +1,6 @@
 import {TFunction} from 'i18next';
 import {describe, expect, it} from 'vitest';
-import {PlanDraft, PlanSlot} from '../dao/RestAPI';
+import {PlanDraft, PlanSlot} from '../api/types/planning';
 import {REROLL_REASONS, draftDays, isUnfilled, leftoverSource, rerollReasonLabel} from './planDraft';
 
 const slot = (id: number, date: string, mealType: PlanSlot['mealType'], kind: PlanSlot['kind'] = 'COOKED',

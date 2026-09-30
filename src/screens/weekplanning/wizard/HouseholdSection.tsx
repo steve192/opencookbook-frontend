@@ -5,7 +5,7 @@ import {Button, Surface, Text} from 'react-native-paper';
 import {ChoiceChips} from '../../../components/ChoiceChips';
 import {CountStepper} from '../../../components/CountStepper';
 import {HintText} from '../../../components/QuestionSection';
-import {PlanningMeal} from '../../../dao/RestAPI';
+import {PlanningMeal} from '../../../api/types/planning';
 import {WEEKEND, WORKDAYS} from '../../../helper/daysOfWeek';
 import {MEAL_TYPES, mealTypeLabel} from '../../../helper/mealTypes';
 import {

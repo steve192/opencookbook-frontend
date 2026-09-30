@@ -6,10 +6,12 @@ import {useTranslation} from 'react-i18next';
 import {RefreshControl, ScrollView, StyleSheet, View} from 'react-native';
 import {Appbar, Button, IconButton, Surface, Text} from 'react-native-paper';
 import XDate from 'xdate';
-import {Recipe, WeekplanDay, WeekplanDayRecipeInfo} from '../../dao/RestAPI';
+import {useSetWeekplanDayMutation} from '../../api/endpoints/weekplan';
+import {Recipe} from '../../api/types/recipes';
+import {WeekplanDay, WeekplanDayRecipeInfo} from '../../api/types/weekplan';
+import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {printHtmlDocument} from '../../helper/printHtmlDocument';
-import {useOnlineGuard} from '../../helper/useOnlineGuard';
 import {
   formatDayAndMonth,
   formatWeekdayAndDate,
@@ -39,8 +41,7 @@ import {useHouseholds} from '../households/useHouseholds';
 import {useShoppingImport} from '../../helper/shopping/useShoppingImport';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps} from '../../navigation/NavigationRoutes';
-import {updateSingleWeekplanDay} from '../../redux/features/weeklyRecipesSlice';
-import {useAppDispatch, useAppSelector} from '../../redux/hooks';
+import {useIsOnline} from '../../offline/useIsOnline';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {RecipeSelectionPopup} from './RecipeSelectionPopup';
 import {WeekplanDayCard} from './WeekplanDayCard';
@@ -64,9 +65,8 @@ const mealTitles = (dayPlans: WeekplanDay[]): string[] =>
 export const WeeklyRecipeListScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
-  const dispatch = useAppDispatch();
-  const loadedDays = useAppSelector((state) => state.weeklyRecipes.weekplanDays);
-  const requireOnline = useOnlineGuard();
+  const online = useIsOnline();
+  const [setWeekplanDay] = useSetWeekplanDayMutation();
 
   // Which week is on screen, relative to the week containing today. Negative
   // values are weeks in the past, which the plan simply could not reach before.
@@ -78,7 +78,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   const planTarget = usePlanTarget(households);
   const shoppingImport = useShoppingImport();
 
-  const {today, weekStart, days, plans, loading, reload} = useWeekplanWeek(weekOffset);
+  const {today, weekStart, days, plans, loadedDays, loading, reload} = useWeekplanWeek(weekOffset);
   const weekStartKey = toDayKey(weekStart);
   // Only what is still ahead can be planned; a week that is over gets no plan action at all
   const todayKey = toDayKey(today);
@@ -135,11 +135,13 @@ export const WeeklyRecipeListScreen = (props: Props) => {
             {plannable.length > 0 && <Appbar.Action
               icon="creation"
               color={theme.colors.onPrimary}
+              disabled={!online}
               accessibilityLabel={t('screens.planning.planWeek')}
               onPress={() => planWeek()} />}
             <Appbar.Action
               icon="cart-plus"
               color={theme.colors.onPrimary}
+              disabled={!online}
               accessibilityLabel={t('screens.shopping.import.addWeek')}
               onPress={() => shopWeek()} />
             <Appbar.Action
@@ -159,15 +161,13 @@ export const WeeklyRecipeListScreen = (props: Props) => {
       // old screen only ever loaded once on mount.
       reload();
     });
-  }, [props.navigation, t, theme, reload, printWeek, plannable, weekOffset, households, shoppingImport.provider]);
+  }, [props.navigation, t, theme, reload, printWeek, plannable, weekOffset, households, shoppingImport.provider, online]);
 
   // Every change goes through the same path: build the new day, then persist it.
-  const persist = (day: WeekplanDay) => dispatch(updateSingleWeekplanDay(day));
+  const persist = (day: WeekplanDay) => setWeekplanDay(day).unwrap()
+      .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
 
   const openRecipeSelection = (day: WeekplanDay) => {
-    if (!requireOnline()) {
-      return;
-    }
     setSelectedWeekplanDay(day);
     setRecipeSelectionVisible(true);
   };
@@ -217,9 +217,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   };
 
   const changeLeftover = (day: WeekplanDay, index: number, cookedOn: string | null) => {
-    if (requireOnline()) {
-      void persist(withLeftoverOf(day, index, cookedOn));
-    }
+    void persist(withLeftoverOf(day, index, cookedOn));
   };
 
   const addSpontaneousMeal = (title: string) => {
@@ -230,9 +228,6 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   };
 
   const removeMeal = (day: WeekplanDay, index: number) => {
-    if (!requireOnline()) {
-      return;
-    }
     void persist(withMealRemoved(day, index));
 
     // Removing is a single tap now, so it has to be undoable
@@ -244,9 +239,6 @@ export const WeeklyRecipeListScreen = (props: Props) => {
   };
 
   const moveMeal = (day: WeekplanDay, fromIndex: number, toIndex: number) => {
-    if (!requireOnline()) {
-      return;
-    }
     void persist(withMealMoved(day, fromIndex, toIndex));
   };
 
@@ -297,6 +289,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
             isToday={isSameDay(date, today)}
             isPast={date.diffDays(today) > 0}
             plans={dayPlans}
+            editable={online}
             onAddPress={() => chooseTargetPlan(dayPlans)}
             onMealPress={openRecipe}
             onMealMove={moveMeal}

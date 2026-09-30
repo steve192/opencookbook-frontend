@@ -1,10 +1,9 @@
 import {useEffect, useRef, useState} from 'react';
 import {AppState} from 'react-native';
-import AppPersistence from '../../AppPersistence';
-import RestAPI from '../../dao/RestAPI';
+import {shoppingLiveUrl} from '../../api/endpoints/shopping';
+import {currentAccessToken, renewTokens} from '../../api/session';
 import {LiveChannel} from '../../helper/shopping/liveChannel';
 import {
-  hydrateShopping,
   loadShoppingLists,
   loadShoppingVocabulary,
   syncAllShoppingLists,
@@ -12,6 +11,7 @@ import {
   syncShoppingListBehind,
 } from '../../helper/shopping/shoppingSync';
 import {useShoppingProvider} from '../../helper/shopping/useShoppingProvider';
+import {useIsOnline} from '../../offline/useIsOnline';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 
 /** Without the live channel, the shown list is asked about this often while the app is open. */
@@ -29,17 +29,15 @@ const ignore = () => undefined;
 export const ShoppingSyncRunner = () => {
   const dispatch = useAppDispatch();
   const {provider} = useShoppingProvider();
-  const isOnline = useAppSelector((state) => state.settings.isOnline);
-  const hydrated = useAppSelector((state) => state.shopping.hydrated);
+  const isOnline = useIsOnline();
   const lists = useAppSelector((state) => state.shopping.lists);
   const activeListId = useAppSelector((state) => state.shopping.activeListId);
   const [foreground, setForeground] = useState(AppState.currentState === 'active');
   const [hearing, setHearing] = useState(false);
   const channel = useRef<LiveChannel | null>(null);
-  const running = provider === 'COOKPAL' && hydrated && isOnline && foreground;
+  const running = provider === 'COOKPAL' && isOnline && foreground;
 
   useEffect(() => {
-    dispatch(hydrateShopping()).catch(ignore);
     const subscription = AppState.addEventListener('change', (state) => setForeground(state === 'active'));
     return () => subscription.remove();
   }, []);
@@ -52,9 +50,9 @@ export const ShoppingSyncRunner = () => {
     dispatch(loadShoppingVocabulary()).catch(ignore);
 
     const live = new LiveChannel({
-      url: () => RestAPI.shoppingLiveUrl(),
-      token: () => AppPersistence.getAuthToken(),
-      renewToken: () => RestAPI.refreshToken(),
+      url: shoppingLiveUrl,
+      token: currentAccessToken,
+      renewToken: renewTokens,
       onChanged: (listId, version) => dispatch(syncShoppingListBehind(listId, version)).catch(ignore),
       onConnected: setHearing,
     });

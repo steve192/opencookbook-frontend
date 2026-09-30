@@ -3,6 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {StyleProp, ViewStyle} from 'react-native';
 import {Button} from 'react-native-paper';
 import {useShoppingImport} from '../../helper/shopping/useShoppingImport';
+import {useIsOnline} from '../../offline/useIsOnline';
 import {BringImportButton} from '../BringExportButton';
 
 interface Props {
@@ -15,18 +16,19 @@ interface Props {
 export const AddToShoppingListButton = (props: Props) => {
   const {t} = useTranslation('translation');
   const {provider, start, exporting, dialog} = useShoppingImport();
+  const online = useIsOnline();
   const addRecipe = () => start({kind: 'recipe', recipeId: props.recipeId, servings: props.servings});
 
   return (
     <>
       {provider === 'BRING' ?
-        <BringImportButton style={props.style} loading={exporting} onPress={addRecipe} /> :
+        <BringImportButton style={props.style} loading={exporting} disabled={!online} onPress={addRecipe} /> :
         <Button
           style={props.style}
           mode="contained-tonal"
           icon="cart-plus"
           loading={exporting}
-          disabled={provider === undefined || exporting}
+          disabled={!online || provider === undefined || exporting}
           onPress={addRecipe}>
           {t('screens.shopping.import.addToList')}
         </Button>}

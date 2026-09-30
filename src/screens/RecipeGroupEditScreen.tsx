@@ -4,48 +4,51 @@ import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
 import {Button, Divider, Surface, Text, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {RecipeGroup} from '../dao/RestAPI';
+import {
+  useCreateRecipeGroupMutation, useDeleteRecipeGroupMutation, useGetRecipeGroupsQuery, useUpdateRecipeGroupMutation,
+} from '../api/endpoints/recipes';
+import {RecipeGroup} from '../api/types/recipes';
+import {errorMessageKey} from '../helper/apiErrorMessage';
+import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {PromptUtil} from '../helper/Prompt';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
-import {createRecipeGroup, deleteRecipeGroup, updateRecipeGroup} from '../redux/features/recipesSlice';
-import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {OfflineSaveHint} from '../offline/OfflineSaveHint';
+import {useIsOnline} from '../offline/useIsOnline';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeGroupEditScreen'>;
 
 export const RecipeGroupEditScreen = (props: Props) => {
   const {t} = useTranslation('translation');
-  const dispatch = useAppDispatch();
   const theme = useAppTheme();
+  const online = useIsOnline();
 
-  const existingRecipeGroup = useAppSelector(
-      (store) => store.recipes.recipeGroups.find((group) => group.id === props.route.params.recipeGroupId),
-  );
+  const existingRecipeGroup = useGetRecipeGroupsQuery().data
+      ?.find((group) => group.id === props.route.params.recipeGroupId);
 
   const [recipeGroupData, setRecipeGroupData] = useState<RecipeGroup>(
       existingRecipeGroup ?? {title: '', type: 'RecipeGroup'},
   );
 
-  const [pending, setPending] = useState(false);
+  const [createRecipeGroup, creating] = useCreateRecipeGroupMutation();
+  const [updateRecipeGroup, updating] = useUpdateRecipeGroupMutation();
+  const [deleteRecipeGroup] = useDeleteRecipeGroupMutation();
+  const pending = creating.isLoading || updating.isLoading;
 
   const trimmedTitle = recipeGroupData.title.trim();
-  const canSave = !pending && trimmedTitle.length > 0;
+  const canSave = online && !pending && trimmedTitle.length > 0;
 
   const saveRecipeGroup = () => {
     if (!canSave) return;
-    setPending(true);
-    const action = existingRecipeGroup ?
-      updateRecipeGroup(recipeGroupData) :
-      createRecipeGroup(recipeGroupData);
-    void dispatch(action).finally(() => {
-      setPending(false);
-      props.navigation.goBack();
-    });
+    const saving = existingRecipeGroup ? updateRecipeGroup(recipeGroupData) : createRecipeGroup(recipeGroupData);
+    saving.unwrap()
+        .then(() => props.navigation.goBack())
+        .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
   };
 
   const performDelete = () => {
     if (!recipeGroupData.id) return;
-    void dispatch(deleteRecipeGroup(recipeGroupData.id)).then(() => {
+    deleteRecipeGroup(recipeGroupData.id).unwrap().then(() => {
       // After deleting, leave the (now-stale) group view and land back on the
       // top-level "My recipes" list.
       props.navigation.navigate('OverviewScreen', {
@@ -55,7 +58,7 @@ export const RecipeGroupEditScreen = (props: Props) => {
           params: {shownRecipeGroupId: undefined},
         },
       });
-    });
+    }).catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
   };
 
   const onDeletePress = () => {
@@ -76,6 +79,7 @@ export const RecipeGroupEditScreen = (props: Props) => {
         mode="contained"
         buttonColor={theme.colors.destructive}
         textColor={theme.colors.onDestructive}
+        disabled={!online}
         onPress={onDeletePress}>{t('common.delete')}</Button>
     </>
   );
@@ -92,6 +96,7 @@ export const RecipeGroupEditScreen = (props: Props) => {
           onChangeText={(newText) => setRecipeGroupData({...recipeGroupData, title: newText})}
           returnKeyType='go'
           onSubmitEditing={saveRecipeGroup} />
+        <OfflineSaveHint />
         <Spacer height={10} />
         <Button
           mode='contained'

@@ -1,4 +1,4 @@
-import {NETWORK_UNREACHABLE, toApiError} from '../dao/ApiError';
+import {NETWORK_UNREACHABLE, toApiError} from '../api/ApiError';
 
 /**
  * What to tell the reader about each failure the server can name. One table for the whole app;

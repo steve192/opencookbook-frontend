@@ -36,7 +36,8 @@ export type MainNavigationProps = {
     ImportScreen: { importUrl?: string },
     RecipeGroupEditScreen: { recipeGroupId?: number, editing: boolean}
     /** By id rather than the recipe itself: parameters go into the address bar, where a recipe is "[object Object]". */
-    GuidedCookingScreen: { recipeId: number, scaledServings: number, initialStep?: number }
+    /** Without scaledServings, cooking is for the servings the recipe itself says. */
+    GuidedCookingScreen: { recipeId: number, scaledServings?: number, initialStep?: number }
     HouseholdListScreen: undefined
     HouseholdScreen: { householdId: string }
     /** Opening an invitation link. The token is the invitation. */

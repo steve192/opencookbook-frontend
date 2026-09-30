@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html lang="%LANG_ISO_CODE%">
   <head>
-    <link rel="manifest" href="/manifest.json" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta charset="utf-8" />
     <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1.00001,viewport-fit=cover" />
+    <meta name="theme-color" content="#295700" />
+    <meta name="description" content="Your recipes, weekplan and shopping list, shared with your household." />
+    <!-- iOS installs from Safari's Add to Home Screen, which reads these rather than the manifest. -->
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Cookpal" />
     <title>%WEB_TITLE%</title>
     <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
     <style id="expo-reset">
@@ -24,34 +31,6 @@
         flex: 1;
       }
     </style>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          // `sw.js` is emitted by `workbox generateSW` during `npm run build-web`,
-          // so it only exists in a production export. The dev server answers
-          // unknown paths with index.html, and registering that as a worker fails
-          // with an "unsupported MIME type ('text/html')" SecurityError. Check
-          // what we actually got back before registering, rather than assuming.
-          fetch('/sw.js', {method: 'HEAD'})
-            .then(response => {
-              const contentType = response.headers.get('content-type') || '';
-              if (!response.ok || !contentType.includes('javascript')) {
-                console.info('No service worker in this build, skipping registration.');
-                return null;
-              }
-              return navigator.serviceWorker.register('/sw.js');
-            })
-            .then(registration => {
-              if (registration) {
-                console.log('Service Worker registered with scope:', registration.scope);
-              }
-            })
-            .catch(error => {
-              console.error('Service Worker registration failed:', error);
-            });
-        });
-      }
-    </script>
   </head>
 
   <body>

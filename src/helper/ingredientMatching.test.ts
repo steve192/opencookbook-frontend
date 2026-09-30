@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {IngredientUse} from '../dao/RestAPI';
+import {IngredientUse} from '../api/types/recipes';
 import {
   findIngredientsWithoutStep,
   ingredientNameForms,

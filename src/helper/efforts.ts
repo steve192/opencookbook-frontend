@@ -1,5 +1,5 @@
 import {TFunction} from 'i18next';
-import {Effort} from '../dao/RestAPI';
+import {Effort} from '../api/types/planning';
 
 /** From the least work to the most. */
 export const EFFORTS: Effort[] = ['SIMPLE', 'ANY', 'ELABORATE'];

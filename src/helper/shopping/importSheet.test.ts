@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {PreviewMeal} from '../../dao/RestAPI';
+import {PreviewMeal} from '../../api/types/shopping';
 import {SheetLine} from './importLines';
 import {importRequest, initialChoices, isShoppedFor} from './importSheet';
 

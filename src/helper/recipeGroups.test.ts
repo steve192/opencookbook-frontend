@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import type {Recipe, RecipeGroup} from '../dao/RestAPI';
+import type {Recipe, RecipeGroup} from '../api/types/recipes';
 import {
   NO_RECIPE_GROUP_KEY,
   findRecipeGroupByOption,

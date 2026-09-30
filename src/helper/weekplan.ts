@@ -146,3 +146,11 @@ export const weekOffsetLabel = (t: TFunction, weekOffset: number, weekStart: XDa
   if (weekOffset === -1) return t('screens.weekplan.lastWeek');
   return t('screens.weekplan.weekNumber', {number: isoWeekNumber(weekStart)});
 };
+
+/**
+ * The week a day belongs to, as the day key of its Monday.
+ *
+ * @param {string} dayKey any day of the week
+ * @return {string} the day key of that week's Monday
+ */
+export const weekKeyOf = (dayKey: string): string => toDayKey(startOfWeek(new XDate(dayKey)));

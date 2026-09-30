@@ -14,6 +14,7 @@ import {
   startOfWeek,
   toDayKey,
   weekDays,
+  weekKeyOf,
 } from './weekplan';
 
 const at = (isoDate: string) => new XDate(isoDate + 'T12:00:00');
@@ -187,5 +188,13 @@ describe('weekOffsetLabel', () => {
     expect(weekOffsetLabel(t, 0, new XDate(2026, 8, 14))).toBe('screens.weekplan.thisWeek');
     expect(weekOffsetLabel(t, 1, new XDate(2026, 8, 21))).toBe('screens.weekplan.nextWeek');
     expect(weekOffsetLabel(t, 2, new XDate(2026, 8, 28))).toBe('screens.weekplan.weekNumber:40');
+  });
+});
+
+describe('weekKeyOf', () => {
+  it('names a week by its Monday', () => {
+    expect(weekKeyOf('2026-10-01')).toBe('2026-09-28');
+    expect(weekKeyOf('2026-09-28')).toBe('2026-09-28');
+    expect(weekKeyOf('2026-10-04')).toBe('2026-09-28');
   });
 });

@@ -1,29 +1,34 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, View} from 'react-native';
-import {ActivityIndicator, Appbar, Button, Card, IconButton, List, Surface} from 'react-native-paper';
-import RestAPI, {Household, HouseholdInvite, HouseholdMember} from '../../dao/RestAPI';
+import {Appbar, Button, Card, IconButton, List, Surface} from 'react-native-paper';
+import {
+  useCreateHouseholdInviteMutation,
+  useGetHouseholdInvitesQuery,
+  useGetHouseholdQuery,
+  useRemoveHouseholdMemberMutation,
+  useRenameHouseholdMutation,
+  useRevokeHouseholdInviteMutation,
+  useSetHouseholdSharingMutation,
+} from '../../api/endpoints/households';
+import {useCookbookRecipes} from '../../api/endpoints/recipes';
+import {HouseholdInvite, HouseholdMember} from '../../api/types/households';
+import {QueryFallback} from '../../components/QueryFallback';
+import {SwitchRow} from '../../components/SwitchRow';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
-import {PromptUtil} from '../../helper/Prompt';
 import {HOUSEHOLD_NAME_MAX_LENGTH} from '../../helper/nameLimits';
-import {TextPromptUtil} from '../../helper/TextPrompt';
+import {PromptUtil} from '../../helper/Prompt';
 import {shareLink} from '../../helper/shareLink';
+import {TextPromptUtil} from '../../helper/TextPrompt';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
+import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
-import {SwitchRow} from '../../components/SwitchRow';
 import {useOwnRecipeCount} from './useOwnRecipeCount';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'HouseholdScreen'>;
-
-/**
- * @param {HouseholdInvite} revoked the invite that no longer works
- * @return {Function} drops it from the invites on screen
- */
-const without = (revoked: HouseholdInvite) => (existing: HouseholdInvite[]): HouseholdInvite[] =>
-  existing.filter((candidate) => candidate.token !== revoked.token);
 
 /**
  * One household: its members, your sharing switches and its invite links. There are no roles.
@@ -35,35 +40,27 @@ export const HouseholdScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
   const householdId = props.route.params.householdId;
+  const online = useIsOnline();
 
-  const [household, setHousehold] = useState<Household | undefined>(undefined);
-  const [invites, setInvites] = useState<HouseholdInvite[]>([]);
-  const [busy, setBusy] = useState(false);
+  const {data: household, error, refetch} = useGetHouseholdQuery(householdId);
+  const invites = useGetHouseholdInvitesQuery(householdId).data ?? [];
+  const recipeCount = useCookbookRecipes(householdId).data?.length ?? 0;
   const ownRecipeCount = useOwnRecipeCount();
 
-  const load = useCallback(() => {
-    RestAPI.getHousehold(householdId)
-        .then(setHousehold)
-        .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error,
-            'screens.households.loadFailed'))}));
-    RestAPI.getHouseholdInvites(householdId).then(setInvites).catch(() => setInvites([]));
-  }, [householdId, t]);
+  const [renameHousehold, renaming] = useRenameHouseholdMutation();
+  const [setHouseholdSharing, sharing] = useSetHouseholdSharingMutation();
+  const [removeHouseholdMember, removing] = useRemoveHouseholdMemberMutation();
+  const [createHouseholdInvite, inviting] = useCreateHouseholdInviteMutation();
+  const [revokeHouseholdInvite, revoking] = useRevokeHouseholdInviteMutation();
+  const controlsDisabled = !online || [renaming, sharing, removing, inviting, revoking].some((request) => request.isLoading);
 
-  useEffect(load, [load]);
-
-  const change = useCallback(async (action: () => Promise<Household | void>): Promise<boolean> => {
-    setBusy(true);
+  const change = useCallback(async (action: () => Promise<unknown>): Promise<boolean> => {
     try {
-      const updated = await action();
-      if (updated) {
-        setHousehold(updated);
-      }
+      await action();
       return true;
-    } catch (error) {
-      SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.households.saveFailed'))});
+    } catch (failure) {
+      SnackbarUtil.show({message: t(errorMessageKey(failure, 'screens.households.saveFailed'))});
       return false;
-    } finally {
-      setBusy(false);
     }
   }, [t]);
 
@@ -75,7 +72,7 @@ export const HouseholdScreen = (props: Props) => {
       maxLength: HOUSEHOLD_NAME_MAX_LENGTH,
       confirm: t('common.save'),
       cancel: t('common.cancel'),
-      onConfirm: (name) => change(() => RestAPI.renameHousehold(householdId, name)),
+      onConfirm: (name) => change(() => renameHousehold({householdId, name}).unwrap()),
     });
   }, [change, household?.name, householdId, t]);
 
@@ -86,64 +83,48 @@ export const HouseholdScreen = (props: Props) => {
         <Appbar.Action
           testID="householdRenameButton"
           icon="pencil-outline"
-          disabled={!household}
+          disabled={!household || controlsDisabled}
           color={theme.colors.onPrimary}
           accessibilityLabel={t('screens.households.renameTitle')}
           onPress={rename} />
       ),
     });
-  }, [household, props.navigation, rename, t, theme]);
+  }, [household, controlsDisabled, props.navigation, rename, t, theme]);
 
-  const invite = useCallback(() => change(async () => {
-    const created = await RestAPI.createHouseholdInvite(householdId);
-    setInvites((existing) => [created, ...existing]);
+  const invite = () => change(async () => {
+    const created = await createHouseholdInvite(householdId).unwrap();
     await shareLink(household?.name ?? '', created.link);
-  }), [change, household?.name, householdId]);
+  });
 
-  const revoke = useCallback((openInvite: HouseholdInvite) => {
-    PromptUtil.show({
-      title: t('screens.households.revokeInviteTitle'),
-      message: t('screens.households.revokeInviteMessage'),
-      destructive: true,
-      confirm: t('screens.households.revokeInvite'),
-      cancel: t('common.cancel'),
-      onConfirm: () => change(async () => {
-        await RestAPI.revokeHouseholdInvite(householdId, openInvite.token);
-        setInvites(without(openInvite));
-      }),
-    });
-  }, [change, householdId, t]);
+  const revoke = (openInvite: HouseholdInvite) => PromptUtil.show({
+    title: t('screens.households.revokeInviteTitle'),
+    message: t('screens.households.revokeInviteMessage'),
+    destructive: true,
+    confirm: t('screens.households.revokeInvite'),
+    cancel: t('common.cancel'),
+    onConfirm: () => change(() => revokeHouseholdInvite({householdId, inviteId: openInvite.token}).unwrap()),
+  });
 
-  const part = useCallback((member: HouseholdMember) => {
-    PromptUtil.show({
-      title: member.me ?
-        t('screens.households.leaveTitle', {name: household?.name}) :
-        t('screens.households.removeTitle', {name: member.displayName}),
-      message: member.me ?
-        t('screens.households.leaveMessage') :
-        t('screens.households.removeMessage'),
-      destructive: true,
-      confirm: member.me ? t('screens.households.leave') : t('screens.households.remove'),
-      cancel: t('common.cancel'),
-      onConfirm: async () => {
-        if (!await change(() => RestAPI.removeHouseholdMember(householdId, member.userId))) {
-          return;
-        }
-        if (member.me) {
-          props.navigation.goBack();
-        } else {
-          load();
-        }
-      },
-    });
-  }, [change, household?.name, householdId, load, props.navigation, t]);
+  const part = (member: HouseholdMember) => PromptUtil.show({
+    title: member.me ?
+      t('screens.households.leaveTitle', {name: household?.name}) :
+      t('screens.households.removeTitle', {name: member.displayName}),
+    message: member.me ?
+      t('screens.households.leaveMessage') :
+      t('screens.households.removeMessage'),
+    destructive: true,
+    confirm: member.me ? t('screens.households.leave') : t('screens.households.remove'),
+    cancel: t('common.cancel'),
+    onConfirm: async () => {
+      if (await change(() => removeHouseholdMember({householdId, memberUserId: member.userId}).unwrap()) &&
+        member.me) {
+        props.navigation.goBack();
+      }
+    },
+  });
 
   if (!household) {
-    return (
-      <Surface style={CentralStyles.screen}>
-        <ActivityIndicator style={CentralStyles.elementSpacing} />
-      </Surface>
-    );
+    return <QueryFallback error={error} onRetry={refetch} />;
   }
 
   const me = household.members?.find((member) => member.me);
@@ -153,14 +134,14 @@ export const HouseholdScreen = (props: Props) => {
       <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
         <Card style={CentralStyles.elementSpacing}>
           <Card.Title title={t('screens.households.cookbook')}
-            subtitle={t('screens.households.recipeCount', {count: household.recipeCount ?? 0})} />
+            subtitle={t('screens.households.recipeCount', {count: recipeCount})} />
           <Card.Content>
             <SwitchRow
               label={t('screens.households.shareMyRecipes', {count: ownRecipeCount})}
               explanation={t('screens.households.shareExplanation')}
               value={household.shareRecipes}
-              disabled={busy}
-              onChange={(value) => change(() => RestAPI.setHouseholdSharing(householdId, value))} />
+              disabled={controlsDisabled}
+              onChange={(value) => change(() => setHouseholdSharing({householdId, shareRecipes: value}).unwrap())} />
           </Card.Content>
         </Card>
 
@@ -173,7 +154,7 @@ export const HouseholdScreen = (props: Props) => {
                 title={member.displayName}
                 description={t(sharingKey(member))}
                 right={() => member.me ? null : (
-                  <Button compact disabled={busy} onPress={() => part(member)}>
+                  <Button compact disabled={controlsDisabled} onPress={() => part(member)}>
                     {t('screens.households.remove')}
                   </Button>
                 )} />
@@ -195,23 +176,22 @@ export const HouseholdScreen = (props: Props) => {
                   <View style={CentralStyles.chipRow}>
                     <IconButton
                       icon="share-variant"
-                      disabled={busy}
                       accessibilityLabel={t('screens.households.shareInvite')}
                       onPress={() => shareLink(household.name, openInvite.link)} />
-                    <Button compact disabled={busy} onPress={() => revoke(openInvite)}>
+                    <Button compact disabled={controlsDisabled} onPress={() => revoke(openInvite)}>
                       {t('screens.households.revokeInvite')}
                     </Button>
                   </View>
                 )} />
             ))}
-            <Button mode="outlined" disabled={busy} onPress={invite}>
+            <Button mode="outlined" disabled={controlsDisabled} onPress={invite}>
               {t('screens.households.invite')}
             </Button>
           </Card.Content>
         </Card>
 
         {me &&
-          <Button mode="outlined" disabled={busy} style={CentralStyles.elementSpacing}
+          <Button mode="outlined" disabled={controlsDisabled} style={CentralStyles.elementSpacing}
             onPress={() => part(me)}>
             {t('screens.households.leave')}
           </Button>}

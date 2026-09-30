@@ -1,5 +1,5 @@
 import {TFunction} from 'i18next';
-import {MealType, Recipe} from '../dao/RestAPI';
+import {MealType, Recipe} from '../api/types/recipes';
 import {MEAL_TYPES, mealTypeLabel} from './mealTypes';
 import {dietLabel} from './recipeDiet';
 

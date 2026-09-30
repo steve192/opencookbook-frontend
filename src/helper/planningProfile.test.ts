@@ -1,7 +1,7 @@
 import {TFunction} from 'i18next';
 import {describe, expect, it} from 'vitest';
 import {withToggled} from './choices';
-import {PlanningMeal, PlanningProfile} from '../dao/RestAPI';
+import {PlanningMeal, PlanningProfile} from '../api/types/planning';
 import {
   canPlan,
   cookedDays,

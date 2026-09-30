@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Portal} from 'react-native-paper';
 import Animated from 'react-native-reanimated';
-import {Aisle} from '../../dao/aisles';
+import {Aisle} from '../../api/aisles';
 import {PageRect} from '../../helper/measureView';
 import {ShoppingItemTile} from './ShoppingItemTile';
 

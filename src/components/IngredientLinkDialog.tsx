@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet} from 'react-native';
 import {ActivityIndicator, Button, Dialog, List, Portal, Searchbar, Text} from 'react-native-paper';
-import RestAPI, {CatalogueFood} from '../dao/RestAPI';
+import {useLinkIngredientMutation, useSearchCatalogueQuery} from '../api/endpoints/nutrition';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {formatNutrient} from '../helper/nutrition';
 import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
@@ -22,48 +22,28 @@ export const IngredientLinkDialog = (props: Props) => {
   const theme = useAppTheme();
 
   const [query, setQuery] = useState(props.ingredientName);
-  const [foods, setFoods] = useState<CatalogueFood[]>([]);
-  const [searching, setSearching] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [searched, setSearched] = useState(props.ingredientName.trim());
+  const search = useSearchCatalogueQuery(searched, {skip: searched === ''});
+  const foods = searched === '' ? [] : search.data ?? [];
+  const searching = search.isFetching;
+  const [linkIngredient, {isLoading: saving}] = useLinkIngredientMutation();
   // Shown inside the dialog: a snackbar would be hidden behind it.
-  const [failure, setFailure] = useState<string>();
+  const [linkFailure, setLinkFailure] = useState<string>();
+  const failure = linkFailure ??
+    (search.error ? t(errorMessageKey(search.error, 'nutrition.link.searchFailed')) : undefined);
 
   useEffect(() => {
-    const trimmed = query.trim();
-    if (!trimmed) {
-      setFoods([]);
-      return;
-    }
-    let current = true;
-    const timer = setTimeout(() => {
-      setSearching(true);
-      RestAPI.searchCatalogue(trimmed)
-          .then((found) => {
-            if (current) {
-              setFoods(found);
-              setFailure(undefined);
-            }
-          })
-          .catch((e) => current && setFailure(t(errorMessageKey(e, 'nutrition.link.searchFailed'))))
-          .finally(() => current && setSearching(false));
-    }, SEARCH_DELAY_MS);
-    // Ignore answers to outdated queries.
-    return () => {
-      current = false;
-      clearTimeout(timer);
-    };
+    const timer = setTimeout(() => setSearched(query.trim()), SEARCH_DELAY_MS);
+    return () => clearTimeout(timer);
   }, [query]);
 
   const link = async (catalogueFoodId: number | null) => {
-    setSaving(true);
-    setFailure(undefined);
+    setLinkFailure(undefined);
     try {
-      await RestAPI.linkIngredient(props.ingredientId, catalogueFoodId);
+      await linkIngredient({ingredientId: props.ingredientId, catalogueFoodId}).unwrap();
       props.onLinked();
     } catch (e) {
-      setFailure(t(errorMessageKey(e, 'nutrition.link.failed')));
-    } finally {
-      setSaving(false);
+      setLinkFailure(t(errorMessageKey(e, 'nutrition.link.failed')));
     }
   };
 

@@ -1,12 +1,11 @@
 import {describe, expect, it} from 'vitest';
-import {ShoppingItem, ShoppingOp} from '../../dao/RestAPI';
+import {ShoppingItem, ShoppingOp} from '../../api/types/shopping';
 import {
   activeItems,
   copyOf,
   ItemMap,
   MAX_SOURCES_PER_ADD,
   recentlyBought,
-  timedPending,
   visibleItems,
   withChanges,
   withOp,
@@ -123,11 +122,5 @@ describe('listItems', () => {
     const shown = visibleItems({server: {}, version: 1, pending: [
       {op: add('a', 'Brot'), at: '2026-10-05T10:00:00Z'}, {op: add('b', 'Butter'), at: '2026-10-05T10:00:01Z'}]});
     expect(activeItems(shown).map((each) => each.name)).toEqual(['Brot', 'Butter']);
-  });
-
-  it('gives pending ops stored without a time the time they are read back', () => {
-    const op = add('a', 'Brot');
-    expect(timedPending([op, {op, at: NOW}], '2026-10-06T00:00:00Z'))
-        .toEqual([{op, at: '2026-10-06T00:00:00Z'}, {op, at: NOW}]);
   });
 });

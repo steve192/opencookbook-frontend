@@ -1,12 +1,15 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, View} from 'react-native';
-import {ActivityIndicator, Button, Surface, Text} from 'react-native-paper';
-import RestAPI from '../../dao/RestAPI';
+import {Button, Surface, Text} from 'react-native-paper';
+import {answeredByServer} from '../../api/ApiError';
+import {useAcceptHouseholdInviteMutation, usePreviewHouseholdInviteQuery} from '../../api/endpoints/households';
+import {QueryFallback} from '../../components/QueryFallback';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
+import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
 import {SwitchRow} from '../../components/SwitchRow';
 import {useOwnRecipeCount} from './useOwnRecipeCount';
@@ -23,32 +26,24 @@ export const HouseholdInviteScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const token = props.route.params.token;
 
-  const [householdName, setHouseholdName] = useState<string | undefined>(undefined);
+  const online = useIsOnline();
+  const {data: householdName, error, refetch} = usePreviewHouseholdInviteQuery(token);
+  const [acceptHouseholdInvite, {isLoading: joining}] = useAcceptHouseholdInviteMutation();
   const recipeCount = useOwnRecipeCount();
   const [shareRecipes, setShareRecipes] = useState(true);
-  const [invalid, setInvalid] = useState(false);
-  const [joining, setJoining] = useState(false);
-
-  useEffect(() => {
-    RestAPI.previewHouseholdInvite(token)
-        .then(setHouseholdName)
-        .catch(() => setInvalid(true));
-  }, [token]);
 
   const join = useCallback(async () => {
-    setJoining(true);
     try {
-      const household = await RestAPI.acceptHouseholdInvite(token, shareRecipes);
+      const household = await acceptHouseholdInvite({token, shareRecipes}).unwrap();
       SnackbarUtil.show({message: t('screens.households.joined', {name: householdName})});
       props.navigation.replace('HouseholdScreen', {householdId: household.id});
-    } catch (error) {
-      SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.households.inviteInvalid'))});
-    } finally {
-      setJoining(false);
+    } catch (failure) {
+      SnackbarUtil.show({message: t(errorMessageKey(failure, 'screens.households.inviteInvalid'))});
     }
   }, [householdName, props.navigation, shareRecipes, t, token]);
 
-  if (invalid) {
+  // The server answered: the invite is not valid, as opposed to the server not being reached.
+  if (error && answeredByServer(error)) {
     return (
       <Surface style={CentralStyles.screen}>
         <View style={CentralStyles.contentContainer}>
@@ -59,11 +54,7 @@ export const HouseholdInviteScreen = (props: Props) => {
   }
 
   if (!householdName) {
-    return (
-      <Surface style={CentralStyles.screen}>
-        <ActivityIndicator style={CentralStyles.elementSpacing} />
-      </Surface>
-    );
+    return <QueryFallback error={error} onRetry={refetch} />;
   }
 
   return (
@@ -78,7 +69,7 @@ export const HouseholdInviteScreen = (props: Props) => {
           value={shareRecipes}
           onChange={setShareRecipes} />
 
-        <Button mode="contained" loading={joining} disabled={joining}
+        <Button mode="contained" loading={joining} disabled={!online || joining}
           style={CentralStyles.elementSpacing} onPress={join}>
           {t('screens.households.join')}
         </Button>

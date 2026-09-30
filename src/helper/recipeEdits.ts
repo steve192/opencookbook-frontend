@@ -1,4 +1,4 @@
-import {IngredientUse, Recipe, RecipeDiet, RecipeGroup, RecipeImage} from '../dao/RestAPI';
+import {IngredientUse, Recipe, RecipeDiet, RecipeGroup, RecipeImage} from '../api/types/recipes';
 import {parseOptionalNumber} from './choices';
 import {moveItem} from './listOrder';
 import {toggledMealType} from './mealTypes';

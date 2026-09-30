@@ -1,7 +1,7 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {SegmentedButtons} from 'react-native-paper';
-import {Effort} from '../../../dao/RestAPI';
+import {Effort} from '../../../api/types/planning';
 import {EFFORTS, effortLabel} from '../../../helper/efforts';
 
 interface Props {

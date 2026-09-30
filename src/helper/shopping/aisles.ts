@@ -1,4 +1,4 @@
-import {Aisle, AISLES} from '../../dao/aisles';
+import {Aisle, AISLES} from '../../api/aisles';
 import aisleIcons from './aisleIcons.json';
 
 export interface AisleGroup<T> {

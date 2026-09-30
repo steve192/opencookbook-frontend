@@ -1,4 +1,4 @@
-import {ShoppingChanges, ShoppingItem, ShoppingOp} from '../../dao/RestAPI';
+import {ShoppingChanges, ShoppingItem, ShoppingOp} from '../../api/types/shopping';
 import {nameKey} from './names';
 import {joinSpecs} from './specs';
 
@@ -20,13 +20,6 @@ export interface PendingOp {
   /** When it was made on the device, as an ISO instant. */
   at: string;
 }
-
-/** A list as any app version stored it; older ones kept pending ops without their time. */
-export type StoredListSync = Omit<ListSync, 'pending'> & {pending: (PendingOp | ShoppingOp)[]};
-
-// Pending ops stored without a time count as made now.
-export const timedPending = (stored: StoredListSync['pending'], now: string): PendingOp[] =>
-  stored.map((entry) => ('op' in entry ? entry : {op: entry, at: now}));
 
 /** What "recently bought" keeps, as the server does. */
 export const RECENTLY_BOUGHT_KEPT = 60;

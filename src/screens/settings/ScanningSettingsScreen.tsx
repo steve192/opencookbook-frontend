@@ -6,7 +6,8 @@ import {Button} from 'react-native-paper';
 import AppPersistence from '../../AppPersistence';
 import {CustomCard} from '../../components/CustomCard';
 import {SwitchRow} from '../../components/SwitchRow';
-import RestAPI from '../../dao/RestAPI';
+import {useDeleteScanTrainingDataMutation} from '../../api/endpoints/scan';
+import {useIsOnline} from '../../offline/useIsOnline';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {PromptUtil} from '../../helper/Prompt';
@@ -18,6 +19,8 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'ScanningSettingsScreen
 
 export const ScanningSettingsScreen = (_props: Props) => {
   const {t} = useTranslation('translation');
+  const online = useIsOnline();
+  const [deleteScanTrainingData] = useDeleteScanTrainingDataMutation();
   // Recorded per submission, so switching this off stops future scans being kept but says
   // nothing about the ones already donated, which is what the deletion below is for.
   const [scanTrainingConsent, setScanTrainingConsent] = usePersistedFlag(
@@ -30,7 +33,7 @@ export const ScanningSettingsScreen = (_props: Props) => {
       destructive: true,
       confirm: t('common.delete'),
       onConfirm: () => {
-        RestAPI.deleteScanTrainingData()
+        deleteScanTrainingData().unwrap()
             .then(() => SnackbarUtil.show({message: t('screens.settings.deleteScanDataDone')}))
             .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
       },
@@ -47,7 +50,7 @@ export const ScanningSettingsScreen = (_props: Props) => {
           value={scanTrainingConsent}
           onChange={setScanTrainingConsent} />
       </CustomCard>
-      <Button mode="outlined" icon="delete-outline" onPress={onDeleteScanDataPress}>
+      <Button mode="outlined" icon="delete-outline" disabled={!online} onPress={onDeleteScanDataPress}>
         {t('screens.settings.deleteScanData')}
       </Button>
     </SettingsPage>

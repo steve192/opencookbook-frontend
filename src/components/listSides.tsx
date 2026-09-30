@@ -10,6 +10,7 @@ export interface SideAction {
   icon: string;
   label: string;
   onPress: () => void;
+  disabled?: boolean;
 }
 
 export const iconSide = (icon: string): ListSide => function SideIcon(props) {
@@ -20,7 +21,8 @@ export const actionsSide = (actions: SideAction[]): ListSide => function SideAct
   return (
     <>
       {actions.map((action) => (
-        <IconButton key={action.icon} icon={action.icon} accessibilityLabel={action.label} onPress={action.onPress} />
+        <IconButton key={action.icon} icon={action.icon} accessibilityLabel={action.label} onPress={action.onPress}
+          disabled={action.disabled} />
       ))}
     </>
   );

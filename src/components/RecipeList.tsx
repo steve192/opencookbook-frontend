@@ -1,21 +1,25 @@
 import {MaterialIcons} from '@expo/vector-icons';
-import fuzzy from 'fuzzy';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Pressable, RefreshControl, StyleSheet, View} from 'react-native';
 import {Badge, Surface, Text} from 'react-native-paper';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
-import {Recipe, RecipeGroup} from '../dao/RestAPI';
-import {fetchMyRecipeGroups, fetchMyRecipes, ownRecipes} from '../redux/features/recipesSlice';
-import {useAppDispatch, useAppSelector} from '../redux/hooks';
-import {ListRow, listRowHasChanged, RecipeGroupRow, RecipeRow, toRecipeGroupRow, toRecipeRow} from '../helper/recipeListRows';
+import {useCookbookRecipes, useGetRecipeGroupsQuery} from '../api/endpoints/recipes';
+import {Recipe, RecipeGroup} from '../api/types/recipes';
+import {searchByTitle} from '../helper/titleSearch';
+import {cookbookRows, ListRow, listRowHasChanged, RecipeGroupRow, RecipeRow} from '../helper/recipeListRows';
 import {columnsFor, RECIPE_TILE_HEIGHT} from '../helper/recipeGrid';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
+import {QueryFallback} from './QueryFallback';
 import {RecipeImageComponent} from './RecipeImageComponent';
 import {RECIPE_SEARCHBAR_SPACE, RecipeSearchbar} from './RecipeSearchbar';
 import {RecipeTile} from './RecipeTile';
 
+const NO_GROUPS: RecipeGroup[] = [];
+
 interface Props {
+  /** A household's cookbook instead of your own: it says whose each recipe is, and has no groups. */
+  householdId?: string
   shownRecipeGroupId: number | undefined
   onRecipeClick: (recipe: Recipe) => void
   onRecipeGroupClick: (recipeGroup: RecipeGroup) => void
@@ -25,9 +29,13 @@ interface Props {
   onRecipeSelected?: (selectedRecipe: number) => void
 }
 export const RecipeList = (props: Props) => {
-  const myRecipes = useAppSelector((state) => ownRecipes(state.recipes.recipes));
-  const myRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
-  const listRefreshing = useAppSelector((state) => state.recipes.pendingRequests > 0);
+  const ownCookbook = props.householdId === undefined;
+  const recipes = useCookbookRecipes(props.householdId);
+  // Groups are their owner's own, so a household cookbook shows none.
+  const recipeGroups = useGetRecipeGroupsQuery(undefined, {skip: !ownCookbook});
+  const cookbookRecipes = recipes.data;
+  const cookbookGroups = ownCookbook ? recipeGroups.data ?? NO_GROUPS : NO_GROUPS;
+  const listRefreshing = recipes.isFetching || recipeGroups.isFetching;
   const [searchString, setSearchString] = useState('');
 
   const [componentWidth, setComponentWidth] = useState<number>(1);
@@ -35,39 +43,23 @@ export const RecipeList = (props: Props) => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
 
-  const dispatch = useAppDispatch();
-
   const refreshData = () => {
-    dispatch(fetchMyRecipes());
-    dispatch(fetchMyRecipeGroups());
-  };
-  useEffect(refreshData, []);
-
-  const getShownItems = (includeGroupedRecipes = false): ListRow[] => {
-    const groupRows = () => myRecipeGroups.map((group) => toRecipeGroupRow(group, myRecipes));
-
-    if (props.shownRecipeGroupId) {
-      // Navigated in a group, return only group items
-      return myRecipes
-          .filter((recipe) => recipe.recipeGroups.some((group) => group.id === props.shownRecipeGroupId))
-          .map(toRecipeRow);
-    } else if (includeGroupedRecipes) {
-      // Return all recipes and groups (used in search mode)
-      return [...groupRows(), ...myRecipes.map(toRecipeRow)];
-    } else {
-      // Only return recipes, not in a group and groups
-      return [...groupRows(), ...myRecipes.filter((recipe) => recipe.recipeGroups.length === 0).map(toRecipeRow)];
+    void recipes.refetch();
+    if (ownCookbook) {
+      void recipeGroups.refetch();
     }
   };
 
-  const shownItems = useMemo(() => {
-    if (searchString === '') {
-      return getShownItems();
-    }
-    return fuzzy
-        .filter(searchString, getShownItems(true), {extract: (item) => item.title})
-        .map((match) => match.original);
-  }, [myRecipes, myRecipeGroups, searchString, props.shownRecipeGroupId]);
+  const rowsOf = (searching: boolean): ListRow[] =>
+    cookbookRows(cookbookRecipes ?? [], cookbookGroups, props.shownRecipeGroupId, searching);
+
+  const topLevelRows = useMemo(
+      () => rowsOf(false),
+      [cookbookRecipes, cookbookGroups, props.shownRecipeGroupId]);
+
+  const shownItems = useMemo(
+      () => searchString === '' ? topLevelRows : searchByTitle(rowsOf(true), searchString),
+      [topLevelRows, cookbookRecipes, cookbookGroups, searchString, props.shownRecipeGroupId]);
 
   const dataProvider = useMemo(() =>
     // Empty object as first item.
@@ -93,11 +85,16 @@ export const RecipeList = (props: Props) => {
     props.onRecipeClick(recipe);
   };
 
+  const ownerOf = (recipe: RecipeRow) => recipe.mine ?
+    t('screens.households.byYou') :
+    t('screens.households.ownedBy', {name: recipe.ownerDisplayName});
+
   const createRecipeListItem = (recipe: RecipeRow) => (
     <RecipeTile
       key={recipe.id}
       title={recipe.title}
       coverImageUuid={recipe.coverImageUuid}
+      subtitle={ownCookbook ? undefined : ownerOf(recipe)}
       onPress={() => onRecipeClick(recipe)}
       onLongPress={() => props.onMultiSelectionModeToggled?.(recipe)}
       selectable={props.multiSelectionModeActive}
@@ -165,7 +162,7 @@ export const RecipeList = (props: Props) => {
     <View style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', flex: 1, position: 'absolute'}}>
       <MaterialIcons name="no-food" size={64} color={theme.colors.onSurfaceDisabled} />
       <Text variant="headlineSmall" style={{padding: 64, color: theme.colors.onSurfaceDisabled}}>
-        {t('screens.overview.noRecipesMessage')}
+        {ownCookbook ? t('screens.overview.noRecipesMessage') : t('screens.households.recipeCount', {count: 0})}
       </Text>
     </View>
   );
@@ -182,13 +179,14 @@ export const RecipeList = (props: Props) => {
       [componentWidth, numberOfColumns],
   );
 
-  // The notice is about owning no recipes at all, not about a search matching nothing,
+  // The notice is about a cookbook without recipes, not about a search matching nothing,
   // so it deliberately looks past the search term.
-  const hasItems = useMemo(
-      () => getShownItems().length > 0,
-      [myRecipes, myRecipeGroups, props.shownRecipeGroupId],
-  );
+  const hasItems = topLevelRows.length > 0;
   const showNoItemsNotice = !(hasItems && numberOfColumns !== 0 && componentWidth > 10);
+
+  if (!cookbookRecipes) {
+    return <QueryFallback error={recipes.error} onRetry={recipes.refetch} />;
+  }
 
   return (
     <View

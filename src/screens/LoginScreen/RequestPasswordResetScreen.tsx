@@ -6,7 +6,7 @@ import {Button, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {EmailValidationInput} from '../../components/EmailValidationInput';
 import {SuccessErrorBanner} from '../../components/SuccessErrorBanner';
-import RestAPI from '../../dao/RestAPI';
+import {useRequestPasswordResetMutation} from '../../api/endpoints/account';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
@@ -19,20 +19,19 @@ export const RequestPasswordResetScreen = (props: Props) => {
   const [emailValid, setEmailValid] = useState(false);
   const [error, setError] = useState<string>();
   const [success, setSuccess] = useState(false);
-  const [pending, setPending] = useState(false);
+  const [requestPasswordReset, {isLoading: pending}] = useRequestPasswordResetMutation();
 
   const resetPassword = () => {
     if (pending || !emailValid) {
       return;
     }
-    setPending(true);
     setError(undefined);
-    RestAPI.requestPasswordReset(emailAddress).then(() => {
+    requestPasswordReset(emailAddress).unwrap().then(() => {
       setSuccess(true);
     }).catch((cause) => {
       setError(t(errorMessageKey(cause)));
       setSuccess(false);
-    }).finally(() => setPending(false));
+    });
   };
 
   return (

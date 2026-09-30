@@ -1,5 +1,5 @@
 import {TFunction} from 'i18next';
-import {MacroStyle} from '../dao/RestAPI';
+import {MacroStyle} from '../api/types/planning';
 
 /** The styles a cook can ask for; balanced is what asking for none means. */
 export const MACRO_STYLES: MacroStyle[] = ['LOW_CARB', 'LOW_FAT', 'HIGH_PROTEIN'];

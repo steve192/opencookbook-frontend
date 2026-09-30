@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
 import {FlatList, StyleSheet, View} from 'react-native';
-import {Aisle} from '../../dao/aisles';
+import {Aisle} from '../../api/aisles';
 import {tileCells} from '../../helper/shopping/aisles';
 import {columnsFor, TILE_AREA_PADDING, TILE_GAP, tileRows, tileWidthFor} from '../../helper/shopping/tileLayout';
 import {useLayoutWidth} from '../../helper/useLayoutWidth';

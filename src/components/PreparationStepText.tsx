@@ -1,7 +1,7 @@
 import React, {useMemo} from 'react';
 import {StyleProp, TextStyle} from 'react-native';
 import {Text} from 'react-native-paper';
-import {IngredientUse} from '../dao/RestAPI';
+import {IngredientUse} from '../api/types/recipes';
 import {matchIngredientsInStep, splitStepForHighlighting} from '../helper/ingredientMatching';
 import {useAppTheme} from '../styles/CentralStyles';
 

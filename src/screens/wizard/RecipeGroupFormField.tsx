@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {SelectionPopup} from '../../components/SelectionPopup';
 import {Option} from '../../components/SelectionPopupModal';
-import RestAPI, {RecipeGroup} from '../../dao/RestAPI';
+import {useGetRecipeGroupsQuery} from '../../api/endpoints/recipes';
+import {RecipeGroup} from '../../api/types/recipes';
 import {findRecipeGroupByOption, toRecipeGroupOptions} from '../../helper/recipeGroups';
 
 
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export const RecipeGroupFormField = (props: Props) => {
-  const [availableGroups, setAvailableGroups] = useState<RecipeGroup[]>([]);
+  const availableGroups = useGetRecipeGroupsQuery().data ?? [];
 
   const {t} = useTranslation('translation');
 
@@ -26,15 +27,6 @@ export const RecipeGroupFormField = (props: Props) => {
     }
   };
 
-
-  const queryGroups = () => {
-    RestAPI.getRecipeGroups()
-        .then((groups) => {
-          setAvailableGroups(groups);
-        });
-  };
-
-  useEffect(queryGroups, []);
 
   return (
     <SelectionPopup

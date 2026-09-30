@@ -1,5 +1,5 @@
 import {TFunction} from 'i18next';
-import {RecipeDiet} from '../dao/RestAPI';
+import {RecipeDiet} from '../api/types/recipes';
 
 /** The diets the server knows about, in the order they are offered. */
 export const RECIPE_DIETS: RecipeDiet[] = ['VEGAN', 'VEGETARIAN', 'MEAT'];

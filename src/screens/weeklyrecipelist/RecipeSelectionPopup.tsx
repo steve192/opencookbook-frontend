@@ -5,12 +5,11 @@ import {Appbar, Button, Icon, List, Modal, Portal, Text, TextInput, TouchableRip
 import XDate from 'xdate';
 import {iconSide} from '../../components/listSides';
 import {RecipeList} from '../../components/RecipeList';
-import {Recipe, RecipeGroup} from '../../dao/RestAPI';
+import {Recipe, RecipeGroup} from '../../api/types/recipes';
 import {LEFTOVERS_ICON} from '../../helper/leftovers';
 import {formatWeekdayAndDate} from '../../helper/weekplan';
 import {LEFTOVER_DAYS, LeftoverSource} from '../../helper/weekplanDay';
 import {overlayStyles, useAppTheme} from '../../styles/CentralStyles';
-import {HouseholdCookbookList} from '../households/HouseholdCookbookList';
 
 interface Props {
   visible: boolean;
@@ -83,12 +82,6 @@ export const RecipeSelectionPopup = (props: Props) => {
   );
 
   const renderContent = () => {
-    if (selectionType === 'normal' && props.householdId) {
-      return (
-        <HouseholdCookbookList householdId={props.householdId} onRecipeClick={props.onRecipeSelected} />
-      );
-    }
-
     if (selectionType === 'normal') {
       return (
         <RecipeList
@@ -96,6 +89,7 @@ export const RecipeSelectionPopup = (props: Props) => {
           // keeps filtering inside the group the user just opened - typically
           // down to nothing, because the term matched the group name.
           key={shownRecipeGroup?.id ?? 'all'}
+          householdId={props.householdId ?? undefined}
           shownRecipeGroupId={shownRecipeGroup?.id}
           onRecipeClick={props.onRecipeSelected}
           onRecipeGroupClick={setShownRecipeGroup} />

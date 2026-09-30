@@ -1,4 +1,4 @@
-import {Recipe} from '../dao/RestAPI';
+import {Recipe} from '../api/types/recipes';
 import {suitsOf} from './recipeSuits';
 
 /** What an import or scan often cannot tell, and planning needs. */

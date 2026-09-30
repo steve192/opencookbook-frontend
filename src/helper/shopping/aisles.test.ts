@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {Aisle} from '../../dao/aisles';
+import {Aisle} from '../../api/aisles';
 import {groupByAisle, iconOf, TileCell, tileCells} from './aisles';
 
 describe('aisles', () => {

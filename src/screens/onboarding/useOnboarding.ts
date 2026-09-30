@@ -1,21 +1,16 @@
-import {useEffect, useState} from 'react';
-import RestAPI from '../../dao/RestAPI';
+import {useGetUserInfoQuery} from '../../api/endpoints/account';
 
 /**
  * Whether the signed in account has been through the first-run screen. Unreachable counts as yes,
  * so an offline start is not held at a screen it cannot get past.
  *
- * @return {object} what is known, and a way to record that the screen has been answered
+ * @return {boolean | undefined} the answer, undefined only during the first load
  */
-export const useOnboarding = () => {
-  // Undefined while loading.
-  const [onboarded, setOnboarded] = useState<boolean | undefined>(undefined);
-
-  useEffect(() => {
-    RestAPI.getUserInfo()
-        .then((userInfo) => setOnboarded(userInfo.onboarded !== false))
-        .catch(() => setOnboarded(true));
-  }, []);
-
-  return {onboarded, markOnboarded: () => setOnboarded(true)};
+export const useOnboarding = (): boolean | undefined => {
+  // isLoading stays false while a failed load is retried, so the answer does not flip back.
+  const {data, isLoading} = useGetUserInfoQuery();
+  if (data) {
+    return data.onboarded !== false;
+  }
+  return isLoading ? undefined : true;
 };

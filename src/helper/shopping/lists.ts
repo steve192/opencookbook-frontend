@@ -1,4 +1,4 @@
-import {ShoppingList} from '../../dao/RestAPI';
+import {ShoppingList} from '../../api/types/shopping';
 
 /**
  * The list a plan's shopping goes to unless another is chosen: that plan's default list.

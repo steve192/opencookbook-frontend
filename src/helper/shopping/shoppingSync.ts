@@ -1,22 +1,19 @@
-import {AxiosError} from 'axios';
-import AppPersistence from '../../AppPersistence';
-import RestAPI, {ShoppingItem, ShoppingList, ShoppingOp} from '../../dao/RestAPI';
-import {newClientId} from '../clientId';
+import {toApiError} from '../../api/ApiError';
+import {shoppingEndpoints} from '../../api/endpoints/shopping';
+import {ShoppingItem, ShoppingList, ShoppingOp} from '../../api/types/shopping';
+import {selectIsOnline} from '../../offline/connectivitySlice';
 import {
-  ShoppingState,
   shoppingChangesReceived,
-  shoppingHydrated,
   shoppingListsLoaded,
   shoppingOpQueued,
   shoppingVocabularyLoaded,
 } from '../../redux/features/shoppingSlice';
 import type {AppDispatch, RootState} from '../../redux/store';
+import {newClientId} from '../clientId';
 import {DistributiveOmit} from '../types';
-import {copyOf, StoredListSync, timedPending} from './listItems';
+import {copyOf} from './listItems';
 
 type Thunk<T = void> = (dispatch: AppDispatch, getState: () => RootState) => Promise<T>;
-
-type StoredShopping = Partial<Omit<ShoppingState, 'sync'>> & {sync?: Record<number, StoredListSync>};
 
 /** Several taps in a row go to the server as one batch. */
 const FLUSH_DELAY_MILLIS = 300;
@@ -31,8 +28,14 @@ const listOf = (state: RootState, listId: number): ShoppingList | undefined =>
   state.shopping.lists.find((list) => list.id === listId);
 
 // A batch the server refuses as malformed would be refused for ever, so it is dropped instead.
-const isRefused = (error: unknown) => (error as AxiosError)?.response?.status === 400;
-const isGone = (error: unknown) => (error as AxiosError)?.response?.status === 404;
+const isRefused = (error: unknown) => toApiError(error).status === 400;
+const isGone = (error: unknown) => toApiError(error).status === 404;
+
+// Lists and items are kept in the shopping slice, not in the request cache.
+const FRESH = {subscribe: false, forceRefetch: true};
+
+const changesOf = (dispatch: AppDispatch, list: ShoppingList, since: number) =>
+  dispatch(shoppingEndpoints.getShoppingChanges.initiate({list, since}, FRESH)).unwrap();
 
 /**
  * Sends what this device changed on a list and takes in what others changed. Safe to call at any
@@ -42,7 +45,7 @@ const isGone = (error: unknown) => (error as AxiosError)?.response?.status === 4
  * @return {Thunk} the sync
  */
 export const syncShoppingList = (listId: number): Thunk => async (dispatch, getState) => {
-  if (!getState().settings.isOnline) {
+  if (!selectIsOnline(getState())) {
     return;
   }
   if (inFlight.has(listId)) {
@@ -60,13 +63,12 @@ export const syncShoppingList = (listId: number): Thunk => async (dispatch, getS
     const since = known?.version ?? 0;
     try {
       const changes = batch.length > 0 ?
-        await RestAPI.applyShoppingOps(list, since, batch) :
-        await RestAPI.getShoppingChanges(list, since);
+        await dispatch(shoppingEndpoints.applyShoppingOps.initiate({list, since, ops: batch})).unwrap() :
+        await changesOf(dispatch, list, since);
       dispatch(shoppingChangesReceived({listId, changes, sent: batch.length}));
     } catch (error) {
       if (isRefused(error)) {
-        dispatch(shoppingChangesReceived({listId, sent: batch.length,
-          changes: await RestAPI.getShoppingChanges(list, 0)}));
+        dispatch(shoppingChangesReceived({listId, sent: batch.length, changes: await changesOf(dispatch, list, 0)}));
       } else if (isGone(error)) {
         await dispatch(loadShoppingLists());
       } else {
@@ -149,7 +151,7 @@ export const syncAllShoppingLists = (): Thunk => async (dispatch, getState) => {
  * @return {Thunk} the request
  */
 export const loadShoppingLists = (): Thunk => async (dispatch) => {
-  dispatch(shoppingListsLoaded(await RestAPI.getShoppingLists()));
+  dispatch(shoppingListsLoaded(await dispatch(shoppingEndpoints.getShoppingLists.initiate(undefined, FRESH)).unwrap()));
 };
 
 /**
@@ -158,39 +160,6 @@ export const loadShoppingLists = (): Thunk => async (dispatch) => {
  * @return {Thunk} the request
  */
 export const loadShoppingVocabulary = (): Thunk => async (dispatch) => {
-  dispatch(shoppingVocabularyLoaded(await RestAPI.getShoppingVocabulary()));
-};
-
-/**
- * Brings back what this device stored, so the lists are there before the first request answers.
- *
- * @return {Thunk} the reading
- */
-export const hydrateShopping = (): Thunk => async (dispatch) => {
-  const stored = await AppPersistence.getShoppingOffline<StoredShopping>().catch(() => null);
-  const now = new Date().toISOString();
-  const sync = stored?.sync && Object.fromEntries(Object.entries(stored.sync)
-      .map(([listId, held]) => [listId, {...held, pending: timedPending(held.pending, now)}]));
-  dispatch(shoppingHydrated(stored && {...stored, sync}));
-};
-
-/**
- * Stores the shopping state whenever it changed, which is how an offline change survives the
- * app being closed before it was sent.
- *
- * @param {object} store the redux store
- * @return {Function} stops storing
- */
-export const persistShopping = (store: {getState: () => RootState, subscribe: (listener: () => void) => () => void}) => {
-  let stored: ShoppingState | undefined;
-  return store.subscribe(() => {
-    const shopping = store.getState().shopping;
-    if (shopping === stored || !shopping.hydrated) {
-      return;
-    }
-    stored = shopping;
-    const {lists, activeListId, sync, tiles, unitWords} = shopping;
-    AppPersistence.storeShoppingOffline({lists, activeListId, sync, tiles, unitWords})
-        .catch((error) => console.error('Storing the shopping lists failed', error));
-  });
+  dispatch(shoppingVocabularyLoaded(
+      await dispatch(shoppingEndpoints.getShoppingVocabulary.initiate(undefined, FRESH)).unwrap()));
 };

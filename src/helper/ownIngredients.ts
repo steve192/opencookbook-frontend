@@ -1,4 +1,4 @@
-import {Ingredient} from '../dao/RestAPI';
+import {Ingredient} from '../api/types/recipes';
 
 /** One of the cook's own ingredients, which unlike a catalogue name always has an id. */
 export type OwnIngredient = Ingredient & {id: number};

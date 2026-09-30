@@ -1,4 +1,5 @@
-import {Recipe, WeekplanDay, WeekplanDayRecipeInfo} from '../dao/RestAPI';
+import {Recipe} from '../api/types/recipes';
+import {WeekplanDay, WeekplanDayRecipeInfo} from '../api/types/weekplan';
 import XDate from 'xdate';
 import {uniqueBy} from './arrays';
 import {moveItem} from './listOrder';

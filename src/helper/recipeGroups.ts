@@ -1,5 +1,5 @@
 import type {Option} from '../components/SelectionPopupModal';
-import type {Recipe, RecipeGroup} from '../dao/RestAPI';
+import type {Recipe, RecipeGroup} from '../api/types/recipes';
 
 /**
  * Key of the picker entry that stands for "belongs to no group at all".

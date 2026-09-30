@@ -1,20 +1,22 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useLinkingURL} from 'expo-linking';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Button, Surface, Text} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import AppPersistence from '../AppPersistence';
+import {toApiError} from '../api/ApiError';
+import {useGetSharedRecipeQuery, useImportSharedRecipeMutation} from '../api/endpoints/sharing';
 import {SharedImageAccess} from '../components/ImageAccessContext';
+import {SharedNutritionSheet} from '../components/NutritionSheets';
 import {askForPlanningDetails} from '../components/PlanningDetailsPrompt';
 import {RecipeDetailView} from '../components/RecipeDetailView';
-import {toApiError} from '../dao/ApiError';
-import RestAPI, {Recipe} from '../dao/RestAPI';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {isSameInstance, parseShareLink} from '../helper/recipeSharing';
 import {BaseNavigatorProps} from '../navigation/NavigationRoutes';
+import {useIsOnline} from '../offline/useIsOnline';
+import {selectLoggedIn} from '../redux/features/authSlice';
 import {useAppSelector} from '../redux/hooks';
 import CentralStyles from '../styles/CentralStyles';
 
@@ -35,39 +37,23 @@ type Props = NativeStackScreenProps<BaseNavigatorProps, 'SharedRecipeScreen'>;
 export const SharedRecipeScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const insets = useSafeAreaInsets();
-  const loggedIn = useAppSelector((state) => state.auth.loggedIn);
-
-  const [recipe, setRecipe] = useState<Recipe | undefined>(undefined);
-  const [failure, setFailure] = useState<LoadFailure | undefined>(undefined);
-  const [scaledServings, setScaledServings] = useState(1);
-  const [importing, setImporting] = useState(false);
-  const [signedInInstance, setSignedInInstance] = useState<string | undefined>(undefined);
-  const [awaitingSignIn, setAwaitingSignIn] = useState(false);
-
-  const shareId = props.route.params.shareId;
-  const linkOrigin = useShareLinkOrigin(shareId);
-  const loadNutrition = useCallback(() => RestAPI.getSharedRecipeNutrition(shareId), [shareId]);
-
+  const loggedIn = useAppSelector(selectLoggedIn);
+  const online = useIsOnline();
   // Only used to explain a share that is not here: it is the difference between "your link has
   // expired" and "this recipe lives on a server you are not signed in to".
+  const signedInInstance = useAppSelector((state) => state.settings.backendUrl);
+
+  const shareId = props.route.params.shareId;
+  const {data: recipe, error, refetch} = useGetSharedRecipeQuery(shareId);
+  const [importSharedRecipe, {isLoading: importing}] = useImportSharedRecipeMutation();
+  const [scaledServings, setScaledServings] = useState(1);
+  const [awaitingSignIn, setAwaitingSignIn] = useState(false);
+  const failure = !recipe && error ? failureFor(error) : undefined;
+  const linkOrigin = useShareLinkOrigin(shareId);
+
   useEffect(() => {
-    AppPersistence.getBackendURL().then(setSignedInInstance);
-  }, []);
-
-  // Depends on the share alone. Anything else in here - which server the app talks to, say -
-  // would reload the recipe the moment it resolved, which is a second request against a rate
-  // limited endpoint and a second view counted for every single reader.
-  const load = useCallback(() => {
-    setFailure(undefined);
-    RestAPI.getSharedRecipe(shareId)
-        .then((sharedRecipe) => {
-          setRecipe(sharedRecipe);
-          setScaledServings(sharedRecipe.servings > 0 ? sharedRecipe.servings : 1);
-        })
-        .catch((error) => setFailure(failureFor(error)));
-  }, [shareId]);
-
-  useEffect(load, [load]);
+    recipe && setScaledServings(recipe.servings > 0 ? recipe.servings : 1);
+  }, [recipe]);
 
   useEffect(() => {
     props.navigation.setOptions({
@@ -86,9 +72,8 @@ export const SharedRecipeScreen = (props: Props) => {
   }, [awaitingSignIn, loggedIn, shareId]);
 
   const importRecipe = async () => {
-    setImporting(true);
     try {
-      const imported = await RestAPI.importSharedRecipe(shareId);
+      const imported = await importSharedRecipe(shareId).unwrap();
       SnackbarUtil.show({message: t('screens.sharedRecipe.imported')});
       askForPlanningDetails(imported);
       if (imported.id) {
@@ -99,8 +84,6 @@ export const SharedRecipeScreen = (props: Props) => {
       }
     } catch (e) {
       SnackbarUtil.show({message: t(errorMessageKey(e, 'screens.sharedRecipe.importFailed'))});
-    } finally {
-      setImporting(false);
     }
   };
 
@@ -119,7 +102,7 @@ export const SharedRecipeScreen = (props: Props) => {
           {t(`screens.sharedRecipe.${messageKeyFor(shown)}`, {instance: linkOrigin})}
         </Text>
         {canRetry &&
-          <Button mode="contained-tonal" icon="refresh" onPress={load}>
+          <Button mode="contained-tonal" icon="refresh" onPress={refetch}>
             {t('screens.sharedRecipe.retryButton')}
           </Button>
         }
@@ -143,7 +126,8 @@ export const SharedRecipeScreen = (props: Props) => {
           recipe={recipe}
           scaledServings={scaledServings}
           onScaledServingsChange={setScaledServings}
-          nutrition={{loadDetails: loadNutrition}}
+          nutrition={{canCorrect: false,
+            sheet: (sheetProps) => <SharedNutritionSheet {...sheetProps} shareId={shareId} />}}
         />
       </SharedImageAccess>
 
@@ -153,6 +137,7 @@ export const SharedRecipeScreen = (props: Props) => {
         <ImportAction
           loggedIn={loggedIn}
           importing={importing}
+          online={online}
           onImport={importRecipe}
           onSignIn={() => {
             setAwaitingSignIn(true);
@@ -173,6 +158,7 @@ export const SharedRecipeScreen = (props: Props) => {
 const ImportAction = (props: {
   loggedIn: boolean,
   importing: boolean,
+  online: boolean,
   onImport: () => void,
   onSignIn: () => void,
 }) => {
@@ -195,7 +181,7 @@ const ImportAction = (props: {
       mode="contained"
       icon="bookmark-plus-outline"
       loading={props.importing}
-      disabled={props.importing}
+      disabled={props.importing || !props.online}
       onPress={props.onImport}>
       {props.importing ? t('screens.sharedRecipe.importing') : t('screens.sharedRecipe.importButton')}
     </Button>

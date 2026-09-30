@@ -1,6 +1,6 @@
 import {TFunction} from 'i18next';
 import {describe, expect, it} from 'vitest';
-import {Recipe} from '../dao/RestAPI';
+import {Recipe} from '../api/types/recipes';
 import {planningSummary, suitsOf} from './recipeSuits';
 
 const t = ((key: string) => key) as unknown as TFunction;
