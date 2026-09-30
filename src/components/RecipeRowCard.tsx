@@ -1,7 +1,8 @@
 import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-paper';
-import {Recipe} from '../dao/RestAPI';
+import {Recipe} from '../api/types/recipes';
+import {titleImageUuid} from '../helper/recipeImages';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 import {RecipeImageComponent} from './RecipeImageComponent';
 
@@ -21,7 +22,7 @@ export const RecipeRowCard = (props: Props) => {
         <RecipeImageComponent
           useThumbnail={true}
           forceFitScaling={true}
-          uuid={props.recipe.images[0]?.uuid} />
+          uuid={titleImageUuid(props.recipe)} />
       </View>
       <View style={styles.details}>
         <Text numberOfLines={2} style={styles.title}>{props.recipe.title}</Text>

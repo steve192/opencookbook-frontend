@@ -6,7 +6,11 @@ import {Appbar, Button, Divider, Menu, Surface, Text, TextInput} from 'react-nat
 import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
 import {SectionTitle} from '../../components/SectionTitle';
 import {Option} from '../../components/SelectionPopupModal';
-import RestAPI, {Ingredient, IngredientUse, Recipe, RecipeDiet} from '../../dao/RestAPI';
+import {
+  useCreateRecipeMutation, useDeleteRecipeMutation, useGetIngredientsQuery, useLazyGetRecipeDeletionImpactQuery,
+  useOwnRecipes, useUpdateRecipeMutation,
+} from '../../api/endpoints/recipes';
+import {Ingredient, IngredientUse, Recipe, RecipeDiet} from '../../api/types/recipes';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {missesPlanningDetails, missingDetails} from '../../helper/recipeCompleteness';
@@ -36,8 +40,9 @@ import {useProgressiveRender} from '../../helper/useProgressiveRender';
 import {PromptUtil} from '../../helper/Prompt';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
-import {createRecipe, deleteRecipe, ownRecipes, updateRecipe} from '../../redux/features/recipesSlice';
-import {useAppDispatch, useAppSelector} from '../../redux/hooks';
+import {UNITS} from '../../helper/units';
+import {OfflineSaveHint} from '../../offline/OfflineSaveHint';
+import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
 import {IngredientFormField} from './IngredientFromField';
 import {RecipeFormField} from './PreparationStepFormField';
@@ -48,19 +53,25 @@ import {RecipeGroupFormField} from './RecipeGroupFormField';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeWizardScreen'>;
 
+const NO_INGREDIENTS: Ingredient[] = [];
+
 const RecipeWizardScreen = (props: Props) => {
   const theme = useAppTheme();
 
   const {t} = useTranslation('translation');
-  const dispatch = useAppDispatch();
-
-  const existingRecipe: Recipe | undefined = useAppSelector((state) => ownRecipes(state.recipes.recipes).find((recipe) => recipe.id === props.route.params?.recipeId));
+  const online = useIsOnline();
+  const existingRecipe: Recipe | undefined = useOwnRecipes().data?.find((recipe) => recipe.id === props.route.params?.recipeId);
+  const [createRecipe, creating] = useCreateRecipeMutation();
+  const [updateRecipe, updating] = useUpdateRecipeMutation();
+  const [deleteRecipe] = useDeleteRecipeMutation();
+  const [getRecipeDeletionImpact] = useLazyGetRecipeDeletionImpactQuery();
+  const savePending = creating.isLoading || updating.isLoading;
 
   // A draft wins over anything in the store: it is why the wizard was opened, and it has no id.
   const [recipeData, setRecipeData] = useState<Recipe>(
       () => (props.route.params?.hasDraft ? takeDraft() : undefined) ??
         existingRecipe ?? emptyRecipe());
-  const [savePending, setSavePending] = useState(false);
+  const canSave = online && !savePending && recipeData.title.trim().length > 0;
 
   // A scan opens with a draft: what its source did not say is asked for here
   const opensDraft = props.route.params?.hasDraft === true;
@@ -77,16 +88,8 @@ const RecipeWizardScreen = (props: Props) => {
   const pristineRecipe = useRef(JSON.stringify(existingRecipe ?? emptyRecipe()));
   const savedOrDiscarded = useRef(false);
 
-  // Fetched once for the whole screen. Every ingredient row used to request the full
-  // ingredient list on mount and again on every keystroke, so opening a recipe with
-  // fifteen ingredients fired fifteen requests before anything could be drawn.
-  const [availableIngredients, setAvailableIngredients] = useState<Ingredient[]>([]);
-  const [availableUnits, setAvailableUnits] = useState<string[]>([]);
-
-  useEffect(() => {
-    RestAPI.getIngredients().then(setAvailableIngredients).catch(() => setAvailableIngredients([]));
-    RestAPI.getUnits().then(setAvailableUnits);
-  }, []);
+  // Read once for the whole screen rather than by every ingredient row.
+  const availableIngredients = useGetIngredientsQuery().data ?? NO_INGREDIENTS;
 
   // Every row used to turn the whole ingredient and unit list into options of its own, on
   // every render, even though the picker only reads them once it is opened.
@@ -98,8 +101,8 @@ const RecipeWizardScreen = (props: Props) => {
       [availableIngredients],
   );
   const unitOptions = useMemo<Option[]>(
-      () => availableUnits.map((unit, index) => ({key: index.toString(), value: unit})),
-      [availableUnits],
+      () => UNITS.map((unit, index) => ({key: index.toString(), value: unit})),
+      [],
   );
   const resolveIngredient = useCallback(
       (name: string) => availableIngredients.find(
@@ -153,16 +156,15 @@ const RecipeWizardScreen = (props: Props) => {
   // Unwrapped so that a rejected request is a rejected promise: a plain dispatch resolves
   // either way, which used to close the screen on a recipe the server never accepted.
   const saveRecipe = () => {
-    if (savePending) return;
-    setSavePending(true);
+    if (!canSave) return;
     const toSave = forSaving(recipeData);
-    const action = props.route.params.editing ? updateRecipe(toSave) : createRecipe(toSave);
-    dispatch(action).unwrap().then(() => {
+    const saving = props.route.params.editing ? updateRecipe(toSave) : createRecipe(toSave);
+    saving.unwrap().then(() => {
       savedOrDiscarded.current = true;
       props.navigation.goBack();
     }).catch((error) => {
       SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.editRecipe.saveFailed'))});
-    }).finally(() => setSavePending(false));
+    });
   };
 
   const performDelete = () => {
@@ -171,7 +173,7 @@ const RecipeWizardScreen = (props: Props) => {
       props.navigation.goBack();
       return;
     }
-    dispatch(deleteRecipe(recipeData)).unwrap().then(() => {
+    deleteRecipe(recipeData.id!).unwrap().then(() => {
       savedOrDiscarded.current = true;
       props.navigation.goBack();
     }).catch((error) => {
@@ -184,7 +186,7 @@ const RecipeWizardScreen = (props: Props) => {
   const onDeleteRecipe = async () => {
     const discarding = !props.route.params.editing;
     const impact = discarding || !recipeData.id ? undefined :
-      await RestAPI.getRecipeDeletionImpact(recipeData.id).catch(() => undefined);
+      await getRecipeDeletionImpact(recipeData.id).unwrap().catch(() => undefined);
     const consequences = [
       discarding ? t('screens.editRecipe.discardMessage') : t('screens.editRecipe.deleteMessage'),
       impact?.households ?
@@ -231,7 +233,7 @@ const RecipeWizardScreen = (props: Props) => {
           <Appbar.Action
             icon="content-save-outline"
             color={theme.colors.onPrimary}
-            disabled={savePending || recipeData.title.trim().length === 0}
+            disabled={!canSave}
             onPress={saveRecipe}
           />
           <Menu
@@ -246,6 +248,7 @@ const RecipeWizardScreen = (props: Props) => {
             }>
             <Menu.Item
               leadingIcon="delete-outline"
+              disabled={!online && props.route.params?.editing === true}
               title={t('common.delete')}
               onPress={() => {
                 setMenuOpen(false);
@@ -255,7 +258,7 @@ const RecipeWizardScreen = (props: Props) => {
         </>
       ),
     });
-  }, [props.navigation, recipeData, menuOpen, savePending, theme, t]);
+  }, [props.navigation, recipeData, menuOpen, canSave, online, theme, t]);
 
   // Enough to fill the screen at once, the rest as soon as the transition is over
   const renderedIngredients = useProgressiveRender(recipeData.neededIngredients.length, 5);
@@ -382,10 +385,11 @@ const RecipeWizardScreen = (props: Props) => {
               recipeGroup={recipeData.recipeGroups?.[0]}
               onRecipeGroupChange={(group) => edit((recipe) => withGroup(recipe, group))} />
           </View>
+          <OfflineSaveHint />
           <Button
             mode="contained"
             loading={savePending}
-            disabled={savePending || recipeData.title.trim().length === 0}
+            disabled={!canSave}
             onPress={saveRecipe}>
             {props.route.params?.editing ? t('common.save') : t('common.create')}
           </Button>

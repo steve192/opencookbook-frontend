@@ -1,7 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 import {ShoppingItemTile} from '../../components/shopping/ShoppingItemTile';
-import {ShoppingItem} from '../../dao/RestAPI';
+import {ShoppingItem} from '../../api/types/shopping';
 
 interface Props {
   item: ShoppingItem;

@@ -4,7 +4,7 @@ import {StyleSheet, View} from 'react-native';
 import {TextInput} from 'react-native-paper';
 import {Option} from '../../components/SelectionPopupModal';
 import {SelectionPopup} from '../../components/SelectionPopup';
-import {Ingredient, IngredientUse} from '../../dao/RestAPI';
+import {Ingredient, IngredientUse} from '../../api/types/recipes';
 import {RowActions} from './RowActions';
 
 

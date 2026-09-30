@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {Recipe} from '../dao/RestAPI';
+import {Recipe} from '../api/types/recipes';
 import {mealTypeCoverage, warrantsMealTypeWarning} from './mealTypeCoverage';
 
 const recipe = (mealTypes?: Recipe['mealTypes']) => ({title: 'x', mealTypes} as Recipe);

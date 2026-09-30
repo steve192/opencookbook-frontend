@@ -1,8 +1,7 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useMemo} from 'react';
 import XDate from 'xdate';
-import {WeekplanDay} from '../dao/RestAPI';
-import {fetchWeekplanDays} from '../redux/features/weeklyRecipesSlice';
-import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {useGetWeekplanWeekQuery} from '../api/endpoints/weekplan';
+import {WeekplanDay} from '../api/types/weekplan';
 import {addWeeks, startOfWeek, toDayKey, weekDays} from './weekplan';
 import {emptyWeekplanDay} from './weekplanDay';
 
@@ -15,55 +14,55 @@ export interface WeekplanWeek {
   days: XDate[];
   /** Per day: your own plan first and never missing, then each household plan with meals that day. */
   plans: WeekplanDay[][];
+  /** Every plan day read around the shown week, which leftovers can come from. */
+  loadedDays: WeekplanDay[];
   loading: boolean;
   reload: () => void;
 }
 
+const NO_DAYS: WeekplanDay[] = [];
+
 /**
- * Loads and exposes one week of the plan.
- *
- * Keeping this out of the screen leaves the screen with the two things it is
- * actually about: which week the user is looking at and what they do to it.
+ * One week of the plan, with the weeks either side: the one before for leftovers carried over the
+ * weekend, the one after so that paging does not flash empty days.
  *
  * @param {number} weekOffset weeks from the current one, negative for the past
- * @return {WeekplanWeek} the shown week and the state of loading it
+ * @return {WeekplanWeek} the shown week and the state of reading it
  */
 export const useWeekplanWeek = (weekOffset: number): WeekplanWeek => {
-  const dispatch = useAppDispatch();
-  const weekplanDays = useAppSelector((state) => state.weeklyRecipes.weekplanDays);
-  const [loading, setLoading] = useState(false);
-
   const today = useMemo(() => new XDate().clearTime(), []);
   const weekStart = useMemo(() => addWeeks(startOfWeek(today), weekOffset), [today, weekOffset]);
   const weekStartKey = toDayKey(weekStart);
   const days = useMemo(() => weekDays(weekStart), [weekStartKey]);
+
+  const previous = useGetWeekplanWeekQuery(toDayKey(addWeeks(weekStart, -1)));
+  const shown = useGetWeekplanWeekQuery(weekStartKey);
+  const next = useGetWeekplanWeekQuery(toDayKey(addWeeks(weekStart, 1)));
+
+  const loadedDays = useMemo(
+      () => [...(previous.data ?? NO_DAYS), ...(shown.data ?? NO_DAYS), ...(next.data ?? NO_DAYS)],
+      [previous.data, shown.data, next.data]);
 
   // A day the server does not know about yet is an empty plan, not a missing one, so callers never
   // have to deal with undefined.
   const plans = useMemo(
       () => days.map((date) => {
         const dayKey = toDayKey(date);
-        const onThatDay = weekplanDays.filter((weekplanDay) => weekplanDay.day === dayKey);
+        const onThatDay = loadedDays.filter((weekplanDay) => weekplanDay.day === dayKey);
         const own = onThatDay.find((weekplanDay) => !weekplanDay.householdId) ??
           emptyWeekplanDay(dayKey);
         const shared = onThatDay.filter((weekplanDay) =>
           weekplanDay.householdId && weekplanDay.recipes.length > 0);
         return [own, ...shared];
       }),
-      [days, weekplanDays],
+      [days, loadedDays],
   );
 
   const reload = useCallback(() => {
-    // Fetch the neighbouring weeks too, so paging through the plan does not
-    // flash empty days while the next request is in flight.
-    setLoading(true);
-    dispatch(fetchWeekplanDays({
-      from: addWeeks(weekStart, -1),
-      to: addWeeks(weekStart, 2).addDays(-1),
-    })).finally(() => setLoading(false));
-  }, [weekStartKey]);
+    void previous.refetch();
+    void shown.refetch();
+    void next.refetch();
+  }, [previous.refetch, shown.refetch, next.refetch]);
 
-  useEffect(reload, [weekStartKey]);
-
-  return {today, weekStart, days, plans, loading, reload};
+  return {today, weekStart, days, plans, loadedDays, loading: shown.isFetching, reload};
 };

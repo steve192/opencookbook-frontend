@@ -1,5 +1,5 @@
-import {Aisle} from '../../dao/aisles';
-import {PreviewLine, PreviewMeal, ShoppingItemSource} from '../../dao/RestAPI';
+import {Aisle} from '../../api/aisles';
+import {PreviewLine, PreviewMeal, ShoppingItemSource} from '../../api/types/shopping';
 import {uniqueBy} from '../arrays';
 import {formatAmount, servingFactor} from '../servings';
 import {nameKey} from './names';

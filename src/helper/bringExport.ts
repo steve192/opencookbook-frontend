@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {Linking, Platform} from 'react-native';
-import AppPersistence from '../AppPersistence';
+import {apiUrl} from '../api/client';
 import {BRING_DEEPLINK_API, unwrapBringDeeplink} from './bringDeeplink';
 
 /**
@@ -9,7 +9,7 @@ import {BRING_DEEPLINK_API, unwrapBringDeeplink} from './bringDeeplink';
  * @param {string} exportId the export Bring fetches its lines by
  */
 export const openBringImport = async (exportId: string): Promise<void> => {
-  const exportUrl = (await AppPersistence.getBackendURL()) + AppPersistence.getApiRoute() + '/bringexport?exportId=' + exportId;
+  const exportUrl = await apiUrl('/bringexport?exportId=' + exportId);
 
   if (Platform.OS === 'web') {
     // Plain browser redirect, no app involved, so the attribution hop does no harm here

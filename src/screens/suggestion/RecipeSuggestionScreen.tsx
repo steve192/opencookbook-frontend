@@ -11,7 +11,10 @@ import {NumberInput} from '../../components/NumberInput';
 import {HintText, QuestionSection} from '../../components/QuestionSection';
 import {ScreenFooter} from '../../components/ScreenFooter';
 import {SectionTitle} from '../../components/SectionTitle';
-import RestAPI, {Recipe, RecipeSuggestions, SuggestedRecipe} from '../../dao/RestAPI';
+import {useSuggestRecipesMutation} from '../../api/endpoints/recipes';
+import {useGetWeekplanWeekQuery, useSetWeekplanDayMutation} from '../../api/endpoints/weekplan';
+import {RecipeSuggestions, SuggestedRecipe} from '../../api/types/planning';
+import {Recipe} from '../../api/types/recipes';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {withToggled} from '../../helper/choices';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
@@ -38,11 +41,10 @@ import {
 } from '../../helper/recipeSuggestion';
 import {useOwnIngredients} from '../../helper/useOwnIngredients';
 import {useHouseholds} from '../households/useHouseholds';
-import {toDayKey} from '../../helper/weekplan';
+import {toDayKey, weekKeyOf} from '../../helper/weekplan';
 import {emptyWeekplanDay, withRecipeAdded} from '../../helper/weekplanDay';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
-import {updateSingleWeekplanDay} from '../../redux/features/weeklyRecipesSlice';
-import {useAppDispatch} from '../../redux/hooks';
+import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
 import {SuggestionResultCard} from './SuggestionResultCard';
 
@@ -51,37 +53,40 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeSuggestionScreen
 // Asks a few questions, then shows the answers in one line above the results; changing them goes back to the questions.
 export const RecipeSuggestionScreen = (props: Props) => {
   const {t} = useTranslation('translation');
-  const dispatch = useAppDispatch();
+  const online = useIsOnline();
+  const todayKey = toDayKey(new XDate());
+  const thisWeek = useGetWeekplanWeekQuery(weekKeyOf(todayKey)).data;
+  const [suggestRecipes, {isLoading: searching}] = useSuggestRecipesMutation();
+  const [setWeekplanDay] = useSetWeekplanDayMutation();
   const ingredients = useOwnIngredients();
   const {households} = useHouseholds();
 
   const [request, setRequest] = useState(() => initialSuggestionRequest(new XDate().getHours()));
   const [suggestions, setSuggestions] = useState<RecipeSuggestions>();
   const [asking, setAsking] = useState(true);
-  const [searching, setSearching] = useState(false);
   const [addedRecipeIds, setAddedRecipeIds] = useState(new Set<number>());
   const scrollRef = useRef<ScrollView>(null);
 
   const search = async () => {
     const asked = forNewDraw(request);
     setRequest(asked);
-    setSearching(true);
     try {
-      setSuggestions(await RestAPI.suggestRecipes(asked));
+      setSuggestions(await suggestRecipes(asked).unwrap());
       setAsking(false);
       scrollRef.current?.scrollTo({y: 0, animated: false});
     } catch (e) {
       SnackbarUtil.show({message: t(errorMessageKey(e, 'screens.suggestion.failed'))});
-    } finally {
-      setSearching(false);
     }
   };
 
   const addToToday = async (recipe: Recipe) => {
-    const today = new XDate();
-    const [planned] = await RestAPI.getWeekplanDays(today, today);
-    await dispatch(updateSingleWeekplanDay(withRecipeAdded(planned ?? emptyWeekplanDay(toDayKey(today)), recipe)));
-    setAddedRecipeIds((added) => new Set(added).add(recipe.id!));
+    const planned = thisWeek?.find((day) => day.day === todayKey && !day.householdId);
+    try {
+      await setWeekplanDay(withRecipeAdded(planned ?? emptyWeekplanDay(todayKey), recipe)).unwrap();
+      setAddedRecipeIds((added) => new Set(added).add(recipe.id!));
+    } catch (e) {
+      SnackbarUtil.show({message: t(errorMessageKey(e))});
+    }
   };
 
   const chosenIngredientNames = () => ingredients
@@ -205,6 +210,7 @@ export const RecipeSuggestionScreen = (props: Props) => {
         key={recipeId}
         suggestion={suggestion}
         added={addedRecipeIds.has(recipeId)}
+        canAdd={online && thisWeek !== undefined}
         onOpen={() => props.navigation.navigate('RecipeScreen', {recipeId})}
         onAddToToday={() => addToToday(suggestion.recipe)} />
     );
@@ -224,7 +230,7 @@ export const RecipeSuggestionScreen = (props: Props) => {
       </ScrollView>
       <ScreenFooter>
         <Button mode="contained" icon={showingResults ? 'dice-multiple-outline' : 'chef-hat'} onPress={search}
-          disabled={searching}>
+          disabled={searching || !online}>
           {t(searchLabel)}
         </Button>
       </ScreenFooter>

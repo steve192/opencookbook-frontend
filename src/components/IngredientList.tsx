@@ -2,7 +2,7 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Divider, Icon, IconButton, Text, TouchableRipple} from 'react-native-paper';
-import {IngredientUse} from '../dao/RestAPI';
+import {IngredientUse} from '../api/types/recipes';
 import {formatAmount, servingFactor} from '../helper/servings';
 import {useAppTheme} from '../styles/CentralStyles';
 

@@ -2,37 +2,28 @@ import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet} from 'react-native';
 import {Avatar, Button, Surface, Text, TextInput} from 'react-native-paper';
-import RestAPI from '../../dao/RestAPI';
+import {useCompleteOnboardingMutation} from '../../api/endpoints/account';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {DISPLAY_NAME_MAX_LENGTH} from '../../helper/nameLimits';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
 
-interface Props {
-  /** Called once the account is set up, so the app can carry on to the cookbook. */
-  onDone: () => void;
-}
-
 /**
- * Asks once, at first sign in, for a display name.
+ * Asks once, at first sign in, for a display name. Answered, the account says so and the app carries on.
  *
- * @param {Props} props what to do once it is answered
  * @return {JSX.Element} the setup screen
  */
-export const OnboardingScreen = (props: Props) => {
+export const OnboardingScreen = () => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
 
   const [name, setName] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [completeOnboarding, {isLoading: saving}] = useCompleteOnboardingMutation();
 
   const save = () => {
-    setSaving(true);
-    RestAPI.completeOnboarding(name.trim())
-        .then(props.onDone)
+    completeOnboarding(name.trim()).unwrap()
         .catch((error) => SnackbarUtil.show(
-            {message: t(errorMessageKey(error, 'screens.onboarding.failed'))}))
-        .finally(() => setSaving(false));
+            {message: t(errorMessageKey(error, 'screens.onboarding.failed'))}));
   };
 
   return (

@@ -6,6 +6,7 @@ import {KeyboardProvider} from 'react-native-keyboard-controller';
 import {Provider as PaperProvider} from 'react-native-paper';
 import {enableScreens} from 'react-native-screens';
 import {Provider, useSelector} from 'react-redux';
+import {PersistGate} from 'redux-persist/integration/react';
 import {PlanningDetailsPrompt} from './src/components/PlanningDetailsPrompt';
 import {Prompt} from './src/helper/Prompt';
 import {TextPrompt} from './src/helper/TextPrompt';
@@ -14,16 +15,14 @@ import {TimerNotificationOpener} from './src/components/TimerNotificationOpener'
 import {GlobalSnackbar} from './src/helper/GlobalSnackbar';
 import './src/i18n/config';
 import MainNavigation from './src/navigation/MainNavigation';
-import RestAPI from './src/dao/RestAPI';
-import {logout} from './src/redux/features/authSlice';
-import {RootState, store} from './src/redux/store';
+import {ConnectivityWatcher} from './src/offline/ConnectivityWatcher';
+import {ServiceWorkerUpdates} from './src/pwa/ServiceWorkerUpdates';
+import {bootstrap} from './src/redux/sessionThunks';
+import {persistor, RootState, store} from './src/redux/store';
 import {OwnPaperTheme, OwnPaperThemeDark} from './src/styles/CentralStyles';
 import {StyleSheet, useColorScheme} from 'react-native';
 
 enableScreens();
-
-// A session that can no longer be renewed means the login screen, wherever the app happens to be.
-RestAPI.onSessionExpired = () => store.dispatch(logout());
 
 export default () => {
   return (
@@ -31,7 +30,10 @@ export default () => {
     <GestureHandlerRootView style={styles.root}>
       <KeyboardProvider>
         <Provider store={store}>
-          <ReduxWrappedApp />
+          {/* Nothing renders before what the device stored is back, so no empty list flashes up. */}
+          <PersistGate persistor={persistor} onBeforeLift={() => store.dispatch(bootstrap())}>
+            <ReduxWrappedApp />
+          </PersistGate>
         </Provider>
       </KeyboardProvider>
     </GestureHandlerRootView>
@@ -60,6 +62,8 @@ const ReduxWrappedApp = () => {
 
   return (
     <PaperProvider theme={theme}>
+      <ConnectivityWatcher />
+      <ServiceWorkerUpdates />
       <MainNavigation />
       <Prompt/>
       <TextPrompt />

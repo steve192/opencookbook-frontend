@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Icon, Text, TouchableRipple} from 'react-native-paper';
-import {Aisle} from '../../dao/aisles';
+import {Aisle} from '../../api/aisles';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {ShoppingIcon} from './ShoppingIcon';
 

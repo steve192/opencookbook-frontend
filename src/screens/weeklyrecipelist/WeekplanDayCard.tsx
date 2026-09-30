@@ -3,7 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Icon, Surface, Text, TouchableRipple} from 'react-native-paper';
 import XDate from 'xdate';
-import {WeekplanDay, WeekplanDayRecipeInfo} from '../../dao/RestAPI';
+import {WeekplanDay, WeekplanDayRecipeInfo} from '../../api/types/weekplan';
 import {useLeftoversLabel} from '../../helper/leftovers';
 import {formatMonth} from '../../helper/weekplan';
 import {LeftoverSource} from '../../helper/weekplanDay';
@@ -17,6 +17,8 @@ interface Props {
   isPast: boolean;
   /** Your own plan first, then one entry per household with something on this day. */
   plans: WeekplanDay[];
+  /** False while offline: the plan can be read but not changed. */
+  editable: boolean;
   onAddPress: () => void;
   onMealPress: (meal: WeekplanDayRecipeInfo) => void;
   onMealRemovePress: (plan: WeekplanDay, index: number) => void;
@@ -35,12 +37,14 @@ export const WeekplanDayCard = (props: Props) => {
   const leftoversLabel = useLeftoversLabel();
 
   const leftoversOf = (plan: WeekplanDay, meal: WeekplanDayRecipeInfo, index: number) => {
+    const change = (cookedOn: string | null) =>
+      props.editable ? () => props.onLeftoverChange(plan, index, cookedOn) : undefined;
     if (meal.leftoverOf) {
-      return {active: true, onToggle: () => props.onLeftoverChange(plan, index, null)};
+      return {active: true, onToggle: change(null)};
     }
     const source = meal.type === 'NORMAL_RECIPE' ?
       props.leftoverSourcesOf(plan).find((each) => each.recipeId === meal.id) : undefined;
-    return source && {active: false, onToggle: () => props.onLeftoverChange(plan, index, source.cookedOn)};
+    return source && {active: false, onToggle: change(source.cookedOn)};
   };
 
   const monthLabel = formatMonth(props.date);
@@ -102,17 +106,18 @@ export const WeekplanDayCard = (props: Props) => {
               note={meal.leftoverOf ? leftoversLabel(meal.leftoverOf) : undefined}
               leftovers={leftoversOf(plan, meal, index)}
               imageUuid={meal.titleImageUuid}
-              reorderable={plan.recipes.length > 1}
+              reorderable={props.editable && plan.recipes.length > 1}
               onPress={meal.type === 'NORMAL_RECIPE' ? () => props.onMealPress(meal) : undefined}
               onMoveUpPress={index > 0 ? () => props.onMealMove(plan, index, index - 1) : undefined}
               onMoveDownPress={index < plan.recipes.length - 1 ?
                 () => props.onMealMove(plan, index, index + 1) : undefined}
-              onRemovePress={() => props.onMealRemovePress(plan, index)} />
+              onRemovePress={props.editable ? () => props.onMealRemovePress(plan, index) : undefined} />
           ))}
         </View>
       ))}
 
-      <TouchableRipple style={styles.addRow} onPress={props.onAddPress}>
+      <TouchableRipple style={[styles.addRow, !props.editable && styles.disabled]} disabled={!props.editable}
+        onPress={props.onAddPress}>
         <View style={styles.addRowContent}>
           <Icon source="plus" size={18} color={theme.colors.primaryText} />
           <Text style={{color: theme.colors.primaryText, fontWeight: '600'}}>
@@ -125,6 +130,9 @@ export const WeekplanDayCard = (props: Props) => {
 };
 
 const styles = StyleSheet.create({
+  disabled: {
+    opacity: 0.4,
+  },
   card: {
     borderRadius: 16,
     borderWidth: 1,

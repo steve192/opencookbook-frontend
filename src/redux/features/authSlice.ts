@@ -1,14 +1,11 @@
-import {createSlice} from '@reduxjs/toolkit';
-import AppPersistence from '../../AppPersistence';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 export interface AuthState {
   loggedIn: boolean
-  isLoading: boolean
 }
 
 const initialState: AuthState = {
   loggedIn: false,
-  isLoading: true,
 };
 
 export const authSlice = createSlice({
@@ -16,18 +13,21 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     login: (state) => {
-      state.isLoading = false;
       state.loggedIn = true;
     },
+    // Signing out or a sign in the server ended: everything of the account leaves the device.
     logout: (state) => {
-      state.isLoading = false;
       state.loggedIn = false;
-      AppPersistence.clearOfflineData();
+    },
+    // App start: whether a sign in is stored, decided on the device without asking the server.
+    sessionRestored: (state, action: PayloadAction<boolean>) => {
+      state.loggedIn = action.payload;
     },
   },
 });
 
-// Action creators are generated for each case reducer function
-export const {login, logout} = authSlice.actions;
+export const {login, logout, sessionRestored} = authSlice.actions;
+
+export const selectLoggedIn = (state: {auth: AuthState}) => state.auth.loggedIn;
 
 export default authSlice.reducer;

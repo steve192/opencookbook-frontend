@@ -1,15 +1,17 @@
-import {useFocusEffect} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
-import {ActivityIndicator, Button, Card, Chip, Text} from 'react-native-paper';
-import RestAPI, {ApiKey, IssuedApiKey} from '../../dao/RestAPI';
+import {Button, Card, Chip, Text} from 'react-native-paper';
+import {useGetApiKeysQuery, useRevokeApiKeyMutation} from '../../api/endpoints/account';
+import {ApiKey, IssuedApiKey} from '../../api/types/account';
+import {QueryFallback} from '../../components/QueryFallback';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {scopeLabelKey} from '../../helper/apiScopes';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {PromptUtil} from '../../helper/Prompt';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
+import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
 import {ApiKeyCreateDialog} from './ApiKeyCreateDialog';
 import {ApiKeyCreatedDialog} from './ApiKeyCreatedDialog';
@@ -19,20 +21,11 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'ApiKeysScreen'>;
 
 export const ApiKeysScreen = (props: Props) => {
   const {t} = useTranslation('translation');
-  const [keys, setKeys] = useState<ApiKey[]>();
+  const online = useIsOnline();
+  const {data: keys, error, refetch} = useGetApiKeysQuery();
+  const [revokeApiKey] = useRevokeApiKeyMutation();
   const [creating, setCreating] = useState(false);
   const [issued, setIssued] = useState<IssuedApiKey>();
-
-  const load = useCallback(() => {
-    RestAPI.getApiKeys()
-        .then(setKeys)
-        .catch((error) => {
-          setKeys([]);
-          SnackbarUtil.show({message: t(errorMessageKey(error))});
-        });
-  }, [t]);
-
-  useFocusEffect(load);
 
   const revoke = (key: ApiKey) => PromptUtil.show({
     title: t('screens.apiKeys.revokeTitle'),
@@ -41,8 +34,7 @@ export const ApiKeysScreen = (props: Props) => {
     confirm: t('screens.apiKeys.revoke'),
     cancel: t('common.cancel'),
     onConfirm: () => {
-      RestAPI.revokeApiKey(key.id)
-          .then(load)
+      revokeApiKey(key.id).unwrap()
           .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
     },
   });
@@ -50,16 +42,18 @@ export const ApiKeysScreen = (props: Props) => {
   const onCreated = (key: IssuedApiKey) => {
     setCreating(false);
     setIssued(key);
-    load();
   };
+
+  if (!keys) {
+    return <QueryFallback error={error} onRetry={refetch} />;
+  }
 
   return (
     <SettingsPage>
       <SettingsHint>{t('screens.apiKeys.explanation')}</SettingsHint>
-      {keys === undefined && <ActivityIndicator />}
-      {keys?.length === 0 && <Text>{t('screens.apiKeys.empty')}</Text>}
-      {keys?.map((key) => <ApiKeyCard key={key.id} apiKey={key} onRevoke={() => revoke(key)} />)}
-      <Button mode="contained" icon="key-plus" onPress={() => setCreating(true)}>
+      {keys.length === 0 && <Text>{t('screens.apiKeys.empty')}</Text>}
+      {keys.map((key) => <ApiKeyCard key={key.id} apiKey={key} canRevoke={online} onRevoke={() => revoke(key)} />)}
+      <Button mode="contained" icon="key-plus" disabled={!online} onPress={() => setCreating(true)}>
         {t('screens.apiKeys.create')}
       </Button>
       {creating && <ApiKeyCreateDialog onDismiss={() => setCreating(false)} onCreated={onCreated} />}
@@ -68,7 +62,7 @@ export const ApiKeysScreen = (props: Props) => {
   );
 };
 
-const ApiKeyCard = ({apiKey, onRevoke}: {apiKey: ApiKey, onRevoke: () => void}) => {
+const ApiKeyCard = ({apiKey, canRevoke, onRevoke}: {apiKey: ApiKey, canRevoke: boolean, onRevoke: () => void}) => {
   const {t, i18n} = useTranslation('translation');
   const lastUsed = apiKey.lastUsedAt ?
     t('screens.apiKeys.lastUsed', {date: new Date(apiKey.lastUsedAt).toLocaleString(i18n.language)}) :
@@ -88,7 +82,7 @@ const ApiKeyCard = ({apiKey, onRevoke}: {apiKey: ApiKey, onRevoke: () => void}) 
         </SettingsHint>
       </Card.Content>
       <Card.Actions>
-        <Button icon="key-remove" onPress={onRevoke}>{t('screens.apiKeys.revoke')}</Button>
+        <Button icon="key-remove" disabled={!canRevoke} onPress={onRevoke}>{t('screens.apiKeys.revoke')}</Button>
       </Card.Actions>
     </Card>
   );

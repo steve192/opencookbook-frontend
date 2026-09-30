@@ -24,14 +24,9 @@
     "close": "Close",
     "email": "E-mail",
     "selected": "selected",
-    "offlinemode": "Offline mode",
     "bringimport": "Import in Bring®",
     "bringimportfailed": "Import to Bring® failed. Please try again",
     "noRecipeGroup": "No group",
-    "offline": {
-      "notavailable": "Not available when you are offline",
-      "notavailabletitle": "Offline"
-    },
     "appVersion": "Version {{version}}",
     "appVersionWithBuild": "Version {{version}} (build {{build}})",
     "undo": "Undo",
@@ -39,7 +34,8 @@
     "leftoversFrom": "Leftovers from {{day}}",
     "dismiss": "Dismiss",
     "experimental": "experimental",
-    "mealTypeCoverageWarning": "{{untagged}} of your {{total}} recipes do not say which meals they suit. Until they do, suggestions and plans can only guess - set the meals when editing a recipe."
+    "mealTypeCoverageWarning": "{{untagged}} of your {{total}} recipes do not say which meals they suit. Until they do, suggestions and plans can only guess - set the meals when editing a recipe.",
+    "retry": "Try again"
   },
   "navigation": {
     "screenTitleImportBrowser": "Recipe import browser",
@@ -524,7 +520,6 @@
       "spreadVariety": "Something different each day",
       "plan": "Plan my week",
       "planFailed": "The week could not be planned",
-      "loadFailed": "The week could not be loaded",
       "changeFailed": "That did not work, please try again",
       "summary": "{{recipes}} to cook, {{leftovers}} leftovers, {{gaps}} left to you",
       "repeatsNote": "Your cookbook ran short for this week, so some recipes come round again.",
@@ -627,7 +622,6 @@
       "full": "That household has no room for another member.",
       "tooMany": "You are in as many households as this server allows.",
       "alreadyMember": "You are already in that household.",
-      "loadFailed": "The household could not be loaded.",
       "saveFailed": "That change could not be saved.",
       "tooManyInvites": "That household has as many open invitations as this server allows.",
       "defaultName": "{{name}}’s household",
@@ -880,5 +874,38 @@
     "HOUSEHOLD": "Household",
     "DRUGSTORE": "Drugstore",
     "OTHER": "Other"
+  },
+  "offline": {
+    "noNetwork": "Offline",
+    "unreachable": "Cookpal server not reachable",
+    "since": "showing data from {{time}}",
+    "outdated": "data from {{date}}, may be outdated",
+    "notCached": "Not available offline yet",
+    "notCachedHint": "Open this once while online to have it offline.",
+    "cannotSave": "Offline, cannot save yet",
+    "settingsTitle": "Offline data",
+    "lastSynced": "Last synced {{time}}",
+    "neverSynced": "Not synced yet",
+    "syncNow": "Sync now",
+    "syncing": "Syncing",
+    "storageUsed": "{{size}} MB stored on this device"
+  },
+  "pwa": {
+    "install": {
+      "title": "Install Cookpal",
+      "body": "Add Cookpal to your home screen for faster access and offline use.",
+      "install": "Install",
+      "notNow": "Not now",
+      "dontAsk": "Don't ask again",
+      "installButton": "Install app",
+      "iosTitle": "Install Cookpal on iOS",
+      "iosIntro": "iOS does not let apps install themselves from Safari. Follow these two steps to add Cookpal to your home screen:",
+      "iosStep1": "Tap the Share button in Safari's toolbar.",
+      "iosStep2": "Scroll down and tap \"Add to Home Screen\"."
+    },
+    "update": {
+      "available": "A new version of Cookpal is available.",
+      "reload": "Reload"
+    }
   }
 }

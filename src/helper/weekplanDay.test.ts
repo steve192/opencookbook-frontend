@@ -1,5 +1,6 @@
 import {describe, expect, it} from 'vitest';
-import {Recipe, WeekplanDay} from '../dao/RestAPI';
+import {Recipe} from '../api/types/recipes';
+import {WeekplanDay} from '../api/types/weekplan';
 import {
   countMeals,
   emptyWeekplanDay,

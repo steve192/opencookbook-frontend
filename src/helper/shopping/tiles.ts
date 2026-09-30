@@ -1,4 +1,4 @@
-import {ShoppingItem, ShoppingTile} from '../../dao/RestAPI';
+import {ShoppingItem, ShoppingTile} from '../../api/types/shopping';
 import {nameKey} from './names';
 import {parseQuickAdd} from './quickAdd';
 

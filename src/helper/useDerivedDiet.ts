@@ -1,5 +1,6 @@
 import {useEffect, useRef} from 'react';
-import RestAPI, {RecipeDiet} from '../dao/RestAPI';
+import {usePreviewDietMutation} from '../api/endpoints/recipes';
+import {RecipeDiet} from '../api/types/recipes';
 
 /** Long enough that typing an ingredient's name does not ask after every letter. */
 const DEBOUNCE_MS = 600;
@@ -18,6 +19,7 @@ export const useDerivedDiet = (
 ) => {
   const names = ingredientNames.map((name) => name.trim()).filter((name) => name !== '');
   const key = names.join('\n');
+  const [previewDiet] = usePreviewDietMutation();
   const latestOnDerived = useRef(onDerived);
   latestOnDerived.current = onDerived;
   useEffect(() => {
@@ -27,7 +29,7 @@ export const useDerivedDiet = (
     let current = true;
     const timer = setTimeout(() => {
       // Where the instance does not estimate nutrition there is nothing to read; the diet stays as it is
-      RestAPI.previewDiet(names)
+      previewDiet(names).unwrap()
           .then((diet) => current && latestOnDerived.current(diet))
           .catch(() => undefined);
     }, DEBOUNCE_MS);

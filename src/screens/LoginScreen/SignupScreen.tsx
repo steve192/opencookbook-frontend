@@ -8,7 +8,7 @@ import Spacer from 'react-spacer';
 import {EmailValidationInput} from '../../components/EmailValidationInput';
 import {FormErrorMessage} from '../../components/FormErrorMessage';
 import {PasswordValidationInput} from '../../components/PasswordValidationInput';
-import RestAPI from '../../dao/RestAPI';
+import {useSignUpMutation} from '../../api/endpoints/account';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {PromptUtil} from '../../helper/Prompt';
 import {BaseNavigatorProps, LoginNavigationProps} from '../../navigation/NavigationRoutes';
@@ -26,7 +26,7 @@ export const SignupScreen = (props: Props) => {
   const [termsAccepted, setTermsAccepted] = useState<boolean>(false);
   const [emailOk, setEmailOk] = useState(false);
   const [passwordOk, setPasswordOk] = useState(false);
-  const [registerPending, setRegisterPending] = useState(false);
+  const [signUp, {isLoading: registerPending}] = useSignUpMutation();
 
   const emailRef = useRef<RNTextInput>(null);
   const passwordSectionRef = useRef<{focus:() => void}>(null);
@@ -40,9 +40,8 @@ export const SignupScreen = (props: Props) => {
     if (registerPending || !allFieldsOk) {
       return;
     }
-    setRegisterPending(true);
     setApiErrorMessage(undefined);
-    RestAPI.registerUser(email, password).then(() => {
+    signUp({emailAddress: email, password}).unwrap().then(() => {
       props.navigation.goBack();
       PromptUtil.show({
         confirm: t('common.ok'),
@@ -51,7 +50,7 @@ export const SignupScreen = (props: Props) => {
       });
     }).catch((error) => {
       setApiErrorMessage(t(errorMessageKey(error)));
-    }).finally(() => setRegisterPending(false));
+    });
   };
 
 

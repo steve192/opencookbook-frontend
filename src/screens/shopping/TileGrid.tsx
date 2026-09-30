@@ -1,7 +1,7 @@
 import React from 'react';
 import {DimensionValue, Platform, StyleSheet, View} from 'react-native';
 import Animated, {FadeIn, FadeOut, LayoutAnimationConfig, LinearTransition, ZoomIn, ZoomOut} from 'react-native-reanimated';
-import {Aisle} from '../../dao/aisles';
+import {Aisle} from '../../api/aisles';
 import {headingKey, tileCells} from '../../helper/shopping/aisles';
 import {TILE_GAP, tileWidthFor} from '../../helper/shopping/tileLayout';
 import {useLayoutWidth} from '../../helper/useLayoutWidth';

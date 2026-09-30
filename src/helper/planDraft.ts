@@ -1,5 +1,5 @@
 import {TFunction} from 'i18next';
-import {PlanDraft, PlanSlot, RerollReason} from '../dao/RestAPI';
+import {PlanDraft, PlanSlot, RerollReason} from '../api/types/planning';
 import {inDayOrder} from './mealTypes';
 
 /** Reading a proposed week: by day, and what each of its meals is. */

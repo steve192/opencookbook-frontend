@@ -2,7 +2,8 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Chip} from 'react-native-paper';
-import {Recipe, ScoreReason} from '../dao/RestAPI';
+import {ScoreReason} from '../api/types/planning';
+import {Recipe} from '../api/types/recipes';
 import {formatRecipeTime} from '../helper/recipeDuration';
 import {scoreReasonLabel, shownReasons} from '../helper/scoreReasons';
 

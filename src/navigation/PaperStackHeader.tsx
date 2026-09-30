@@ -1,11 +1,12 @@
 import {NativeStackHeaderProps} from '@react-navigation/native-stack';
 import React from 'react';
 import {Appbar} from 'react-native-paper';
+import {OfflineBanner} from '../offline/OfflineBanner';
 import {useAppTheme} from '../styles/CentralStyles';
 import {appbarOptionsOf} from './appbarOptions';
 
 /**
- * The app bar every stack screen wears.
+ * The app bar every stack screen wears, with the offline banner below it.
  *
  * Native stacks each bring a header of their own, so without one definition the app would have
  * as many slightly different app bars as it has navigators - which is what happened the moment a
@@ -19,15 +20,18 @@ export const PaperStackHeader = (nav: NativeStackHeaderProps) => {
   const {leading, actions} = appbarOptionsOf(nav.options);
 
   return (
-    <Appbar.Header style={{backgroundColor: theme.colors.primary}}>
-      {nav.back ? (
-        <Appbar.BackAction
-          color={theme.colors.onPrimary}
-          onPress={() => nav.navigation.goBack()} />
-      ) : null}
-      {leading}
-      <Appbar.Content color={theme.colors.onPrimary} title={nav.options.title} />
-      {actions}
-    </Appbar.Header>
+    <>
+      <Appbar.Header style={{backgroundColor: theme.colors.primary}}>
+        {nav.back ? (
+          <Appbar.BackAction
+            color={theme.colors.onPrimary}
+            onPress={() => nav.navigation.goBack()} />
+        ) : null}
+        {leading}
+        <Appbar.Content color={theme.colors.onPrimary} title={nav.options.title} />
+        {actions}
+      </Appbar.Header>
+      <OfflineBanner />
+    </>
   );
 };

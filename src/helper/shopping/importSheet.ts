@@ -1,4 +1,4 @@
-import {ImportLine, PreviewMeal, ShownLine} from '../../dao/RestAPI';
+import {ImportLine, PreviewMeal, ShownLine} from '../../api/types/shopping';
 import {MealChoice, SheetLine} from './importLines';
 
 /** A tick the person set by hand, by line key; it survives the checklist being recomputed. */

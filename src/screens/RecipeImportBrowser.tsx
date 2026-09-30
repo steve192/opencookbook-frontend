@@ -1,17 +1,17 @@
 import {useFocusEffect} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {BackHandler, StyleSheet, View} from 'react-native';
 import {Button, Divider, Icon, IconButton, ProgressBar, Surface, Text} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
-import RestAPI, {Recipe} from '../dao/RestAPI';
+import {useGetAvailableImportHostsQuery, useImportRecipeMutation} from '../api/endpoints/recipes';
+import {Recipe} from '../api/types/recipes';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {askForPlanningDetails} from '../components/PlanningDetailsPrompt';
-import {importRecipe} from '../redux/features/recipesSlice';
-import {useAppDispatch} from '../redux/hooks';
+import {useIsOnline} from '../offline/useIsOnline';
 import {useAppTheme} from '../styles/CentralStyles';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeImportBrowser'>;
@@ -30,14 +30,17 @@ const hostOf = (url: string): string => {
   return match?.[1]?.replace(/^www\./, '') ?? url;
 };
 
+const NO_HOSTS: string[] = [];
+
 export const RecipeImportBrowser = (props: Props) => {
   const {t} = useTranslation('translation');
-  const dispatch = useAppDispatch();
+  const online = useIsOnline();
+  const [importRecipe] = useImportRecipeMutation();
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const webViewRef = useRef<WebView>(null);
 
-  const [availableImportHosts, setAvailableImportHosts] = useState<string[]>([]);
+  const availableImportHosts = useGetAvailableImportHostsQuery().data ?? NO_HOSTS;
   const [importStatus, setImportStatus] = useState<ImportStatus>('not_started');
   const [importedRecipe, setImportedRecipe] = useState<Recipe | undefined>(undefined);
   const [importFailure, setImportFailure] = useState<string>();
@@ -45,12 +48,6 @@ export const RecipeImportBrowser = (props: Props) => {
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
   const [loadProgress, setLoadProgress] = useState(1);
-
-  useEffect(() => {
-    RestAPI.getAvailableImportHosts().then((list) => {
-      setAvailableImportHosts(list);
-    });
-  }, []);
 
   useFocusEffect(
       React.useCallback(() => {
@@ -101,7 +98,7 @@ export const RecipeImportBrowser = (props: Props) => {
       return;
     }
     setImportStatus('pending');
-    dispatch(importRecipe(currentURL)).unwrap().then((recipe) => {
+    importRecipe(currentURL).unwrap().then((recipe) => {
       setImportedRecipe(recipe);
       setImportStatus('success');
       askForPlanningDetails(recipe);
@@ -221,7 +218,7 @@ export const RecipeImportBrowser = (props: Props) => {
           textColor={importStatus === 'failed' ? theme.colors.onDestructive : undefined}
           icon={importStatus === 'success' ? 'arrow-right' : 'import'}
           loading={importStatus === 'pending'}
-          disabled={importStatus === 'pending' || !currentURL}
+          disabled={!online || importStatus === 'pending' || !currentURL}
           onPress={importStatus === 'success' ? openImportedRecipe : startImport}>
           {presentation.label}
         </Button>

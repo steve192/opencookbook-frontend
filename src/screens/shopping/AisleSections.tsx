@@ -1,6 +1,6 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Aisle} from '../../dao/aisles';
+import {Aisle} from '../../api/aisles';
 import {groupByAisle} from '../../helper/shopping/aisles';
 import {AisleHeading} from './AisleHeading';
 

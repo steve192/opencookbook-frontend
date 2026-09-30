@@ -1,8 +1,8 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Linking, SectionList, StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Button, List, Searchbar, Surface, Text} from 'react-native-paper';
-import RestAPI from '../../dao/RestAPI';
+import {useGetOpenSourceSectionsQuery} from '../../api/endpoints/account';
 import {
   browsableHomepage,
   filterSections,
@@ -41,17 +41,11 @@ const ComponentDetails = ({component}: {component: OpenSourceComponent}) => {
 export const OpenSourceLicensesScreen = () => {
   const {t} = useTranslation('translation');
   const app = useMemo(appSection, []);
-  const [server, setServer] = useState<OpenSourceSection[] | 'loading' | 'failed'>('loading');
+  const {data: server, isError, isFetching, refetch} = useGetOpenSourceSectionsQuery();
   const [query, setQuery] = useState('');
 
-  const loadServer = useCallback(() => {
-    setServer('loading');
-    RestAPI.getOpenSourceSections().then(setServer).catch(() => setServer('failed'));
-  }, []);
-  useEffect(loadServer, []);
-
   const sections = useMemo(
-      () => filterSections([app, ...(Array.isArray(server) ? server : [])], query)
+      () => filterSections([app, ...(server ?? [])], query)
           .map((section) => ({id: section.id, data: section.components})),
       [app, server, query]);
 
@@ -76,11 +70,11 @@ export const OpenSourceLicensesScreen = () => {
         )}
         ListFooterComponent={
           <View style={styles.footer}>
-            {server === 'loading' && <ActivityIndicator />}
-            {server === 'failed' &&
+            {!server && isFetching && <ActivityIndicator />}
+            {!server && isError && !isFetching &&
               <>
                 <Text variant="bodyMedium">{t('screens.licenses.serverUnavailable')}</Text>
-                <Button mode="outlined" onPress={loadServer}>{t('screens.licenses.retry')}</Button>
+                <Button mode="outlined" onPress={refetch}>{t('screens.licenses.retry')}</Button>
               </>}
           </View>} />
     </Surface>

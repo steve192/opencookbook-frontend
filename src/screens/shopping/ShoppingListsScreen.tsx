@@ -6,7 +6,10 @@ import {Button, List, Surface} from 'react-native-paper';
 import {usePlanTarget} from '../../components/PlanTargetDialog';
 import {actionsSide, iconSide, SideAction} from '../../components/listSides';
 import {ScreenFooter} from '../../components/ScreenFooter';
-import RestAPI, {ShoppingList} from '../../dao/RestAPI';
+import {
+  useCreateShoppingListMutation, useDeleteShoppingListMutation, useRenameShoppingListMutation,
+} from '../../api/endpoints/shopping';
+import {ShoppingList} from '../../api/types/shopping';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {PromptUtil} from '../../helper/Prompt';
@@ -14,8 +17,8 @@ import {listIcon} from '../../helper/shopping/lists';
 import {loadShoppingLists} from '../../helper/shopping/shoppingSync';
 import {useListName} from '../../helper/shopping/useListName';
 import {TextPromptUtil} from '../../helper/TextPrompt';
-import {useOnlineGuard} from '../../helper/useOnlineGuard';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
+import {useIsOnline} from '../../offline/useIsOnline';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles from '../../styles/CentralStyles';
 import {useHouseholds} from '../households/useHouseholds';
@@ -28,7 +31,10 @@ const NAME_MAX_LENGTH = 64;
 export const ShoppingListsScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const dispatch = useAppDispatch();
-  const requireOnline = useOnlineGuard();
+  const online = useIsOnline();
+  const [createShoppingList] = useCreateShoppingListMutation();
+  const [renameShoppingList] = useRenameShoppingListMutation();
+  const [deleteShoppingList] = useDeleteShoppingListMutation();
   const lists = useAppSelector((state) => state.shopping.lists);
   const {households} = useHouseholds();
   const scope = usePlanTarget(households);
@@ -39,9 +45,6 @@ export const ShoppingListsScreen = (props: Props) => {
   }, []);
 
   const run = (action: () => Promise<unknown>) => {
-    if (!requireOnline()) {
-      return;
-    }
     action()
         .then(() => dispatch(loadShoppingLists()))
         .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
@@ -53,10 +56,10 @@ export const ShoppingListsScreen = (props: Props) => {
 
   const create = (householdId: string | undefined) =>
     askName(t('screens.shopping.newList'), '', (name) =>
-      run(() => RestAPI.createShoppingList(name, householdId ?? null)));
+      run(() => createShoppingList({name, householdId: householdId ?? null}).unwrap()));
 
   const rename = (list: ShoppingList) =>
-    askName(t('screens.shopping.rename'), nameOf(list), (name) => run(() => RestAPI.renameShoppingList(list, name)));
+    askName(t('screens.shopping.rename'), nameOf(list), (name) => run(() => renameShoppingList({list, name}).unwrap()));
 
   const remove = (list: ShoppingList) => PromptUtil.show({
     title: t('screens.shopping.deleteList'),
@@ -64,14 +67,15 @@ export const ShoppingListsScreen = (props: Props) => {
     confirm: t('common.delete'),
     cancel: t('common.cancel'),
     destructive: true,
-    onConfirm: () => run(() => RestAPI.deleteShoppingList(list)),
+    onConfirm: () => run(() => deleteShoppingList(list).unwrap()),
   });
 
   // A default list can be renamed but never deleted.
   const actionsOf = (list: ShoppingList): SideAction[] => [
-    {icon: 'pencil-outline', label: t('screens.shopping.rename'), onPress: () => rename(list)},
+    {icon: 'pencil-outline', label: t('screens.shopping.rename'), onPress: () => rename(list), disabled: !online},
     ...(list.defaultList ? [] :
-      [{icon: 'delete-outline', label: t('screens.shopping.deleteList'), onPress: () => remove(list)}]),
+      [{icon: 'delete-outline', label: t('screens.shopping.deleteList'), onPress: () => remove(list),
+        disabled: !online}]),
   ];
 
   return (
@@ -87,7 +91,8 @@ export const ShoppingListsScreen = (props: Props) => {
         ))}
       </ScrollView>
       <ScreenFooter>
-        <Button key="new" mode="contained" icon="plus" onPress={() => scope.choose(t('screens.shopping.whoseList'), create)}>
+        <Button key="new" mode="contained" icon="plus" disabled={!online}
+          onPress={() => scope.choose(t('screens.shopping.whoseList'), create)}>
           {t('screens.shopping.newList')}
         </Button>
       </ScreenFooter>

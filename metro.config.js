@@ -54,7 +54,7 @@ const relayToBackend = (request, response) => {
 // Generated on every start, so a dependency or catalogue update flows through without a manual step;
 // both scripts return at once when nothing changed. Synchronous, because the files must exist before
 // Metro resolves the modules that load them.
-for (const script of ['generate-open-source-components.mjs', 'shopping-icons.mjs']) {
+for (const script of ['generate-open-source-components.mjs', 'shopping-icons.mjs', 'pwa-icons.mjs']) {
   execFileSync(process.execPath, [path.join(__dirname, 'scripts', script)], {stdio: 'inherit'});
 }
 

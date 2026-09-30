@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {IconButton, Menu} from 'react-native-paper';
-import {RerollReason} from '../../dao/RestAPI';
+import {RerollReason} from '../../api/types/planning';
 import {REROLL_REASONS, rerollReasonLabel} from '../../helper/planDraft';
 
 interface Props {

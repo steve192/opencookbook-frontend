@@ -1,4 +1,4 @@
-import type {RecipeImage} from '../dao/RestAPI';
+import type {Recipe, RecipeImage} from '../api/types/recipes';
 
 /** Position of the image that represents the recipe wherever a single image is shown. */
 export const TITLE_IMAGE_INDEX = 0;
@@ -28,3 +28,5 @@ export const moveImage = (images: RecipeImage[], index: number, offset: number):
   reordered.splice(targetIndex, 0, moved);
   return reordered;
 };
+
+export const titleImageUuid = (recipe: Recipe): string | undefined => recipe.images[TITLE_IMAGE_INDEX]?.uuid;

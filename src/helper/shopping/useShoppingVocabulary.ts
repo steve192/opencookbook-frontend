@@ -1,4 +1,5 @@
 import {useEffect, useMemo} from 'react';
+import {useIsOnline} from '../../offline/useIsOnline';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {loadShoppingVocabulary} from './shoppingSync';
 
@@ -10,7 +11,7 @@ import {loadShoppingVocabulary} from './shoppingSync';
  */
 export const useShoppingVocabulary = () => {
   const dispatch = useAppDispatch();
-  const isOnline = useAppSelector((state) => state.settings.isOnline);
+  const isOnline = useIsOnline();
   const tiles = useAppSelector((state) => state.shopping.tiles);
   const words = useAppSelector((state) => state.shopping.unitWords);
 

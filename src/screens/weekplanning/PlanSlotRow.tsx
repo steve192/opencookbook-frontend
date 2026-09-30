@@ -5,7 +5,7 @@ import {Button, IconButton, Surface, Text} from 'react-native-paper';
 import XDate from 'xdate';
 import {RecipeFactChips} from '../../components/RecipeFactChips';
 import {RecipeRowCard} from '../../components/RecipeRowCard';
-import {PlanSlot, RerollReason} from '../../dao/RestAPI';
+import {PlanSlot, RerollReason} from '../../api/types/planning';
 import {mealTypeLabel} from '../../helper/mealTypes';
 import {isUnfilled} from '../../helper/planDraft';
 import {concerns, scoreReasonLabel} from '../../helper/scoreReasons';

@@ -5,8 +5,8 @@ import {Button, Chip, Dialog, Menu, Portal, Text, TextInput} from 'react-native-
 import XDate from 'xdate';
 import {ShoppingIcon} from '../../components/shopping/ShoppingIcon';
 import {PRIORITY_ICON} from '../../components/shopping/ShoppingItemTile';
-import {Aisle, AISLES} from '../../dao/aisles';
-import {ShoppingItem, ShoppingItemSource, ShoppingOp} from '../../dao/RestAPI';
+import {Aisle, AISLES} from '../../api/aisles';
+import {ShoppingItem, ShoppingItemSource, ShoppingOp} from '../../api/types/shopping';
 import {formatShortWeekday} from '../../helper/weekplan';
 import {overlayStyles, useAppTheme} from '../../styles/CentralStyles';
 

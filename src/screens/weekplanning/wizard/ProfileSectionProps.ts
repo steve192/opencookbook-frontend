@@ -1,4 +1,4 @@
-import {PlanningProfile} from '../../../dao/RestAPI';
+import {PlanningProfile} from '../../../api/types/planning';
 
 /** What every section of the wizard edits: the profile, changed as a whole value. */
 export interface ProfileSectionProps {

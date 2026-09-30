@@ -5,6 +5,7 @@ import {Avatar, Button} from 'react-native-paper';
 
 type Props = {
   loading: boolean;
+  disabled: boolean;
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
 }
@@ -20,7 +21,7 @@ export const BringImportButton = (props: Props) => {
       buttonColor="#324047"
       mode="elevated"
       loading={props.loading}
-      disabled={props.loading}
+      disabled={props.loading || props.disabled}
       onPress={props.onPress}>{t('common.bringimport')}</Button>
   );
 };

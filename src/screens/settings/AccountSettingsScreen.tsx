@@ -3,60 +3,56 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Button, Text, TextInput} from 'react-native-paper';
-import {useDispatch} from 'react-redux';
+import {
+  useDeleteAccountMutation, useGetUserInfoQuery, useRequestPasswordResetMutation, useSetDisplayNameMutation,
+} from '../../api/endpoints/account';
 import {CustomCard} from '../../components/CustomCard';
-import RestAPI from '../../dao/RestAPI';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {DISPLAY_NAME_MAX_LENGTH} from '../../helper/nameLimits';
 import {PromptUtil} from '../../helper/Prompt';
-import {useUserInfo} from '../../helper/useUserInfo';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
+import {useIsOnline} from '../../offline/useIsOnline';
+import {signOut} from '../../redux/sessionThunks';
 import {logout} from '../../redux/features/authSlice';
+import {useAppDispatch} from '../../redux/hooks';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {SettingsHint, SettingsPage} from './SettingsPage';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'AccountSettingsScreen'>;
 
 export const AccountSettingsScreen = (_props: Props) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
-  const userInfo = useUserInfo();
-  // Needed to address the password reset. Falls back to the offline copy stored at login.
+  const online = useIsOnline();
+  const {data: userInfo} = useGetUserInfoQuery();
   const emailAddress = userInfo?.email ?? '';
-  const [passwordResetPending, setPasswordResetPending] = useState(false);
+  const savedDisplayName = userInfo?.displayName ?? '';
   const [displayName, setDisplayName] = useState('');
-  const [savedDisplayName, setSavedDisplayName] = useState('');
-  const [savingDisplayName, setSavingDisplayName] = useState(false);
+  const [saveDisplayNameOf, {isLoading: savingDisplayName}] = useSetDisplayNameMutation();
+  const [requestPasswordReset, {isLoading: passwordResetPending}] = useRequestPasswordResetMutation();
+  const [deleteAccount] = useDeleteAccountMutation();
 
-  useEffect(() => {
-    setDisplayName(userInfo?.displayName ?? '');
-    setSavedDisplayName(userInfo?.displayName ?? '');
-  }, [userInfo]);
+  useEffect(() => setDisplayName(savedDisplayName), [savedDisplayName]);
 
   const saveDisplayName = () => {
     // Saved on blur, which also happens when nothing was changed.
     if (displayName.trim() === savedDisplayName) {
       return;
     }
-    setSavingDisplayName(true);
-    RestAPI.setDisplayName(displayName)
-        .then((saved) => setSavedDisplayName(saved.displayName ?? ''))
+    saveDisplayNameOf(displayName).unwrap()
         .then(() => SnackbarUtil.show({message: t('screens.settings.displayNameSaved')}))
-        .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}))
-        .finally(() => setSavingDisplayName(false));
+        .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
   };
 
   // Reuses the reset flow rather than adding a second way to set a password: the user proves
   // they own the mailbox, and the app never handles the old or the new password itself.
   const sendPasswordResetLink = () => {
-    setPasswordResetPending(true);
-    RestAPI.requestPasswordReset(emailAddress)
+    requestPasswordReset(emailAddress).unwrap()
         .then(() => SnackbarUtil.show({message: t('screens.settings.changePasswordSent')}))
         .catch((error) => SnackbarUtil.show(
-            {message: t(errorMessageKey(error, 'errors.mailFailed'))}))
-        .finally(() => setPasswordResetPending(false));
+            {message: t(errorMessageKey(error, 'errors.mailFailed'))}));
   };
 
   const onChangePasswordPress = () => {
@@ -69,17 +65,13 @@ export const AccountSettingsScreen = (_props: Props) => {
     });
   };
 
-  const performLogout = async () => {
-    await RestAPI.logout();
-    dispatch(logout());
-  };
 
   const onLogoutPress = () => {
     PromptUtil.show({
       title: t('screens.settings.logoutTitle'),
       message: t('screens.settings.logoutMessage'),
       confirm: t('common.ok'),
-      onConfirm: performLogout,
+      onConfirm: () => dispatch(signOut()),
       cancel: t('common.cancel'),
     });
   };
@@ -93,7 +85,7 @@ export const AccountSettingsScreen = (_props: Props) => {
       onConfirm: () => {
         // Signed out only once the account is actually gone: doing it first left somebody at
         // the login screen believing a request that had failed.
-        RestAPI.deleteAccount()
+        deleteAccount().unwrap()
             .then(() => dispatch(logout()))
             .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
       },
@@ -110,7 +102,7 @@ export const AccountSettingsScreen = (_props: Props) => {
           value={displayName}
           onChangeText={setDisplayName}
           onBlur={saveDisplayName}
-          disabled={savingDisplayName}
+          disabled={!online || savingDisplayName}
           maxLength={DISPLAY_NAME_MAX_LENGTH} />
         <SettingsHint>{t('screens.settings.displayNameExplanation')}</SettingsHint>
       </CustomCard>
@@ -120,7 +112,7 @@ export const AccountSettingsScreen = (_props: Props) => {
           icon="lock-reset"
           loading={passwordResetPending}
           // Without an address there is nothing to send the link to
-          disabled={passwordResetPending || emailAddress.length === 0}
+          disabled={!online || passwordResetPending || emailAddress.length === 0}
           onPress={onChangePasswordPress}>{t('screens.settings.changePassword')}</Button>
         <Button mode="outlined" icon="logout" onPress={onLogoutPress}>{t('screens.settings.logout')}</Button>
       </CustomCard>
@@ -131,6 +123,7 @@ export const AccountSettingsScreen = (_props: Props) => {
           mode="contained"
           buttonColor={theme.colors.destructive}
           textColor={theme.colors.onDestructive}
+          disabled={!online}
           onPress={onDeleteAccountPress}>
           {t('screens.settings.deleteAccount')}
         </Button>

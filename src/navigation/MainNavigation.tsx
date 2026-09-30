@@ -1,5 +1,4 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
-import NetInfo from '@react-native-community/netinfo';
 import {BottomTabNavigationOptions, createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -8,14 +7,14 @@ import {createURL} from 'expo-linking';
 import {StatusBar} from 'expo-status-bar';
 import * as Updates from 'expo-updates';
 import {TFunction} from 'i18next';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Platform} from 'react-native';
 import {KeyboardAvoidingScreen} from '../components/KeyboardAvoidingScreen';
-import AppPersistence from '../AppPersistence';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
-import {changeOnlineState} from '../redux/features/settingsSlice';
-import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {useIsOnline} from '../offline/useIsOnline';
+import {PwaInstallPrompt} from '../pwa/PwaInstallPrompt';
+import {selectLoggedIn} from '../redux/features/authSlice';
+import {useAppSelector} from '../redux/hooks';
 import {AccountActivationScreen} from '../screens/AccountActivationScreen';
 import {GuidedCookingScreen} from '../screens/GuidedCookingScreen';
 import {ImportScreen} from '../screens/ImportScreen';
@@ -180,7 +179,7 @@ const BottomTabNavigation = () => {
 
 const MainStackNavigation = () => {
   const {t} = useTranslation('translation');
-  const {onboarded, markOnboarded} = useOnboarding();
+  const onboarded = useOnboarding();
 
   if (onboarded === undefined) {
     return <SplashScreen />;
@@ -190,7 +189,7 @@ const MainStackNavigation = () => {
   if (!onboarded) {
     return (
       <KeyboardAvoidingScreen>
-        <OnboardingScreen onDone={markOnboarded} />
+        <OnboardingScreen />
       </KeyboardAvoidingScreen>
     );
   }
@@ -327,15 +326,14 @@ const MainStackNavigation = () => {
           options={{title: t('screens.apiKeys.title')}}
         />
       </MainStack.Navigator>
+      <PwaInstallPrompt />
     </KeyboardAvoidingScreen>
   );
 };
 
 
-/** Applies a downloaded update, dropping offline data the new build may not understand. */
 const restartIntoUpdate = () => {
-  AppPersistence.clearOfflineData()
-      .then(() => Updates.reloadAsync())
+  Updates.reloadAsync()
       .then((result) => console.log('Restart triggered', result))
       .catch((error) => console.error('Restarting failed', error));
 };
@@ -346,6 +344,10 @@ const restartIntoUpdate = () => {
  * @param {TFunction} t the translations for the offer
  */
 const offerUpdate = async (t: TFunction) => {
+  // Development builds have no updates to fetch.
+  if (!Updates.isEnabled) {
+    return;
+  }
   console.log('Update check');
   await new Promise((resolve) => setTimeout(resolve, 1000));
   const update = await Updates.checkForUpdateAsync();
@@ -364,36 +366,23 @@ const offerUpdate = async (t: TFunction) => {
 };
 
 const MainNavigation = () => {
-  const loggedIn = useAppSelector((state) => state.auth.loggedIn);
-  const isLoading = useAppSelector((state) => state.auth.isLoading);
-  const dispatch = useAppDispatch();
-
-  const [initializersRun, setInitializersRun] = useState(false);
+  const loggedIn = useAppSelector(selectLoggedIn);
+  const online = useIsOnline();
 
   const {t} = useTranslation('translation');
 
+  // At most one check per run of the app, not one per reconnect; a failed one is retried on the next return online.
+  const updateChecked = useRef(false);
   useEffect(() => {
-    if (initializersRun) {
+    if (!online || updateChecked.current) {
       return;
     }
-    setInitializersRun(true);
-
-    void (async () => {
-      NetInfo.addEventListener((state) => {
-        if (Platform.OS === 'android') {
-          dispatch(changeOnlineState(state.isInternetReachable === true));
-        } else {
-          dispatch(changeOnlineState(state.isConnected === true));
-        }
-      });
-
-      // Check for new app versions
-      const info = await NetInfo.fetch();
-      if (info.isInternetReachable) {
-        await offerUpdate(t);
-      }
-    })();
-  }, []);
+    updateChecked.current = true;
+    offerUpdate(t).catch((error) => {
+      console.info('Update check failed', error);
+      updateChecked.current = false;
+    });
+  }, [online]);
 
   // Render either the main-app stack or the login flow under a single "default"
   // base screen, so deep-link routes resolve against the right stack at runtime.
@@ -402,7 +391,7 @@ const MainNavigation = () => {
       [loggedIn],
   );
 
-  const baseNavigator = isLoading ? <SplashScreen /> : (
+  const baseNavigator = (
     <BaseStack.Navigator screenOptions={{headerShown: false}}>
       <BaseStack.Screen
         name='default'

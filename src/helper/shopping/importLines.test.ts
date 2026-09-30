@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {PreviewLine, PreviewMeal} from '../../dao/RestAPI';
+import {PreviewLine, PreviewMeal} from '../../api/types/shopping';
 import {bringLine, MealChoice, sheetLines} from './importLines';
 
 const UNITS = new Set(['g', 'kg', 'ml', 'l']);

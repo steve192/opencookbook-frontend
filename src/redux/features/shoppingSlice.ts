@@ -1,5 +1,5 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {ShoppingChanges, ShoppingList, ShoppingTile, ShoppingVocabulary} from '../../dao/RestAPI';
+import {ShoppingChanges, ShoppingList, ShoppingTile, ShoppingVocabulary} from '../../api/types/shopping';
 import {ListSync, PendingOp, withChanges} from '../../helper/shopping/listItems';
 import {logout} from './authSlice';
 
@@ -12,12 +12,9 @@ export interface ShoppingState {
   tiles: ShoppingTile[];
   /** What makes "2 kg" an amount when typing; kept for adding offline. */
   unitWords: string[];
-  /** Whether what this device stored has been read back since the app started. */
-  hydrated: boolean;
 }
 
-const initialState: ShoppingState = {lists: [], activeListId: null, sync: {}, tiles: [], unitWords: [],
-  hydrated: false};
+const initialState: ShoppingState = {lists: [], activeListId: null, sync: {}, tiles: [], unitWords: []};
 
 const syncOf = (state: ShoppingState, listId: number): ListSync => {
   state.sync[listId] ??= {server: {}, version: 0, pending: []};
@@ -28,9 +25,6 @@ const shoppingSlice = createSlice({
   name: 'shopping',
   initialState,
   reducers: {
-    shoppingHydrated: (state, action: PayloadAction<Partial<ShoppingState> | null>) => ({
-      ...state, ...action.payload, hydrated: true,
-    }),
     shoppingListsLoaded: (state, action: PayloadAction<ShoppingList[]>) => {
       state.lists = action.payload;
       const ids = new Set(action.payload.map((list) => list.id));
@@ -60,11 +54,11 @@ const shoppingSlice = createSlice({
   },
   extraReducers: (builder) => {
     // Nothing of one account's lists may be shown to whoever signs in next.
-    builder.addCase(logout, () => ({...initialState, hydrated: true}));
+    builder.addCase(logout, () => initialState);
   },
 });
 
-export const {shoppingHydrated, shoppingListsLoaded, shoppingListChosen, shoppingOpQueued, shoppingChangesReceived,
+export const {shoppingListsLoaded, shoppingListChosen, shoppingOpQueued, shoppingChangesReceived,
   shoppingVocabularyLoaded} = shoppingSlice.actions;
 
 export default shoppingSlice.reducer;

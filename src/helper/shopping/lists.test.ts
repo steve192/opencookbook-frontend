@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {ShoppingList} from '../../dao/RestAPI';
+import {ShoppingList} from '../../api/types/shopping';
 import {defaultListFor, listName} from './lists';
 
 const list = (id: number, householdId: string | null, defaultList = true, name: string | null = null): ShoppingList =>

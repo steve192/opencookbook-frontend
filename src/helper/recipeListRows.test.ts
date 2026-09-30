@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
-import {Recipe, RecipeGroup, RecipeImage} from '../dao/RestAPI';
-import {ListRow, listRowHasChanged, toRecipeGroupRow, toRecipeRow} from './recipeListRows';
+import {Recipe, RecipeGroup, RecipeImage} from '../api/types/recipes';
+import {cookbookRows, ListRow, listRowHasChanged, toRecipeGroupRow, toRecipeRow} from './recipeListRows';
 
 const image = (uuid: string): RecipeImage => ({uuid} as RecipeImage);
 
@@ -97,6 +97,13 @@ describe('listRowHasChanged', () => {
     expect(listRowHasChanged(before, after)).toBe(true);
   });
 
+  it('reports a recipe as changed when its owner is renamed', () => {
+    expect(listRowHasChanged(
+        toRecipeRow({...recipe(1), ownerDisplayName: 'Anna'}),
+        toRecipeRow({...recipe(1), ownerDisplayName: 'Anne'}),
+    )).toBe(true);
+  });
+
   it('reports a renamed row as changed', () => {
     expect(listRowHasChanged(
         toRecipeRow(recipe(1, {title: 'before'})),
@@ -124,5 +131,29 @@ describe('listRowHasChanged', () => {
   // The list is led by an empty item that offsets the rows below the search field
   it('leaves the leading spacer row alone', () => {
     expect(listRowHasChanged({} as ListRow, {} as ListRow)).toBe(false);
+  });
+});
+
+describe('cookbookRows', () => {
+  const desserts = group(3);
+  const cake = recipe(1, {groups: [desserts], title: 'Cake'});
+  const soup = recipe(2, {title: 'Soup'});
+  const titles = (rows: ListRow[]) => rows.map((row) => row.title);
+
+  it('shows the groups and the recipes in none of them', () => {
+    expect(titles(cookbookRows([cake, soup], [desserts], undefined, false))).toEqual(['Desserts', 'Soup']);
+  });
+
+  it('shows only its recipes inside a group', () => {
+    expect(titles(cookbookRows([cake, soup], [desserts], 3, false))).toEqual(['Cake']);
+  });
+
+  it('looks into the groups while searching', () => {
+    expect(titles(cookbookRows([cake, soup], [desserts], undefined, true))).toEqual(['Desserts', 'Cake', 'Soup']);
+  });
+
+  // A household cookbook shows no groups: they are their owner's own
+  it('shows every recipe of a cookbook without groups', () => {
+    expect(titles(cookbookRows([cake, soup], [], undefined, false))).toEqual(['Cake', 'Soup']);
   });
 });

@@ -1,4 +1,4 @@
-import {Aisle} from '../../dao/aisles';
+import {Aisle} from '../../api/aisles';
 import {headingKey, TileCell} from './aisles';
 
 /** Narrower than this, a tile's name no longer fits in two lines. */

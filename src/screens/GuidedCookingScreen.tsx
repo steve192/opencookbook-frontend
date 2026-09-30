@@ -1,6 +1,7 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useKeepAwake} from 'expo-keep-awake';
 import React, {useEffect, useLayoutEffect, useMemo, useState} from 'react';
+import {useRecipe} from '../api/endpoints/recipes';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {Appbar, Button, Divider, Icon, Surface, Text} from 'react-native-paper';
@@ -11,8 +12,8 @@ import {SectionTitle} from '../components/SectionTitle';
 import {StepProgressBar} from '../components/StepProgressBar';
 import {StepTimer} from '../components/StepTimer';
 import {ViewPager} from '../components/ViewPager';
-import {LoadingScreen} from '../components/LoadingScreen';
-import {IngredientUse, Recipe} from '../dao/RestAPI';
+import {QueryFallback} from '../components/QueryFallback';
+import {IngredientUse, Recipe} from '../api/types/recipes';
 import {runningTimerCount} from '../helper/cookingTimers';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {findIngredientsWithoutStep, matchIngredientsInStep} from '../helper/ingredientMatching';
@@ -20,8 +21,7 @@ import {useCheckedIngredients} from '../helper/useCheckedIngredients';
 import {findStepDurations} from '../helper/recipeDuration';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {setAppbarOptions} from '../navigation/appbarOptions';
-import {fetchSingleRecipe, selectRecipe} from '../redux/features/recipesSlice';
-import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {useAppSelector} from '../redux/hooks';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
@@ -29,24 +29,17 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 /** Cooking happens at arm's length, so the smallest option is already fairly large. */
 const TEXT_SIZES = [18, 22, 27];
 
-// Loads the recipe first: after a reload, or from a timer notification, nothing is in the store yet.
 export const GuidedCookingScreen = (props: Props) => {
-  const {recipeId} = props.route.params;
-  const dispatch = useAppDispatch();
-  const recipe = useAppSelector((state) => selectRecipe(state, recipeId));
+  const {data: recipe, notFound, error, refetch} = useRecipe(props.route.params.recipeId);
 
   useEffect(() => {
-    if (!recipe) {
-      dispatch(fetchSingleRecipe(recipeId)).then((result) => {
-        if (result.meta.requestStatus === 'rejected') {
-          props.navigation.goBack();
-        }
-      });
+    if (notFound) {
+      props.navigation.goBack();
     }
-  }, [recipeId]);
+  }, [notFound]);
 
   if (!recipe) {
-    return <LoadingScreen />;
+    return <QueryFallback error={error} onRetry={refetch} />;
   }
   return <GuidedCooking {...props} recipe={recipe} />;
 };
@@ -116,7 +109,7 @@ const GuidedCooking = (props: Props & {recipe: Recipe}) => {
       ingredientIndexes={indexes}
       checkedIngredients={ingredientChecklist.checked}
       onIngredientToggle={ingredientChecklist.toggle}
-      scaledServings={props.route.params.scaledServings}
+      scaledServings={props.route.params.scaledServings ?? recipe.servings}
       servings={recipe.servings} />
   );
 

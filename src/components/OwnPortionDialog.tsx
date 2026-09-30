@@ -2,7 +2,8 @@ import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet} from 'react-native';
 import {Button, Dialog, Portal, Text, TextInput} from 'react-native-paper';
-import RestAPI, {NutritionLine} from '../dao/RestAPI';
+import {useRemoveOwnPortionMutation, useSetOwnPortionMutation} from '../api/endpoints/nutrition';
+import {NutritionLine} from '../api/types/nutrition';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
 
@@ -22,7 +23,9 @@ export const OwnPortionDialog = (props: Props) => {
 
   const unit = props.line.unit ?? '';
   const [grams, setGrams] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [setOwnPortion, setting] = useSetOwnPortionMutation();
+  const [removeOwnPortion, removing] = useRemoveOwnPortionMutation();
+  const saving = setting.isLoading || removing.isLoading;
   // Shown inside the dialog: a snackbar would be hidden behind it.
   const [failure, setFailure] = useState<string>();
 
@@ -30,15 +33,12 @@ export const OwnPortionDialog = (props: Props) => {
   const valid = grams.trim() !== '' && parsed > 0 && parsed <= MAX_GRAMS;
 
   const run = async (action: () => Promise<void>) => {
-    setSaving(true);
     setFailure(undefined);
     try {
       await action();
       props.onSaved();
     } catch (e) {
       setFailure(t(errorMessageKey(e, 'nutrition.portion.failed')));
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -66,7 +66,7 @@ export const OwnPortionDialog = (props: Props) => {
         </Dialog.Content>
         <Dialog.Actions style={overlayStyles.dialogActions}>
           {props.line.ownPortion &&
-            <Button disabled={saving} onPress={() => run(() => RestAPI.removeOwnPortion(props.line.ingredientId, unit))}>
+            <Button disabled={saving} onPress={() => run(() => removeOwnPortion({ingredientId: props.line.ingredientId, unit}).unwrap())}>
               {t('nutrition.portion.remove')}
             </Button>
           }
@@ -76,7 +76,7 @@ export const OwnPortionDialog = (props: Props) => {
             mode="contained"
             loading={saving}
             disabled={saving || !valid}
-            onPress={() => run(() => RestAPI.setOwnPortion(props.line.ingredientId, unit, parsed))}>
+            onPress={() => run(() => setOwnPortion({ingredientId: props.line.ingredientId, unit, grams: parsed}).unwrap())}>
             {t('nutrition.portion.save')}
           </Button>
         </Dialog.Actions>

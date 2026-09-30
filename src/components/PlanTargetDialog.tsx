@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Dialog, List, Portal} from 'react-native-paper';
-import {Household} from '../dao/RestAPI';
+import {Household} from '../api/types/households';
 import {overlayStyles} from '../styles/CentralStyles';
 import {iconSide} from './listSides';
 

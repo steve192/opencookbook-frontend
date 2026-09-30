@@ -1,7 +1,7 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {Avatar, Dialog, List, Portal, Text} from 'react-native-paper';
-import {ShoppingProvider} from '../../dao/RestAPI';
+import {ShoppingProvider} from '../../api/types/shopping';
 import {overlayStyles} from '../../styles/CentralStyles';
 import {iconSide} from '../listSides';
 

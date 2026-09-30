@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {Recipe} from '../dao/RestAPI';
+import {Recipe} from '../api/types/recipes';
 import {missesPlanningDetails, missingDetails} from './recipeCompleteness';
 
 const recipe = (fields: Partial<Recipe>) => ({title: 'x', ...fields} as Recipe);

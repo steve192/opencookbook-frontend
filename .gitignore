@@ -25,5 +25,6 @@ coverage/
 
 # Generated on every Metro start; see metro.config.js
 assets/shopping-icons/
+public/icons/
 src/**/*.generated.js
 src/**/*.generated.json

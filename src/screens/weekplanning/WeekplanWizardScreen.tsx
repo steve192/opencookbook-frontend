@@ -3,12 +3,15 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Button, List, Surface, Text} from 'react-native-paper';
+import {
+  useGeneratePlanDraftMutation, useGetPlanningProfilesQuery, useSavePlanningProfileMutation,
+} from '../../api/endpoints/planning';
 import {MealTypeCoverageWarning} from '../../components/MealTypeCoverageWarning';
 import {HintText} from '../../components/QuestionSection';
 import {ScreenFooter} from '../../components/ScreenFooter';
 import {SectionTitle} from '../../components/SectionTitle';
 import {StepProgressBar} from '../../components/StepProgressBar';
-import RestAPI, {PlanningProfile} from '../../dao/RestAPI';
+import {PlanningProfile} from '../../api/types/planning';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {
@@ -22,6 +25,7 @@ import {useOwnIngredients} from '../../helper/useOwnIngredients';
 import {usePlanPeriod} from '../../helper/usePlanPeriod';
 import {toDayKey} from '../../helper/weekplan';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
+import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
 import {ExtrasSection} from './wizard/ExtrasSection';
 import {FoodSection} from './wizard/FoodSection';
@@ -57,19 +61,23 @@ export const WeekplanWizardScreen = (props: Props) => {
   const [guidedStep, setGuidedStep] = useState<number>();
   const [expanded, setExpanded] = useState<SectionKey>();
   const [planning, setPlanning] = useState(false);
+  const online = useIsOnline();
   // Undefined for your own plan.
   const householdId = props.route.params.householdId;
   const {households} = useHouseholds();
+  const profiles = useGetPlanningProfilesQuery(householdId ?? null);
+  const [savePlanningProfile] = useSavePlanningProfileMutation();
+  const [generatePlanDraft] = useGeneratePlanDraftMutation();
 
+  // The saved answers, once, as the start of this week's; without any the questions are asked in turn.
   useEffect(() => {
-    RestAPI.getPlanningProfiles(householdId)
-        .then((profiles) => profiles.find((saved) => saved.defaultProfile) ?? profiles[0])
-        .catch(() => undefined)
-        .then((saved) => {
-          setProfile(saved ?? newPlanningProfile(t('screens.planning.defaultProfileName')));
-          setGuidedStep(saved ? undefined : 0);
-        });
-  }, [t, householdId]);
+    if (profile || (!profiles.data && !profiles.isError)) {
+      return;
+    }
+    const saved = profiles.data?.find((candidate) => candidate.defaultProfile) ?? profiles.data?.[0];
+    setProfile(saved ?? newPlanningProfile(t('screens.planning.defaultProfileName')));
+    setGuidedStep(saved ? undefined : 0);
+  }, [profiles.data, profiles.isError]);
 
   if (!profile) {
     return <Surface style={styles.screen}><ActivityIndicator style={styles.loading} /></Surface>;
@@ -78,9 +86,10 @@ export const WeekplanWizardScreen = (props: Props) => {
   const plan = async () => {
     setPlanning(true);
     try {
-      const saved = await RestAPI.savePlanningProfile({...profile, defaultProfile: true}, householdId);
-      const draft = await RestAPI.generatePlanDraft(saved.id!, toDayKey(period.days[0]), period.days.length,
-          period.awayDays, householdId);
+      const saved = await savePlanningProfile({profile: {...profile, defaultProfile: true},
+        householdId: householdId ?? null}).unwrap();
+      const draft = await generatePlanDraft({profileId: saved.id!, startDate: toDayKey(period.days[0]),
+        days: period.days.length, skippedDates: period.awayDays, householdId: householdId ?? null}).unwrap();
       props.navigation.replace('PlanDraftScreen', {draftId: draft.id, householdId: householdId});
     } catch (e) {
       SnackbarUtil.show({message: t(errorMessageKey(e, 'screens.planning.planFailed'))});
@@ -149,7 +158,7 @@ export const WeekplanWizardScreen = (props: Props) => {
   );
 
   const isLastStep = guidedStep === GUIDED_STEPS.length - 1;
-  const blocked = planning || !canPlan(profile);
+  const blocked = !online || planning || !canPlan(profile);
 
   return (
     <Surface style={styles.screen}>

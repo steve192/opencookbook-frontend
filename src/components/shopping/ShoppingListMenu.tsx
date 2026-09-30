@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Menu} from 'react-native-paper';
-import {ShoppingList} from '../../dao/RestAPI';
+import {ShoppingList} from '../../api/types/shopping';
 import {listIcon} from '../../helper/shopping/lists';
 import {useListName} from '../../helper/shopping/useListName';
 

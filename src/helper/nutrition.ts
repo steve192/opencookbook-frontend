@@ -1,4 +1,4 @@
-import {NutritionLine, NutritionLineFlag, NutritionLineStatus, NutritionSummary, Nutrients} from '../dao/RestAPI';
+import {NutritionLine, NutritionLineFlag, NutritionLineStatus, NutritionSummary, Nutrients} from '../api/types/nutrition';
 
 export type LineNoteKey =
   | `nutrition.lineStatus.${Exclude<NutritionLineStatus, 'RESOLVED'>}`

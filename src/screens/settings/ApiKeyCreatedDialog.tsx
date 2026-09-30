@@ -2,7 +2,7 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Button, Dialog, Portal, Text, TextInput} from 'react-native-paper';
-import {IssuedApiKey} from '../../dao/RestAPI';
+import {IssuedApiKey} from '../../api/types/account';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {SHARE_TEXT_COPIES, shareText} from '../../helper/shareText';
 import {overlayStyles} from '../../styles/CentralStyles';

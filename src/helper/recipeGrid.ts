@@ -10,12 +10,3 @@ const MAX_COLUMNS = 4;
  */
 export const columnsFor = (width: number): number =>
   Math.max(1, Math.min(MAX_COLUMNS, Math.ceil(width / TILE_TARGET_WIDTH)));
-
-/**
- * The width of one tile, as a share rather than flex, so a short last row does not stretch.
- *
- * @param {number} columns how many fit side by side
- * @return {string} the width of one cell
- */
-export const columnWidth = (columns: number): `${number}%` =>
-  `${100 / columns}%`;

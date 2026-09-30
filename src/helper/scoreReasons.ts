@@ -1,5 +1,5 @@
 import {TFunction} from 'i18next';
-import {ScoreReason} from '../dao/RestAPI';
+import {ScoreReason} from '../api/types/planning';
 
 /**
  * Why a recipe was chosen, for suggestions and planned weeks alike. A term that raised a recipe is a

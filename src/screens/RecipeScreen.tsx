@@ -1,4 +1,3 @@
-import {useIsFocused} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {useKeepAwake} from 'expo-keep-awake';
 import React, {useCallback, useEffect, useState} from 'react';
@@ -6,49 +5,45 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Appbar, Button, Surface} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useRecipe, useSaveRecipeCopyMutation} from '../api/endpoints/recipes';
+import {isOwnRecipe} from '../api/recipeSelection';
+import {RecipeNutritionSheet} from '../components/NutritionSheets';
+import {QueryFallback} from '../components/QueryFallback';
 import {RecipeDetailView} from '../components/RecipeDetailView';
 import {AddToShoppingListButton} from '../components/shopping/AddToShoppingListButton';
 import {RecipeShareDialog} from '../components/RecipeShareDialog';
-import RestAPI from '../dao/RestAPI';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
-import {useOnlineGuard} from '../helper/useOnlineGuard';
+import {useInstanceFeatures} from '../helper/useInstanceFeatures';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {setAppbarOptions} from '../navigation/appbarOptions';
-import {fetchSingleRecipe, selectRecipe} from '../redux/features/recipesSlice';
-import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {useIsOnline} from '../offline/useIsOnline';
 import {useAppTheme} from '../styles/CentralStyles';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScreen'>;
 export const RecipeScreen = (props: Props) => {
-  const dispatch = useAppDispatch();
-  const focussed = useIsFocused();
   const insets = useSafeAreaInsets();
-  const requireOnline = useOnlineGuard();
+  const online = useIsOnline();
+  const recipeId = props.route.params.recipeId;
 
-  const displayedRecipe = useAppSelector((state) => selectRecipe(state, props.route.params.recipeId));
-  const sharingEnabled = useAppSelector((state) => state.settings.sharingEnabled);
+  const {data: displayedRecipe, notFound, error, refetch} = useRecipe(recipeId);
+  const {sharingEnabled} = useInstanceFeatures();
+  const [saveRecipeCopy, {isLoading: saving}] = useSaveRecipeCopyMutation();
   const [scaledServings, setScaledServings] = useState<number>(displayedRecipe?.servings ? displayedRecipe.servings : 1);
   const [sharingOpen, setSharingOpen] = useState(false);
-  const [saving, setSaving] = useState(false);
-  // Absent on a cold start and in the offline copy, which only holds your own.
-  const mine = displayedRecipe?.mine !== false;
+  const mine = displayedRecipe !== undefined && isOwnRecipe(displayedRecipe);
   const {t} = useTranslation('translation');
 
   const theme = useAppTheme();
 
   useKeepAwake();
 
+  // Deleted, unshared or never readable: there is nothing to show.
   useEffect(() => {
-    // Load recipe if recipe id of screen has changed or screen is navigated to
-    dispatch(fetchSingleRecipe(props.route.params.recipeId))
-        .then((result) => {
-          if (result.meta.requestStatus === 'rejected') {
-            // Recipe does not exist, try to go back
-            props.navigation.goBack();
-          }
-        });
-  }, [props.route.params.recipeId, focussed]);
+    if (notFound) {
+      props.navigation.goBack();
+    }
+  }, [notFound]);
 
   // Only when a different recipe is shown. Keyed on the recipe object, this also ran on every
   // refetch, so scaling to eight servings was undone by leaving the app and coming back. The
@@ -70,7 +65,7 @@ export const RecipeScreen = (props: Props) => {
             <Appbar.Action
               testID='recipe-share-action'
               icon="share-variant"
-              disabled={!displayedRecipe}
+              disabled={!displayedRecipe || !online}
               color={theme.colors.onPrimary}
               accessibilityLabel={t('screens.recipe.sharing.shareButton')}
               onPress={() => setSharingOpen(true)} />
@@ -78,42 +73,28 @@ export const RecipeScreen = (props: Props) => {
           {mine && <Appbar.Action
             testID='recipe-edit-button'
             icon="pencil-outline"
-            disabled={!displayedRecipe}
+            disabled={!displayedRecipe || !online}
             color={theme.colors.onPrimary}
             accessibilityLabel={t('screens.recipe.editRecipe')}
-            onPress={() => {
-              if (!requireOnline() || !displayedRecipe) {
-                return;
-              }
-              props.navigation.navigate('RecipeWizardScreen', {
-                editing: true,
-                recipeId: displayedRecipe.id,
-              });
-            }} />}
+            onPress={() => props.navigation.navigate('RecipeWizardScreen', {
+              editing: true,
+              recipeId: displayedRecipe?.id,
+            })} />}
         </>
       ),
     });
-  }, [displayedRecipe, theme, t, sharingEnabled, mine]);
-
-  const recipeId = props.route.params.recipeId;
+  }, [displayedRecipe, theme, t, sharingEnabled, mine, online]);
 
   // Replaces the original with the copy, so going back returns to where it was opened from.
   const saveACopy = useCallback(async () => {
-    setSaving(true);
     try {
-      const copy = await RestAPI.saveRecipeCopy(recipeId);
+      const copy = await saveRecipeCopy(recipeId).unwrap();
       SnackbarUtil.show({message: t('screens.recipe.savedACopy')});
       copy.id && props.navigation.replace('RecipeScreen', {recipeId: copy.id});
     } catch (error) {
       SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.recipe.saveACopyFailed'))});
-    } finally {
-      setSaving(false);
     }
   }, [props.navigation, recipeId, t]);
-
-  const loadNutrition = useCallback(() => RestAPI.getRecipeNutrition(recipeId), [recipeId]);
-  // The summary comes with the recipe.
-  const reloadRecipe = useCallback(() => dispatch(fetchSingleRecipe(recipeId)), [recipeId]);
 
   // What can be done with the recipe, below the steps. Sharing is not here: it is an action you
   // go and take, not something to read past on the way to the preparation steps.
@@ -128,6 +109,10 @@ export const RecipeScreen = (props: Props) => {
     );
   };
 
+  if (!displayedRecipe) {
+    return <QueryFallback error={error} onRetry={refetch} />;
+  }
+
   return (
     <Surface style={styles.screen}>
       {displayedRecipe &&
@@ -136,7 +121,8 @@ export const RecipeScreen = (props: Props) => {
           scaledServings={scaledServings}
           onScaledServingsChange={setScaledServings}
           footer={renderFooterActions()}
-          nutrition={{loadDetails: loadNutrition, onLinkChanged: reloadRecipe}}
+          nutrition={{canCorrect: mine,
+            renderSheet: (sheetProps) => <RecipeNutritionSheet {...sheetProps} recipeId={recipeId} />}}
         />
       }
 
@@ -158,7 +144,7 @@ export const RecipeScreen = (props: Props) => {
               icon="bookmark-plus-outline"
               style={styles.saveButton}
               loading={saving}
-              disabled={saving}
+              disabled={saving || !online}
               onPress={saveACopy}>
               {t('screens.recipe.saveACopy')}
             </Button>

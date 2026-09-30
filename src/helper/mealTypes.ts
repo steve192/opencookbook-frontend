@@ -1,5 +1,5 @@
 import {TFunction} from 'i18next';
-import {MealType} from '../dao/RestAPI';
+import {MealType} from '../api/types/recipes';
 import {toggledIn} from './choices';
 
 /** The meals the server knows about, in the order of a day. */

@@ -24,14 +24,9 @@
     "close": "Schließen",
     "email": "E-Mail",
     "selected": "Ausgewählt",
-    "offlinemode": "Offlinemodus",
     "bringimport": "Import zu Bring®",
     "bringimportfailed": "Import zu Bring® fehlgeschlagen. Bitte erneut versuchen",
     "noRecipeGroup": "Keine Gruppe",
-    "offline": {
-      "notavailable": "Nicht verfügbar wenn du offline bist",
-      "notavailabletitle": "Offline"
-    },
     "appVersion": "Version {{version}}",
     "appVersionWithBuild": "Version {{version}} (Build {{build}})",
     "undo": "Rückgängig",
@@ -39,7 +34,8 @@
     "leftoversFrom": "Reste von {{day}}",
     "dismiss": "Schließen",
     "experimental": "experimentell",
-    "mealTypeCoverageWarning": "{{untagged}} von {{total}} Rezepten sagen nicht, zu welchen Mahlzeiten sie passen. Solange das fehlt, können Vorschläge und Pläne nur raten - lege die Mahlzeiten beim Bearbeiten eines Rezepts fest."
+    "mealTypeCoverageWarning": "{{untagged}} von {{total}} Rezepten sagen nicht, zu welchen Mahlzeiten sie passen. Solange das fehlt, können Vorschläge und Pläne nur raten - lege die Mahlzeiten beim Bearbeiten eines Rezepts fest.",
+    "retry": "Erneut versuchen"
   },
   "navigation": {
     "screenTitleImportBrowser": "Rezept Import Browser",
@@ -524,7 +520,6 @@
       "spreadVariety": "Jeden Tag etwas anderes",
       "plan": "Woche planen",
       "planFailed": "Die Woche konnte nicht geplant werden",
-      "loadFailed": "Die Woche konnte nicht geladen werden",
       "changeFailed": "Das hat nicht geklappt, bitte versuch es noch einmal",
       "summary": "{{recipes}} zum Kochen, {{leftovers}} Reste, {{gaps}} machst du selbst",
       "repeatsNote": "Dein Kochbuch reicht für diese Woche nicht ganz, deshalb kommen manche Rezepte wieder.",
@@ -627,7 +622,6 @@
       "full": "In diesem Haushalt ist kein Platz mehr.",
       "tooMany": "Du bist in so vielen Haushalten, wie dieser Server erlaubt.",
       "alreadyMember": "Du bist in diesem Haushalt schon Mitglied.",
-      "loadFailed": "Der Haushalt konnte nicht geladen werden.",
       "saveFailed": "Die Änderung konnte nicht gespeichert werden.",
       "tooManyInvites": "Dieser Haushalt hat so viele offene Einladungen, wie dieser Server erlaubt.",
       "defaultName": "{{name}}s Haushalt",
@@ -880,5 +874,38 @@
     "HOUSEHOLD": "Haushalt",
     "DRUGSTORE": "Drogerie",
     "OTHER": "Sonstiges"
+  },
+  "offline": {
+    "noNetwork": "Offline",
+    "unreachable": "Cookpal-Server nicht erreichbar",
+    "since": "Stand {{time}}",
+    "outdated": "Stand {{date}}, eventuell veraltet",
+    "notCached": "Offline noch nicht verfügbar",
+    "notCachedHint": "Öffne das einmal online, dann ist es auch offline da.",
+    "cannotSave": "Offline, Speichern noch nicht möglich",
+    "settingsTitle": "Offline-Daten",
+    "lastSynced": "Zuletzt abgeglichen {{time}}",
+    "neverSynced": "Noch nicht abgeglichen",
+    "syncNow": "Jetzt abgleichen",
+    "syncing": "Wird abgeglichen",
+    "storageUsed": "{{size}} MB auf diesem Gerät gespeichert"
+  },
+  "pwa": {
+    "install": {
+      "title": "Cookpal installieren",
+      "body": "Lege Cookpal auf den Startbildschirm, für schnelleren Zugriff und zum Offline-Nutzen.",
+      "install": "Installieren",
+      "notNow": "Nicht jetzt",
+      "dontAsk": "Nicht mehr fragen",
+      "installButton": "App installieren",
+      "iosTitle": "Cookpal auf iOS installieren",
+      "iosIntro": "iOS lässt Apps sich nicht selbst aus Safari installieren. Mit diesen zwei Schritten kommt Cookpal auf deinen Startbildschirm:",
+      "iosStep1": "Tippe in Safari auf die Teilen-Taste.",
+      "iosStep2": "Scrolle nach unten und tippe auf \"Zum Home-Bildschirm\"."
+    },
+    "update": {
+      "available": "Eine neue Version von Cookpal ist verfügbar.",
+      "reload": "Neu laden"
+    }
   }
 }

@@ -3,7 +3,8 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet} from 'react-native';
 import {Button, Dialog, Portal, Text} from 'react-native-paper';
 import AppPersistence from '../AppPersistence';
-import {Recipe, RecipeDiet} from '../dao/RestAPI';
+import {useUpdateRecipeMutation} from '../api/endpoints/recipes';
+import {Recipe, RecipeDiet} from '../api/types/recipes';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {createGlobalOverlay} from '../helper/globalOverlay';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
@@ -11,8 +12,8 @@ import {missingDetails} from '../helper/recipeCompleteness';
 import {withDiet, withSuitToggled} from '../helper/recipeEdits';
 import {RecipeSuit} from '../helper/recipeSuits';
 import {useDerivedDiet} from '../helper/useDerivedDiet';
-import {updateRecipe} from '../redux/features/recipesSlice';
-import {useAppDispatch} from '../redux/hooks';
+import {OfflineSaveHint} from '../offline/OfflineSaveHint';
+import {useIsOnline} from '../offline/useIsOnline';
 import {overlayStyles} from '../styles/CentralStyles';
 import {PlanningDetailsFields} from './PlanningDetailsFields';
 
@@ -37,10 +38,10 @@ export const askForPlanningDetails = (recipe: Recipe, options?: Options) => over
 // reroll saying the recipe is no meal of its own.
 export const PlanningDetailsPrompt = () => {
   const {t} = useTranslation('translation');
-  const dispatch = useAppDispatch();
+  const online = useIsOnline();
+  const [updateRecipe, {isLoading: saving}] = useUpdateRecipeMutation();
   const [recipe, setRecipe] = useState<Recipe>();
   const [insisted, setInsisted] = useState(false);
-  const [saving, setSaving] = useState(false);
   // A diet read from the ingredients is offered as an answer, not kept behind the cook's back;
   // once the cook answers themselves it is never read again, not even when they clear it
   const [dietDerived, setDietDerived] = useState(false);
@@ -82,14 +83,10 @@ export const PlanningDetailsPrompt = () => {
   };
 
   const save = () => {
-    setSaving(true);
-    dispatch(updateRecipe(recipe)).unwrap()
+    updateRecipe(recipe).unwrap()
         .then(() => SnackbarUtil.show({message: t('planningDetails.saved')}))
         .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}))
-        .finally(() => {
-          setSaving(false);
-          close();
-        });
+        .finally(close);
   };
 
   return (
@@ -107,11 +104,14 @@ export const PlanningDetailsPrompt = () => {
               setRecipe(withDiet(recipe, diet));
             }}
             onSuitToggled={(suit: RecipeSuit) => setRecipe(withSuitToggled(recipe, suit))} />
+          <OfflineSaveHint />
         </Dialog.Content>
         <Dialog.Actions style={overlayStyles.dialogActions}>
           {!insisted && <Button onPress={neverAgain}>{t('planningDetails.neverAgain')}</Button>}
           <Button onPress={close}>{t('planningDetails.later')}</Button>
-          <Button mode="contained" loading={saving} disabled={saving} onPress={save}>{t('common.save')}</Button>
+          <Button mode="contained" loading={saving} disabled={saving || !online} onPress={save}>
+            {t('common.save')}
+          </Button>
         </Dialog.Actions>
       </Dialog>
     </Portal>

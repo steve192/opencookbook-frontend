@@ -1,9 +1,8 @@
-import axios from 'axios';
-import * as Localization from 'expo-localization';
 import i18n from 'i18next';
 import {initReactI18next} from 'react-i18next';
 import de from './de.json';
 import en from './en.json';
+import {deviceLanguage} from './locale';
 
 export const resources = {
   en: {
@@ -14,15 +13,10 @@ export const resources = {
   },
 } as const;
 
-const locale = Localization.getLocales()[0]?.languageCode ?? 'en';
-
-console.debug('Detected locale', locale);
-
-// Sent on every request, logged in or not, so that the server can use the users language
-axios.defaults.headers.common['Accept-Language'] = locale;
+console.debug('Detected locale', deviceLanguage);
 
 i18n.use(initReactI18next).init({
-  lng: locale,
+  lng: deviceLanguage,
   interpolation: {
     escapeValue: false, // not needed for react as it escapes by default
   },

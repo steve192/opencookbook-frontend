@@ -5,18 +5,19 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Appbar, Divider, FAB, Menu, Surface} from 'react-native-paper';
 import AppPersistence from '../AppPersistence';
+import {useGetRecipeGroupsQuery, useOwnRecipes, useUpdateRecipeMutation} from '../api/endpoints/recipes';
+import {Household} from '../api/types/households';
 import {RecipeList} from '../components/RecipeList';
 import {Option, SelectionPopupModal} from '../components/SelectionPopupModal';
-import {Household, Recipe, RecipeGroup} from '../dao/RestAPI';
+import {Recipe, RecipeGroup} from '../api/types/recipes';
+import {errorMessageKey} from '../helper/apiErrorMessage';
+import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {findRecipeGroupByOption, moveRecipesToGroup, toRecipeGroupOptions} from '../helper/recipeGroups';
-import {useOnlineGuard} from '../helper/useOnlineGuard';
 import {VibrationUtils} from '../helper/VibrationUtil';
 import {setAppbarOptions} from '../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps, RecipeScreenNavigation} from '../navigation/NavigationRoutes';
-import {ownRecipes, updateRecipe} from '../redux/features/recipesSlice';
-import {useAppDispatch, useAppSelector} from '../redux/hooks';
+import {useIsOnline} from '../offline/useIsOnline';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
-import {HouseholdCookbookList} from './households/HouseholdCookbookList';
 import {useHouseholds} from './households/useHouseholds';
 
 
@@ -50,14 +51,11 @@ const RecipeListScreen = (props: Props) => {
     households.find((household) => household.id === shownHouseholdId) :
     undefined;
 
-  const dispatch = useAppDispatch();
-
-  const requireOnline = useOnlineGuard();
-
-
-  const allRecipeGroups = useAppSelector((state) => state.recipes.recipeGroups);
-  const allRecipes = useAppSelector((state) => ownRecipes(state.recipes.recipes));
-  const shownRecipeGroup = useAppSelector((state) => state.recipes.recipeGroups.find((recipeGroup) => recipeGroup.id === props.route.params?.shownRecipeGroupId));
+  const online = useIsOnline();
+  const [updateRecipe] = useUpdateRecipeMutation();
+  const allRecipeGroups = useGetRecipeGroupsQuery().data ?? [];
+  const allRecipes = useOwnRecipes().data ?? [];
+  const shownRecipeGroup = allRecipeGroups.find((recipeGroup) => recipeGroup.id === props.route.params?.shownRecipeGroupId);
 
   const [selectedRecipes, setSelectedRecipes] = useState(new Set<number>());
   const [multiSelectionModeActive, setMultiSelectionModeActive] = useState(false);
@@ -78,6 +76,7 @@ const RecipeListScreen = (props: Props) => {
             <Appbar.Action
               icon="group"
               color={theme.colors.onPrimary}
+              disabled={!online}
               onPress={() => setRecipeGroupSelectionOpened(true)} />
           ),
           leading: (
@@ -103,6 +102,7 @@ const RecipeListScreen = (props: Props) => {
             <Appbar.Action
               icon="pencil-outline"
               color={theme.colors.onPrimary}
+              disabled={!online}
               onPress={() => shownRecipeGroup.id && props.navigation.navigate('RecipeGroupEditScreen', {editing: true, recipeGroupId: shownRecipeGroup.id})} />
           ),
         });
@@ -122,7 +122,7 @@ const RecipeListScreen = (props: Props) => {
     adjustActionbar();
     return props.navigation.addListener('focus', adjustActionbar);
   }, [props.navigation, shownRecipeGroup, multiSelectionModeActive, selectedRecipes,
-    households, shownHousehold, shownHouseholdId]);
+    households, shownHousehold, shownHouseholdId, online]);
 
   // Memoize so RecipeList can React.memo its rows without busting on every parent
   // re-render (which the searchbar, multi-select state, etc. trigger).
@@ -148,9 +148,16 @@ const RecipeListScreen = (props: Props) => {
     const recipesToMove = allRecipes.filter((recipe) => recipe.id !== undefined && selectedRecipes.has(recipe.id));
     const targetGroup = findRecipeGroupByOption(allRecipeGroups, selectedOption);
 
-    moveRecipesToGroup(recipesToMove, targetGroup)
-        .forEach((movedRecipe) => dispatch(updateRecipe(movedRecipe)));
+    const movedRecipes = moveRecipesToGroup(recipesToMove, targetGroup);
+    Promise.all(movedRecipes.map((movedRecipe) => updateRecipe(movedRecipe).unwrap()))
+        .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
     clearMultiSelectionMode();
+  };
+
+  const toggleMultiSelectionMode = (firstSelectedRecipe: Recipe) => {
+    setMultiSelectionModeActive(!multiSelectionModeActive);
+    setSelectedRecipes(new Set([firstSelectedRecipe.id!]));
+    VibrationUtils.longPressFeedbackVibration();
   };
 
   const onRecipeSelected = (selectedRecipe: number) => {
@@ -166,12 +173,10 @@ const RecipeListScreen = (props: Props) => {
   return (
     <>
       <Surface testID="recipeListScreen" style={CentralStyles.screen}>
-        {shownHousehold ?
-          <HouseholdCookbookList
-            householdId={shownHousehold.id}
-            onRecipeClick={(recipe) => props.navigation.getParent()?.getParent()
-                ?.navigate('RecipeScreen', {recipeId: recipe.id})} /> :
         <RecipeList
+          // Another cookbook starts with an empty search.
+          key={shownHousehold?.id ?? 'own'}
+          householdId={shownHousehold?.id}
           // Route params coming from deep links are strings; from in-app
           // navigation they're numbers. Coerce once here.
           shownRecipeGroupId={(() => {
@@ -181,21 +186,17 @@ const RecipeListScreen = (props: Props) => {
           })()}
           onRecipeClick={openRecipe}
           onRecipeGroupClick={openRecipeGroup}
-          onMultiSelectionModeToggled={(firstSelectedRecipe) => {
-            setMultiSelectionModeActive(!multiSelectionModeActive);
-            const newSet = new Set<number>();
-            newSet.add(firstSelectedRecipe.id!);
-            setSelectedRecipes(newSet);
-            VibrationUtils.longPressFeedbackVibration();
-          }}
+          // Selecting is for moving recipes into your own groups.
+          onMultiSelectionModeToggled={shownHousehold ? undefined : toggleMultiSelectionMode}
           multiSelectionModeActive={multiSelectionModeActive}
           onRecipeSelected={onRecipeSelected}
-          selectedRecipes={selectedRecipes} />}
+          selectedRecipes={selectedRecipes} />
 
         <FAB.Group
           icon="plus"
           open={fabOpen}
-          visible={true}
+          // Everything it offers needs the server, and a FAB group cannot be disabled.
+          visible={online}
           onStateChange={(state) => setFabOpen(state.open)}
           fabStyle={{
             backgroundColor: theme.colors.primary,
@@ -206,43 +207,23 @@ const RecipeListScreen = (props: Props) => {
               size: 'medium',
               icon: 'chef-hat',
               label: t('navigation.suggestion'),
-              onPress: () => {
-                if (!requireOnline()) {
-                  return;
-                }
-                props.navigation.navigate('RecipeSuggestionScreen');
-              },
+              onPress: () => props.navigation.navigate('RecipeSuggestionScreen'),
             },
             {
               size: 'medium',
               icon: 'plus',
               label: t('screens.overview.addRecipe'),
-              onPress: () => {
-                if (!requireOnline()) {
-                  return;
-                }
-                props.navigation.navigate('RecipeWizardScreen', {});
-              },
+              onPress: () => props.navigation.navigate('RecipeWizardScreen', {}),
             },
             {
               icon: 'group',
               label: t('screens.overview.addRecipeGroup'),
-              onPress: () => {
-                if (!requireOnline()) {
-                  return;
-                }
-                props.navigation.navigate('RecipeGroupEditScreen', {editing: false});
-              },
+              onPress: () => props.navigation.navigate('RecipeGroupEditScreen', {editing: false}),
             },
             {
               icon: 'import',
               label: t('screens.overview.importRecipe'),
-              onPress: () => {
-                if (!requireOnline()) {
-                  return;
-                }
-                props.navigation.navigate('ImportScreen', {});
-              },
+              onPress: () => props.navigation.navigate('ImportScreen', {}),
             },
           ]}
         />

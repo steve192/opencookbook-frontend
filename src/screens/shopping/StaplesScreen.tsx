@@ -1,45 +1,36 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet} from 'react-native';
 import {List, Surface, Text} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import RestAPI, {Staple} from '../../dao/RestAPI';
+import {useForgetStapleMutation, useGetStaplesQuery} from '../../api/endpoints/shopping';
+import {Staple} from '../../api/types/shopping';
+import {actionsSide} from '../../components/listSides';
+import {QueryFallback} from '../../components/QueryFallback';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
-import {useOnlineGuard} from '../../helper/useOnlineGuard';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
+import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
-import {actionsSide} from '../../components/listSides';
-import {LoadingScreen} from '../../components/LoadingScreen';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'StaplesScreen'>;
 
 // What the imports learned you keep at home, each of which can be offered ticked again.
 export const StaplesScreen = (_props: Props) => {
   const {t} = useTranslation('translation');
-  const requireOnline = useOnlineGuard();
+  const online = useIsOnline();
   const insets = useSafeAreaInsets();
-  const [staples, setStaples] = useState<Staple[]>();
-
-  useEffect(() => {
-    RestAPI.getStaples().then(setStaples).catch((error) => {
-      setStaples([]);
-      SnackbarUtil.show({message: t(errorMessageKey(error))});
-    });
-  }, []);
+  const {data: staples, error: loadError, refetch} = useGetStaplesQuery();
+  const [forgetStaple] = useForgetStapleMutation();
 
   const forget = (staple: Staple) => {
-    if (!requireOnline()) {
-      return;
-    }
-    RestAPI.forgetStaple(staple.id)
-        .then(() => setStaples((current) => without(current, staple)))
+    forgetStaple(staple.id).unwrap()
         .catch((error) => SnackbarUtil.show({message: t(errorMessageKey(error))}));
   };
 
   if (!staples) {
-    return <LoadingScreen />;
+    return <QueryFallback error={loadError} onRetry={refetch} />;
   }
 
   return (
@@ -53,16 +44,14 @@ export const StaplesScreen = (_props: Props) => {
             key={staple.id}
             title={staple.name}
             right={actionsSide([
-              {icon: 'close', label: t('screens.shopping.forgetStaple'), onPress: () => forget(staple)},
+              {icon: 'close', label: t('screens.shopping.forgetStaple'), onPress: () => forget(staple),
+                disabled: !online},
             ])} />
         ))}
       </ScrollView>
     </Surface>
   );
 };
-
-const without = (staples: Staple[] | undefined, forgotten: Staple) =>
-  staples?.filter((staple) => staple.id !== forgotten.id);
 
 const styles = StyleSheet.create({
   intro: {margin: 16},

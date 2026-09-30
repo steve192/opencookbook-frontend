@@ -1,16 +1,19 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, View} from 'react-native';
-import {ActivityIndicator, Button, Card, Chip, Surface, Text} from 'react-native-paper';
-import RestAPI, {Household} from '../../dao/RestAPI';
+import {Button, Card, Chip, Surface, Text} from 'react-native-paper';
+import {useGetUserInfoQuery} from '../../api/endpoints/account';
+import {useCreateHouseholdMutation, useGetHouseholdsQuery} from '../../api/endpoints/households';
+import {Household} from '../../api/types/households';
+import {QueryFallback} from '../../components/QueryFallback';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {HOUSEHOLD_NAME_MAX_LENGTH} from '../../helper/nameLimits';
 import {TextPromptUtil} from '../../helper/TextPrompt';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
+import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
-import {useHouseholds} from './useHouseholds';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'HouseholdListScreen'>;
 
@@ -22,27 +25,23 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'HouseholdListScreen'>;
  */
 export const HouseholdListScreen = (props: Props) => {
   const {t} = useTranslation('translation');
-  const {households, loading} = useHouseholds();
-  const [creating, setCreating] = useState(false);
+  const online = useIsOnline();
+  const {data: households, error: loadError, refetch} = useGetHouseholdsQuery();
+  const {data: userInfo} = useGetUserInfoQuery();
+  const [createHousehold, {isLoading: creating}] = useCreateHouseholdMutation();
 
   const createNamed = useCallback(async (name: string) => {
-    setCreating(true);
     try {
-      const household = await RestAPI.createHousehold(name, true);
+      const household = await createHousehold({name, shareRecipes: true}).unwrap();
       props.navigation.navigate('HouseholdScreen', {householdId: household.id});
     } catch (error) {
       SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.households.saveFailed'))});
-    } finally {
-      setCreating(false);
     }
   }, [props.navigation, t]);
 
-  const create = useCallback(async () => {
+  const create = useCallback(() => {
     // Only suggested when there is a display name to build it from.
-    const chosenName = await RestAPI.getUserInfo()
-        .then((userInfo) => userInfo.displayName?.trim())
-        .catch(() => undefined);
-
+    const chosenName = userInfo?.displayName?.trim();
     TextPromptUtil.show({
       title: t('screens.households.createTitle'),
       message: t('screens.households.createMessage'),
@@ -53,14 +52,10 @@ export const HouseholdListScreen = (props: Props) => {
       cancel: t('common.cancel'),
       onConfirm: createNamed,
     });
-  }, [createNamed, t]);
+  }, [createNamed, userInfo, t]);
 
-  if (loading) {
-    return (
-      <Surface style={CentralStyles.screen}>
-        <ActivityIndicator style={CentralStyles.elementSpacing} />
-      </Surface>
-    );
+  if (!households) {
+    return <QueryFallback error={loadError} onRetry={refetch} />;
   }
 
   return (
@@ -79,7 +74,7 @@ export const HouseholdListScreen = (props: Props) => {
         <Button
           mode="contained"
           loading={creating}
-          disabled={creating}
+          disabled={!online || creating}
           style={CentralStyles.elementSpacing}
           onPress={create}>
           {t('screens.households.create')}

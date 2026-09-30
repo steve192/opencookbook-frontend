@@ -2,7 +2,7 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {SegmentedButtons} from 'react-native-paper';
-import {Recipe, RecipeDiet} from '../dao/RestAPI';
+import {Recipe, RecipeDiet} from '../api/types/recipes';
 import {RECIPE_DIETS, dietLabel} from '../helper/recipeDiet';
 import {RECIPE_SUITS, RecipeSuit, isSuited, suitLabel} from '../helper/recipeSuits';
 import {ChoiceChips} from './ChoiceChips';

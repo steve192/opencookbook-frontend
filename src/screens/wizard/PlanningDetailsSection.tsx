@@ -3,7 +3,7 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {List} from 'react-native-paper';
 import {PlanningDetailsFields} from '../../components/PlanningDetailsFields';
-import {Recipe, RecipeDiet} from '../../dao/RestAPI';
+import {Recipe, RecipeDiet} from '../../api/types/recipes';
 import {RecipeSuit, planningSummary} from '../../helper/recipeSuits';
 
 interface Props {

@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {NETWORK_UNREACHABLE, toApiError} from '../dao/ApiError';
+import {NETWORK_UNREACHABLE, toApiError} from '../api/ApiError';
 import {errorMessageKey} from './apiErrorMessage';
 
 const answered = (status: number, data?: unknown) => ({response: {status, data}});
@@ -14,14 +14,23 @@ describe('reading what a failed request means', () => {
     expect(toApiError(new Error('Network Error')).code).toBe(NETWORK_UNREACHABLE);
   });
 
-  // A proxy, or a server older than this app, answers without a code of ours.
   it('falls back to the status when the answer carries no code', () => {
     expect(toApiError(answered(404)).code).toBe('RESOURCE_NOT_FOUND');
-    expect(toApiError(answered(503, '<html>gateway</html>')).code).toBe('INTERNAL_ERROR');
+    expect(toApiError(answered(500, '<html>error</html>')).code).toBe('INTERNAL_ERROR');
+  });
+
+  it('takes a gateway error of a proxy for an unreachable server', () => {
+    expect(toApiError(answered(502, '<html>bad gateway</html>'))).toEqual({code: NETWORK_UNREACHABLE, retryable: true});
+    expect(toApiError(answered(504)).code).toBe(NETWORK_UNREACHABLE);
+  });
+
+  it('keeps a gateway status the server named itself', () => {
+    expect(toApiError(answered(503, {code: 'SCAN_UNAVAILABLE', retryable: true})))
+        .toEqual({code: 'SCAN_UNAVAILABLE', status: 503, retryable: true});
   });
 
   it('treats a server side failure as worth retrying and a rejected request as not', () => {
-    expect(toApiError(answered(503)).retryable).toBe(true);
+    expect(toApiError(answered(500)).retryable).toBe(true);
     expect(toApiError(answered(400)).retryable).toBe(false);
   });
 });

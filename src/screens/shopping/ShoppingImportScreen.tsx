@@ -8,7 +8,9 @@ import {ScreenFooter} from '../../components/ScreenFooter';
 import {SectionTitle} from '../../components/SectionTitle';
 import {ShoppingListMenu} from '../../components/shopping/ShoppingListMenu';
 import {LoadingScreen} from '../../components/LoadingScreen';
-import RestAPI, {PreviewMeal} from '../../dao/RestAPI';
+import {
+  useCreateBringExportOfLinesMutation, useGetImportPreviewQuery, useImportToShoppingListMutation,
+} from '../../api/endpoints/shopping';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {openBringImport} from '../../helper/bringExport';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
@@ -23,6 +25,7 @@ import {useShoppingProvider} from '../../helper/shopping/useShoppingProvider';
 import {useShoppingVocabulary} from '../../helper/shopping/useShoppingVocabulary';
 import {formatDayAndMonth, toDayKey} from '../../helper/weekplan';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
+import {useIsOnline} from '../../offline/useIsOnline';
 import {shoppingListChosen} from '../../redux/features/shoppingSlice';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles from '../../styles/CentralStyles';
@@ -41,6 +44,7 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
   const lists = useAppSelector((state) => state.shopping.lists);
   const sync = useAppSelector((state) => state.shopping.sync);
   const {unitWords} = useShoppingVocabulary();
+  const online = useIsOnline();
 
   const today = useMemo(() => toDayKey(new XDate().clearTime()), []);
   const householdId = target.kind === 'week' ? target.householdId : undefined;
@@ -52,20 +56,24 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
   const [targetListId, setTargetListId] = useState<number>();
   const [showEarlier, setShowEarlier] = useState(false);
   const [sending, setSending] = useState(false);
+  const preview = useGetImportPreviewQuery(target);
+  const [createBringExportOfLines] = useCreateBringExportOfLinesMutation();
+  const [importToShoppingList] = useImportToShoppingListMutation();
 
   useEffect(() => {
-    const preview: Promise<PreviewMeal[]> = target.kind === 'week' ?
-      RestAPI.getWeekImportPreview(target.from, target.to, target.householdId) :
-      RestAPI.getRecipeImportPreview(target.recipeId).then((meal) => [meal]);
-    preview
-        .then((meals) => setChoices(initialChoices(meals, today, {
-          onlyFromToday, servings: target.kind === 'recipe' ? target.servings : undefined,
-        })))
-        .catch((error) => {
-          SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.shopping.import.loadFailed'))});
-          navigation.goBack();
-        });
-  }, []);
+    if (preview.data && !choices) {
+      setChoices(initialChoices(preview.data, today, {
+        onlyFromToday, servings: target.kind === 'recipe' ? target.servings : undefined,
+      }));
+    }
+  }, [preview.data]);
+
+  useEffect(() => {
+    if (preview.error) {
+      SnackbarUtil.show({message: t(errorMessageKey(preview.error, 'screens.shopping.import.loadFailed'))});
+      navigation.goBack();
+    }
+  }, [preview.error]);
 
   useEffect(() => {
     if (provider === 'COOKPAL') {
@@ -110,10 +118,10 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
     try {
       if (provider === 'BRING') {
         const servings = choices?.find((choice) => choice.included && isShoppedFor(choice.meal))?.servings ?? 1;
-        await openBringImport(await RestAPI.createBringExportOfLines(bringTitle(), servings,
-            tickedLines.map(bringLine), request.shown));
+        await openBringImport(await createBringExportOfLines({title: bringTitle(), servings,
+          lines: tickedLines.map(bringLine), shown: request.shown}).unwrap());
       } else if (targetList) {
-        await RestAPI.importToShoppingList(targetList, request.lines, request.shown);
+        await importToShoppingList({list: targetList, lines: request.lines, shown: request.shown}).unwrap();
         dispatch(shoppingListChosen(targetList.id));
         void dispatch(syncShoppingList(targetList.id));
         SnackbarUtil.show({message: t('screens.shopping.import.added',
@@ -176,7 +184,7 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
           mode="contained"
           icon={provider === 'BRING' ? 'send' : 'cart-plus'}
           loading={sending}
-          disabled={sending || tickedLines.length === 0 || (provider === 'COOKPAL' && !targetList)}
+          disabled={!online || sending || tickedLines.length === 0 || (provider === 'COOKPAL' && !targetList)}
           onPress={send}>
           {provider === 'BRING' ?
             t('screens.shopping.import.sendToBring', {count: tickedLines.length}) :

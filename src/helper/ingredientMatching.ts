@@ -1,4 +1,4 @@
-import {IngredientUse} from '../dao/RestAPI';
+import {IngredientUse} from '../api/types/recipes';
 
 /** A stretch of the step text that named an ingredient. */
 export interface TextRange {

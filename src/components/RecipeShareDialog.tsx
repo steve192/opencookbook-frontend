@@ -1,14 +1,14 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Button, Dialog, Portal, Text} from 'react-native-paper';
-import RestAPI, {RecipeShare} from '../dao/RestAPI';
+import {useGetSharesOfRecipeQuery, useRevokeShareMutation, useShareRecipeMutation} from '../api/endpoints/sharing';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {PromptUtil} from '../helper/Prompt';
 import {formatShareExpiry} from '../helper/recipeSharing';
 import {shareLink} from '../helper/shareLink';
-import {useOnlineGuard} from '../helper/useOnlineGuard';
+import {useIsOnline} from '../offline/useIsOnline';
 import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
 
 interface Props {
@@ -31,40 +31,23 @@ interface Props {
 export const RecipeShareDialog = (props: Props) => {
   const {t, i18n} = useTranslation('translation');
   const theme = useAppTheme();
-  const requireOnline = useOnlineGuard();
-
-  const [share, setShare] = useState<RecipeShare | undefined>(undefined);
-  const [loading, setLoading] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const online = useIsOnline();
+  // Not knowing whether a recipe is shared is not worth an error dialog on top of a dialog; the
+  // buttons below still work, and sharing again returns the existing link.
+  const shares = useGetSharesOfRecipeQuery(props.recipeId, {skip: !props.visible});
+  const share = shares.data?.[0];
+  const loading = shares.isLoading;
+  const [createShare, sharing] = useShareRecipeMutation();
+  const [revokeShare, revoking] = useRevokeShareMutation();
+  const busy = sharing.isLoading || revoking.isLoading;
   // Reported inside the dialog rather than through a snackbar: everything in a Portal renders
   // above the global snackbar, so a message raised while this is open would never be seen.
   const [failure, setFailure] = useState<string>();
 
-  const loadShare = useCallback(() => {
-    if (!props.visible) {
-      return;
-    }
-    setLoading(true);
-    setFailure(undefined);
-    RestAPI.getSharesOfRecipe(props.recipeId)
-        .then((shares) => setShare(shares[0]))
-        // Not knowing whether a recipe is shared is not worth an error dialog on top of a dialog;
-        // the buttons below still work, and sharing again returns the existing link.
-        .catch(() => setShare(undefined))
-        .finally(() => setLoading(false));
-  }, [props.visible, props.recipeId]);
-
-  useEffect(loadShare, [loadShare]);
-
   const shareRecipe = async () => {
-    if (!requireOnline()) {
-      return;
-    }
-    setBusy(true);
     setFailure(undefined);
     try {
-      const created = share ?? await RestAPI.shareRecipe(props.recipeId);
-      setShare(created);
+      const created = share ?? await createShare(props.recipeId).unwrap();
       const outcome = await shareLink(props.recipeTitle, created.shareUrl);
 
       // Out of the way first, then say what happened - a snackbar underneath this dialog is
@@ -75,13 +58,11 @@ export const RecipeShareDialog = (props: Props) => {
       }
     } catch (e) {
       setFailure(t(errorMessageKey(e, 'screens.recipe.sharing.shareFailed')));
-    } finally {
-      setBusy(false);
     }
   };
 
   const stopSharing = () => {
-    if (!share || !requireOnline()) {
+    if (!share) {
       return;
     }
     PromptUtil.show({
@@ -90,17 +71,13 @@ export const RecipeShareDialog = (props: Props) => {
       destructive: true,
       confirm: t('screens.recipe.sharing.stopSharingButton'),
       onConfirm: async () => {
-        setBusy(true);
         setFailure(undefined);
         try {
-          await RestAPI.revokeShare(share.shareId);
-          setShare(undefined);
+          await revokeShare(share.shareId).unwrap();
           props.onDismiss();
           SnackbarUtil.show({message: t('screens.recipe.sharing.stoppedSharing')});
         } catch (e) {
           setFailure(t(errorMessageKey(e, 'screens.recipe.sharing.shareFailed')));
-        } finally {
-          setBusy(false);
         }
       },
       cancel: t('common.cancel'),
@@ -148,7 +125,7 @@ export const RecipeShareDialog = (props: Props) => {
             <Button
               testID='recipe-stop-sharing-button'
               icon="link-off"
-              disabled={busy}
+              disabled={busy || !online}
               onPress={stopSharing}>
               {t('screens.recipe.sharing.stopSharingButton')}
             </Button>
@@ -159,7 +136,7 @@ export const RecipeShareDialog = (props: Props) => {
             mode="contained"
             icon="share-variant"
             loading={busy}
-            disabled={busy || loading}
+            disabled={busy || loading || !online}
             onPress={shareRecipe}>
             {share ? t('screens.recipe.sharing.shareAgainButton') : t('screens.recipe.sharing.shareButton')}
           </Button>

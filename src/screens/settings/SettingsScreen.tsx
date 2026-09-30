@@ -6,11 +6,14 @@ import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Avatar, Text} from 'react-native-paper';
-import {useSelector} from 'react-redux';
-import {useUserInfo} from '../../helper/useUserInfo';
+import {useGetUserInfoQuery} from '../../api/endpoints/account';
+import {useInstanceFeatures} from '../../helper/useInstanceFeatures';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps} from '../../navigation/NavigationRoutes';
-import {RootState} from '../../redux/store';
+import {OfflineDataCard} from '../../offline/OfflineDataCard';
+import {PwaIosInstructionsDialog} from '../../pwa/PwaIosInstructionsDialog';
+import {useInstallApp} from '../../pwa/useInstallApp';
+import {useAppSelector} from '../../redux/hooks';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {SettingsEntry} from './SettingsEntry';
 import {SettingsHint, SettingsPage} from './SettingsPage';
@@ -26,13 +29,12 @@ type SettingsRoute =
   'ScanningSettingsScreen' | 'AppearanceSettingsScreen' | 'ApiKeysScreen' | 'OpenSourceLicensesScreen';
 
 export const SettingsScreen = (props: Props) => {
-  const backendUrl = useSelector((state: RootState) => state.settings.backendUrl);
-  const ocrImportEnabled = useSelector((state: RootState) => state.settings.ocrImportEnabled);
-  const householdsEnabled = useSelector((state: RootState) => state.settings.householdsEnabled);
-  const apiKeysEnabled = useSelector((state: RootState) => state.settings.apiKeysEnabled);
+  const backendUrl = useAppSelector((state) => state.settings.backendUrl);
+  const {ocrImportEnabled, householdsEnabled, apiKeysEnabled} = useInstanceFeatures();
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
-  const userInfo = useUserInfo();
+  const {data: userInfo} = useGetUserInfoQuery();
+  const installApp = useInstallApp();
 
   useEffect(() => {
     const applyHeaderOptions = () => setAppbarOptions(props.navigation.getParent(), {
@@ -58,6 +60,7 @@ export const SettingsScreen = (props: Props) => {
         <Text style={styles.bold}>{backendUrl}</Text>
         {userInfo?.email ? <Text>{userInfo.email}</Text> : null}
       </View>
+      <OfflineDataCard />
       <SettingsEntry
         title={t('screens.settings.account')}
         subtitle={t('screens.settings.accountSubtitle')}
@@ -96,6 +99,12 @@ export const SettingsScreen = (props: Props) => {
           subtitle={t('screens.settings.apiKeysSubtitle')}
           icon="key-variant"
           onPress={open('ApiKeysScreen')} />}
+      {installApp.prompt.canInstall &&
+        <SettingsEntry
+          title={t('pwa.install.installButton')}
+          subtitle={t('pwa.install.body')}
+          icon="download"
+          onPress={installApp.install} />}
       <SettingsEntry
         title={t('screens.licenses.title')}
         subtitle={t('screens.licenses.subtitle')}
@@ -104,6 +113,7 @@ export const SettingsScreen = (props: Props) => {
       <View style={styles.header}>
         <SettingsHint>{t('screens.settings.appVersion', {version: Constants.expoConfig?.version})}</SettingsHint>
       </View>
+      <PwaIosInstructionsDialog visible={installApp.iosStepsShown} onDismiss={installApp.hideIosSteps} />
     </SettingsPage>
   );
 };

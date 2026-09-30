@@ -1,4 +1,4 @@
-import {ApiScope} from '../dao/RestAPI';
+import {ApiScope} from '../api/types/account';
 
 interface ScopeFacts {
   labelKey: `screens.apiKeys.scopes.${'shoppingRead' | 'shoppingWrite'}`;

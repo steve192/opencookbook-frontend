@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {NutritionLine, NutritionSummary, Nutrients} from '../dao/RestAPI';
+import {NutritionLine, NutritionSummary, Nutrients} from '../api/types/nutrition';
 import de from '../i18n/de.json';
 import en from '../i18n/en.json';
 import {translationAt} from '../i18n/translationAt';
