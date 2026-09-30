@@ -1,10 +1,10 @@
-import {NavigationProp, ParamListBase} from '@react-navigation/native';
-import {useCallback, useEffect, useRef, useState} from 'react';
-import {BackHandler, Keyboard} from 'react-native';
+import {useCallback, useRef, useState} from 'react';
+import {Keyboard} from 'react-native';
 import {FieldHandle} from './QuickAddField';
+import {LeavableNavigation, useEndOnLeave} from './useEndOnLeave';
 
 // Also ends on system back (whose first press only hides the keyboard) and when leaving the screen.
-export const useQuickAdd = (navigation: Pick<NavigationProp<ParamListBase>, 'addListener'>) => {
+export const useQuickAdd = (navigation: LeavableNavigation) => {
   const [adding, setAdding] = useState(false);
   const [typed, setTyped] = useState('');
   const fieldRef = useRef<FieldHandle>(null);
@@ -24,20 +24,7 @@ export const useQuickAdd = (navigation: Pick<NavigationProp<ParamListBase>, 'add
     Keyboard.dismiss();
   }, []);
 
-  useEffect(() => {
-    if (!adding) {
-      return undefined;
-    }
-    const back = BackHandler.addEventListener('hardwareBackPress', () => {
-      stop();
-      return true;
-    });
-    const leaving = navigation.addListener('blur', stop);
-    return () => {
-      back.remove();
-      leaving();
-    };
-  }, [adding, navigation, stop]);
+  useEndOnLeave(adding, navigation, stop);
 
   return {adding, typed, setTyped, fieldRef, start, next, stop};
 };

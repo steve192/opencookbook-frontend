@@ -1,6 +1,16 @@
 import {describe, expect, it} from 'vitest';
 import {ShoppingItem, ShoppingOp} from '../../dao/RestAPI';
-import {activeItems, ItemMap, recentlyBought, timedPending, visibleItems, withChanges, withOp} from './listItems';
+import {
+  activeItems,
+  copyOf,
+  ItemMap,
+  MAX_SOURCES_PER_ADD,
+  recentlyBought,
+  timedPending,
+  visibleItems,
+  withChanges,
+  withOp,
+} from './listItems';
 
 const NOW = '2026-10-05T10:00:00Z';
 
@@ -82,6 +92,31 @@ describe('listItems', () => {
     expect(names(items)).toEqual(['Milch', 'Brot']);
     expect(names(withOp(items, add('x', 'milch', '1 l'), NOW))).toEqual(['Brot', 'Milch']);
     expect(names(withOp(items, {opId: '1', type: 'RESTORE', itemId: 'c'}, NOW))).toEqual(['Milch', 'Brot', 'Eier']);
+  });
+
+  it('shows prioritized items first and forgets the priority once bought', () => {
+    const items = listOf(item('a', 'Milch', {addedAt: '2026-10-01T00:00:00Z'}),
+        item('b', 'Brot', {addedAt: '2026-10-02T00:00:00Z'}));
+    const prioritized = withOp(items, {opId: '1', type: 'UPDATE', itemId: 'b', prioritized: true}, NOW);
+    expect(activeItems(prioritized).map((each) => each.name)).toEqual(['Brot', 'Milch']);
+
+    const bought = withOp(prioritized, {opId: '2', type: 'BUY', itemId: 'b'}, NOW);
+    expect(bought.b.prioritized).toBe(false);
+  });
+
+  it('keeps a priority when more of a name is asked for, and takes one along', () => {
+    const items = listOf(item('a', 'Milch', {prioritized: true}));
+    expect(withOp(items, add('b', 'Milch'), NOW).a.prioritized).toBe(true);
+    const urgent: ShoppingOp = {opId: '1', type: 'ADD', itemId: 'b', name: 'Milch', prioritized: true};
+    expect(withOp(listOf(item('a', 'Milch')), urgent, NOW).a.prioritized).toBe(true);
+  });
+
+  it('copies an item for another list with as many meals as an add carries', () => {
+    const sources = Array.from({length: MAX_SOURCES_PER_ADD + 2}, (_, index) => ({title: `Meal ${index}`, planDate: null}));
+    const copy = copyOf(item('a', 'Mehl', {spec: '1 kg', aisle: 'BAKING', prioritized: true, sources}), 'b');
+
+    expect(copy).toMatchObject({type: 'ADD', itemId: 'b', name: 'Mehl', spec: '1 kg', aisle: 'BAKING', prioritized: true});
+    expect(copy.sources).toEqual(sources.slice(2));
   });
 
   it('orders changes made offline by when they were made', () => {

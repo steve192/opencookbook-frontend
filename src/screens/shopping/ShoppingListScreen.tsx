@@ -13,14 +13,20 @@ import {ShoppingItem, ShoppingList, ShoppingTile} from '../../dao/RestAPI';
 import {newClientId} from '../../helper/clientId';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {activeItems, recentlyBought, visibleItems} from '../../helper/shopping/listItems';
-import {changeShoppingList, loadShoppingLists, ShoppingChange, syncShoppingList} from '../../helper/shopping/shoppingSync';
+import {
+  changeShoppingList,
+  loadShoppingLists,
+  moveShoppingItems,
+  ShoppingChange,
+  syncShoppingList,
+} from '../../helper/shopping/shoppingSync';
 import {boughtKey, listKey, sheetKey, sourceKeyOf} from '../../helper/shopping/tileKeys';
 import {TILE_AREA_PADDING} from '../../helper/shopping/tileLayout';
 import {typedEntry} from '../../helper/shopping/tiles';
 import {useListName} from '../../helper/shopping/useListName';
 import {useShoppingVocabulary} from '../../helper/shopping/useShoppingVocabulary';
 import {useStableCallback} from '../../helper/useStableCallback';
-import {setAppbarOptions} from '../../navigation/appbarOptions';
+import {AppbarOptions, setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps} from '../../navigation/NavigationRoutes';
 import {shoppingListChosen} from '../../redux/features/shoppingSlice';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
@@ -31,6 +37,7 @@ import {QuickAddSheet} from './QuickAddSheet';
 import {ItemEdit, ShoppingItemDialog} from './ShoppingItemDialog';
 import {TILE_LAYOUT, TileGrid} from './TileGrid';
 import {useFollowNewest} from './useFollowNewest';
+import {useItemSelection} from './useItemSelection';
 import {useQuickAdd} from './useQuickAdd';
 
 type Props =
@@ -53,10 +60,12 @@ export const ShoppingListScreen = (props: Props) => {
   const [openItem, setOpenItem] = useState<ShoppingItem>();
   const [refreshing, setRefreshing] = useState(false);
   const quickAdd = useQuickAdd(props.navigation);
+  const selection = useItemSelection(props.navigation);
   const follow = useFollowNewest(quickAdd.adding, LIST_END_PADDING);
   const flights = useTileFlights();
 
   const activeList = lists.find((list) => list.id === activeListId);
+  const otherLists = lists.filter((list) => list.id !== activeListId);
   const nameOf = useListName();
   const items = useMemo(
       () => visibleItems(held), [held]);
@@ -80,31 +89,68 @@ export const ShoppingListScreen = (props: Props) => {
 
   const manageLists = () => props.navigation.navigate('ShoppingListsScreen');
 
+  const startMoving = () => {
+    quickAdd.stop();
+    selection.start();
+  };
+
+  const moveTo = (target: ShoppingList) => {
+    const chosen = active.filter((item) => selection.selected.has(item.id));
+    if (activeListId !== null && chosen.length > 0) {
+      dispatch(moveShoppingItems(activeListId, target.id, chosen));
+      SnackbarUtil.show({message: t('screens.shopping.itemsMoved', {list: nameOf(target)})});
+    }
+    selection.stop();
+  };
+
+  const browsingHeader = (): AppbarOptions => ({
+    title: activeList ? nameOf(activeList) : t('screens.shopping.screenTitle'),
+    leading: undefined,
+    actions: (
+      <ShoppingListMenu
+        lists={lists}
+        selectedId={activeListId}
+        renderAnchor={(open) => <Appbar.Action icon="format-list-bulleted" color={theme.colors.onPrimary}
+          accessibilityLabel={t('screens.shopping.switchList')} onPress={open} />}
+        onChoose={chooseList}
+        extraItems={[
+          ...(otherLists.length > 0 && active.length > 0 ?
+            [{title: t('screens.shopping.moveItems'), icon: MOVE_ICON, onPress: startMoving}] : []),
+          {title: t('screens.shopping.manageLists'), icon: 'cog-outline', onPress: manageLists},
+        ]} />
+    ),
+  });
+
+  const selectingHeader = (): AppbarOptions => ({
+    title: `${selection.selected.size} ${t('common.selected')}`,
+    leading: <Appbar.Action icon="close" color={theme.colors.onPrimary} accessibilityLabel={t('common.cancel')}
+      onPress={selection.stop} />,
+    actions: (
+      <ShoppingListMenu
+        lists={otherLists}
+        renderAnchor={(open) => <Appbar.Action icon={MOVE_ICON} color={theme.colors.onPrimary}
+          disabled={selection.selected.size === 0} accessibilityLabel={t('screens.shopping.moveTo')}
+          onPress={open} />}
+        onChoose={moveTo} />
+    ),
+  });
+
   useEffect(() => {
     const applyHeaderOptions = () => {
       if (!props.navigation.isFocused()) {
         return;
       }
-      setAppbarOptions(props.navigation.getParent(), {
-        title: activeList ? nameOf(activeList) : t('screens.shopping.screenTitle'),
-        leading: undefined,
-        actions: (
-          <ShoppingListMenu
-            lists={lists}
-            selectedId={activeListId}
-            renderAnchor={(open) => <Appbar.Action icon="format-list-bulleted" color={theme.colors.onPrimary}
-              accessibilityLabel={t('screens.shopping.switchList')} onPress={open} />}
-            onChoose={chooseList}
-            extraItems={[{title: t('screens.shopping.manageLists'), icon: 'cog-outline', onPress: manageLists}]} />
-        ),
-      });
+      setAppbarOptions(props.navigation.getParent(), selection.selecting ? selectingHeader() : browsingHeader());
     };
     applyHeaderOptions();
     return props.navigation.addListener('focus', () => {
       applyHeaderOptions();
       void refresh();
     });
-  }, [props.navigation, lists, activeList, activeListId, theme, refresh]);
+  }, [props.navigation, lists, activeList, activeListId, active, theme, refresh, selection.selecting,
+    selection.selected]);
+
+  useEffect(() => selection.stop(), [activeListId, selection.stop]);
 
   const change = (op: ShoppingChange) => activeListId !== null && dispatch(changeShoppingList(activeListId, op));
 
@@ -143,11 +189,13 @@ export const ShoppingListScreen = (props: Props) => {
     flights.launch(boughtKey(item.name), listKey(item.name), lookOf(item),
         () => change({type: 'RESTORE', itemId: item.id, spec}));
 
-  const onTick = useStableCallback(tick);
+  const onPress = useStableCallback((item: ShoppingItem) => selection.selecting ? selection.toggle(item.id) : tick(item));
+  const onLongPress = useStableCallback((item: ShoppingItem) =>
+    selection.selecting ? selection.toggle(item.id) : setOpenItem(item));
   const onRestore = useStableCallback((item: ShoppingItem) => restore(item));
 
   const save = (item: ShoppingItem, changes: ItemEdit) => {
-    if (changes.name !== undefined || changes.spec !== undefined || changes.aisle !== undefined) {
+    if (Object.values(changes).some((value) => value !== undefined)) {
       change({type: 'UPDATE', itemId: item.id, ...changes});
     }
   };
@@ -172,10 +220,11 @@ export const ShoppingListScreen = (props: Props) => {
           <TileGrid byAisle={!quickAdd.adding} animated items={active} keyOf={(item) => item.id}
             still={(item) => flights.isMoving(listKey(item.name))}
             renderTile={(item) => (
-              <ItemTile item={item} hidden={flights.isMoving(listKey(item.name))}
-                viewRef={flights.register(listKey(item.name))} onPress={onTick} onLongPress={setOpenItem} />
+              <ItemTile item={item} selected={selection.selected.has(item.id)}
+                hidden={flights.isMoving(listKey(item.name))}
+                viewRef={flights.register(listKey(item.name))} onPress={onPress} onLongPress={onLongPress} />
             )} />
-          {!quickAdd.adding &&
+          {!quickAdd.adding && !selection.selecting &&
             <Animated.View layout={TILE_LAYOUT} entering={FadeIn} exiting={FadeOut}>
               {bought.length > 0 &&
                 <Text variant="titleSmall" style={styles.recent}>{t('screens.shopping.recentlyBought')}</Text>}
@@ -195,8 +244,9 @@ export const ShoppingListScreen = (props: Props) => {
       {quickAdd.adding &&
         <QuickAddSheet typed={quickAdd.typed} tiles={tiles} unitWords={unitWords} active={active} bought={bought}
           onAdd={add} onRestore={restoreFrom} registerSource={(key) => flights.register(sheetKey(key))} />}
-      <QuickAddField inputRef={quickAdd.fieldRef} typed={quickAdd.typed} onType={quickAdd.setTyped}
-        onFocus={quickAdd.start} onSubmit={addTyped} adding={quickAdd.adding} onDone={quickAdd.stop} />
+      {!selection.selecting &&
+        <QuickAddField inputRef={quickAdd.fieldRef} typed={quickAdd.typed} onType={quickAdd.setTyped}
+          onFocus={quickAdd.start} onSubmit={addTyped} adding={quickAdd.adding} onDone={quickAdd.stop} />}
       {flights.copies}
       {openItem &&
         <ShoppingItemDialog
@@ -212,6 +262,7 @@ const lookOf = (item: ShoppingItem): TileLook =>
   ({name: item.name, spec: item.spec, icon: item.icon, aisle: item.aisle});
 
 const LIST_END_PADDING = 32;
+const MOVE_ICON = 'folder-move-outline';
 
 const styles = StyleSheet.create({
   listArea: {flex: 1},

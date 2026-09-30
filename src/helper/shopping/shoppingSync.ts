@@ -1,6 +1,6 @@
 import {AxiosError} from 'axios';
 import AppPersistence from '../../AppPersistence';
-import RestAPI, {ShoppingList, ShoppingOp} from '../../dao/RestAPI';
+import RestAPI, {ShoppingItem, ShoppingList, ShoppingOp} from '../../dao/RestAPI';
 import {newClientId} from '../clientId';
 import {
   ShoppingState,
@@ -12,7 +12,7 @@ import {
 } from '../../redux/features/shoppingSlice';
 import type {AppDispatch, RootState} from '../../redux/store';
 import {DistributiveOmit} from '../types';
-import {StoredListSync, timedPending} from './listItems';
+import {copyOf, StoredListSync, timedPending} from './listItems';
 
 type Thunk<T = void> = (dispatch: AppDispatch, getState: () => RootState) => Promise<T>;
 
@@ -106,6 +106,20 @@ export const changeShoppingList = (listId: number, change: ShoppingChange) => (d
     void dispatch(syncShoppingList(listId));
   }, FLUSH_DELAY_MILLIS));
 };
+
+/**
+ * Moves items as an add to one list and a delete from the other, so moving works offline like any change.
+ *
+ * @param {number} fromListId where the items are
+ * @param {number} toListId where they go; a name already there asks for more of it
+ * @param {ShoppingItem[]} items what to move
+ * @return {Thunk} the changes
+ */
+export const moveShoppingItems = (fromListId: number, toListId: number, items: ShoppingItem[]) =>
+  (dispatch: AppDispatch) => items.forEach((item) => {
+    dispatch(changeShoppingList(toListId, copyOf(item, newClientId())));
+    dispatch(changeShoppingList(fromListId, {type: 'DELETE', itemId: item.id}));
+  });
 
 /**
  * Takes in a change the live channel hinted at, unless this device made it or has it already.

@@ -56,18 +56,19 @@ const withNameKey = (items: ItemMap, key: string): ShoppingItem | undefined =>
 const added = (items: ItemMap, op: Extract<ShoppingOp, {type: 'ADD'}>, now: string,
     addedBy: string | null): ShoppingItem => {
   const existing = withNameKey(items, nameKey(op.name));
+  const prioritized = !!op.prioritized;
   if (existing?.status === 'ACTIVE') {
     return {...existing, spec: joinSpecs(existing.spec, op.spec), sources: [...existing.sources, ...(op.sources ?? [])],
-      addedAt: now};
+      prioritized: !!existing.prioritized || prioritized, addedAt: now};
   }
   if (existing) {
     return {...existing, status: 'ACTIVE', boughtAt: null, spec: joinSpecs(null, op.spec), sources: op.sources ?? [],
-      addedAt: now};
+      prioritized, addedAt: now};
   }
   return {
     id: op.itemId, name: op.name.trim(), spec: joinSpecs(null, op.spec), aisle: op.aisle ?? 'OTHER', aisleManual: false,
-    icon: op.icon ?? null, status: 'ACTIVE', boughtAt: null, addedAt: now, addedBy, sources: op.sources ?? [],
-    deleted: false, version: 0,
+    icon: op.icon ?? null, prioritized, status: 'ACTIVE', boughtAt: null, addedAt: now, addedBy,
+    sources: op.sources ?? [], deleted: false, version: 0,
   };
 };
 
@@ -79,6 +80,7 @@ const updated = (items: ItemMap, item: ShoppingItem, op: Extract<ShoppingOp, {ty
     spec: op.spec === undefined ? item.spec : joinSpecs(null, op.spec),
     aisle: op.aisle ?? item.aisle,
     aisleManual: item.aisleManual || op.aisle !== undefined,
+    prioritized: op.prioritized ?? item.prioritized,
   };
 };
 
@@ -105,7 +107,7 @@ export const withOp = (items: ItemMap, op: ShoppingOp, now: string, addedBy: str
     case 'UPDATE':
       return {...items, [item.id]: updated(items, item, op)};
     case 'BUY':
-      return item.status === 'ACTIVE' ? {...items, [item.id]: {...item, status: 'BOUGHT', boughtAt: now}} : items;
+      return item.status === 'ACTIVE' ? {...items, [item.id]: {...item, status: 'BOUGHT', boughtAt: now, prioritized: false}} : items;
     case 'RESTORE':
       return item.status === 'BOUGHT' ?
         {...items, [item.id]: {...item, status: 'ACTIVE', boughtAt: null, addedAt: now, spec: joinSpecs(null, op.spec),
@@ -126,10 +128,26 @@ export const visibleItems = (held: ListSync | undefined): ItemMap =>
 // Compared as times: the server writes microseconds, the device milliseconds.
 const timeOf = (instant: string | null | undefined): number => (instant ? Date.parse(instant) : 0);
 
-// Oldest first, so what was added last is at the end.
+// Prioritized first, then oldest first, so what was added last is at the end.
 export const activeItems = (items: ItemMap): ShoppingItem[] =>
   Object.values(items).filter((item) => item.status === 'ACTIVE')
-      .sort((first, second) => timeOf(first.addedAt) - timeOf(second.addedAt));
+      .sort((first, second) => Number(!!second.prioritized) - Number(!!first.prioritized) ||
+        timeOf(first.addedAt) - timeOf(second.addedAt));
+
+/** What an add op carries at most, as the server accepts. */
+export const MAX_SOURCES_PER_ADD = 20;
+
+/**
+ * An add op putting an item on another list as it is, the newest meals it is for included.
+ *
+ * @param {ShoppingItem} item the item to copy
+ * @param {string} itemId the copy's id
+ * @return {ShoppingOp} the add, without its op id
+ */
+export const copyOf = (item: ShoppingItem, itemId: string): Omit<Extract<ShoppingOp, {type: 'ADD'}>, 'opId'> => ({
+  type: 'ADD', itemId, name: item.name, spec: item.spec, aisle: item.aisle, icon: item.icon,
+  sources: item.sources.slice(-MAX_SOURCES_PER_ADD), prioritized: !!item.prioritized,
+});
 
 /**
  * The newest purchases first, for putting back with one tap.
