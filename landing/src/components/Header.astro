@@ -1,0 +1,43 @@
+---
+import Button from './Button.astro';
+import GithubIcon from './icons/GithubIcon.astro';
+import LanguageSwitch from './LanguageSwitch.astro';
+import { getContent, type Lang } from '../content';
+import { linkTarget, links, pagePaths, type PageKey } from '../site';
+
+interface Props {
+  lang: Lang;
+  page: PageKey;
+}
+
+const { lang, page } = Astro.props;
+const t = getContent(lang);
+const home = pagePaths.home[lang];
+const anchors = [
+  { label: t.nav.features, href: `${home}#features` },
+  { label: t.nav.selfHosting, href: `${home}#self-hosting` },
+  { label: t.nav.faq, href: `${home}#faq` },
+];
+---
+
+<header class="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur">
+  <nav class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-2 px-4 sm:px-6" aria-label="Cookpal">
+    <a href={home} class="flex items-center gap-2.5 text-lg font-bold tracking-tight">
+      <img src="/favicon.png" alt="" width="32" height="32" class="h-8 w-8 rounded-lg" />
+      Cookpal
+    </a>
+    <div class="flex items-center gap-1 sm:gap-2">
+      {anchors.map((a) => <a href={a.href} class="hidden rounded-lg px-3 py-2 text-sm text-muted transition hover:text-text md:block">{a.label}</a>)}
+      <LanguageSwitch lang={lang} page={page} />
+      <a
+        href={links.github}
+        {...linkTarget(links.github)}
+        aria-label={t.ui.sourceCode}
+        class="hidden h-10 w-10 place-items-center rounded-lg text-muted transition hover:text-text md:grid"
+      >
+        <GithubIcon />
+      </a>
+      <Button href={links.app} class="min-h-10 px-4 py-2 text-sm">{t.ui.openApp}</Button>
+    </div>
+  </nav>
+</header>

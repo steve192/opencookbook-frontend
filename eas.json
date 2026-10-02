@@ -33,18 +33,12 @@
       }
     },
     "production": {
-      "channel": "production",
-      "env": {
-        "DEFAULT_API_URL": "https://beta.cookpal.io"
-      }
+      "channel": "production"
     },
     "production-apk": {
       "channel": "production",
       "android": {
         "buildType": "apk"
-      },
-      "env": {
-        "DEFAULT_API_URL": "https://beta.cookpal.io"
       }
     }
   },

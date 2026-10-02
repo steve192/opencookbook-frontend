@@ -18,7 +18,7 @@ const request = vi.mocked(client.request);
 
 const SERVER: Record<string, unknown> = {
   '/users/self': {email: 'anna@example.test'},
-  '/instance': {termsOfService: '', sharingEnabled: true, householdsEnabled: true, ocrImportEnabled: false,
+  '/instance': {sharingEnabled: true, householdsEnabled: true, ocrImportEnabled: false,
     apiKeysEnabled: false},
   '/recipes': [
     {id: 1, title: 'Lasagne', images: [{uuid: 'lasagne-cover'}, {uuid: 'lasagne-step'}], mine: true},

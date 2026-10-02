@@ -31,11 +31,6 @@
               "scheme": "https",
               "host": "beta.cookpal.io",
               "pathPrefix": "/"
-            },
-            {
-              "scheme": "https",
-              "host": "*.cookpal.io",
-              "pathPrefix": "/"
             }
           ],
           "category": [
@@ -62,6 +57,9 @@
     },
     "web": {
       "favicon": "./assets/icon.png"
+    },
+    "experiments": {
+      "baseUrl": "/app"
     },
     "plugins": [
       [

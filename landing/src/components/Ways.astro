@@ -1,0 +1,32 @@
+---
+import Button from './Button.astro';
+import { getContent, type Lang } from '../content';
+import { links, pagePaths } from '../site';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getContent(lang);
+const { hosted, selfHosted } = t.ways;
+---
+
+<section id="self-hosting" class="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20">
+  <h2 class="text-3xl font-bold tracking-tight">{t.ways.title}</h2>
+  <div class="mt-10 grid gap-6 md:grid-cols-2">
+    <div class="flex flex-col rounded-2xl border border-line bg-surface p-8">
+      <h3 class="text-2xl font-semibold">{hosted.title}</h3>
+      <p class="mt-3 flex-1 text-lg leading-8 text-muted">{hosted.body}</p>
+      <Button href={links.signup} class="mt-8">{hosted.cta}</Button>
+    </div>
+    <div class="flex flex-col rounded-2xl border border-line bg-surface p-8">
+      <h3 class="text-2xl font-semibold">{selfHosted.title}</h3>
+      <p class="mt-3 flex-1 text-lg leading-8 text-muted">{selfHosted.body}</p>
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+        <Button href={pagePaths.selfHosting[lang]}>{selfHosted.guide}</Button>
+        <Button href={links.github} variant="secondary">{t.ui.github}</Button>
+      </div>
+    </div>
+  </div>
+</section>

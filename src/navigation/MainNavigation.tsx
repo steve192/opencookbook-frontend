@@ -1,6 +1,6 @@
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {BottomTabNavigationOptions, createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {NavigationContainer} from '@react-navigation/native';
+import {getPathFromState, getStateFromPath, NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Constants from 'expo-constants';
 import {createURL} from 'expo-linking';
@@ -9,6 +9,7 @@ import * as Updates from 'expo-updates';
 import {TFunction} from 'i18next';
 import React, {useCallback, useEffect, useRef} from 'react';
 import {useTranslation} from 'react-i18next';
+import {defaultBackendUrl} from '../api/defaultBackendUrl';
 import {KeyboardAvoidingScreen} from '../components/KeyboardAvoidingScreen';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {useIsOnline} from '../offline/useIsOnline';
@@ -51,11 +52,13 @@ import {ShoppingListsScreen} from '../screens/shopping/ShoppingListsScreen';
 import {StaplesScreen} from '../screens/shopping/StaplesScreen';
 import {ShoppingSyncRunner} from '../components/shopping/ShoppingSyncRunner';
 import {useShoppingProvider} from '../helper/shopping/useShoppingProvider';
-import {TermsOfServiceScreen} from '../screens/TermsOfSerciceScreen';
+import {LegalDocumentScreen} from '../screens/legal/LegalDocumentScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
 import {useAppTheme} from '../styles/CentralStyles';
 import {LINKING_SCREENS} from './linking';
+import {RETIRED_HOSTED_INSTANCE_URL} from '../hostedInstance';
+import {addBasePath, restoreBasePathInState, stripBasePath} from './basePath';
 import {navigationRef} from './navigationRef';
 import {PaperStackHeader} from './PaperStackHeader';
 import {
@@ -408,9 +411,9 @@ const MainNavigation = () => {
         options={{title: t('screens.resetPassword.title')}}
       />
       <BaseStack.Screen
-        name='TermsOfServiceScreen'
-        component={TermsOfServiceScreen}
-        options={{headerShown: true, title: t('screens.login.toc')}}
+        name='LegalDocumentScreen'
+        component={LegalDocumentScreen}
+        options={({route}) => ({headerShown: true, title: t(`screens.legal.${route.params.document}`)})}
       />
       <BaseStack.Screen
         name='SharedRecipeScreen'
@@ -436,10 +439,17 @@ const MainNavigation = () => {
           formatter: (options) => options?.title ? `${options.title} - ${APP_NAME}` : APP_NAME,
         }}
         linking={{
-          prefixes: [createURL('/'), 'https://beta.cookpal.io/'],
+          // Without a trailing slash the matched path keeps its leading one, which stripBasePath relies on.
+          prefixes: [createURL('/'), defaultBackendUrl(), RETIRED_HOSTED_INSTANCE_URL],
           // The linking config mixes BaseNavigatorProps + nested stack routes; the
           // generated PathConfig type doesn't model that union, so cast to any here.
           config: {screens: LINKING_SCREENS} as any,
+          // Links of the retired address have no base path, which stripping leaves alone.
+          getStateFromPath: (path, options) => {
+            const state = getStateFromPath(stripBasePath(path), options);
+            return state && restoreBasePathInState(state);
+          },
+          getPathFromState: (state, options) => addBasePath(getPathFromState(state, options)),
         }}
       >
         {baseNavigator}

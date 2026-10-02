@@ -6,6 +6,7 @@ import {Button, Card, IconButton, Modal, Portal, Text, TextInput} from 'react-na
 import Spacer from 'react-spacer';
 import {useSignInMutation} from '../../api/endpoints/account';
 import {FormErrorMessage} from '../../components/FormErrorMessage';
+import {LegalLinks} from '../../components/LegalLinks';
 import {PasswordInput} from '../../components/PasswordInput';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {resolveAppVersion} from '../../helper/appVersion';
@@ -151,7 +152,10 @@ const LoginScreen = ({route, navigation}: Props) => {
           </Button>
         </View>
       </View>
-      <Text style={styles.footer}>{versionLabel()}</Text>
+      <View style={styles.footer}>
+        <LegalLinks color={OwnColors.bluishGrey} />
+        <Text style={styles.version}>{versionLabel()}</Text>
+      </View>
       {settingsModal}
     </LoginBackdrop>
   );
@@ -161,6 +165,11 @@ const styles = StyleSheet.create({
   footer: {
     position: 'absolute',
     bottom: 10,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  version: {
     color: 'white',
     fontSize: 10,
   },

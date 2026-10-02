@@ -34,8 +34,6 @@ permissions:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  # The production app talks to the beta.cookpal.io backend.
-  DEFAULT_API_URL: https://beta.cookpal.io
 
 jobs:
   semantic-preview:
@@ -263,13 +261,6 @@ jobs:
         with:
           ref: ${{ needs.semantic-preview.outputs.tag }}
 
-      - name: Setup
-        uses: ./.github/actions/setup
-
-      # The image copies a prebuilt dist/, so the bundle has to exist first.
-      - name: Build web bundle
-        run: npm run build-web
-
       - name: Setup Docker buildx
         uses: docker/setup-buildx-action@v4.4.1
 
@@ -352,7 +343,6 @@ jobs:
         run: |
           docker run \
             -e EXPO_TOKEN="$EXPO_TOKEN" \
-            -e DEFAULT_API_URL="$DEFAULT_API_URL" \
             -v "$(pwd)":/builder \
             ghcr.io/steve192/cookpal-easbuilder:latest \
             production "cookpal-${RELEASE_VERSION}.aab"
@@ -370,7 +360,6 @@ jobs:
         run: |
           docker run \
             -e EXPO_TOKEN="$EXPO_TOKEN" \
-            -e DEFAULT_API_URL="$DEFAULT_API_URL" \
             -v "$(pwd)":/builder \
             ghcr.io/steve192/cookpal-easbuilder:latest \
             production-apk "cookpal-${RELEASE_VERSION}.apk"

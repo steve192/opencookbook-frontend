@@ -1,0 +1,35 @@
+---
+import PhoneStack from './PhoneStack.astro';
+import type { Feature, Lang } from '../content';
+
+interface Props {
+  lang: Lang;
+  feature: Feature;
+  flip?: boolean;
+}
+
+const { lang, feature, flip = false } = Astro.props;
+---
+
+<section id={feature.id} class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 md:gap-16 md:py-20">
+  <div class:list={[flip && 'md:order-2']}>
+    <p class="text-sm font-semibold uppercase tracking-wider text-brand">{feature.eyebrow}</p>
+    <h2 class="mt-2 text-3xl font-bold tracking-tight">{feature.title}</h2>
+    <p class="mt-4 text-lg leading-8 text-muted">{feature.body}</p>
+    <ul class="mt-6 space-y-3">
+      {
+        feature.points.map((point) => (
+          <li class="flex items-start gap-3">
+            <svg viewBox="0 0 20 20" class="mt-1 h-5 w-5 flex-none text-brand" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.5 7.5a1 1 0 0 1-1.4 0L3.3 9.7a1 1 0 1 1 1.4-1.4l3.3 3.3 6.8-6.8a1 1 0 0 1 1.4 0Z" clip-rule="evenodd" />
+            </svg>
+            <span class="leading-7">{point}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <div class:list={[flip && 'md:order-1']}>
+    <PhoneStack lang={lang} shots={feature.shots} />
+  </div>
+</section>

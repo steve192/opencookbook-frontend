@@ -1,3 +1,5 @@
+const {baseUrl} = require('./app.json').expo.experiments;
+
 module.exports = {
 	globDirectory: 'dist/',
 	// Everything the app needs to start and draw offline, fonts and shopping icons included.
@@ -6,6 +8,8 @@ module.exports = {
 	],
 	// Expo exports the icon fonts under assets/node_modules, which workbox skips by default.
 	globIgnores: [],
+	// The app is served under app.json's baseUrl, so the precached files are too.
+	modifyURLPrefix: {'': `${baseUrl}/`},
 	swDest: 'dist/sw.js',
 	ignoreURLParametersMatching: [
 		/^utm_/,
@@ -26,7 +30,7 @@ module.exports = {
 
 	// No runtime caching: recipe images are kept by the app itself (imageCache.web.ts), so they are there without a worker too.
 
-	// Any address of the app opens offline too; the server's own paths never get the app instead.
-	navigateFallback: '/index.html',
-	navigateFallbackDenylist: [/^\/(api|admin|swagger-ui|v3\/api-docs|h2-console)/],
+	// Any address of the app opens offline too; everything else (landing page, api) stays with the server.
+	navigateFallback: `${baseUrl}/index.html`,
+	navigateFallbackAllowlist: [new RegExp(`^${baseUrl}/`)],
 };

@@ -122,8 +122,7 @@
       "email": "E-Mail",
       "password": "Password",
       "passwordConfirm": "Password confirm",
-      "acceptTOC": "I accept the",
-      "toc": "terms and conditions and privacy policy",
+      "acceptTerms": "I accept the <terms>terms of use</terms> and the <privacy>privacy policy</privacy>",
       "register": "Register",
       "errorNoPasswordMatch": "Passwords do not match"
     },
@@ -716,6 +715,11 @@
         "weekTitle": "Week of {{date}}",
         "leftoversNothingToBuy": "{{leftovers}}, nothing to buy"
       }
+    },
+    "legal": {
+      "terms": "Terms of use",
+      "privacy": "Privacy policy",
+      "imprint": "Imprint"
     },
     "licenses": {
       "title": "Open-source licenses",

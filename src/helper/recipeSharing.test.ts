@@ -1,7 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {
   formatShareExpiry,
-  isSameInstance,
   parseShareLink,
   shareMessage,
 } from './recipeSharing';
@@ -16,6 +15,20 @@ describe('parseShareLink', () => {
 
   it('survives a query string and a fragment', () => {
     expect(parseShareLink('https://beta.cookpal.io/share/7f3a?from=chat#top')?.shareId).toBe('7f3a');
+  });
+
+  it('reads a link under the base path', () => {
+    expect(parseShareLink('https://cookpal.io/app/share/7f3a')).toEqual({
+      origin: 'https://cookpal.io',
+      shareId: '7f3a',
+    });
+  });
+
+  it('still reads a link of the retired address, which has no base path', () => {
+    expect(parseShareLink('https://beta.cookpal.io/share/x')).toEqual({
+      origin: 'https://beta.cookpal.io',
+      shareId: 'x',
+    });
   });
 
   it('reads a link opened through the app scheme, which names no instance', () => {
@@ -36,38 +49,6 @@ describe('parseShareLink', () => {
 
   it('rejects something that is not a link at all', () => {
     expect(parseShareLink('share/7f3a')).toBeUndefined();
-  });
-});
-
-describe('isSameInstance', () => {
-  // Every one of these is a way of writing the same server, and every one of them would
-  // otherwise put a "this recipe lives somewhere else" notice in front of somebody who is
-  // looking at their own instance.
-  it.each([
-    ['https://beta.cookpal.io', 'https://beta.cookpal.io/'],
-    ['https://beta.cookpal.io/', 'https://BETA.cookpal.io'],
-    ['https://BETA.CookPal.io/some/path', 'https://beta.cookpal.io'],
-    ['https://beta.cookpal.io:443', 'https://beta.cookpal.io'],
-    ['http://beta.cookpal.io:80', 'http://beta.cookpal.io/'],
-    ['http://localhost:8081', 'http://localhost:8081/share/abc'],
-  ])('treats %s and %s as one server', (one, other) => {
-    expect(isSameInstance(one, other)).toBe(true);
-  });
-
-  it.each([
-    ['https://beta.cookpal.io', 'https://cookbook.example.com'],
-    ['https://beta.cookpal.io', 'http://beta.cookpal.io'],
-    ['http://localhost:8081', 'http://localhost:9090'],
-  ])('keeps %s and %s apart', (one, other) => {
-    expect(isSameInstance(one, other)).toBe(false);
-  });
-
-  it('has nothing to compare when a link names no host at all', () => {
-    expect(isSameInstance('cookpal://share/7f3a', 'https://beta.cookpal.io')).toBe(false);
-  });
-
-  it('does not consider two unknowns to be the same server', () => {
-    expect(isSameInstance(undefined, undefined)).toBe(false);
   });
 });
 

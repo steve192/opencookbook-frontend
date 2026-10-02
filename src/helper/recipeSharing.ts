@@ -6,6 +6,9 @@
  * exhaustively - which none of it is once it lives inside a screen.
  */
 
+import {BASE_PATH} from '../navigation/basePath';
+import {normalizeOrigin} from './instanceAddress';
+
 /** The path a shared recipe lives under, on every instance. */
 const SHARE_PATH_SEGMENT = 'share';
 
@@ -20,12 +23,11 @@ export interface ShareLink {
 }
 
 // Only http(s) links carry an instance. Anything else - the app's own scheme included - has a
-// share id but no host worth resolving against.
-const WEB_SHARE_LINK = new RegExp(`^(https?://[^/?#]+)/${SHARE_PATH_SEGMENT}/([^/?#]+)`, 'i');
+// share id but no host worth resolving against. The web app sits under the base path; links of
+// the retired address do not have it.
+const WEB_SHARE_LINK = new RegExp(
+    `^(https?://[^/?#]+)(?:${BASE_PATH})?/${SHARE_PATH_SEGMENT}/([^/?#]+)`, 'i');
 const SCHEME_SHARE_LINK = new RegExp(`^[a-z][a-z0-9+.-]*:(?://[^/?#]*)?/?${SHARE_PATH_SEGMENT}/([^/?#]+)`, 'i');
-
-const ORIGIN = /^(https?):\/\/([^/?#:]+)(?::(\d+))?/i;
-const DEFAULT_PORTS: Record<string, string> = {'http': '80', 'https': '443'};
 
 /**
  * Reads a share link back.
@@ -41,40 +43,6 @@ export const parseShareLink = (url: string): ShareLink | undefined => {
 
   const schemeLink = SCHEME_SHARE_LINK.exec(url.trim());
   return schemeLink ? {shareId: decodeURIComponent(schemeLink[1])} : undefined;
-};
-
-/**
- * An address reduced to the instance it names, so two spellings of one server compare equal.
- *
- * @param {string} url any absolute http(s) address
- * @return {string | undefined} scheme, host and non default port, lowercased
- */
-const normalizeOrigin = (url: string): string | undefined => {
-  const parts = ORIGIN.exec(url.trim());
-  if (!parts) {
-    return undefined;
-  }
-  const [, scheme, host, port] = parts;
-  const lowercaseScheme = scheme.toLowerCase();
-  const meaningfulPort = port && port !== DEFAULT_PORTS[lowercaseScheme] ? `:${port}` : '';
-  return `${lowercaseScheme}://${host.toLowerCase()}${meaningfulPort}`;
-};
-
-/**
- * Whether two addresses name the same instance.
- *
- * Trailing slashes, capitalisation and an explicitly written default port are all ways of
- * spelling the same server, and every one of them would otherwise put a "this recipe lives
- * somewhere else" notice in front of somebody looking at their own instance.
- *
- * @param {string} [one] an address
- * @param {string} [other] another address
- * @return {boolean} true when both name the same instance
- */
-export const isSameInstance = (one?: string, other?: string): boolean => {
-  const normalizedOne = one ? normalizeOrigin(one) : undefined;
-  const normalizedOther = other ? normalizeOrigin(other) : undefined;
-  return normalizedOne !== undefined && normalizedOne === normalizedOther;
 };
 
 /**

@@ -10,7 +10,6 @@ export interface UserInfo {
 }
 
 export interface InstanceInfo {
-  termsOfService: string;
   sharingEnabled: boolean;
   householdsEnabled: boolean;
   /**

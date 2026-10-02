@@ -7,6 +7,7 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Avatar, Text} from 'react-native-paper';
 import {useGetUserInfoQuery} from '../../api/endpoints/account';
+import {LegalLinks} from '../../components/LegalLinks';
 import {useInstanceFeatures} from '../../helper/useInstanceFeatures';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps, OverviewNavigationProps} from '../../navigation/NavigationRoutes';
@@ -110,6 +111,7 @@ export const SettingsScreen = (props: Props) => {
         subtitle={t('screens.licenses.subtitle')}
         icon="scale-balance"
         onPress={open('OpenSourceLicensesScreen')} />
+      <LegalLinks />
       <View style={styles.header}>
         <SettingsHint>{t('screens.settings.appVersion', {version: Constants.expoConfig?.version})}</SettingsHint>
       </View>

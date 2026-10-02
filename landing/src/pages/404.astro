@@ -1,0 +1,19 @@
+---
+import Button from '../components/Button.astro';
+import Layout from '../layouts/Layout.astro';
+import { pagePaths } from '../site';
+---
+
+<Layout lang="en" title="Cookpal: Page not found / Seite nicht gefunden" description="Page not found. Seite nicht gefunden.">
+  <main id="main" class="mx-auto flex min-h-screen max-w-xl flex-col justify-center gap-6 px-4 py-16">
+    <img src="/favicon.png" alt="" width="48" height="48" class="h-12 w-12 rounded-xl" />
+    <h1 class="text-3xl font-extrabold tracking-tight">Page not found</h1>
+    <p class="text-lg text-muted">This page does not exist. Go to the home page of Cookpal.</p>
+    <h2 class="text-3xl font-extrabold tracking-tight" lang="de">Seite nicht gefunden</h2>
+    <p class="text-lg text-muted" lang="de">Diese Seite gibt es nicht. Zur Startseite von Cookpal.</p>
+    <div class="flex flex-col gap-3 sm:flex-row">
+      <Button href={pagePaths.home.en} hreflang="en">English</Button>
+      <Button href={pagePaths.home.de} hreflang="de" variant="secondary">Deutsch</Button>
+    </div>
+  </main>
+</Layout>

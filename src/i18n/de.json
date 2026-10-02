@@ -121,8 +121,7 @@
       "createAccount": "Noch keinen Account? Jetzt erstellen",
       "email": "E-Mail",
       "password": "Passwort",
-      "acceptTOC": "Ich akzeptiere die",
-      "toc": "Nutzungsbedingungen und Datenschutzerklärung",
+      "acceptTerms": "Ich akzeptiere die <terms>Nutzungsbedingungen</terms> und die <privacy>Datenschutzerklärung</privacy>",
       "register": "Registrieren",
       "passwordConfirm": "Passwort bestätigen",
       "errorNoPasswordMatch": "Passwörter stimmen nicht überein"
@@ -716,6 +715,11 @@
         "weekTitle": "Woche vom {{date}}",
         "leftoversNothingToBuy": "{{leftovers}}, nichts zu kaufen"
       }
+    },
+    "legal": {
+      "terms": "Nutzungsbedingungen",
+      "privacy": "Datenschutzerklärung",
+      "imprint": "Impressum"
     },
     "licenses": {
       "title": "Open-Source-Lizenzen",

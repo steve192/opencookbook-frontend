@@ -1,0 +1,28 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { linkTarget } from '../site';
+
+interface Props extends Omit<HTMLAttributes<'a'>, 'href'> {
+  href: string;
+  variant?: 'primary' | 'secondary';
+}
+
+const { variant = 'primary', class: className, href, ...rest } = Astro.props;
+const styles = {
+  primary: 'bg-brand text-on-brand hover:opacity-90',
+  secondary: 'border border-line bg-surface text-text hover:border-brand',
+};
+---
+
+<a
+  href={href}
+  {...linkTarget(href)}
+  class:list={[
+    'inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 text-base font-semibold transition',
+    styles[variant],
+    className,
+  ]}
+  {...rest}
+>
+  <slot />
+</a>

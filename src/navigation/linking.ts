@@ -9,7 +9,7 @@ const flag = (value: string): boolean => value === 'true';
 export const LINKING_SCREENS = {
   AccountActivationScreen: 'activateAccount',
   PasswordResetScreen: 'resetPassword',
-  TermsOfServiceScreen: 'tos',
+  LegalDocumentScreen: 'legal/:document',
   SharedRecipeScreen: 'share/:shareId',
   default: {
     // Beneath any linked screen, so it has somewhere to go back to. The login stack

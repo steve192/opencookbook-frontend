@@ -52,13 +52,17 @@ const relayToBackend = (request, response) => {
 };
 
 // Generated on every start, so a dependency or catalogue update flows through without a manual step;
-// both scripts return at once when nothing changed. Synchronous, because the files must exist before
+// all three scripts return at once when nothing changed. Synchronous, because the files must exist before
 // Metro resolves the modules that load them.
 for (const script of ['generate-open-source-components.mjs', 'shopping-icons.mjs', 'pwa-icons.mjs']) {
   execFileSync(process.execPath, [path.join(__dirname, 'scripts', script)], {stdio: 'inherit'});
 }
 
 const config = getDefaultConfig(__dirname);
+
+// The landing page is its own project with its own node_modules, which Metro must not crawl.
+const landingDir = path.join(__dirname, 'landing').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+config.resolver.blockList = [].concat(config.resolver.blockList ?? [], new RegExp(`^${landingDir}[/\\\\].*`));
 
 // The web app resolves its api from the origin it was served from, which is right in every
 // deployment because the reverse proxy puts both on one host. The dev server is the only place
