@@ -1,0 +1,28 @@
+---
+import Button from './Button.astro';
+import PhoneStack from './PhoneStack.astro';
+import PlayIcon from './icons/PlayIcon.astro';
+import { getContent, type Lang } from '../content';
+import { links } from '../site';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getContent(lang);
+---
+
+<section id="hero" class="mx-auto grid max-w-6xl items-center gap-12 px-4 py-12 sm:px-6 md:grid-cols-2 md:py-20">
+  <div>
+    <h1 class="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">{t.hero.title}</h1>
+    <p class="mt-6 text-lg leading-8 text-muted">{t.hero.lead}</p>
+    <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+      <Button href={links.signup}>{t.ui.signup}</Button>
+      <Button href={links.googlePlay} variant="secondary"><PlayIcon />{t.ui.googlePlay}</Button>
+    </div>
+    <p class="mt-4"><a href="#self-hosting" class="font-semibold text-brand underline underline-offset-4">{t.hero.selfHostingLink}</a></p>
+    <ul class="mt-8 flex flex-wrap gap-x-3 gap-y-1 text-sm font-medium text-muted">{t.hero.facts.map((fact, i) => <li class="whitespace-nowrap">{i > 0 && <span aria-hidden="true" class="mr-3">·</span>}{fact}</li>)}</ul>
+  </div>
+  <PhoneStack lang={lang} shots={['recipe-detail', 'recipe-list']} priority />
+</section>

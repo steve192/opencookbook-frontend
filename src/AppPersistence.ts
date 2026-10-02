@@ -1,31 +1,22 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants from 'expo-constants';
-import {Platform} from 'react-native';
+import {defaultBackendUrl} from './api/defaultBackendUrl';
 import {readSecure, writeSecure} from './api/secureStorage';
+import {isSameInstance} from './helper/instanceAddress';
+import {RETIRED_HOSTED_INSTANCE_URL} from './hostedInstance';
 
 export default class AppPersistence {
-  static async getBackendURL(): Promise<string> {
-    return (await readSecure('backendUrl')) ?? AppPersistence.defaultBackendURL();
-  }
-
   /**
-   * Where to talk to when nobody has said otherwise.
-   *
-   * On the web this is the origin the app was served from, because a deployed web app and its api
-   * live behind the same address. It matters most for somebody who has never signed in - opening
-   * a share link, say - who has no stored server and cannot be asked for one.
-   *
-   * @return {string} the backend url to use
+   * @return {Promise<string>} the stored server, with the retired hosted address replaced by the current one
    */
-  private static defaultBackendURL(): string {
-    const configuredAtBuildTime = Constants.expoConfig?.extra?.defaultApiUrl;
-    if (configuredAtBuildTime) {
-      return configuredAtBuildTime;
+  static async getBackendURL(): Promise<string> {
+    const stored = await readSecure('backendUrl');
+    if (stored && isSameInstance(stored, RETIRED_HOSTED_INSTANCE_URL)) {
+      // Not switchServer: the account is the same on the new address, so nobody is signed out.
+      const current = defaultBackendUrl();
+      await writeSecure('backendUrl', current);
+      return current;
     }
-    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.origin) {
-      return window.location.origin;
-    }
-    return 'https://beta.cookpal.io';
+    return stored ?? defaultBackendUrl();
   }
 
   static async setBackendURL(url: string) {

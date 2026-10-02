@@ -50,9 +50,9 @@ describe('baseQuery', () => {
   });
 
   it('still sends public requests while signed out', async () => {
-    request.mockResolvedValue(answer({termsOfService: ''}));
+    request.mockResolvedValue(answer({sharingEnabled: true}));
     const {result} = await run({loggedIn: false}, '/instance', true);
-    expect(result.data).toEqual({termsOfService: ''});
+    expect(result.data).toEqual({sharingEnabled: true});
     expect(request.mock.calls[0][0].headers?.Authorization).toBeUndefined();
   });
 

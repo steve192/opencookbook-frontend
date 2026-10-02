@@ -8,7 +8,7 @@ describe('instanceFeatures', () => {
   });
 
   it.each([true, false])('takes what the instance offers: %s', (enabled) => {
-    expect(instanceFeatures({termsOfService: '', sharingEnabled: enabled, householdsEnabled: enabled,
+    expect(instanceFeatures({sharingEnabled: enabled, householdsEnabled: enabled,
       ocrImportEnabled: enabled, apiKeysEnabled: enabled})).toEqual(
         {sharingEnabled: enabled, householdsEnabled: enabled, ocrImportEnabled: enabled, apiKeysEnabled: enabled});
   });

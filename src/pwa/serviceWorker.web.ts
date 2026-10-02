@@ -1,9 +1,10 @@
 import {Workbox} from 'workbox-window';
+import {BASE_PATH} from '../navigation/basePath';
 
 // sw.js only exists in a production export (build-web); the dev server answers unknown paths with
 // index.html, which registering as a worker fails on.
 const workerExists = async () => {
-  const response = await fetch('/sw.js', {method: 'HEAD'});
+  const response = await fetch(`${BASE_PATH}/sw.js`, {method: 'HEAD'});
   return response.ok && (response.headers.get('content-type') ?? '').includes('javascript');
 };
 
@@ -17,7 +18,7 @@ export const registerServiceWorker = async (onUpdateWaiting: (reload: () => void
   if (!('serviceWorker' in navigator) || !await workerExists()) {
     return;
   }
-  const workbox = new Workbox('/sw.js');
+  const workbox = new Workbox(`${BASE_PATH}/sw.js`, {scope: `${BASE_PATH}/`});
   workbox.addEventListener('waiting', () => onUpdateWaiting(() => {
     workbox.addEventListener('controlling', () => window.location.reload());
     workbox.messageSkipWaiting();

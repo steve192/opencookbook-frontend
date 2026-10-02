@@ -1,14 +1,15 @@
 import {CompositeScreenProps} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useRef, useState} from 'react';
-import {useTranslation} from 'react-i18next';
-import {StyleSheet, TextInput as RNTextInput, View} from 'react-native';
+import {Trans, useTranslation} from 'react-i18next';
+import {StyleSheet, Text as RNText, TextInput as RNTextInput, View} from 'react-native';
 import {Button, Checkbox, MD3Colors, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {EmailValidationInput} from '../../components/EmailValidationInput';
 import {FormErrorMessage} from '../../components/FormErrorMessage';
 import {PasswordValidationInput} from '../../components/PasswordValidationInput';
 import {useSignUpMutation} from '../../api/endpoints/account';
+import {LegalDocument} from '../../api/types/legal';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {PromptUtil} from '../../helper/Prompt';
 import {BaseNavigatorProps, LoginNavigationProps} from '../../navigation/NavigationRoutes';
@@ -17,7 +18,7 @@ import {LoginBackdrop} from './LoginBackdrop';
 
 type Props = CompositeScreenProps<
 NativeStackScreenProps<LoginNavigationProps, 'SignupScreen'>,
-NativeStackScreenProps<BaseNavigatorProps, 'TermsOfServiceScreen'>
+NativeStackScreenProps<BaseNavigatorProps, 'LegalDocumentScreen'>
 >
 export const SignupScreen = (props: Props) => {
   const [email, setEmail] = useState<string>('');
@@ -35,6 +36,12 @@ export const SignupScreen = (props: Props) => {
   const {colors} = useAppTheme();
 
   const allFieldsOk = passwordOk && password && emailOk && termsAccepted;
+
+  const legalLink = (document: LegalDocument) => (
+    <RNText
+      onPress={() => props.navigation.navigate('LegalDocumentScreen', {document})}
+      style={{color: colors.primary}} />
+  );
 
   const register = () => {
     if (registerPending || !allFieldsOk) {
@@ -87,12 +94,11 @@ export const SignupScreen = (props: Props) => {
             <Text
               onPress={() => setTermsAccepted(!termsAccepted)}
               style={{paddingLeft: 10, color: 'white'}}>
-              {t('screens.login.acceptTOC')}{' '}
-              <Text
-                onPress={() => props.navigation.navigate('TermsOfServiceScreen')}
-                style={{color: colors.primary}}>
-                {t('screens.login.toc')}
-              </Text>
+              <Trans
+                t={t}
+                i18nKey="screens.login.acceptTerms"
+                components={{terms: legalLink('terms'), privacy: legalLink('privacy')}}
+              />
             </Text>
           </View>
           <Spacer height={20} />

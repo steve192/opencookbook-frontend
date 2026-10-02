@@ -1,0 +1,32 @@
+---
+import { languages, getContent, type Lang } from '../content';
+import { pagePaths, type PageKey } from '../site';
+
+interface Props {
+  lang: Lang;
+  page: PageKey;
+}
+
+const { lang, page } = Astro.props;
+const label = getContent(lang).ui.languageLabel;
+---
+
+<div role="group" aria-label={label} class="flex rounded-lg border border-line p-0.5 text-sm font-semibold">
+  {
+    languages.map((code) => (
+      <a
+        href={pagePaths[page][code]}
+        hreflang={code}
+        lang={code}
+        data-set-lang={code}
+        aria-current={code === lang ? 'true' : undefined}
+        class:list={[
+          'rounded-md px-2.5 py-1.5 uppercase transition',
+          code === lang ? 'bg-brand text-on-brand' : 'text-muted hover:text-text',
+        ]}
+      >
+        {code}
+      </a>
+    ))
+  }
+</div>

@@ -1,0 +1,44 @@
+---
+import RichText from './RichText.astro';
+import type { Block } from '../selfHosting';
+import { linkTarget } from '../site';
+
+interface Props {
+  block: Block;
+  copy: string;
+  copied: string;
+}
+
+const { block, copy, copied } = Astro.props;
+---
+
+{block.type === 'p' && <p><RichText text={block.text} /></p>}
+{block.type === 'list' && <ul class="list-disc space-y-2 pl-6">{block.items.map((item) => <li><RichText text={item} /></li>)}</ul>}
+{
+  block.type === 'code' && (
+    <div class="flex items-start rounded-xl border border-line bg-surface" data-code-block>
+      <pre class="min-w-0 flex-1 overflow-x-auto p-4 text-sm leading-6 text-text"><code>{block.code}</code></pre>
+      <button type="button" data-copy-code data-copied={copied} class="m-2 min-h-9 shrink-0 rounded-lg border border-line bg-surface px-3 text-xs font-semibold text-text transition hover:border-brand">{copy}</button>
+    </div>
+  )
+}
+{
+  block.type === 'table' && (
+    <div class="overflow-x-auto rounded-xl border border-line bg-surface">
+      <table class="w-full border-collapse text-left text-sm">
+        <thead class="bg-bg-soft text-text">
+          <tr>{block.head.map((h) => <th scope="col" class="px-4 py-3 font-semibold">{h}</th>)}</tr>
+        </thead>
+        <tbody class="divide-y divide-line">
+          {block.rows.map(([key, text]) => (
+            <tr class="align-top">
+              <th scope="row" class="whitespace-nowrap px-4 py-3 text-left font-mono text-sm font-semibold text-text">{key}</th>
+              <td class="px-4 py-3"><RichText text={text} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+{block.type === 'link' && <p><a href={block.href} {...linkTarget(block.href)} class="font-semibold text-brand underline underline-offset-4">{block.label}</a></p>}

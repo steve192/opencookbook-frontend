@@ -1,0 +1,53 @@
+---
+import LanguageSwitch from './LanguageSwitch.astro';
+import { getContent, type Lang } from '../content';
+import { linkTarget, links, pagePaths, type PageKey } from '../site';
+
+interface Props {
+  lang: Lang;
+  page: PageKey;
+}
+
+const { lang, page } = Astro.props;
+const t = getContent(lang);
+const home = pagePaths.home[lang];
+const product = [
+  { label: t.nav.features, href: `${home}#features` },
+  { label: t.nav.selfHosting, href: pagePaths.selfHosting[lang] },
+  { label: t.ui.sourceCode, href: links.github },
+  { label: t.ui.googlePlay, href: links.googlePlay },
+];
+const legal = [
+  { label: t.ui.imprint, href: links.imprint },
+  { label: t.ui.privacy, href: links.privacy },
+  { label: t.ui.terms, href: links.terms },
+];
+const linkClass = 'text-muted transition hover:text-text';
+---
+
+<footer class="border-t border-line bg-bg-soft">
+  <div class="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.5fr_1fr_1fr]">
+    <div class="max-w-xs">
+      <p class="flex items-center gap-2.5 text-lg font-bold">
+        <img src="/favicon.png" alt="" width="32" height="32" class="h-8 w-8 rounded-lg" />
+        Cookpal
+      </p>
+      <p class="mt-3 text-sm text-muted">{t.footer.tagline}</p>
+    </div>
+    <nav aria-label={t.footer.product}>
+      <ul class="space-y-3 text-sm">
+        {product.map((item) => (
+          <li>
+            <a href={item.href} class={linkClass} {...linkTarget(item.href)}>{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <nav aria-label={t.footer.legal}>
+      <ul class="space-y-3 text-sm">
+        {legal.map((item) => <li><a href={item.href} rel="nofollow" class={linkClass}>{item.label}</a></li>)}
+      </ul>
+      <div class="mt-6 w-fit"><LanguageSwitch lang={lang} page={page} /></div>
+    </nav>
+  </div>
+</footer>

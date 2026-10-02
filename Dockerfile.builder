@@ -1,5 +1,5 @@
 # Local EAS Android builder image.
-# Usage: docker run -e EXPO_TOKEN=... -e DEFAULT_API_URL=... \
+# Usage: docker run -e EXPO_TOKEN=... \
 #          -v "$(pwd)":/builder ghcr.io/steve192/cookpal-easbuilder:latest <eas-profile> [output-file]
 #
 # Three stages:

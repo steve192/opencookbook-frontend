@@ -1,5 +1,6 @@
 import AppPersistence from '../AppPersistence';
 import {endSignInOnServer, hasStoredSignIn} from '../api/session';
+import {normalizeServerAddress} from '../helper/instanceAddress';
 import {logout, sessionRestored} from './features/authSlice';
 import {changeBackendUrl} from './features/settingsSlice';
 import type {AppDispatch} from './store';
@@ -17,7 +18,8 @@ export const signOut = () => async (dispatch: AppDispatch) => {
 
 // Nothing read from one server may be shown as another's.
 export const switchServer = (url: string) => async (dispatch: AppDispatch) => {
-  await AppPersistence.setBackendURL(url);
-  dispatch(changeBackendUrl(url));
+  const address = normalizeServerAddress(url);
+  await AppPersistence.setBackendURL(address);
+  dispatch(changeBackendUrl(address));
   dispatch(logout());
 };

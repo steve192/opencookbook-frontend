@@ -1,0 +1,59 @@
+@import 'tailwindcss';
+
+/* Light theme; the dark values below replace the same tokens. */
+@theme {
+  --color-bg: #fbf8f1;
+  --color-bg-soft: #f4efe3;
+  --color-surface: #ffffff;
+  --color-line: #e2dac8;
+  --color-text: #1c1b16;
+  --color-muted: #5b584b;
+  --color-brand: #295700;
+  --color-on-brand: #ffffff;
+  --color-brand-soft: #e6efd8;
+
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #12150f;
+    --color-bg-soft: #171b13;
+    --color-surface: #1c2117;
+    --color-line: #333b2b;
+    --color-text: #ecebe3;
+    --color-muted: #a9ae9e;
+    --color-brand: #9ad35b;
+    --color-on-brand: #10200a;
+    --color-brand-soft: #243319;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: light dark;
+  background-color: var(--color-bg);
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+[id] {
+  scroll-margin-top: 5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

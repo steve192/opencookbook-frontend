@@ -1,0 +1,27 @@
+---
+import PhoneFrame from './PhoneFrame.astro';
+import { getContent, type Lang } from '../content';
+import { screenshot, type ScreenshotName } from '../screenshots';
+
+interface Props {
+  lang: Lang;
+  shots: ScreenshotName[];
+  priority?: boolean;
+}
+
+const { lang, shots, priority = false } = Astro.props;
+const alts = getContent(lang).screenshotAlts;
+---
+
+<div class="flex items-start justify-center">
+  {
+    shots.map((name, i) => (
+      <PhoneFrame
+        image={screenshot(lang, name)}
+        alt={alts[name]}
+        priority={priority && i === 0}
+        class:list={[shots.length === 1 ? 'w-[60%]' : 'w-[45%]', 'max-w-[16.5rem] sm:w-64', i > 0 && '-ml-8 mt-10 sm:-ml-12 sm:mt-14']}
+      />
+    ))
+  }
+</div>

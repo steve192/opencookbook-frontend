@@ -1,10 +1,11 @@
 import {NavigatorScreenParams} from '@react-navigation/native';
+import {LegalDocument} from '../api/types/legal';
 import {ShoppingImportTarget} from '../helper/shopping/importTarget';
 
 export type BaseNavigatorProps = {
     AccountActivationScreen: { activationId: string}
     PasswordResetScreen: { id: string}
-    TermsOfServiceScreen: undefined
+    LegalDocumentScreen: { document: LegalDocument }
     // Outside the authenticated navigator on purpose: a public link that demanded an account
     // would not be public. Only saving the recipe needs one.
     SharedRecipeScreen: { shareId: string }

@@ -1,0 +1,38 @@
+---
+import Button from './Button.astro';
+import { getContent, type Lang } from '../content';
+import { links } from '../site';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getContent(lang);
+const { android, web, offline } = t.platforms;
+---
+
+<section id="platforms" class="border-y border-line bg-bg-soft">
+  <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20">
+    <h2 class="text-3xl font-bold tracking-tight">{t.platforms.title}</h2>
+    <div class="mt-10 grid gap-6 md:grid-cols-3">
+      <div class="flex flex-col rounded-2xl border border-line bg-surface p-6">
+        <h3 class="text-xl font-semibold">{android.title}</h3>
+        <p class="mt-3 flex-1 leading-7 text-muted">{android.body}</p>
+        <div class="mt-6 flex flex-col gap-3">
+          <Button href={links.googlePlay}>{t.ui.googlePlay}</Button>
+          <Button href={links.apk} variant="secondary">{t.ui.apk}</Button>
+        </div>
+      </div>
+      <div class="flex flex-col rounded-2xl border border-line bg-surface p-6">
+        <h3 class="text-xl font-semibold">{web.title}</h3>
+        <p class="mt-3 flex-1 leading-7 text-muted">{web.body}</p>
+        <Button href={links.app} variant="secondary" class="mt-6">{t.platforms.webApp}</Button>
+      </div>
+      <div class="rounded-2xl border border-line bg-surface p-6">
+        <h3 class="text-xl font-semibold">{offline.title}</h3>
+        <p class="mt-3 leading-7 text-muted">{offline.body}</p>
+      </div>
+    </div>
+  </div>
+</section>
