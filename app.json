@@ -3,7 +3,7 @@
     "name": "CookPal",
     "slug": "opencookbook",
     "scheme": "cookpal",
-    "version": "1.21.0",
+    "version": "1.21.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "runtimeVersion": "52.0.0",
