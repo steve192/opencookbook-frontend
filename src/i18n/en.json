@@ -916,7 +916,7 @@
     "neverSynced": "Not synced yet",
     "syncNow": "Sync now",
     "syncing": "Syncing",
-    "storageUsed": "{{size}} MB stored on this device"
+    "storageUsed": "{{size}} MB on this device, including the app"
   },
   "pwa": {
     "install": {

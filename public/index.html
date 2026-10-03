@@ -10,7 +10,9 @@
     <!-- iOS installs from Safari's Add to Home Screen, which reads these rather than the manifest. -->
     <link rel="apple-touch-icon" href="/app/icons/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- TODO: back to black-translucent once https://bugs.webkit.org/show_bug.cgi?id=301108 is fixed. With it,
+         iOS 26 sizes the installed app one status bar short and leaves a strip below the tab bar. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <meta name="apple-mobile-web-app-title" content="Cookpal" />
     <title>%WEB_TITLE%</title>
     <!-- The `react-native-web` recommended style reset: https://necolas.github.io/react-native-web/docs/setup/#root-element -->

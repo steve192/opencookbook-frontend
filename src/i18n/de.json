@@ -916,7 +916,7 @@
     "neverSynced": "Noch nicht abgeglichen",
     "syncNow": "Jetzt abgleichen",
     "syncing": "Wird abgeglichen",
-    "storageUsed": "{{size}} MB auf diesem Gerät gespeichert"
+    "storageUsed": "{{size}} MB auf diesem Gerät, inklusive der App"
   },
   "pwa": {
     "install": {
