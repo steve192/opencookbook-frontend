@@ -1,16 +1,16 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {View} from 'react-native';
 import {Button, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {EmailValidationInput} from '../../components/EmailValidationInput';
 import {SuccessErrorBanner} from '../../components/SuccessErrorBanner';
 import {useRequestPasswordResetMutation} from '../../api/endpoints/account';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
+import {useInstanceFeatures} from '../../helper/useInstanceFeatures';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import CentralStyles from '../../styles/CentralStyles';
-import {LoginBackdrop} from './LoginBackdrop';
+import {LoginBackdrop, LoginColumn, LoginNotice} from './LoginBackdrop';
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'RequestPasswordResetScreen'>;
 export const RequestPasswordResetScreen = (props: Props) => {
@@ -20,6 +20,7 @@ export const RequestPasswordResetScreen = (props: Props) => {
   const [error, setError] = useState<string>();
   const [success, setSuccess] = useState(false);
   const [requestPasswordReset, {isLoading: pending}] = useRequestPasswordResetMutation();
+  const {mailEnabled} = useInstanceFeatures();
 
   const resetPassword = () => {
     if (pending || !emailValid) {
@@ -34,6 +35,21 @@ export const RequestPasswordResetScreen = (props: Props) => {
     });
   };
 
+  if (!mailEnabled) {
+    return (
+      <LoginBackdrop>
+        <LoginColumn>
+          <Text style={CentralStyles.loginTitle}>{t('screens.resetPassword.title')}</Text>
+          <LoginNotice
+            testID="password-reset-no-mail"
+            message={t('screens.resetPassword.noMail')}
+            actionLabel={t('screens.resetPassword.backToLogin')}
+            onAction={() => props.navigation.popTo('LoginScreen')} />
+        </LoginColumn>
+      </LoginBackdrop>
+    );
+  }
+
   return (
     <LoginBackdrop>
       <SuccessErrorBanner
@@ -44,28 +60,22 @@ export const RequestPasswordResetScreen = (props: Props) => {
         errorContent={error ?? ''}
         successContent={t('screens.resetPassword.successRequestSent.message')}
       />
-      <View style={{flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center'}}>
-
-        <View style={CentralStyles.smallContentContainer}>
-          <Text testID="password-reset-title" style={CentralStyles.loginTitle}>{t('screens.resetPassword.title')}</Text>
-          <EmailValidationInput
-            value={emailAddress}
-            onChangeText={setEmailAddress}
-            onValidityChange={setEmailValid}
-            returnKeyType='go'
-            onSubmitEditing={resetPassword} />
-          <Spacer height={20}/>
-          <Button
-            mode='contained'
-            loading={pending}
-            disabled={pending || !emailValid}
-            onPress={resetPassword}
-          >{t('screens.resetPassword.resetPasswordButton')}</Button>
-        </View>
-      </View>
+      <LoginColumn>
+        <Text testID="password-reset-title" style={CentralStyles.loginTitle}>{t('screens.resetPassword.title')}</Text>
+        <EmailValidationInput
+          value={emailAddress}
+          onChangeText={setEmailAddress}
+          onValidityChange={setEmailValid}
+          returnKeyType='go'
+          onSubmitEditing={resetPassword} />
+        <Spacer height={20}/>
+        <Button
+          mode='contained'
+          loading={pending}
+          disabled={pending || !emailValid}
+          onPress={resetPassword}
+        >{t('screens.resetPassword.resetPasswordButton')}</Button>
+      </LoginColumn>
     </LoginBackdrop>
   );
 };

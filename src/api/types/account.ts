@@ -19,6 +19,23 @@ export interface InstanceInfo {
   ocrImportEnabled: boolean;
   /** Whether accounts may create api keys. */
   apiKeysEnabled: boolean;
+  /** True until an administrator exists; sign ups are refused until then. */
+  setupRequired: boolean;
+  signupMode: SignupMode;
+  /** Whether the instance can send emails. Without, an administrator hands out reset and invitation links. */
+  mailEnabled: boolean;
+}
+
+export type SignupMode = 'OPEN' | 'INVITATION_ONLY';
+
+/** What became of a new account: usable at once, waiting for its owner's mail link, or for an administrator. */
+export type SignupState = 'ACTIVE' | 'AWAITING_CONFIRMATION' | 'AWAITING_APPROVAL';
+
+export interface SignupRequest {
+  emailAddress: string;
+  password: string;
+  /** The token of an invitation link; absent for an open sign up. */
+  invitation?: string;
 }
 
 export type ApiScope = 'shopping:read' | 'shopping:write';

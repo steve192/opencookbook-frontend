@@ -51,6 +51,7 @@
     "screenTitleRequestPasswordReset": "Forgot password",
     "screenTitleAccountActivation": "Account activation",
     "screenTitleSharedRecipe": "Shared recipe",
+    "screenTitleInvitation": "Invitation",
     "screenTitleRecipeScan": "Scan a recipe",
     "suggestion": "What to cook"
   },
@@ -104,6 +105,8 @@
         "message": "Your password was successfully set"
       },
       "title": "Reset Password",
+      "noMail": "This server cannot send emails. Ask its administrator for a link to reset your password.",
+      "backToLogin": "Back to login",
       "enterNewPassword": "Enter new password",
       "resetPasswordButton": "Reset Password"
     },
@@ -124,7 +127,23 @@
       "passwordConfirm": "Password confirm",
       "acceptTerms": "I accept the <terms>terms of use</terms> and the <privacy>privacy policy</privacy>",
       "register": "Register",
-      "errorNoPasswordMatch": "Passwords do not match"
+      "errorNoPasswordMatch": "Passwords do not match",
+      "setupRequired": "This server has not been set up yet. The administrator has to create the first account at {{address}}.",
+      "openAdministration": "Open administration",
+      "invitationOnly": "This server only accepts invited people",
+      "signupActive": {
+        "title": "Account created",
+        "message": "Your account is ready. You can sign in now."
+      },
+      "signupApproval": {
+        "title": "Account created, waiting for approval",
+        "message": "An administrator of this server has to activate your account before you can sign in."
+      },
+      "invitation": {
+        "title": "Join {{instance}}",
+        "signedIn": "You are signed in. To use this invitation, sign out first and create the new account.",
+        "signOut": "Sign out"
+      }
     },
     "overview": {
       "myRecipes": "My recipes",
@@ -830,6 +849,11 @@
     "conflict": "That conflicts with something that already exists",
     "rateLimited": "That was tried a few times too often. Please wait a moment",
     "mailFailed": "The email could not be sent. Please try again in a few minutes",
+    "setupRequired": "This server has not been set up yet. The administrator has to finish the setup first",
+    "setupCompleted": "This server is already set up",
+    "invitationInvalid": "This invitation has expired or was already used. Ask for a new one",
+    "accountAwaitingApproval": "Your account has to be activated by an administrator first",
+    "mailNotConfigured": "This server cannot send emails",
     "importUrlInvalid": "That does not look like a recipe link. Paste a full address starting with https://",
     "importNotSupported": "This website is unfortunately not supported yet",
     "importFailed": "No recipe could be read from that page"

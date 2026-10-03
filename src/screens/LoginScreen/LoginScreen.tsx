@@ -1,22 +1,26 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, TextInput as RNTextInput, View} from 'react-native';
+import {Linking, StyleSheet, TextInput as RNTextInput, View} from 'react-native';
 import {Button, Card, IconButton, Modal, Portal, Text, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
-import {useSignInMutation} from '../../api/endpoints/account';
+import {useGetInstanceInfoQuery, useSignInMutation} from '../../api/endpoints/account';
 import {FormErrorMessage} from '../../components/FormErrorMessage';
 import {LegalLinks} from '../../components/LegalLinks';
 import {PasswordInput} from '../../components/PasswordInput';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {resolveAppVersion} from '../../helper/appVersion';
+import {adminAddress} from '../../helper/instanceAddress';
+import {useInstanceFeatures} from '../../helper/useInstanceFeatures';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import {switchServer} from '../../redux/sessionThunks';
 import {login} from '../../redux/features/authSlice';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles, {OwnColors} from '../../styles/CentralStyles';
-import {LoginBackdrop} from './LoginBackdrop';
+import {LoginBackdrop, LoginColumn, LoginNotice} from './LoginBackdrop';
 
+
+const SETUP_POLL_INTERVAL_MS = 10_000;
 
 type Props = NativeStackScreenProps<LoginNavigationProps, 'LoginScreen'>;
 
@@ -28,6 +32,9 @@ const LoginScreen = ({route, navigation}: Props) => {
   const [serverUrl, setServerUrl] = useState<string>(backendUrl);
   const [apiErrorMessage, setApiErrorMessage] = useState<string>();
   const [signIn, {isLoading: loginPending}] = useSignInMutation();
+  const {setupRequired, signupMode} = useInstanceFeatures();
+  // The administrator finishes the setup in another window; the notice goes away on its own.
+  useGetInstanceInfoQuery(undefined, {pollingInterval: setupRequired ? SETUP_POLL_INTERVAL_MS : 0});
 
   const passwordInputRef = useRef<RNTextInput>(null);
 
@@ -46,6 +53,11 @@ const LoginScreen = ({route, navigation}: Props) => {
   };
 
   useEffect(() => setServerUrl(backendUrl), [backendUrl]);
+
+  const newAccountAddress = route.params?.emailAddress;
+  useEffect(() => {
+    newAccountAddress && setEmail(newAccountAddress);
+  }, [newAccountAddress]);
 
   // Translated here rather than in the helper so the app's typed translation
   // keys stay checked at the call site.
@@ -85,6 +97,70 @@ const LoginScreen = ({route, navigation}: Props) => {
   );
 
 
+  const signInForm = (
+    <>
+      <TextInput
+        testID='usernameInput'
+        mode="flat"
+        dense={true}
+        value={email}
+        keyboardType='email-address'
+        autoCapitalize='none'
+        autoComplete='email'
+        autoCorrect={false}
+        returnKeyType='next'
+        submitBehavior='submit'
+        onSubmitEditing={() => passwordInputRef.current?.focus()}
+        onChangeText={setEmail}
+        label="E-Mail" />
+      <Spacer height={10} />
+      <PasswordInput
+        ref={passwordInputRef}
+        testID='passwordInput'
+        password={password}
+        setPassword={setPassword}
+        label={t('screens.login.password')}
+        returnKeyType='go'
+        onSubmitEditing={doLogin}
+      />
+      <View style={styles.forgotPasswordContainer}>
+        <Button
+          testID='forgotPassword'
+          textColor={OwnColors.bluishGrey}
+          compact={true}
+          uppercase={false}
+          labelStyle={{fontWeight: 'bold'}}
+          onPress={() => navigation.navigate('RequestPasswordResetScreen')}>
+          {t('screens.login.forgotPassword')}
+        </Button>
+      </View>
+      <Button
+        testID='loginButton'
+        mode="contained"
+        labelStyle={{fontWeight: 'bold', color: 'white'}}
+        style={CentralStyles.elementSpacing}
+        loading={loginPending}
+        disabled={loginPending || !email || !password}
+        onPress={doLogin}>Login</Button>
+      <FormErrorMessage testID='loginError' message={apiErrorMessage} />
+      {signupMode === 'OPEN' &&
+        <Button
+          testID='SignUpButton'
+          textColor={OwnColors.bluishGrey}
+          compact={true}
+          uppercase={false}
+          labelStyle={{fontWeight: 'bold'}}
+          onPress={() => navigation.navigate('SignupScreen')}
+        >
+          {t('screens.login.createAccount')}
+        </Button>
+      }
+      {signupMode === 'INVITATION_ONLY' &&
+        <Text testID='invitationOnly' style={styles.invitationOnly}>{t('screens.login.invitationOnly')}</Text>
+      }
+    </>
+  );
+
   return (
     <LoginBackdrop>
       <IconButton
@@ -93,65 +169,10 @@ const LoginScreen = ({route, navigation}: Props) => {
         size={20}
         onPress={() => setSettingsModalVisible(true)}
       />
-      <View style={styles.loginContainer}>
-        <View style={CentralStyles.smallContentContainer}>
-          <Text style={CentralStyles.loginTitle}>CookPal</Text>
-          <TextInput
-            testID='usernameInput'
-            mode="flat"
-            dense={true}
-            value={email}
-            keyboardType='email-address'
-            autoCapitalize='none'
-            autoComplete='email'
-            autoCorrect={false}
-            returnKeyType='next'
-            submitBehavior='submit'
-            onSubmitEditing={() => passwordInputRef.current?.focus()}
-            onChangeText={setEmail}
-            label="E-Mail" />
-          <Spacer height={10} />
-          <PasswordInput
-            ref={passwordInputRef}
-            testID='passwordInput'
-            password={password}
-            setPassword={setPassword}
-            label={t('screens.login.password')}
-            returnKeyType='go'
-            onSubmitEditing={doLogin}
-          />
-          <View style={styles.forgotPasswordContainer}>
-            <Button
-              testID='forgotPassword'
-              textColor={OwnColors.bluishGrey}
-              compact={true}
-              uppercase={false}
-              labelStyle={{fontWeight: 'bold'}}
-              onPress={() => navigation.navigate('RequestPasswordResetScreen')}>
-              {t('screens.login.forgotPassword')}
-            </Button>
-          </View>
-          <Button
-            testID='loginButton'
-            mode="contained"
-            labelStyle={{fontWeight: 'bold', color: 'white'}}
-            style={CentralStyles.elementSpacing}
-            loading={loginPending}
-            disabled={loginPending || !email || !password}
-            onPress={doLogin}>Login</Button>
-          <FormErrorMessage testID='loginError' message={apiErrorMessage} />
-          <Button
-            testID='SignUpButton'
-            textColor={OwnColors.bluishGrey}
-            compact={true}
-            uppercase={false}
-            labelStyle={{fontWeight: 'bold'}}
-            onPress={() => navigation.navigate('SignupScreen')}
-          >
-            {t('screens.login.createAccount')}
-          </Button>
-        </View>
-      </View>
+      <LoginColumn>
+        <Text style={CentralStyles.loginTitle}>CookPal</Text>
+        {setupRequired ? <SetupRequiredNotice instance={backendUrl} /> : signInForm}
+      </LoginColumn>
       <View style={styles.footer}>
         <LegalLinks color={OwnColors.bluishGrey} />
         <Text style={styles.version}>{versionLabel()}</Text>
@@ -161,7 +182,31 @@ const LoginScreen = ({route, navigation}: Props) => {
   );
 };
 
+/**
+ * Stands in for the form while the instance has no administrator: nobody can sign in or sign up
+ * before the setup, which happens in the administration.
+ *
+ * @param {object} props the instance that is not set up
+ * @return {JSX.Element} what to do instead
+ */
+const SetupRequiredNotice = (props: {instance: string}) => {
+  const {t} = useTranslation('translation');
+  const address = adminAddress(props.instance);
+  return (
+    <LoginNotice
+      testID='setupRequired'
+      message={t('screens.login.setupRequired', {address})}
+      actionLabel={t('screens.login.openAdministration')}
+      onAction={() => Linking.openURL(address)} />
+  );
+};
+
 const styles = StyleSheet.create({
+  invitationOnly: {
+    color: OwnColors.bluishGrey,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
   footer: {
     position: 'absolute',
     bottom: 10,
@@ -179,15 +224,6 @@ const styles = StyleSheet.create({
   forgotPasswordContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-  },
-  loginContainer: {
-    flex: 1,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 16,
-    marginRight: 16,
-
   },
 });
 

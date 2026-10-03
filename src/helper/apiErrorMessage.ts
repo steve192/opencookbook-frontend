@@ -21,10 +21,14 @@ export const MESSAGE_KEYS = {
   REAUTHENTICATION_REQUIRED: 'errors.authenticationRequired',
   INVALID_CREDENTIALS: 'errors.invalidCredentials',
   ACCOUNT_NOT_ACTIVATED: 'errors.accountNotActivated',
+  ACCOUNT_AWAITING_APPROVAL: 'errors.accountAwaitingApproval',
   ACCESS_DENIED: 'errors.accessDenied',
 
   EMAIL_ALREADY_REGISTERED: 'errors.emailAlreadyRegistered',
   SIGNUP_DISABLED: 'errors.signupDisabled',
+  SETUP_REQUIRED: 'errors.setupRequired',
+  SETUP_COMPLETED: 'errors.setupCompleted',
+  INVITATION_INVALID: 'errors.invitationInvalid',
   ACTIVATION_LINK_INVALID: 'errors.activationLinkInvalid',
   PASSWORD_RESET_LINK_INVALID: 'errors.passwordResetLinkInvalid',
   LAST_ADMINISTRATOR: 'errors.lastAdministrator',
@@ -33,6 +37,7 @@ export const MESSAGE_KEYS = {
   CONFLICT: 'errors.conflict',
   RATE_LIMITED: 'errors.rateLimited',
   MAIL_DELIVERY_FAILED: 'errors.mailFailed',
+  MAIL_NOT_CONFIGURED: 'errors.mailNotConfigured',
 
   HOUSEHOLD_FULL: 'screens.households.full',
   TOO_MANY_HOUSEHOLDS: 'screens.households.tooMany',

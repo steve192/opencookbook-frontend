@@ -34,6 +34,7 @@ import {useOnboarding} from '../screens/onboarding/useOnboarding';
 import {RecipeSuggestionScreen} from '../screens/suggestion/RecipeSuggestionScreen';
 import {PlanDraftScreen} from '../screens/weekplanning/PlanDraftScreen';
 import {WeekplanWizardScreen} from '../screens/weekplanning/WeekplanWizardScreen';
+import {InvitationScreen} from '../screens/InvitationScreen';
 import {SharedRecipeScreen} from '../screens/SharedRecipeScreen';
 import {HouseholdInviteScreen} from '../screens/households/HouseholdInviteScreen';
 import {HouseholdListScreen} from '../screens/households/HouseholdListScreen';
@@ -423,6 +424,11 @@ const MainNavigation = () => {
           header: (nav) => <PaperStackHeader {...nav} />,
           title: t('navigation.screenTitleSharedRecipe'),
         }}
+      />
+      <BaseStack.Screen
+        name='InvitationScreen'
+        component={InvitationScreen}
+        options={{title: t('navigation.screenTitleInvitation')}}
       />
     </BaseStack.Navigator>
   );
