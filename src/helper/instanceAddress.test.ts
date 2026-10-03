@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {isSameInstance, normalizeServerAddress} from './instanceAddress';
+import {adminAddress, isSameInstance, normalizeServerAddress} from './instanceAddress';
 
 describe('isSameInstance', () => {
   // Every one of these is a way of writing the same server, and every one of them would
@@ -47,5 +47,15 @@ describe('normalizeServerAddress', () => {
 
   it('keeps a path that only starts like the base path', () => {
     expect(normalizeServerAddress('https://example.org/application')).toBe('https://example.org/application');
+  });
+});
+
+describe('adminAddress', () => {
+  it.each([
+    ['https://example.org', 'https://example.org/admin'],
+    ['https://example.org/', 'https://example.org/admin'],
+    ['https://example.org/app', 'https://example.org/admin'],
+  ])('puts the administration of %s at %s', (instance, expected) => {
+    expect(adminAddress(instance)).toBe(expected);
   });
 });

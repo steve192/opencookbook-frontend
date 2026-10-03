@@ -49,3 +49,11 @@ export const normalizeServerAddress = (typed: string): string => {
   const address = withoutSlashes(typed.trim());
   return withoutSlashes(address.endsWith(BASE_PATH) ? address.slice(0, -BASE_PATH.length) : address);
 };
+
+/**
+ * Where an instance's administration lives, which is also where it is set up.
+ *
+ * @param {string} instance the address of the instance
+ * @return {string} the address of its administration
+ */
+export const adminAddress = (instance: string): string => `${normalizeServerAddress(instance)}/admin`;

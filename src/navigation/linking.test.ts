@@ -35,6 +35,10 @@ describe('linking', () => {
     expect(paramsOf('/recipe?recipeId=3')).toEqual({recipeId: 3});
   });
 
+  it('opens an invitation with its token', () => {
+    expect(paramsOf('/invite/Xy_9-abc')).toEqual({token: 'Xy_9-abc'});
+  });
+
   it('reads a group of the recipe list as a number', () => {
     expect(paramsOf('/myRecipes?shownRecipeGroupId=5')).toEqual({shownRecipeGroupId: 5});
   });

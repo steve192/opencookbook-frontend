@@ -9,13 +9,16 @@ export type BaseNavigatorProps = {
     // Outside the authenticated navigator on purpose: a public link that demanded an account
     // would not be public. Only saving the recipe needs one.
     SharedRecipeScreen: { shareId: string }
+    // Outside the authenticated navigator for the same reason: the invited have no account yet.
+    InvitationScreen: { token: string }
     // Holds the login stack until somebody is signed in and the main one afterwards. Typed
     // as the main one so that reaching a screen from outside the app - from a notification,
     // say - is checked rather than cast away.
     default: NavigatorScreenParams<MainNavigationProps> | undefined
 }
 export type LoginNavigationProps = {
-    LoginScreen: undefined
+    /** The address of a new account, filled in so that signing in is the next thing to do. */
+    LoginScreen: { emailAddress?: string } | undefined
     SignupScreen: undefined
     RequestPasswordResetScreen: undefined
 }

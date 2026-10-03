@@ -51,6 +51,7 @@
     "screenTitleRequestPasswordReset": "Passwort vergessen",
     "screenTitleAccountActivation": "Kontoaktivierung",
     "screenTitleSharedRecipe": "Geteiltes Rezept",
+    "screenTitleInvitation": "Einladung",
     "screenTitleRecipeScan": "Rezept scannen",
     "suggestion": "Was kochen"
   },
@@ -104,6 +105,8 @@
         "message": "Dein neues Passwort wurde erfolgreich gesetzt. Du kannst es absofort zum einloggen verwenden"
       },
       "title": "Passwort zurücksetzen",
+      "noMail": "Dieser Server kann keine E-Mails versenden. Frag den Administrator nach einem Link zum Zurücksetzen deines Passworts.",
+      "backToLogin": "Zurück zur Anmeldung",
       "enterNewPassword": "Neues Passwort eingeben",
       "resetPasswordButton": "Passwort zurücksetzen"
     },
@@ -124,7 +127,23 @@
       "acceptTerms": "Ich akzeptiere die <terms>Nutzungsbedingungen</terms> und die <privacy>Datenschutzerklärung</privacy>",
       "register": "Registrieren",
       "passwordConfirm": "Passwort bestätigen",
-      "errorNoPasswordMatch": "Passwörter stimmen nicht überein"
+      "errorNoPasswordMatch": "Passwörter stimmen nicht überein",
+      "setupRequired": "Dieser Server ist noch nicht eingerichtet. Der Administrator muss unter {{address}} das erste Konto anlegen.",
+      "openAdministration": "Administration öffnen",
+      "invitationOnly": "Dieser Server nimmt nur eingeladene Leute auf",
+      "signupActive": {
+        "title": "Konto erstellt",
+        "message": "Dein Konto ist bereit. Du kannst dich jetzt anmelden."
+      },
+      "signupApproval": {
+        "title": "Konto erstellt, wartet auf Freigabe",
+        "message": "Ein Administrator dieses Servers muss dein Konto aktivieren, bevor du dich anmelden kannst."
+      },
+      "invitation": {
+        "title": "Beitreten: {{instance}}",
+        "signedIn": "Du bist angemeldet. Um diese Einladung zu nutzen, melde dich zuerst ab und lege dann das neue Konto an.",
+        "signOut": "Abmelden"
+      }
     },
     "overview": {
       "myRecipes": "Meine Rezepte",
@@ -830,6 +849,11 @@
     "conflict": "Das steht im Konflikt mit etwas, das bereits existiert",
     "rateLimited": "Das wurde ein paar Mal zu oft versucht. Bitte warte einen Moment",
     "mailFailed": "Die E-Mail konnte nicht gesendet werden. Bitte versuche es in ein paar Minuten erneut",
+    "setupRequired": "Dieser Server ist noch nicht eingerichtet. Der Administrator muss zuerst die Einrichtung abschließen",
+    "setupCompleted": "Dieser Server ist bereits eingerichtet",
+    "invitationInvalid": "Diese Einladung ist abgelaufen oder wurde schon verwendet. Frag nach einer neuen",
+    "accountAwaitingApproval": "Dein Konto muss zuerst von einem Administrator aktiviert werden",
+    "mailNotConfigured": "Dieser Server kann keine E-Mails versenden",
     "importUrlInvalid": "Das sieht nicht nach einem Rezept-Link aus. Füge eine vollständige Adresse ein, die mit https:// beginnt",
     "importNotSupported": "Diese Webseite wird leider noch nicht unterstützt",
     "importFailed": "Von dieser Seite konnte kein Rezept gelesen werden"

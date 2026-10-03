@@ -44,8 +44,8 @@ const de: SelfHostingContent = {
           type: 'list',
           items: [
             'Einen Server oder Rechner mit Docker und Docker Compose.',
-            'Für den öffentlichen Betrieb eine Domain und einen Reverse Proxy mit HTTPS.',
-            'Einen SMTP-Zugang, damit Aktivierungs- und Passwort-Mails verschickt werden können.',
+            'Für den öffentlichen Betrieb eine Domain und einen Reverse Proxy mit HTTPS. Er muss `X-Forwarded-For` setzen, damit Cookpal Anmeldeversuche pro Besucher zählt; Traefik, Caddy und Nginx Proxy Manager tun das von selbst.',
+            'Optional einen SMTP-Zugang, damit Mails verschickt werden können. Ohne ihn läuft Cookpal auch, siehe Erster Start.',
           ],
         },
         {
@@ -62,7 +62,7 @@ const de: SelfHostingContent = {
         { type: 'code', code: installCode },
         {
           type: 'p',
-          text: '2. Passe die Datei `.env` an. Ändere mindestens `DB_PASSWORD`. Die wichtigsten Einstellungen stehen im nächsten Abschnitt.',
+          text: '2. Passe die Datei `.env` an. Ändere mindestens `DB_PASSWORD` und setze `INSTANCE_URL` auf die öffentliche Adresse ohne `/app` (z. B. `https://kochbuch.example.com` oder `http://<Server>:3009`). Die wichtigsten Einstellungen stehen im Abschnitt „Wichtige Einstellungen“.',
         },
         { type: 'p', text: '3. Starte Cookpal.' },
         { type: 'code', code: startCode },
@@ -71,6 +71,29 @@ const de: SelfHostingContent = {
           text: 'Die App ist danach auf dem Port erreichbar, den `httpPort` festlegt (Standard 3009). Stelle für den öffentlichen Betrieb einen Reverse Proxy mit HTTPS davor.',
         },
         { type: 'link', label: 'Ordner compose auf GitHub', href: links.githubCompose },
+      ],
+    },
+    {
+      id: 'first-start',
+      title: 'Erster Start',
+      blocks: [
+        {
+          type: 'p',
+          text: 'Öffne direkt nach dem Start `https://<deine Domain>/admin`, ohne Domain `http://<Server>:3009/admin`. Wer zuerst dort ist, wird Administrator, also tu das sofort. Bis dahin bleibt die App geschlossen. Die Administration ist nur auf Englisch.',
+        },
+        {
+          type: 'list',
+          items: [
+            'Lege das Administrator-Konto an.',
+            'Prüfe die Übersicht unter „Instance“: Sie zeigt deine Konfiguration und ob Mailserver, Rezeptimport und Rezeptscan funktionieren.',
+            'Wähle die Registrierung: „Open“ (jeder kann sich registrieren) oder „Invitation only“ (nur mit Einladung).',
+            'Lade Leute unter „Invitations“ ein: Du erzeugst einen Link und gibst ihn weiter. Ein Link gilt einmal und läuft nach 1, 7 oder 30 Tagen ab. Wer ihn öffnet, wählt E-Mail-Adresse und Passwort.',
+          ],
+        },
+        {
+          type: 'p',
+          text: 'Mail ist optional. Mails brauchen `SMTP_*` und `INSTANCE_URL`. Ohne sie bleiben offene Registrierungen gesperrt, bis ein Administrator sie unter „Users“ in der Administration aktiviert. Einladungs- und Passwort-Links werden nicht verschickt, sondern in der Administration angezeigt, damit du sie weitergeben kannst.',
+        },
       ],
     },
     {
@@ -86,9 +109,9 @@ const de: SelfHostingContent = {
             ['DB_PASSWORD', 'Das Passwort der Datenbank. Ändere es.'],
             [
               'INSTANCE_URL',
-              'Die öffentliche Adresse ohne `/app`. Sie wird für Links in Mails und beim Teilen verwendet.',
+              'Die öffentliche Adresse ohne `/app`. Immer setzen: Einladungs- und Passwort-Links, jede Mail und geteilte Rezepte nutzen sie, und ohne sie werden keine Mails verschickt.',
             ],
-            ['SMTP_*, MAIL_FROM', 'Zugangsdaten und Absender für Aktivierungs- und Passwort-Mails.'],
+            ['SMTP_*, MAIL_FROM', 'Optional: Zugangsdaten und Absender für Mails. Zusammen mit `INSTANCE_URL` nötig, sonst verschickt Cookpal keine Mails.'],
             [
               'LANDING_ENABLED',
               'Zeigt diese Projektseite unter `/`. Standardmäßig aus, dann öffnet `/` die App.',
@@ -171,8 +194,8 @@ const en: SelfHostingContent = {
           type: 'list',
           items: [
             'A server or computer with Docker and Docker Compose.',
-            'For public use, a domain and a reverse proxy with HTTPS.',
-            'SMTP access, so activation and password mails can be sent.',
+            'For public use, a domain and a reverse proxy with HTTPS. It has to set `X-Forwarded-For` so Cookpal counts sign-in attempts per visitor; Traefik, Caddy and Nginx Proxy Manager do that out of the box.',
+            'Optionally SMTP access, so mails can be sent. Cookpal runs without it too, see First start.',
           ],
         },
         {
@@ -189,7 +212,7 @@ const en: SelfHostingContent = {
         { type: 'code', code: installCode },
         {
           type: 'p',
-          text: '2. Edit the `.env` file. At the very least change `DB_PASSWORD`. The most important settings are in the next section.',
+          text: '2. Edit the `.env` file. At the very least change `DB_PASSWORD` and set `INSTANCE_URL` to the public address without `/app` (e.g. `https://cookbook.example.com` or `http://<server>:3009`). The most important settings are in the section Important settings.',
         },
         { type: 'p', text: '3. Start Cookpal.' },
         { type: 'code', code: startCode },
@@ -198,6 +221,29 @@ const en: SelfHostingContent = {
           text: 'The app is then reachable on the port set by `httpPort` (default 3009). For public use, put a reverse proxy with HTTPS in front.',
         },
         { type: 'link', label: 'The compose folder on GitHub', href: links.githubCompose },
+      ],
+    },
+    {
+      id: 'first-start',
+      title: 'First start',
+      blocks: [
+        {
+          type: 'p',
+          text: 'Right after the start, open `https://<your domain>/admin`, or `http://<server>:3009/admin` without a domain. Whoever gets there first becomes the administrator, so do it immediately. Until then the app stays closed. The admin panel is English only.',
+        },
+        {
+          type: 'list',
+          items: [
+            'Create the administrator account.',
+            'Check the overview under "Instance": it shows your configuration and whether the mail server, the recipe import and the recipe scan work.',
+            'Choose the registration: "Open" (anyone can sign up) or "Invitation only".',
+            'Invite people under "Invitations": create a link and hand it over. A link works once and expires after 1, 7 or 30 days. Whoever opens it picks an email address and a password.',
+          ],
+        },
+        {
+          type: 'p',
+          text: 'Mail is optional and needs `SMTP_*` and `INSTANCE_URL`. Without them, open signups stay locked until an administrator activates them under "Users" in the admin panel. Invitation and password reset links are not mailed but shown in the admin panel, so you can hand them over.',
+        },
       ],
     },
     {
@@ -213,9 +259,9 @@ const en: SelfHostingContent = {
             ['DB_PASSWORD', 'The database password. Change it.'],
             [
               'INSTANCE_URL',
-              'The public address without `/app`. It is used for links in mails and shares.',
+              'The public address without `/app`. Always set it: invitation and password reset links, every mail and shared recipes use it, and no mail is sent without it.',
             ],
-            ['SMTP_*, MAIL_FROM', 'Credentials and sender for activation and password mails.'],
+            ['SMTP_*, MAIL_FROM', 'Optional: credentials and sender for mails. Needed together with `INSTANCE_URL`, otherwise Cookpal sends no mail.'],
             [
               'LANDING_ENABLED',
               'Shows this project page at `/`. Off by default, then `/` opens the app.',

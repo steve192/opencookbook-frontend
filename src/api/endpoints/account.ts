@@ -3,7 +3,7 @@ import {api} from '../api';
 import {ApiError} from '../ApiError';
 import {queryString} from '../queryString';
 import {IssuedTokens, storeTokens} from '../session';
-import {ApiKey, ApiScope, InstanceInfo, IssuedApiKey, UserInfo} from '../types/account';
+import {ApiKey, ApiScope, InstanceInfo, IssuedApiKey, SignupRequest, SignupState, UserInfo} from '../types/account';
 import {ShoppingProvider} from '../types/shopping';
 
 // Tokens are stored before the call resolves, so whatever the caller does next is signed in.
@@ -44,8 +44,8 @@ const accountApi = api.injectEndpoints({
           signedIn(await baseQuery({url: '/users/activate' + queryString({activationId}),
             anonymous: true})),
       }),
-      signUp: builder.mutation<void, {emailAddress: string, password: string}>({
-        query: (credentials) => ({url: '/users/signup', method: 'POST', body: credentials, anonymous: true}),
+      signUp: builder.mutation<{state: SignupState}, SignupRequest>({
+        query: (request) => ({url: '/users/signup', method: 'POST', body: request, anonymous: true}),
       }),
       requestPasswordReset: builder.mutation<void, string>({
         query: (emailAddress) => ({url: '/users/requestPasswordReset', method: 'POST', body: {emailAddress},

@@ -4,13 +4,16 @@
  * it with a number, and `editing: "false"`, which is true.
  */
 
+import {LINK_SEGMENTS} from '../helper/appLink';
+
 const flag = (value: string): boolean => value === 'true';
 
 export const LINKING_SCREENS = {
   AccountActivationScreen: 'activateAccount',
   PasswordResetScreen: 'resetPassword',
   LegalDocumentScreen: 'legal/:document',
-  SharedRecipeScreen: 'share/:shareId',
+  SharedRecipeScreen: `${LINK_SEGMENTS.share}/:shareId`,
+  InvitationScreen: `${LINK_SEGMENTS.invitation}/:token`,
   default: {
     // Beneath any linked screen, so it has somewhere to go back to. The login stack
     // has no such route and drops it.

@@ -1,6 +1,5 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {useLinkingURL} from 'expo-linking';
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Button, Surface, Text} from 'react-native-paper';
@@ -11,10 +10,11 @@ import {SharedImageAccess} from '../components/ImageAccessContext';
 import {SharedNutritionSheet} from '../components/NutritionSheets';
 import {askForPlanningDetails} from '../components/PlanningDetailsPrompt';
 import {RecipeDetailView} from '../components/RecipeDetailView';
+import {LINK_SEGMENTS} from '../helper/appLink';
+import {useAppLinkOrigin} from '../helper/useAppLinkOrigin';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {isSameInstance} from '../helper/instanceAddress';
-import {parseShareLink} from '../helper/recipeSharing';
 import {BaseNavigatorProps} from '../navigation/NavigationRoutes';
 import {useIsOnline} from '../offline/useIsOnline';
 import {selectLoggedIn} from '../redux/features/authSlice';
@@ -50,7 +50,7 @@ export const SharedRecipeScreen = (props: Props) => {
   const [scaledServings, setScaledServings] = useState(1);
   const [awaitingSignIn, setAwaitingSignIn] = useState(false);
   const failure = !recipe && error ? failureFor(error) : undefined;
-  const linkOrigin = useShareLinkOrigin(shareId);
+  const linkOrigin = useAppLinkOrigin(LINK_SEGMENTS.share, shareId);
 
   useEffect(() => {
     recipe && setScaledServings(recipe.servings > 0 ? recipe.servings : 1);
@@ -187,30 +187,6 @@ const ImportAction = (props: {
       {props.importing ? t('screens.sharedRecipe.importing') : t('screens.sharedRecipe.importButton')}
     </Button>
   );
-};
-
-/**
- * The instance a share link named, if it named one.
- *
- * The route only carries the share id, because that is all the navigator matches on - but which
- * server the share lives on is in the link too, and a link to somebody else's instance has to be
- * resolved there rather than against whatever server this app happens to be signed in to.
- *
- * @param {string} shareId the share the screen was opened for
- * @return {string | undefined} the instance from the link, or undefined when it named none
- */
-const useShareLinkOrigin = (shareId: string): string | undefined => {
-  const openedUrl = useLinkingURL();
-
-  return useMemo(() => {
-    if (!openedUrl) {
-      return undefined;
-    }
-    const link = parseShareLink(openedUrl);
-    // Ignore a url that has moved on to another share, which happens when a second link is
-    // opened while the first one is still on screen.
-    return link?.shareId === shareId ? link.origin : undefined;
-  }, [openedUrl, shareId]);
 };
 
 /**
