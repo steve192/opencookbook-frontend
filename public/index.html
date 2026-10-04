@@ -26,6 +26,15 @@
       body {
         overflow: hidden;
       }
+      /* iOS paints the status bar of the installed app in the body color: the header color, until the app has started */
+      body {
+        background-color: #72B600;
+      }
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: #518100;
+        }
+      }
       /* These styles make the root element full-height */
       #root {
         display: flex;

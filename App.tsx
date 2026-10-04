@@ -16,6 +16,7 @@ import {GlobalSnackbar} from './src/helper/GlobalSnackbar';
 import './src/i18n/config';
 import MainNavigation from './src/navigation/MainNavigation';
 import {ConnectivityWatcher} from './src/offline/ConnectivityWatcher';
+import {usePageBackground} from './src/pwa/pageBackground';
 import {ServiceWorkerUpdates} from './src/pwa/ServiceWorkerUpdates';
 import {bootstrap} from './src/redux/sessionThunks';
 import {persistor, RootState, store} from './src/redux/store';
@@ -59,6 +60,7 @@ const ReduxWrappedApp = () => {
     theme = colorScheme == 'light' ? OwnPaperTheme : OwnPaperThemeDark;
   }
 
+  usePageBackground(theme.colors.primary);
 
   return (
     <PaperProvider theme={theme}>
