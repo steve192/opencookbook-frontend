@@ -98,7 +98,7 @@
     "eslint": "8.57.1",
     "eslint-config-google": "0.14.0",
     "eslint-plugin-react": "7.37.5",
-    "sharp": "0.35.4",
+    "sharp": "0.35.5",
     "typescript": "~6.0.3",
     "vitest": "5.0.2",
     "workbox-cli": "7.4.1"
