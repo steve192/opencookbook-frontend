@@ -14,6 +14,9 @@ export interface ScanPages {
   editing: number;
 }
 
+/** How many photographs may make up one recipe. Mirrors the server's own limit. */
+export const MAX_SCAN_PAGES = 6;
+
 export const noPages: ScanPages = {pages: [], editing: -1};
 
 export type ScanPagesAction =
@@ -77,6 +80,13 @@ export const scanPagesReducer = (state: ScanPages, action: ScanPagesAction): Sca
 
 // The page being edited, or undefined when there are none.
 export const editedPage = (state: ScanPages): ScanPage | undefined => state.pages[state.editing];
+
+// Photos to start with, such as ones shared from another app.
+export const pagesOf = (uris: string[] = []): ScanPages => {
+  const added = uris.slice(0, MAX_SCAN_PAGES).reduce(
+      (state, uri) => scanPagesReducer(state, {type: 'added', uri}), noPages);
+  return scanPagesReducer(added, {type: 'selected', index: 0});
+};
 
 const inRange = (index: number, pages: ScanPage[]) => index >= 0 && index < pages.length;
 

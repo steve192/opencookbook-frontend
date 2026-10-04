@@ -9,7 +9,7 @@ interface Options {
   /** Goes ahead with what was asked. Rendered last, as the filled button. */
   confirm?: string;
   onConfirm?: () => void;
-  /** Backs out. Rendered first, as plain text. */
+  /** Backs out. Rendered first, as plain text. Tapping outside or going back answers the same. */
   cancel?: string;
   onCancel?: () => void;
   /** Colours the confirming answer red, for the ones that delete or revoke. */
@@ -33,16 +33,14 @@ export const Prompt = () => {
     return null;
   }
 
-  const close = () => setOptions(undefined);
-
   const answer = (callback?: () => void) => {
     callback?.();
-    close();
+    setOptions(undefined);
   };
 
   return (
     <Portal>
-      <Dialog visible style={overlayStyles.dialogView} onDismiss={close}>
+      <Dialog visible style={overlayStyles.dialogView} onDismiss={() => answer(options.onCancel)}>
         <Dialog.Title>{options.title}</Dialog.Title>
         <Dialog.Content>
           <Text variant="bodyMedium">{options.message}</Text>

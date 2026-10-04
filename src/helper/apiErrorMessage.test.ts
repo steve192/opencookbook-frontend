@@ -29,6 +29,12 @@ describe('reading what a failed request means', () => {
         .toEqual({code: 'SCAN_UNAVAILABLE', status: 503, retryable: true});
   });
 
+  it('keeps the link a failure points to', () => {
+    expect(toApiError(answered(422, {code: 'IMPORT_NO_RECIPE', retryable: false, link: 'https://example.com/pie'})).link)
+        .toBe('https://example.com/pie');
+    expect(toApiError(answered(422, {code: 'IMPORT_NO_RECIPE', retryable: false})).link).toBeUndefined();
+  });
+
   it('treats a server side failure as worth retrying and a rejected request as not', () => {
     expect(toApiError(answered(500)).retryable).toBe(true);
     expect(toApiError(answered(400)).retryable).toBe(false);

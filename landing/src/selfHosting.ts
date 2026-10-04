@@ -29,12 +29,12 @@ const startCode = 'docker compose up -d';
 const updateCode = 'docker compose pull && docker compose up -d';
 
 const de: SelfHostingContent = {
-  title: 'Rezeptverwaltung selbst hosten mit Docker Compose | Cookpal',
+  title: 'Rezeptverwaltung selbst hosten mit Docker Compose | CookPal',
   description:
-    'So hostest du Cookpal selbst: Installation mit Docker Compose, die wichtigsten Einstellungen, die rechtlichen Texte, Updates und Backups.',
+    'So hostest du CookPal selbst: Installation mit Docker Compose, die wichtigsten Einstellungen, die rechtlichen Texte, Updates und Backups.',
   eyebrow: 'Selbst hosten',
-  h1: 'Cookpal selbst hosten',
-  lead: 'Cookpal läuft mit Docker Compose auf deinem eigenen Server. Deine Rezepte, dein Wochenplan und deine Einkaufslisten bleiben bei dir.',
+  h1: 'CookPal selbst hosten',
+  lead: 'CookPal läuft mit Docker Compose auf deinem eigenen Server. Deine Rezepte, dein Wochenplan und deine Einkaufslisten bleiben bei dir.',
   sections: [
     {
       id: 'requirements',
@@ -44,8 +44,8 @@ const de: SelfHostingContent = {
           type: 'list',
           items: [
             'Einen Server oder Rechner mit Docker und Docker Compose.',
-            'Für den öffentlichen Betrieb eine Domain und einen Reverse Proxy mit HTTPS. Er muss `X-Forwarded-For` setzen, damit Cookpal Anmeldeversuche pro Besucher zählt; Traefik, Caddy und Nginx Proxy Manager tun das von selbst.',
-            'Optional einen SMTP-Zugang, damit Mails verschickt werden können. Ohne ihn läuft Cookpal auch, siehe Erster Start.',
+            'Für den öffentlichen Betrieb eine Domain und einen Reverse Proxy mit HTTPS. Er muss `X-Forwarded-For` setzen, damit CookPal Anmeldeversuche pro Besucher zählt; Traefik, Caddy und Nginx Proxy Manager tun das von selbst.',
+            'Optional einen SMTP-Zugang, damit Mails verschickt werden können. Ohne ihn läuft CookPal auch, siehe Erster Start.',
           ],
         },
         {
@@ -64,7 +64,7 @@ const de: SelfHostingContent = {
           type: 'p',
           text: '2. Passe die Datei `.env` an. Ändere mindestens `DB_PASSWORD` und setze `INSTANCE_URL` auf die öffentliche Adresse ohne `/app` (z. B. `https://kochbuch.example.com` oder `http://<Server>:3009`). Die wichtigsten Einstellungen stehen im Abschnitt „Wichtige Einstellungen“.',
         },
-        { type: 'p', text: '3. Starte Cookpal.' },
+        { type: 'p', text: '3. Starte CookPal.' },
         { type: 'code', code: startCode },
         {
           type: 'p',
@@ -111,7 +111,7 @@ const de: SelfHostingContent = {
               'INSTANCE_URL',
               'Die öffentliche Adresse ohne `/app`. Immer setzen: Einladungs- und Passwort-Links, jede Mail und geteilte Rezepte nutzen sie, und ohne sie werden keine Mails verschickt.',
             ],
-            ['SMTP_*, MAIL_FROM', 'Optional: Zugangsdaten und Absender für Mails. Zusammen mit `INSTANCE_URL` nötig, sonst verschickt Cookpal keine Mails.'],
+            ['SMTP_*, MAIL_FROM', 'Optional: Zugangsdaten und Absender für Mails. Zusammen mit `INSTANCE_URL` nötig, sonst verschickt CookPal keine Mails.'],
             [
               'LANDING_ENABLED',
               'Zeigt diese Projektseite unter `/`. Standardmäßig aus, dann öffnet `/` die App.',
@@ -179,12 +179,12 @@ const de: SelfHostingContent = {
 };
 
 const en: SelfHostingContent = {
-  title: 'Self-hosted recipe manager with Docker Compose | Cookpal',
+  title: 'Self-hosted recipe manager with Docker Compose | CookPal',
   description:
-    'How to host Cookpal yourself: installation with Docker Compose, the important settings, the legal texts, updates and backups.',
+    'How to host CookPal yourself: installation with Docker Compose, the important settings, the legal texts, updates and backups.',
   eyebrow: 'Self-hosting',
-  h1: 'Host Cookpal yourself',
-  lead: 'Cookpal runs with Docker Compose on your own server. Your recipes, your week plan and your shopping lists stay with you.',
+  h1: 'Host CookPal yourself',
+  lead: 'CookPal runs with Docker Compose on your own server. Your recipes, your week plan and your shopping lists stay with you.',
   sections: [
     {
       id: 'requirements',
@@ -194,8 +194,8 @@ const en: SelfHostingContent = {
           type: 'list',
           items: [
             'A server or computer with Docker and Docker Compose.',
-            'For public use, a domain and a reverse proxy with HTTPS. It has to set `X-Forwarded-For` so Cookpal counts sign-in attempts per visitor; Traefik, Caddy and Nginx Proxy Manager do that out of the box.',
-            'Optionally SMTP access, so mails can be sent. Cookpal runs without it too, see First start.',
+            'For public use, a domain and a reverse proxy with HTTPS. It has to set `X-Forwarded-For` so CookPal counts sign-in attempts per visitor; Traefik, Caddy and Nginx Proxy Manager do that out of the box.',
+            'Optionally SMTP access, so mails can be sent. CookPal runs without it too, see First start.',
           ],
         },
         {
@@ -214,7 +214,7 @@ const en: SelfHostingContent = {
           type: 'p',
           text: '2. Edit the `.env` file. At the very least change `DB_PASSWORD` and set `INSTANCE_URL` to the public address without `/app` (e.g. `https://cookbook.example.com` or `http://<server>:3009`). The most important settings are in the section Important settings.',
         },
-        { type: 'p', text: '3. Start Cookpal.' },
+        { type: 'p', text: '3. Start CookPal.' },
         { type: 'code', code: startCode },
         {
           type: 'p',
@@ -261,7 +261,7 @@ const en: SelfHostingContent = {
               'INSTANCE_URL',
               'The public address without `/app`. Always set it: invitation and password reset links, every mail and shared recipes use it, and no mail is sent without it.',
             ],
-            ['SMTP_*, MAIL_FROM', 'Optional: credentials and sender for mails. Needed together with `INSTANCE_URL`, otherwise Cookpal sends no mail.'],
+            ['SMTP_*, MAIL_FROM', 'Optional: credentials and sender for mails. Needed together with `INSTANCE_URL`, otherwise CookPal sends no mail.'],
             [
               'LANDING_ENABLED',
               'Shows this project page at `/`. Off by default, then `/` opens the app.',

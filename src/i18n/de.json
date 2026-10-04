@@ -223,16 +223,12 @@
       "tooMany": "Du hast so viele API-Schlüssel, wie dieser Server erlaubt. Widerrufe einen, den du nicht mehr brauchst."
     },
     "import": {
-      "URLToImport": "URL zum importieren",
       "import": "Importieren",
       "supportedServices": "Unterstützte Dienste",
       "importSuccess": "Import erfolgreich",
       "importFailed": "Import fehlgeschlagen",
       "startRecipeBrowser": "Rezepte im Web suchen",
-      "title": "Aus einem Rezept-Link importieren",
-      "description": "Füge den Link eines Online-Rezepts ein. Zutaten, Schritte und Bilder werden automatisch übernommen.",
       "importing": "Rezept wird importiert…",
-      "invalidUrl": "Das sieht nicht nach einem Link aus. Füge eine vollständige Adresse ein, die mit https:// beginnt",
       "openRecipe": "Rezept öffnen",
       "browserTitle": "Kein Link zur Hand?",
       "browserDescription": "Durchsuche Rezeptseiten direkt hier und importiere das Rezept, das du gerade ansiehst.",
@@ -240,7 +236,26 @@
       "supportedServicesDescription": "Diese Seiten werden zuverlässig importiert. Andere Seiten funktionieren oft ebenfalls - probiere es einfach aus.",
       "scanTitle": "Rezept fotografieren",
       "scanDescription": "Ein gedrucktes Rezept abfotografieren und automatisch auslesen lassen.",
-      "startScan": "Rezept scannen"
+      "startScan": "Rezept scannen",
+      "input": "Link oder Rezepttext",
+      "tooLong": "Das ist zu lang für ein Rezept. Füge nur das Rezept selbst ein.",
+      "howShare": "In Instagram, im Browser oder in jeder anderen App: Tippe auf Teilen und dann auf CookPal.",
+      "howPaste": "Oder kopiere einen Link oder Rezepttext und füge ihn unten ein.",
+      "howPasteOnly": "Kopiere einen Link oder Rezepttext und füge ihn unten ein.",
+      "share": {
+        "linkTitle": "Diesen Link importieren?",
+        "textTitle": "Diesen Text importieren?",
+        "photosTitle_one": "Dieses Foto scannen?",
+        "photosTitle_other": "Diese {{count}} Fotos scannen?",
+        "photoLimit": "Nur die ersten {{count}} werden gelesen.",
+        "scan": "Scannen",
+        "photosUnavailableTitle": "Fotos können hier nicht gescannt werden",
+        "photosUnavailable": "Rezepte aus Fotos zu lesen ist auf diesem Server nicht verfügbar. Teile stattdessen einen Link oder den Rezepttext."
+      },
+      "linkedRecipe": {
+        "title": "Dieser Beitrag verweist auf ein Rezept",
+        "message": "Möchtest du es von {{host}} importieren?"
+      }
     },
     "editRecipe": {
       "screenTitleEdit": "Rezept bearbeiten",
@@ -695,7 +710,7 @@
       "provider": {
         "question": "Wohin soll deine Einkaufsliste?",
         "explanation": "Du kannst das jederzeit in den Einstellungen ändern.",
-        "cookpal": "Cookpal-Einkaufsliste",
+        "cookpal": "CookPal-Einkaufsliste",
         "cookpalDescription": "Eingebaut, funktioniert offline, mit deinen Haushalten geteilt.",
         "bring": "Bring®",
         "bringDescription": "Schickt die Zutaten an die Bring®-App.",
@@ -743,7 +758,7 @@
     "licenses": {
       "title": "Open-Source-Lizenzen",
       "subtitle": "Die Software und Grafiken, aus denen diese App besteht",
-      "intro": "Cookpal besteht aus Open-Source-Software und nutzt offene Daten. Jede Komponente behält ihre eigene Lizenz, hier so wiedergegeben, wie sie es verlangt.",
+      "intro": "CookPal besteht aus Open-Source-Software und nutzt offene Daten. Jede Komponente behält ihre eigene Lizenz, hier so wiedergegeben, wie sie es verlangt.",
       "search": "Nach Name oder Lizenz suchen",
       "author": "Von {{author}}",
       "noLicenseText": "Die Komponente liefert keinen eigenen Lizenztext mit.",
@@ -856,7 +871,9 @@
     "mailNotConfigured": "Dieser Server kann keine E-Mails versenden",
     "importUrlInvalid": "Das sieht nicht nach einem Rezept-Link aus. Füge eine vollständige Adresse ein, die mit https:// beginnt",
     "importNotSupported": "Diese Webseite wird leider noch nicht unterstützt",
-    "importFailed": "Von dieser Seite konnte kein Rezept gelesen werden"
+    "importFailed": "Von dieser Seite konnte kein Rezept gelesen werden",
+    "importNoRecipe": "Darin wurde kein Rezept gefunden. Viele Beiträge verweisen nur auf das Rezept, in der Bio oder in einem Kommentar. Importiere es von dort",
+    "importSourceUnavailable": "Dieser Beitrag konnte nicht gelesen werden. Vielleicht ist er privat oder gelöscht. Kopiere stattdessen seinen Text und importiere ihn"
   },
   "mealTypes": {
     "breakfast": "Frühstück",
@@ -905,7 +922,7 @@
   },
   "offline": {
     "noNetwork": "Offline",
-    "unreachable": "Cookpal-Server nicht erreichbar",
+    "unreachable": "CookPal-Server nicht erreichbar",
     "since": "Stand {{time}}",
     "outdated": "Stand {{date}}, eventuell veraltet",
     "notCached": "Offline noch nicht verfügbar",
@@ -920,19 +937,19 @@
   },
   "pwa": {
     "install": {
-      "title": "Cookpal installieren",
-      "body": "Lege Cookpal auf den Startbildschirm, für schnelleren Zugriff und zum Offline-Nutzen.",
+      "title": "CookPal installieren",
+      "body": "Lege CookPal auf den Startbildschirm, für schnelleren Zugriff und zum Offline-Nutzen.",
       "install": "Installieren",
       "notNow": "Nicht jetzt",
       "dontAsk": "Nicht mehr fragen",
       "installButton": "App installieren",
-      "iosTitle": "Cookpal auf iOS installieren",
-      "iosIntro": "iOS lässt Apps sich nicht selbst aus Safari installieren. Mit diesen zwei Schritten kommt Cookpal auf deinen Startbildschirm:",
+      "iosTitle": "CookPal auf iOS installieren",
+      "iosIntro": "iOS lässt Apps sich nicht selbst aus Safari installieren. Mit diesen zwei Schritten kommt CookPal auf deinen Startbildschirm:",
       "iosStep1": "Tippe in Safari auf die Teilen-Taste.",
       "iosStep2": "Scrolle nach unten und tippe auf \"Zum Home-Bildschirm\"."
     },
     "update": {
-      "available": "Eine neue Version von Cookpal ist verfügbar.",
+      "available": "Eine neue Version von CookPal ist verfügbar.",
       "reload": "Neu laden"
     }
   }

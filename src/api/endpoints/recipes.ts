@@ -1,11 +1,10 @@
 import {createSelector} from '@reduxjs/toolkit';
 import {api, KEEP_BRIEFLY_SECONDS} from '../api';
 import {UPLOAD_TIMEOUT_MILLIS} from '../client';
-import {queryString} from '../queryString';
 import {ownRecipesOf, recipeInListing, recipesShownIn} from '../recipeSelection';
 import {imageForm, uploadRequest} from '../upload';
 import {RecipeSuggestionRequest, RecipeSuggestions} from '../types/planning';
-import {Ingredient, Recipe, RecipeDeletionImpact, RecipeDiet, RecipeGroup} from '../types/recipes';
+import {Ingredient, Recipe, RecipeDeletionImpact, RecipeDiet, RecipeGroup, RecipeImport} from '../types/recipes';
 
 export const asRecipe = (recipe: Recipe): Recipe => ({...recipe, type: 'Recipe'});
 const asRecipeGroup = (group: RecipeGroup): RecipeGroup => ({...group, type: 'RecipeGroup'});
@@ -35,11 +34,11 @@ const recipesApi = api.injectEndpoints({
       query: (recipeId) => ({url: `/recipes/${recipeId}`, method: 'DELETE'}),
       invalidatesTags: [...RECIPE_CHANGED],
     }),
-    // Reads a recipe website and saves what it found as a new recipe.
-    importRecipe: builder.mutation<Recipe, string>({
-      query: (importUrl) => ({url: '/recipes/import' + queryString({importUrl}), timeout: UPLOAD_TIMEOUT_MILLIS}),
-      transformResponse: asRecipe,
-      invalidatesTags: [...RECIPE_CHANGED],
+    // Reads a recipe from a link or from text; the server decides which it is.
+    importRecipe: builder.mutation<RecipeImport, string>({
+      query: (input) => ({url: '/recipes/import', method: 'POST', body: {input}, timeout: UPLOAD_TIMEOUT_MILLIS}),
+      transformResponse: (result: RecipeImport) => ({...result, recipe: asRecipe(result.recipe)}),
+      invalidatesTags: (result) => result?.saved ? [...RECIPE_CHANGED] : [],
     }),
     // Copies a recipe somebody else owns into your own cookbook.
     saveRecipeCopy: builder.mutation<Recipe, number>({

@@ -2,7 +2,9 @@ import {describe, expect, it} from 'vitest';
 import {Crop, fullPageCrop, ScanPage} from './recipeScanCrop';
 import {
   editedPage,
+  MAX_SCAN_PAGES,
   noPages,
+  pagesOf,
   ScanPages,
   ScanPagesAction,
   scanPagesReducer,
@@ -36,6 +38,25 @@ describe('adding pages', () => {
 
     expect(uris(state)).toEqual(['one.jpg', 'two.jpg']);
     expect(editedPage(state)?.uri).toBe('two.jpg');
+  });
+});
+
+describe('starting with shared photos', () => {
+  it('starts on the first of them', () => {
+    const state = pagesOf(['one.jpg', 'two.jpg']);
+
+    expect(uris(state)).toEqual(['one.jpg', 'two.jpg']);
+    expect(editedPage(state)?.uri).toBe('one.jpg');
+  });
+
+  it('takes no more than one recipe may span', () => {
+    const shared = Array.from({length: MAX_SCAN_PAGES + 2}, (_, index) => `${index}.jpg`);
+
+    expect(uris(pagesOf(shared))).toEqual(shared.slice(0, MAX_SCAN_PAGES));
+  });
+
+  it('starts empty without any', () => {
+    expect(pagesOf()).toEqual(noPages);
   });
 });
 

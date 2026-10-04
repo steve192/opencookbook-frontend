@@ -28,7 +28,8 @@ export const LINKING_SCREENS = {
       WeekplanWizardScreen: {path: 'planWeek', parse: {weekOffset: Number}},
       PlanDraftScreen: {path: 'planDraft', parse: {draftId: Number}},
       GuidedCookingScreen: {path: 'cook', parse: {recipeId: Number, scaledServings: Number, initialStep: Number}},
-      ImportScreen: 'import',
+      // A share opens the Android app at cookpal://expo-sharing.
+      ImportScreen: {path: 'import', alias: ['expo-sharing']},
       RecipeScanScreen: 'scanRecipe',
       HouseholdListScreen: 'households',
       HouseholdScreen: 'household',

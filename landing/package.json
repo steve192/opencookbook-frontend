@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Public landing page and self-hosting guide for Cookpal.",
+  "description": "Public landing page and self-hosting guide for CookPal.",
   "engines": {
     "node": ">=22.18.0"
   },

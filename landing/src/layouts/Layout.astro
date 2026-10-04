@@ -24,7 +24,7 @@ const jsonLd = [
   {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
-    name: 'Cookpal',
+    name: 'CookPal',
     operatingSystem: 'Android, Web',
     applicationCategory: 'LifestyleApplication',
     inLanguage: lang,
@@ -32,7 +32,7 @@ const jsonLd = [
     url: url(pagePaths.home[lang]),
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
   },
-  { '@context': 'https://schema.org', '@type': 'WebSite', name: 'Cookpal', url: url('/') },
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: 'CookPal', url: url('/') },
 ];
 
 ---
@@ -75,7 +75,7 @@ const jsonLd = [
     <link rel="apple-touch-icon" href="/favicon.png" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Cookpal" />
+    <meta property="og:site_name" content="CookPal" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     {canonical && <meta property="og:url" content={canonical} />}

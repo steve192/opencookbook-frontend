@@ -50,6 +50,8 @@ export const MESSAGE_KEYS = {
   IMPORT_URL_INVALID: 'errors.importUrlInvalid',
   IMPORT_NOT_SUPPORTED: 'errors.importNotSupported',
   IMPORT_FAILED: 'errors.importFailed',
+  IMPORT_NO_RECIPE: 'errors.importNoRecipe',
+  IMPORT_SOURCE_UNAVAILABLE: 'errors.importSourceUnavailable',
 
   SCAN_TOO_MANY_PAGES: 'screens.recipeScan.errors.tooManyPages',
   SCAN_IMAGE_UNREADABLE: 'screens.recipeScan.errors.badImage',

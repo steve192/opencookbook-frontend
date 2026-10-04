@@ -13,6 +13,8 @@ export interface ApiError {
   status?: number;
   /** Whether sending the very same request again could succeed. */
   retryable: boolean;
+  /** Where the reader can go instead, as with IMPORT_NO_RECIPE. */
+  link?: string;
 }
 
 /** The one failure no server can report, because none was reached. */
@@ -22,6 +24,7 @@ export const NETWORK_UNREACHABLE = 'NETWORK_UNREACHABLE';
 interface ErrorBody {
   code?: unknown;
   retryable?: unknown;
+  link?: unknown;
 }
 
 const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
@@ -61,7 +64,9 @@ export const toApiError = (error: unknown): ApiError => {
     body.retryable :
     RETRYABLE_STATUS.has(response.status);
 
-  return {code, status: response.status, retryable};
+  const link = typeof body?.link === 'string' ? body.link : undefined;
+
+  return {code, status: response.status, retryable, link};
 };
 
 // What to call a failure the server did not name. Those come from something in front of it, such as a proxy or

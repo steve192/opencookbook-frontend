@@ -8,10 +8,10 @@ export default ({config}) => {
   if (buildProfile === 'production') {
     // config.android.package = 'com.sterul.opencookbook';
   } else if (buildProfile === 'development') {
-    config.name = 'Cookpal (devclient)';
+    config.name = 'CookPal (devclient)';
     config.android.package = 'com.sterul.opencookbook.dev';
   } else if (buildProfile === 'preview') {
-    config.name = 'Cookpal (preview)';
+    config.name = 'CookPal (preview)';
     config.android.package = 'com.sterul.opencookbook.preview';
   }
   return {

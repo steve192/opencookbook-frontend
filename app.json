@@ -40,7 +40,7 @@
         }
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#295700"
       },
       "package": "com.sterul.opencookbook",
@@ -87,6 +87,21 @@
       "expo-font",
       "expo-localization",
       "expo-secure-store",
+      [
+        "expo-sharing",
+        {
+          "android": {
+            "enabled": true,
+            "singleShareMimeTypes": [
+              "text/plain",
+              "image/*"
+            ],
+            "multipleShareMimeTypes": [
+              "image/*"
+            ]
+          }
+        }
+      ],
       "expo-status-bar"
     ]
   }

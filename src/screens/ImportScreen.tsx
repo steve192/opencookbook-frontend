@@ -1,32 +1,31 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import React, {useEffect, useState} from 'react';
-import {useGetAvailableImportHostsQuery, useImportRecipeMutation} from '../api/endpoints/recipes';
+import React, {useState} from 'react';
+import {useGetAvailableImportHostsQuery} from '../api/endpoints/recipes';
 import {useTranslation} from 'react-i18next';
 import {Platform, ScrollView, StyleSheet, View} from 'react-native';
 import {Button, Chip, Divider, HelperText, Icon, List, Surface, Text, TextInput} from 'react-native-paper';
-import {Recipe} from '../api/types/recipes';
-import {askForPlanningDetails} from '../components/PlanningDetailsPrompt';
-import {errorMessageKey} from '../helper/apiErrorMessage';
+import {Notice} from '../components/Notice';
+import {RECEIVES_SHARES, useIncomingShare} from '../helper/incomingShare';
+import {MAX_IMPORT_INPUT, SharedContent} from '../helper/sharedContent';
 import {useInstanceFeatures} from '../helper/useInstanceFeatures';
+import {useRecipeImport} from '../helper/useRecipeImport';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {useIsOnline} from '../offline/useIsOnline';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
+import {SharePreview} from './import/SharePreview';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'ImportScreen'>;
 
-// Extracts the first http(s) URL from a free-form pasted string (people often
-// share recipe URLs with surrounding text).
-const extractUrl = (input: string): string => {
-  const matches = /((https?):\S+)/.exec(input);
-  return matches?.[1] ?? '';
-};
-
 export const ImportScreen = (props: Props) => {
-  const [importURL, setImportURL] = useState<string>(props.route.params?.importUrl ?? '');
-  const [importRecipe, {isLoading: importPending}] = useImportRecipeMutation();
-  const [importError, setImportError] = useState<string>('');
-  const [importedRecipe, setImportedRecipe] = useState<Recipe | undefined>(undefined);
+  const [input, setInput] = useState('');
+  const {share, dismiss} = useIncomingShare(props.route.params);
+  const {startImport, importing, result} = useRecipeImport({
+    // Replaced, as after a scan: saving the draft leads back to the cookbook.
+    openDraft: () => props.navigation.replace('RecipeWizardScreen', {hasDraft: true}),
+    onSaved: () => setInput(''),
+    failureFallback: 'errors.importFailed',
+  });
   // The host list is a convenience only; without it importing still works.
   const supportedHosts = useGetAvailableImportHostsQuery().data ?? [];
 
@@ -35,35 +34,22 @@ export const ImportScreen = (props: Props) => {
   const online = useIsOnline();
   const {ocrImportEnabled} = useInstanceFeatures();
 
-  // A deep link (e.g. sharing a recipe url into the app) can hand us a url after mount
-  useEffect(() => {
-    const linkedUrl = props.route.params?.importUrl;
-    linkedUrl && setImportURL(linkedUrl);
-  }, [props.route.params?.importUrl]);
+  const tooLong = input.length > MAX_IMPORT_INPUT;
+  const canImport = online && !importing && input.trim().length > 0 && !tooLong;
 
-  const extracted = extractUrl(importURL);
-  const urlLooksValid = extracted.length > 0;
-  // Only complain about the input once the user actually typed something
-  const showInvalidUrlHint = importURL.trim().length > 0 && !urlLooksValid;
-  const canImport = online && !importPending && urlLooksValid;
-
-  const startImport = () => {
-    if (!canImport) return;
-    setImportedRecipe(undefined);
-    setImportError('');
-
-    importRecipe(extracted).unwrap().then((recipe) => {
-      setImportError('');
-      setImportedRecipe(recipe);
-      setImportURL('');
-      askForPlanningDetails(recipe);
-    }).catch((error) => {
-      setImportError(t(errorMessageKey(error, 'errors.importFailed')));
-    });
+  const importShare = (shared: SharedContent) => {
+    dismiss();
+    if (shared.kind === 'photos') {
+      props.navigation.navigate('RecipeScanScreen', {photoUris: shared.uris});
+      return;
+    }
+    // Into the field, so a failed import can be corrected and tried again.
+    setInput(shared.input);
+    startImport(shared.input);
   };
 
   const renderResult = () => {
-    if (importError.length > 0) {
+    if (result?.kind === 'failed') {
       return (
         <View style={[styles.resultBanner, {backgroundColor: theme.colors.errorContainer}]}>
           <Icon source="alert-circle-outline" size={24} color={theme.colors.onErrorContainer} />
@@ -71,13 +57,14 @@ export const ImportScreen = (props: Props) => {
             <Text style={{color: theme.colors.onErrorContainer, fontWeight: 'bold'}}>
               {t('screens.import.importFailed')}
             </Text>
-            <Text style={{color: theme.colors.onErrorContainer}}>{importError}</Text>
+            <Text style={{color: theme.colors.onErrorContainer}}>{t(result.messageKey)}</Text>
           </View>
         </View>
       );
     }
 
-    if (importedRecipe) {
+    if (result?.kind === 'saved') {
+      const recipeId = result.recipe.id;
       return (
         <View style={[styles.resultBanner, {backgroundColor: theme.colors.primaryContainer}]}>
           <Icon source="check-circle-outline" size={24} color={theme.colors.onPrimaryContainer} />
@@ -85,10 +72,10 @@ export const ImportScreen = (props: Props) => {
             <Text style={{color: theme.colors.onPrimaryContainer, fontWeight: 'bold'}}>
               {t('screens.import.importSuccess')}
             </Text>
-            <Text numberOfLines={2} style={{color: theme.colors.onPrimaryContainer}}>{importedRecipe.title}</Text>
+            <Text numberOfLines={2} style={{color: theme.colors.onPrimaryContainer}}>{result.recipe.title}</Text>
             <Button
               compact
-              onPress={() => importedRecipe.id && props.navigation.navigate('RecipeScreen', {recipeId: importedRecipe.id})}>
+              onPress={() => recipeId && props.navigation.navigate('RecipeScreen', {recipeId})}>
               {t('screens.import.openRecipe')}
             </Button>
           </View>
@@ -165,53 +152,70 @@ export const ImportScreen = (props: Props) => {
     </>
   );
 
+  const renderExplanation = () => (
+    <View style={styles.explanation}>
+      {RECEIVES_SHARES && <Notice icon="share-variant" tone="information">{t('screens.import.howShare')}</Notice>}
+      <Notice icon="content-paste" tone="information">
+        {RECEIVES_SHARES ? t('screens.import.howPaste') : t('screens.import.howPasteOnly')}
+      </Notice>
+    </View>
+  );
+
+  const renderImport = () => (
+    <>
+      {renderExplanation()}
+
+      <TextInput
+        label={t('screens.import.input')}
+        value={input}
+        onChangeText={setInput}
+        multiline
+        numberOfLines={4}
+        contentStyle={styles.inputContent}
+        error={tooLong}
+        autoCapitalize='none'
+        autoCorrect={false}
+        right={input.length > 0 ?
+          <TextInput.Icon
+            icon="close"
+            accessibilityLabel={t('screens.import.clearInput')}
+            onPress={() => setInput('')} /> :
+          undefined} />
+      {/* Sits directly under the input so the hint points at what it is about */}
+      <HelperText type="error" visible={tooLong}>
+        {t('screens.import.tooLong')}
+      </HelperText>
+
+      <Button
+        mode="contained"
+        icon="import"
+        loading={importing}
+        disabled={!canImport}
+        onPress={() => startImport(input)}>
+        {importing ? t('screens.import.importing') : t('screens.import.import')}
+      </Button>
+
+      {renderResult()}
+      {renderSupportedServices()}
+      {renderScanSection()}
+      {Platform.OS !== 'web' && renderBrowserSection()}
+    </>
+  );
+
   return (
     <Surface style={styles.screen}>
-      <ScrollView keyboardShouldPersistTaps="handled">
-        <View style={CentralStyles.contentContainer}>
-          <Text variant="titleMedium">{t('screens.import.title')}</Text>
-          <Text style={[styles.sectionDescription, {color: theme.colors.onSurfaceVariant}]}>
-            {t('screens.import.description')}
-          </Text>
-
-          <TextInput
-            label={t('screens.import.URLToImport')}
-            value={importURL}
-            onChangeText={setImportURL}
-            error={showInvalidUrlHint}
-            autoCapitalize='none'
-            autoCorrect={false}
-            keyboardType='url'
-            autoComplete='url'
-            returnKeyType='go'
-            left={<TextInput.Icon icon="link-variant" />}
-            right={importURL.length > 0 ?
-              <TextInput.Icon
-                icon="close"
-                accessibilityLabel={t('screens.import.clearInput')}
-                onPress={() => setImportURL('')} /> :
-              undefined}
-            onSubmitEditing={startImport} />
-          {/* Sits directly under the input so the hint points at what it is about */}
-          <HelperText type="error" visible={showInvalidUrlHint}>
-            {t('screens.import.invalidUrl')}
-          </HelperText>
-
-          <Button
-            mode="contained"
-            icon="import"
-            loading={importPending}
-            disabled={!canImport}
-            onPress={startImport}>
-            {importPending ? t('screens.import.importing') : t('screens.import.import')}
-          </Button>
-
-          {renderResult()}
-          {renderSupportedServices()}
-          {renderScanSection()}
-          {Platform.OS !== 'web' && renderBrowserSection()}
-        </View>
-      </ScrollView>
+      {share ?
+        <SharePreview
+          share={share}
+          canScan={ocrImportEnabled}
+          importDisabled={!online || importing}
+          onImport={() => importShare(share)}
+          onDismiss={dismiss} /> :
+        <ScrollView keyboardShouldPersistTaps="handled">
+          <View style={CentralStyles.contentContainer}>
+            {renderImport()}
+          </View>
+        </ScrollView>}
     </Surface>
   );
 };
@@ -219,6 +223,13 @@ export const ImportScreen = (props: Props) => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
+  },
+  explanation: {
+    gap: 8,
+    marginBottom: 16,
+  },
+  inputContent: {
+    maxHeight: 240,
   },
   sectionHeading: {
     flexDirection: 'row',

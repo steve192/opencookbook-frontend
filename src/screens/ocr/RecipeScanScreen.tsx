@@ -28,16 +28,13 @@ import {
   progressMessageKey,
   ScanFailure,
 } from '../../helper/recipeScanJob';
-import {editedPage, noPages, scanPagesReducer} from '../../helper/recipeScanPages';
+import {editedPage, MAX_SCAN_PAGES, pagesOf, scanPagesReducer} from '../../helper/recipeScanPages';
 import {rotationDegrees, Turn} from '../../helper/recipeScanRotation';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {useIsOnline} from '../../offline/useIsOnline';
 import {BlockConfirmation} from './BlockConfirmation';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScanScreen'>;
-
-/** How many photographs may make up one recipe. Mirrors the server's own limit. */
-const MAX_PAGES = 6;
 
 /** Which of the three things this screen is doing. */
 type Step = 'pages' | 'scanning' | 'confirming';
@@ -52,7 +49,7 @@ export const RecipeScanScreen = (props: Props) => {
   const {t, i18n} = useTranslation('translation');
   const insets = useSafeAreaInsets();
 
-  const [{pages, editing}, dispatch] = useReducer(scanPagesReducer, noPages);
+  const [{pages, editing}, dispatch] = useReducer(scanPagesReducer, props.route.params?.photoUris, pagesOf);
   const online = useIsOnline();
   const [scanRecipe] = useScanRecipeMutation();
   const [detectPageEdges] = useDetectPageEdgesMutation();
@@ -126,6 +123,11 @@ export const RecipeScanScreen = (props: Props) => {
       // The crop still works by hand, which is all this was saving.
     }
   };
+
+  // Shared photos get their page found like picked ones.
+  useEffect(() => {
+    pages.forEach((entry) => findThePage(entry.uri));
+  }, []);
 
   const turnPage = async (turn: Turn) => {
     if (!page || turning) {
@@ -296,17 +298,17 @@ export const RecipeScanScreen = (props: Props) => {
 
         <View style={styles.actions}>
           <Button icon="camera" mode="contained-tonal"
-            disabled={pages.length >= MAX_PAGES} onPress={() => addPage(true)}>
+            disabled={pages.length >= MAX_SCAN_PAGES} onPress={() => addPage(true)}>
             {t('screens.recipeScan.takePhoto')}
           </Button>
           <Button icon="image-multiple" mode="contained-tonal"
-            disabled={pages.length >= MAX_PAGES} onPress={() => addPage(false)}>
+            disabled={pages.length >= MAX_SCAN_PAGES} onPress={() => addPage(false)}>
             {t('screens.recipeScan.choosePhoto')}
           </Button>
         </View>
 
-        {pages.length >= MAX_PAGES &&
-          <Text style={styles.hint}>{t('screens.recipeScan.pageLimit', {count: MAX_PAGES})}</Text>}
+        {pages.length >= MAX_SCAN_PAGES &&
+          <Text style={styles.hint}>{t('screens.recipeScan.pageLimit', {count: MAX_SCAN_PAGES})}</Text>}
 
         {renderFailure()}
 

@@ -4,14 +4,17 @@ import {LINKING_SCREENS} from './linking';
 
 const config = {screens: LINKING_SCREENS} as Parameters<typeof getStateFromPath>[1];
 
-// The params of the screen an address opens, found wherever it is nested.
-const paramsOf = (path: string): Record<string, unknown> | undefined => {
+// The screen an address opens, found wherever it is nested.
+const routeOf = (path: string) => {
   let route = getStateFromPath(path, config)?.routes[0];
   while (route?.state) {
     route = route.state.routes[route.state.routes.length - 1] as typeof route;
   }
-  return route?.params as Record<string, unknown> | undefined;
+  return route;
 };
+
+const paramsOf = (path: string): Record<string, unknown> | undefined =>
+  routeOf(path)?.params as Record<string, unknown> | undefined;
 
 // Where the app goes when it navigates to a screen, as the address bar shows it.
 const pathOf = (name: string, params: object): string =>
@@ -41,5 +44,21 @@ describe('linking', () => {
 
   it('reads a group of the recipe list as a number', () => {
     expect(paramsOf('/myRecipes?shownRecipeGroupId=5')).toEqual({shownRecipeGroupId: 5});
+  });
+
+  it('opens the import for something shared on Android', () => {
+    // What React Navigation leaves of cookpal://expo-sharing once the scheme is gone.
+    expect(routeOf('expo-sharing')?.name).toBe('ImportScreen');
+  });
+
+  it('opens the import with what the web share target hands over', () => {
+    const path = '/import?title=Apple%20Pie&text=&url=https%3A%2F%2Fexample.com%2Fpie';
+
+    expect(routeOf(path)?.name).toBe('ImportScreen');
+    expect(paramsOf(path)).toEqual({title: 'Apple Pie', text: '', url: 'https://example.com/pie'});
+  });
+
+  it('keeps the import at its own address', () => {
+    expect(pathOf('ImportScreen', {})).toBe('/import');
   });
 });

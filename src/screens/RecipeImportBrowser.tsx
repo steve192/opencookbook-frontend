@@ -6,11 +6,10 @@ import {BackHandler, StyleSheet, View} from 'react-native';
 import {Button, Divider, Icon, IconButton, ProgressBar, Surface, Text} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
-import {useGetAvailableImportHostsQuery, useImportRecipeMutation} from '../api/endpoints/recipes';
-import {Recipe} from '../api/types/recipes';
-import {errorMessageKey} from '../helper/apiErrorMessage';
+import {useGetAvailableImportHostsQuery} from '../api/endpoints/recipes';
+import {hostOf} from '../helper/sharedContent';
+import {useRecipeImport} from '../helper/useRecipeImport';
 import {MainNavigationProps} from '../navigation/NavigationRoutes';
-import {askForPlanningDetails} from '../components/PlanningDetailsPrompt';
 import {useIsOnline} from '../offline/useIsOnline';
 import {useAppTheme} from '../styles/CentralStyles';
 
@@ -25,25 +24,21 @@ type ImportStatus = 'not_started' | 'pending' | 'failed' | 'success';
  */
 const START_PAGE = 'https://duckduckgo.com/';
 
-const hostOf = (url: string): string => {
-  const match = /^https?:\/\/([^/?#]+)/.exec(url);
-  return match?.[1]?.replace(/^www\./, '') ?? url;
-};
-
 const NO_HOSTS: string[] = [];
 
 export const RecipeImportBrowser = (props: Props) => {
   const {t} = useTranslation('translation');
   const online = useIsOnline();
-  const [importRecipe] = useImportRecipeMutation();
+  // Pushed, so saving the draft leads back to the page.
+  const {startImport: importFrom, importing, result, clearResult} = useRecipeImport({
+    openDraft: () => props.navigation.navigate('RecipeWizardScreen', {hasDraft: true}),
+    failureFallback: 'screens.importbrowser.faileddescription',
+  });
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const webViewRef = useRef<WebView>(null);
 
   const availableImportHosts = useGetAvailableImportHostsQuery().data ?? NO_HOSTS;
-  const [importStatus, setImportStatus] = useState<ImportStatus>('not_started');
-  const [importedRecipe, setImportedRecipe] = useState<Recipe | undefined>(undefined);
-  const [importFailure, setImportFailure] = useState<string>();
   const [currentURL, setCurrentURL] = useState('');
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
@@ -74,12 +69,11 @@ export const RecipeImportBrowser = (props: Props) => {
     setCurrentURL(state.url);
     setCanGoBack(state.canGoBack);
     setCanGoForward(state.canGoForward);
-    if (importStatus === 'pending') {
+    if (importing) {
       return;
     }
     // Leaving the page the result belongs to invalidates that result
-    setImportStatus('not_started');
-    setImportedRecipe(undefined);
+    clearResult();
   };
 
   /**
@@ -94,23 +88,21 @@ export const RecipeImportBrowser = (props: Props) => {
   };
 
   const startImport = () => {
-    if (importStatus === 'pending' || !currentURL) {
+    if (importing || !currentURL) {
       return;
     }
-    setImportStatus('pending');
-    importRecipe(currentURL).unwrap().then((recipe) => {
-      setImportedRecipe(recipe);
-      setImportStatus('success');
-      askForPlanningDetails(recipe);
-    }).catch((error) => {
-      setImportFailure(t(errorMessageKey(error, 'screens.importbrowser.faileddescription')));
-      setImportStatus('failed');
-    });
+    importFrom(currentURL);
   };
 
   const openImportedRecipe = () => {
-    importedRecipe?.id && props.navigation.navigate('RecipeScreen', {recipeId: importedRecipe.id});
+    const recipeId = result?.kind === 'saved' ? result.recipe.id : undefined;
+    recipeId && props.navigation.navigate('RecipeScreen', {recipeId});
   };
+
+  const importStatus: ImportStatus =
+    importing ? 'pending' :
+    result?.kind === 'saved' ? 'success' :
+    result?.kind === 'failed' ? 'failed' : 'not_started';
 
   // Icon, wording, colour and button label all follow the same status, so keep them together
   // eslint-disable-next-line no-unused-vars
@@ -137,7 +129,7 @@ export const RecipeImportBrowser = (props: Props) => {
     'failed': {
       icon: 'alert-circle-outline',
       title: t('screens.importbrowser.failed'),
-      detail: importFailure ?? t('screens.importbrowser.faileddescription'),
+      detail: t(result?.kind === 'failed' ? result.messageKey : 'screens.importbrowser.faileddescription'),
       label: t('screens.importbrowser.retry'),
       color: theme.colors.error,
     },

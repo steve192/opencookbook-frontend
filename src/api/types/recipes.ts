@@ -52,6 +52,12 @@ export interface Recipe {
     householdIds?: string[];
 }
 
+/** A recipe website is saved; text and Instagram posts come back as an unsaved draft. */
+export interface RecipeImport {
+    recipe: Recipe;
+    saved: boolean;
+}
+
 export interface RecipeGroup {
     id?: number;
     title: string;

@@ -69,7 +69,7 @@ export interface Content {
 const de: Content = {
   lang: 'de',
   home: {
-    title: 'Cookpal: Dein digitales Rezeptbuch mit Wochenplan und Einkaufsliste',
+    title: 'CookPal: Dein digitales Rezeptbuch mit Wochenplan und Einkaufsliste',
     description:
       'Lieblings- und Familienrezepte an einem Ort: per Link importieren, aus dem Kochbuch abfotografieren oder selbst schreiben. Dazu Wochenplan und Einkaufsliste. Kostenlos und selbst hostbar.',
   },
@@ -92,7 +92,7 @@ const de: Content = {
   nav: { features: 'Funktionen', selfHosting: 'Selbst hosten', faq: 'FAQ' },
   hero: {
     title: 'Dein persönliches Rezeptbuch.',
-    lead: `Die Lieblingsrezepte aus dem Netz, Omas Rezeptkarten und die Familienklassiker, die sonst nur im Kopf stehen: Mit Cookpal hast du alle an einem Ort. Die moderne Form der guten alten Rezeptsammlung, mit Wochenplan und Einkaufsliste dazu. Kostenlos auf ${hostedSite} oder auf deinem eigenen Server.`,
+    lead: `Die Lieblingsrezepte aus dem Netz, Omas Rezeptkarten und die Familienklassiker, die sonst nur im Kopf stehen: Mit CookPal hast du alle an einem Ort. Die moderne Form der guten alten Rezeptsammlung, mit Wochenplan und Einkaufsliste dazu. Kostenlos auf ${hostedSite} oder auf deinem eigenen Server.`,
     selfHostingLink: 'Lieber selbst hosten?',
     facts: ['Kostenlos', 'Android & Web', wording.de.selfHostable],
   },
@@ -105,8 +105,10 @@ const de: Content = {
       body: 'Speichere die Rezepte von deinem Lieblingsblog, aus dem Kochbuch und aus der Familie, bevor sie verloren gehen. So wird aus vielen Zetteln, Lesezeichen und Erinnerungen dein eigenes Rezeptbuch.',
       points: [
         'Rezepte aus dem Netz importieren: Link einfügen, Zutaten, Schritte und Bilder werden übernommen.',
+        'Aus jeder App teilen: In der Android-App steht CookPal im Teilen-Menü, für Links, Rezepttexte und Fotos.',
+        'Instagram-Beiträge und Reels per Link importieren: Die Beschreibung wird zum Rezept, das Foto zu seinem Bild. Auch kopierten Rezepttext liest CookPal ein.',
         'In der Android-App durchstöberst du Rezeptseiten direkt in der App und importierst, was du gerade ansiehst.',
-        'Rezepte aus dem Kochbuch digitalisieren: Gedruckte Rezepte abfotografieren, Cookpal liest sie, du prüfst vor dem Speichern. Ein Rezept darf über mehrere Fotos gehen.',
+        'Rezepte aus dem Kochbuch digitalisieren: Gedruckte Rezepte abfotografieren, CookPal liest sie, du prüfst vor dem Speichern. Ein Rezept darf über mehrere Fotos gehen.',
         'Eigene Rezepte schreiben, zum Beispiel die Familienrezepte, die bisher nur im Kopf stehen. In Gruppen ordnen und per Suche wiederfinden.',
       ],
     },
@@ -169,7 +171,7 @@ const de: Content = {
       shots: ['nutrition'],
       eyebrow: 'Nährwerte',
       title: 'Kalorien und Nährwerte pro Portion',
-      body: 'Cookpal schätzt Kalorien und Nährstoffe aus den Zutaten deines Rezepts.',
+      body: 'CookPal schätzt Kalorien und Nährstoffe aus den Zutaten deines Rezepts.',
       points: [
         'Grundlage ist der Bundeslebensmittelschlüssel (BLS) des Max Rubner-Instituts.',
         'Beim Wochenplan kannst du Kalorien pro Tag und einen Ernährungsstil vorgeben: ausgewogen, Low Carb, Low Fat oder High Protein.',
@@ -177,16 +179,16 @@ const de: Content = {
     },
   ],
   screenshotAlts: {
-    'recipe-list': 'Cookpal: Liste der Rezepte',
-    'recipe-detail': 'Cookpal: Ein Rezept mit Zutaten und Zubereitung',
-    weekplan: 'Cookpal: Wochenplan mit Rezepten für jeden Tag',
-    'shopping-list': 'Cookpal: Einkaufsliste nach Supermarkt-Abteilungen',
-    'guided-cooking': 'Cookpal: Geführtes Kochen mit Zutaten und Timer für den aktuellen Schritt',
-    'recipe-scan': 'Cookpal: Rezept aus einem Foto einlesen und prüfen',
-    'recipe-import': 'Cookpal: Rezept über einen Link importieren',
-    household: 'Cookpal: Haushalt, der Kochbuch, Wochenplan und Einkaufsliste teilt',
-    nutrition: 'Cookpal: Kalorien und Nährwerte pro Portion',
-    'week-suggestion': 'Cookpal: Vorschlag für eine Woche mit Einstellungen zum Planen',
+    'recipe-list': 'CookPal: Liste der Rezepte',
+    'recipe-detail': 'CookPal: Ein Rezept mit Zutaten und Zubereitung',
+    weekplan: 'CookPal: Wochenplan mit Rezepten für jeden Tag',
+    'shopping-list': 'CookPal: Einkaufsliste nach Supermarkt-Abteilungen',
+    'guided-cooking': 'CookPal: Geführtes Kochen mit Zutaten und Timer für den aktuellen Schritt',
+    'recipe-scan': 'CookPal: Rezept aus einem Foto einlesen und prüfen',
+    'recipe-import': 'CookPal: Rezept über einen Link importieren',
+    household: 'CookPal: Haushalt, der Kochbuch, Wochenplan und Einkaufsliste teilt',
+    nutrition: 'CookPal: Kalorien und Nährwerte pro Portion',
+    'week-suggestion': 'CookPal: Vorschlag für eine Woche mit Einstellungen zum Planen',
   },
   platforms: {
     title: 'Auf Handy, Tablet und Desktop',
@@ -205,7 +207,7 @@ const de: Content = {
     webApp: 'Web-App öffnen',
   },
   ways: {
-    title: 'Zwei Wege zu Cookpal',
+    title: 'Zwei Wege zu CookPal',
     hosted: {
       title: `${hostedSite} nutzen`,
       body: 'Konto anlegen und dein Rezeptbuch anfangen. Die Anmeldung ist offen und kostenlos.',
@@ -213,7 +215,7 @@ const de: Content = {
     },
     selfHosted: {
       title: 'Selbst hosten',
-      body: 'Cookpal läuft mit Docker Compose auf deinem eigenen Server. Dein Rezeptbuch und deine Daten bleiben bei dir.',
+      body: 'CookPal läuft mit Docker Compose auf deinem eigenen Server. Dein Rezeptbuch und deine Daten bleiben bei dir.',
       guide: 'Zur Anleitung',
     },
   },
@@ -221,9 +223,9 @@ const de: Content = {
     title: 'Häufige Fragen',
     items: [
       {
-        question: 'Ist Cookpal kostenlos?',
+        question: 'Ist CookPal kostenlos?',
         answer:
-          `Ja. Die Anmeldung auf ${hostedSite} ist offen und kostenlos. Wenn du Cookpal selbst hostest, kostet dich nur dein Server etwas.`,
+          `Ja. Die Anmeldung auf ${hostedSite} ist offen und kostenlos. Wenn du CookPal selbst hostest, kostet dich nur dein Server etwas.`,
       },
       {
         question: 'Von welchen Seiten kann ich Rezepte importieren?',
@@ -231,12 +233,22 @@ const de: Content = {
           'Von vielen Rezeptseiten, die ihre Rezepte mit strukturierten Daten auszeichnen. Füge einfach den Link ein und probiere es aus. Klappt ein Link nicht, kannst du das Rezept selbst eintragen.',
       },
       {
+        question: 'Kann ich Rezepte aus Instagram übernehmen?',
+        answer:
+          'Ja. Teile den Beitrag oder das Reel aus der Instagram-App an CookPal oder füge seinen Link ein. Steht das Rezept in der Beschreibung, öffnet es sich als Entwurf, den du vor dem Speichern prüfst. Verweist der Beitrag nur auf ein Rezept anderswo, bietet CookPal an, diesen Link zu importieren.',
+      },
+      {
+        question: 'Wie teile ich Rezepte aus anderen Apps?',
+        answer:
+          'In der Android-App tippst du in Chrome, Instagram oder jeder anderen App auf Teilen und wählst CookPal. Das geht mit Links, Texten und Fotos. Die auf Android installierte Web-App nimmt Links und Texte an. Überall sonst kopierst du den Link oder Text und fügst ihn beim Importieren ein.',
+      },
+      {
         question: 'Gibt es eine iPhone-App?',
         answer:
           'Nicht im App Store. Die Web-App läuft aber im Browser und lässt sich auf dem iPhone über „Zum Home-Bildschirm“ wie eine App installieren. Für Android gibt es die App bei Google Play.',
       },
       {
-        question: 'Funktioniert Cookpal offline?',
+        question: 'Funktioniert CookPal offline?',
         answer:
           'Rezepte, Wochenplan und Einkaufsliste kannst du ohne Netz lesen. Die Einkaufsliste hakst du im Laden auch offline ab, sie gleicht sich ab, sobald du wieder Empfang hast.',
       },
@@ -251,23 +263,23 @@ const de: Content = {
           'Es sind Schätzungen, berechnet aus den Zutaten deines Rezepts auf Basis des Bundeslebensmittelschlüssels (BLS) des Max Rubner-Instituts. Wie nah sie an der Wirklichkeit liegen, hängt auch davon ab, wie genau die Zutatenangaben sind.',
       },
       {
-        question: 'Kann ich Cookpal selbst hosten?',
+        question: 'Kann ich CookPal selbst hosten?',
         answer: 'Ja, mit Docker Compose auf einem eigenen Server.',
         link: { label: 'Zur Anleitung zum Selbst hosten', href: pagePaths.selfHosting.de },
       },
       {
         question: 'Was passiert mit meinen Daten?',
         answer:
-          'Deine Rezepte bleiben in deinem Konto, und nur du siehst sie, bis du sie mit deinem Haushalt teilst oder per Link weitergibst. Wer alles bei sich behalten will, hostet Cookpal selbst.',
+          'Deine Rezepte bleiben in deinem Konto, und nur du siehst sie, bis du sie mit deinem Haushalt teilst oder per Link weitergibst. Wer alles bei sich behalten will, hostet CookPal selbst.',
       },
     ],
   },
   closing: {
     title: 'Fang heute mit deinem Rezeptbuch an',
-    body: 'Leg ein Konto an und sammle deine ersten Rezepte, oder starte Cookpal auf deinem eigenen Server.',
+    body: 'Leg ein Konto an und sammle deine ersten Rezepte, oder starte CookPal auf deinem eigenen Server.',
   },
   footer: {
-    product: 'Cookpal',
+    product: 'CookPal',
     legal: 'Rechtliches',
     tagline: 'Dein persönliches Rezeptbuch mit Wochenplan und Einkaufsliste.',
   },
@@ -276,7 +288,7 @@ const de: Content = {
 const en: Content = {
   lang: 'en',
   home: {
-    title: 'Cookpal: Your digital recipe book with meal planner and shopping list',
+    title: 'CookPal: Your digital recipe book with meal planner and shopping list',
     description:
       'Your favourite and family recipes in one place: import them by link, photograph cookbook pages or write your own. With a week plan and shopping list. Free and self-hostable.',
   },
@@ -299,7 +311,7 @@ const en: Content = {
   nav: { features: 'Features', selfHosting: 'Self-hosting', faq: 'FAQ' },
   hero: {
     title: 'Your personal recipe book.',
-    lead: `The recipes you love from around the web, grandma's recipe cards and the family classics that only live in someone's head: Cookpal keeps them all in one place. The modern take on the old recipe box, with a week plan and shopping list built in. Free on ${hostedSite} or on your own server.`,
+    lead: `The recipes you love from around the web, grandma's recipe cards and the family classics that only live in someone's head: CookPal keeps them all in one place. The modern take on the old recipe box, with a week plan and shopping list built in. Free on ${hostedSite} or on your own server.`,
     selfHostingLink: 'Prefer to host it yourself?',
     facts: ['Free', 'Android & web', wording.en.selfHostable],
   },
@@ -312,8 +324,10 @@ const en: Content = {
       body: 'Save the recipes from your favourite blog, from your cookbooks and from your family before they get lost. Scraps of paper, bookmarks and memories become your own recipe book.',
       points: [
         'Import recipes from the web by pasting a link: ingredients, steps and pictures are taken over.',
+        'Share from any app: in the Android app, CookPal is in the share menu for links, recipe texts and photos.',
+        'Import Instagram posts and reels by link: the caption becomes the recipe and the photo its picture. CookPal reads copied recipe text too.',
         'In the Android app you can browse recipe sites inside the app and import what you are looking at.',
-        'Digitize recipes from your cookbooks: photograph a cookbook page, Cookpal reads it and you check it before saving. A recipe may span several photos.',
+        'Digitize recipes from your cookbooks: photograph a cookbook page, CookPal reads it and you check it before saving. A recipe may span several photos.',
         'Write your own recipes, for example the family recipes that only live in your head. Sort them into groups and find them again with search.',
       ],
     },
@@ -322,7 +336,7 @@ const en: Content = {
       shots: ['week-suggestion', 'weekplan'],
       eyebrow: 'Plan',
       title: 'From recipe book to week plan',
-      body: 'Decide what is cooked on which day, or let Cookpal suggest a week.',
+      body: 'Decide what is cooked on which day, or let CookPal suggest a week.',
       points: [
         'The week plan arranges recipes by day and meal. Meals without a recipe and leftovers can be planned too.',
         '"Plan my week" creates a draft from your own recipes: how many people eat, which days you are away, how often each meal happens, quick or elaborate. You adjust the draft before taking it.',
@@ -376,7 +390,7 @@ const en: Content = {
       shots: ['nutrition'],
       eyebrow: 'Nutrition',
       title: 'Calories and nutrients per serving',
-      body: 'Cookpal estimates calories and nutrients from the ingredients of your recipe.',
+      body: 'CookPal estimates calories and nutrients from the ingredients of your recipe.',
       points: [
         'They are based on the German Federal Food Code (Bundeslebensmittelschlüssel, BLS) of the Max Rubner-Institut.',
         'In the week plan you can set calories per day and a nutrition style: balanced, low carb, low fat or high protein.',
@@ -384,16 +398,16 @@ const en: Content = {
     },
   ],
   screenshotAlts: {
-    'recipe-list': 'Cookpal: List of recipes',
-    'recipe-detail': 'Cookpal: A recipe with ingredients and steps',
-    weekplan: 'Cookpal: Week plan with a recipe for each day',
-    'shopping-list': 'Cookpal: Shopping list sorted by supermarket aisle',
-    'guided-cooking': 'Cookpal: Guided cooking with the ingredients and timer of the current step',
-    'recipe-scan': 'Cookpal: Reading a recipe from a photo and checking it',
-    'recipe-import': 'Cookpal: Importing a recipe from a link',
-    household: 'Cookpal: A household sharing cookbook, week plan and shopping list',
-    nutrition: 'Cookpal: Calories and nutrients per serving',
-    'week-suggestion': 'Cookpal: A suggested week with the planning settings',
+    'recipe-list': 'CookPal: List of recipes',
+    'recipe-detail': 'CookPal: A recipe with ingredients and steps',
+    weekplan: 'CookPal: Week plan with a recipe for each day',
+    'shopping-list': 'CookPal: Shopping list sorted by supermarket aisle',
+    'guided-cooking': 'CookPal: Guided cooking with the ingredients and timer of the current step',
+    'recipe-scan': 'CookPal: Reading a recipe from a photo and checking it',
+    'recipe-import': 'CookPal: Importing a recipe from a link',
+    household: 'CookPal: A household sharing cookbook, week plan and shopping list',
+    nutrition: 'CookPal: Calories and nutrients per serving',
+    'week-suggestion': 'CookPal: A suggested week with the planning settings',
   },
   platforms: {
     title: 'On phone, tablet and desktop',
@@ -412,7 +426,7 @@ const en: Content = {
     webApp: 'Open web app',
   },
   ways: {
-    title: 'Two ways to use Cookpal',
+    title: 'Two ways to use CookPal',
     hosted: {
       title: `Use ${hostedSite}`,
       body: 'Create an account and start your recipe book. Signup is open and free.',
@@ -420,7 +434,7 @@ const en: Content = {
     },
     selfHosted: {
       title: 'Host it yourself',
-      body: 'Cookpal runs with Docker Compose on your own server. Your recipe book and your data stay with you.',
+      body: 'CookPal runs with Docker Compose on your own server. Your recipe book and your data stay with you.',
       guide: 'Read the guide',
     },
   },
@@ -428,9 +442,9 @@ const en: Content = {
     title: 'Frequently asked questions',
     items: [
       {
-        question: 'Is Cookpal free?',
+        question: 'Is CookPal free?',
         answer:
-          `Yes. Signup on ${hostedSite} is open and free. If you host Cookpal yourself, only your server costs anything.`,
+          `Yes. Signup on ${hostedSite} is open and free. If you host CookPal yourself, only your server costs anything.`,
       },
       {
         question: 'Which sites can I import recipes from?',
@@ -438,12 +452,22 @@ const en: Content = {
           'Many recipe sites that publish their recipes with structured data. Paste the link and try it. If a link does not work, you can enter the recipe yourself.',
       },
       {
+        question: 'Can I import recipes from Instagram?',
+        answer:
+          'Yes. Share the post or reel from the Instagram app to CookPal, or paste its link. If the recipe is in the caption, it opens as a draft you check before saving. If the post only points to a recipe elsewhere, CookPal offers to import that link.',
+      },
+      {
+        question: 'How do I share recipes from other apps?',
+        answer:
+          'In the Android app, tap Share in Chrome, Instagram or any other app and pick CookPal. This works for links, texts and photos. Installed on Android, the web app takes links and texts as well. Everywhere else, copy the link or text and paste it into the import.',
+      },
+      {
         question: 'Is there an iPhone app?',
         answer:
           'Not in the App Store. The web app runs in the browser though, and on the iPhone you can install it like an app with "Add to Home Screen". For Android there is an app on Google Play.',
       },
       {
-        question: 'Does Cookpal work offline?',
+        question: 'Does CookPal work offline?',
         answer:
           'You can read recipes, the week plan and the shopping list without a connection. In the shop you can tick off the shopping list offline, and it syncs once you have reception again.',
       },
@@ -458,23 +482,23 @@ const en: Content = {
           'They are estimates, calculated from the ingredients of your recipe based on the German Federal Food Code (BLS) of the Max Rubner-Institut. How close they come to reality also depends on how exact the ingredient amounts are.',
       },
       {
-        question: 'Can I host Cookpal myself?',
+        question: 'Can I host CookPal myself?',
         answer: 'Yes, with Docker Compose on your own server.',
         link: { label: 'Read the self-hosting guide', href: pagePaths.selfHosting.en },
       },
       {
         question: 'What happens to my data?',
         answer:
-          'Your recipes stay in your account, and only you see them until you share them with your household or pass one on by link. If you want to keep everything at home, host Cookpal yourself.',
+          'Your recipes stay in your account, and only you see them until you share them with your household or pass one on by link. If you want to keep everything at home, host CookPal yourself.',
       },
     ],
   },
   closing: {
     title: 'Start your recipe book today',
-    body: 'Create an account and save your first recipes, or run Cookpal on your own server.',
+    body: 'Create an account and save your first recipes, or run CookPal on your own server.',
   },
   footer: {
-    product: 'Cookpal',
+    product: 'CookPal',
     legal: 'Legal',
     tagline: 'Your personal recipe book with week plan and shopping list.',
   },

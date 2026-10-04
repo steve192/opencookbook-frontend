@@ -1,5 +1,6 @@
 import {NavigatorScreenParams} from '@react-navigation/native';
 import {LegalDocument} from '../api/types/legal';
+import {WebShare} from '../helper/sharedContent';
 import {ShoppingImportTarget} from '../helper/shopping/importTarget';
 
 export type BaseNavigatorProps = {
@@ -31,13 +32,15 @@ export type MainNavigationProps = {
      * recipe becomes "[object Object]".
      */
     RecipeWizardScreen: { editing?: boolean, recipeId?: number, hasDraft?: boolean }
-    RecipeScanScreen: undefined
+    /** Shared photos. Only Android receives them, so they never reach an address bar. */
+    RecipeScanScreen: { photoUris?: string[] } | undefined
     RecipeSuggestionScreen: undefined
     /** The week preselected for planning, in weeks from the current one. */
     WeekplanWizardScreen: { weekOffset: number, householdId?: string }
     PlanDraftScreen: { draftId: number, householdId?: string }
     RecipeScreen: { recipeId: number }
-    ImportScreen: { importUrl?: string },
+    /** The web share target's parameters; Android keeps its shares in expo-sharing. */
+    ImportScreen: WebShare | undefined,
     RecipeGroupEditScreen: { recipeGroupId?: number, editing: boolean}
     /** By id rather than the recipe itself: parameters go into the address bar, where a recipe is "[object Object]". */
     /** Without scaledServings, cooking is for the servings the recipe itself says. */

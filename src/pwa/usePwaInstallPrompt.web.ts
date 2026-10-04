@@ -16,7 +16,7 @@ interface Installability {
   standalone: boolean;
 }
 
-const detectStandalone = (): boolean =>
+export const detectStandalone = (): boolean =>
   globalThis.matchMedia?.('(display-mode: standalone)').matches ||
   // iOS Safari's own flag.
   (globalThis.navigator as Navigator & {standalone?: boolean}).standalone === true;

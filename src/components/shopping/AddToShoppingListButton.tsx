@@ -12,7 +12,7 @@ interface Props {
   style?: StyleProp<ViewStyle>;
 }
 
-// Bring's own button for those who chose Bring; the Cookpal list for everybody else.
+// Bring's own button for those who chose Bring; the CookPal list for everybody else.
 export const AddToShoppingListButton = (props: Props) => {
   const {t} = useTranslation('translation');
   const {provider, start, exporting, dialog} = useShoppingImport();

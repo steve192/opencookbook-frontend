@@ -1,4 +1,4 @@
-# Cookpal landing
+# CookPal landing
 
 Static landing page and self-hosting guide for cookpal.io (Astro, Tailwind v4). English is served at `/`, German at `/de/`. The app lives at `/app/`, outside this project.
 

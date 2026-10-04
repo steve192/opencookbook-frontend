@@ -53,6 +53,7 @@ import {ShoppingListsScreen} from '../screens/shopping/ShoppingListsScreen';
 import {StaplesScreen} from '../screens/shopping/StaplesScreen';
 import {ShoppingSyncRunner} from '../components/shopping/ShoppingSyncRunner';
 import {useShoppingProvider} from '../helper/shopping/useShoppingProvider';
+import {useOpenWaitingShare} from '../helper/useOpenWaitingShare';
 import {LegalDocumentScreen} from '../screens/legal/LegalDocumentScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
 import RecipeWizardScreen from '../screens/wizard/RecipeWizardScreen';
@@ -133,6 +134,7 @@ const BottomTabNavigation = () => {
   const theme = useAppTheme();
   // Somebody who shops with Bring has no use for the built-in list.
   const {provider} = useShoppingProvider();
+  useOpenWaitingShare();
   return (
     <BottomTab.Navigator
       backBehavior="history"

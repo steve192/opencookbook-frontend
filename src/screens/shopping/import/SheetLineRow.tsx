@@ -9,7 +9,7 @@ import {useAppTheme} from '../../../styles/CentralStyles';
 interface Props {
   line: SheetLine;
   ticked: boolean;
-  /** What the target list already has of it, for a Cookpal list; undefined when it has none. */
+  /** What the target list already has of it, for a CookPal list; undefined when it has none. */
   onList?: string | null;
   onToggle: () => void;
 }
