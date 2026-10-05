@@ -64,7 +64,6 @@ export const InvitationScreen = (props: Props) => {
         {ready &&
           <SignupForm
             invitation={token}
-            onOpenLegalDocument={(document) => props.navigation.navigate('LegalDocumentScreen', {document})}
             onSignedUp={(emailAddress) => props.navigation.reset({
               index: 0,
               routes: [{name: 'default', state: {routes: [{name: 'LoginScreen', params: {emailAddress}}]}}],

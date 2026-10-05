@@ -1,22 +1,22 @@
 import React, {useRef, useState} from 'react';
 import {Trans, useTranslation} from 'react-i18next';
-import {Text as RNText, TextInput as RNTextInput, View} from 'react-native';
+import {TextInput as RNTextInput, View} from 'react-native';
 import {Button, Checkbox, MD3Colors, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {useSignUpMutation} from '../api/endpoints/account';
-import {LegalDocument} from '../api/types/legal';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {PromptUtil} from '../helper/Prompt';
 import {SIGNUP_OUTCOME_KEYS} from '../helper/signupOutcome';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 import {EmailValidationInput} from './EmailValidationInput';
 import {FormErrorMessage} from './FormErrorMessage';
+import {GoogleSignIn} from './GoogleSignIn';
+import {useLegalDocumentLinks} from './LegalLinks';
 import {PasswordValidationInput} from './PasswordValidationInput';
 
 interface Props {
   /** The token of the invitation link the account is created with; absent for an open sign up. */
   invitation?: string;
-  onOpenLegalDocument: (document: LegalDocument) => void;
   /** Called once the account exists and its owner has been told what happens next. */
   onSignedUp: (emailAddress: string) => void;
 }
@@ -42,12 +42,9 @@ export const SignupForm = (props: Props) => {
 
   const {t} = useTranslation('translation');
   const {colors} = useAppTheme();
+  const legalLinks = useLegalDocumentLinks();
 
   const allFieldsOk = passwordOk && password && emailOk && termsAccepted;
-
-  const legalLink = (document: LegalDocument) => (
-    <RNText onPress={() => props.onOpenLegalDocument(document)} style={{color: colors.primary}} />
-  );
 
   const register = () => {
     if (registerPending || !allFieldsOk) {
@@ -99,7 +96,7 @@ export const SignupForm = (props: Props) => {
           <Trans
             t={t}
             i18nKey="screens.login.acceptTerms"
-            components={{terms: legalLink('terms'), privacy: legalLink('privacy')}}
+            components={legalLinks}
           />
         </Text>
       </View>
@@ -112,6 +109,7 @@ export const SignupForm = (props: Props) => {
         style={CentralStyles.elementSpacing}
         onPress={register}>{t('screens.login.register')}</Button>
       <FormErrorMessage testID='signupError' message={apiErrorMessage} />
+      <GoogleSignIn invitation={props.invitation} />
     </>
   );
 };

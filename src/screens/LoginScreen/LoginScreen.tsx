@@ -6,6 +6,7 @@ import {Button, Card, IconButton, Modal, Portal, Text, TextInput} from 'react-na
 import Spacer from 'react-spacer';
 import {useGetInstanceInfoQuery, useSignInMutation} from '../../api/endpoints/account';
 import {FormErrorMessage} from '../../components/FormErrorMessage';
+import {GoogleSignIn} from '../../components/GoogleSignIn';
 import {LegalLinks} from '../../components/LegalLinks';
 import {PasswordInput} from '../../components/PasswordInput';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
@@ -143,6 +144,7 @@ const LoginScreen = ({route, navigation}: Props) => {
         disabled={loginPending || !email || !password}
         onPress={doLogin}>Login</Button>
       <FormErrorMessage testID='loginError' message={apiErrorMessage} />
+      <GoogleSignIn />
       {signupMode === 'OPEN' &&
         <Button
           testID='SignUpButton'

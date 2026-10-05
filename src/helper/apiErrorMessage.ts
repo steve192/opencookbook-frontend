@@ -22,6 +22,7 @@ export const MESSAGE_KEYS = {
   INVALID_CREDENTIALS: 'errors.invalidCredentials',
   ACCOUNT_NOT_ACTIVATED: 'errors.accountNotActivated',
   ACCOUNT_AWAITING_APPROVAL: 'errors.accountAwaitingApproval',
+  GOOGLE_SIGN_IN_FAILED: 'errors.googleSignInFailed',
   ACCESS_DENIED: 'errors.accessDenied',
 
   EMAIL_ALREADY_REGISTERED: 'errors.emailAlreadyRegistered',
