@@ -143,6 +143,11 @@
         "title": "Beitreten: {{instance}}",
         "signedIn": "Du bist angemeldet. Um diese Einladung zu nutzen, melde dich zuerst ab und lege dann das neue Konto an.",
         "signOut": "Abmelden"
+      },
+      "google": {
+        "or": "oder",
+        "continue": "Weiter mit Google",
+        "terms": "Wenn du mit Google fortfährst, akzeptierst du die <terms>Nutzungsbedingungen</terms> und die <privacy>Datenschutzerklärung</privacy>"
       }
     },
     "overview": {
@@ -868,6 +873,7 @@
     "setupCompleted": "Dieser Server ist bereits eingerichtet",
     "invitationInvalid": "Diese Einladung ist abgelaufen oder wurde schon verwendet. Frag nach einer neuen",
     "accountAwaitingApproval": "Dein Konto muss zuerst von einem Administrator aktiviert werden",
+    "googleSignInFailed": "Die Anmeldung mit Google hat nicht geklappt. Bitte versuche es noch einmal",
     "mailNotConfigured": "Dieser Server kann keine E-Mails versenden",
     "importUrlInvalid": "Das sieht nicht nach einem Rezept-Link aus. Füge eine vollständige Adresse ein, die mit https:// beginnt",
     "importNotSupported": "Diese Webseite wird leider noch nicht unterstützt",

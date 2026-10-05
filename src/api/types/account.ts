@@ -24,6 +24,15 @@ export interface InstanceInfo {
   signupMode: SignupMode;
   /** Whether the instance can send emails. Without, an administrator hands out reset and invitation links. */
   mailEnabled: boolean;
+  /** Null when the instance does not offer signing in with Google. */
+  googleSignIn: GoogleClients | null;
+}
+
+/** OAuth client ids; public by design. */
+export interface GoogleClients {
+  clientId: string;
+  /** Null when the Android app does not offer Google. */
+  androidClientId: string | null;
 }
 
 export type SignupMode = 'OPEN' | 'INVITATION_ONLY';

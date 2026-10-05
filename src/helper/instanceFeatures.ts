@@ -2,7 +2,7 @@ import {InstanceInfo} from '../api/types/account';
 
 export type InstanceFeatures = Pick<InstanceInfo, 'sharingEnabled' | 'householdsEnabled' | 'ocrImportEnabled' |
   'apiKeysEnabled' |
-  'setupRequired' | 'signupMode' | 'mailEnabled'>;
+  'setupRequired' | 'signupMode' | 'mailEnabled' | 'googleSignIn'>;
 
 /**
  * What an instance offers, with what to assume until it has said.
@@ -21,4 +21,5 @@ export const instanceFeatures = (info?: InstanceInfo): InstanceFeatures => ({
   setupRequired: info?.setupRequired ?? false,
   signupMode: info?.signupMode ?? 'OPEN',
   mailEnabled: info?.mailEnabled ?? true,
+  googleSignIn: info?.googleSignIn ?? null,
 });

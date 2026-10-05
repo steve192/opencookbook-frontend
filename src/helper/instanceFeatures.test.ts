@@ -13,14 +13,22 @@ describe('instanceFeatures', () => {
 
   it('takes the setup state, the registration mode and the mail ability the instance reports', () => {
     expect(instanceFeatures({sharingEnabled: true, householdsEnabled: true, ocrImportEnabled: false,
-      apiKeysEnabled: false, setupRequired: true, signupMode: 'INVITATION_ONLY', mailEnabled: false}))
+      apiKeysEnabled: false, setupRequired: true, signupMode: 'INVITATION_ONLY', mailEnabled: false, googleSignIn: null}))
         .toMatchObject({setupRequired: true, signupMode: 'INVITATION_ONLY', mailEnabled: false});
   });
 
   it.each([true, false])('takes what the instance offers: %s', (enabled) => {
     expect(instanceFeatures({sharingEnabled: enabled, householdsEnabled: enabled,
       ocrImportEnabled: enabled, apiKeysEnabled: enabled, setupRequired: false, signupMode: 'OPEN',
-      mailEnabled: true})).toMatchObject(
+      mailEnabled: true, googleSignIn: null})).toMatchObject(
         {sharingEnabled: enabled, householdsEnabled: enabled, ocrImportEnabled: enabled, apiKeysEnabled: enabled});
+  });
+
+  it('offers Google only once the instance names its clients', () => {
+    const googleSignIn = {clientId: 'web.apps.googleusercontent.com', androidClientId: null};
+    expect(instanceFeatures().googleSignIn).toBeNull();
+    expect(instanceFeatures({sharingEnabled: true, householdsEnabled: true, ocrImportEnabled: false,
+      apiKeysEnabled: false, setupRequired: false, signupMode: 'OPEN', mailEnabled: true, googleSignIn})
+        .googleSignIn).toEqual(googleSignIn);
   });
 });

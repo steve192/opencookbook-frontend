@@ -26,6 +26,12 @@ export default ({config}) => {
           data: [{scheme: defaultInstance.protocol.slice(0, -1), host: defaultInstance.hostname, pathPrefix: `${config.experiments.baseUrl}/`}],
           category: ['BROWSABLE', 'DEFAULT'],
         },
+        {
+          // Google signs the app in through <package>:/oauthredirect.
+          action: 'VIEW',
+          data: [{scheme: config.android.package}],
+          category: ['BROWSABLE', 'DEFAULT'],
+        },
       ],
     },
     extra: {

@@ -39,6 +39,10 @@ const accountApi = api.injectEndpoints({
         queryFn: async (credentials, _api, _extra, baseQuery) =>
           signedIn(await baseQuery({url: '/users/login', method: 'POST', body: credentials, anonymous: true})),
       }),
+      signInWithGoogle: builder.mutation<void, {idToken: string, invitation?: string}>({
+        queryFn: async (request, _api, _extra, baseQuery) =>
+          signedIn(await baseQuery({url: '/users/login/google', method: 'POST', body: request, anonymous: true})),
+      }),
       activateAccount: builder.mutation<void, string>({
         queryFn: async (activationId, _api, _extra, baseQuery) =>
           signedIn(await baseQuery({url: '/users/activate' + queryString({activationId}),
@@ -88,6 +92,7 @@ export const {
   useGetUserInfoQuery,
   useGetInstanceInfoQuery,
   useSignInMutation,
+  useSignInWithGoogleMutation,
   useActivateAccountMutation,
   useSignUpMutation,
   useRequestPasswordResetMutation,

@@ -143,6 +143,11 @@
         "title": "Join {{instance}}",
         "signedIn": "You are signed in. To use this invitation, sign out first and create the new account.",
         "signOut": "Sign out"
+      },
+      "google": {
+        "or": "or",
+        "continue": "Continue with Google",
+        "terms": "By continuing with Google you accept the <terms>terms of use</terms> and the <privacy>privacy policy</privacy>"
       }
     },
     "overview": {
@@ -868,6 +873,7 @@
     "setupCompleted": "This server is already set up",
     "invitationInvalid": "This invitation has expired or was already used. Ask for a new one",
     "accountAwaitingApproval": "Your account has to be activated by an administrator first",
+    "googleSignInFailed": "Signing in with Google did not work. Please try again",
     "mailNotConfigured": "This server cannot send emails",
     "importUrlInvalid": "That does not look like a recipe link. Paste a full address starting with https://",
     "importNotSupported": "This website is unfortunately not supported yet",
