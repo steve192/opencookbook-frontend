@@ -1,7 +1,6 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {View} from 'react-native';
 import {Button, Text} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {PasswordValidationInput} from '../components/PasswordValidationInput';
@@ -10,7 +9,7 @@ import {useResetPasswordMutation} from '../api/endpoints/account';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {BaseNavigatorProps} from '../navigation/NavigationRoutes';
 import CentralStyles from '../styles/CentralStyles';
-import {LoginBackdrop} from './LoginScreen/LoginBackdrop';
+import {LoginBackdrop, LoginColumn} from './LoginScreen/LoginBackdrop';
 
 type Props = NativeStackScreenProps<BaseNavigatorProps, 'PasswordResetScreen'>;
 export const PasswordResetScreen = (props: Props) => {
@@ -43,49 +42,47 @@ export const PasswordResetScreen = (props: Props) => {
   });
 
   const resetForm = (
-    <View style={{flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
-      <Text style={CentralStyles.loginTitle}>{t('screens.resetPassword.title')}</Text>
-      <View style={CentralStyles.smallContentContainer}>
-        <PasswordValidationInput
-          onValidityChange={setPasswordOk}
-          onPasswordChange={setNewPassword}
-          confirmReturnKeyType='go'
-          onSubmitConfirm={resetPassword}
-        />
-        <Spacer height={20}/>
-        <Button
-          disabled={!passwordOk || newPassword.length === 0 || pending}
-          loading={pending}
-          mode='contained'
-          theme={{dark: true}}
-          onPress={resetPassword}
-        >{t('screens.resetPassword.resetPasswordButton')}</Button>
-      </View>
-    </View>
+    <>
+      <PasswordValidationInput
+        onValidityChange={setPasswordOk}
+        onPasswordChange={setNewPassword}
+        confirmReturnKeyType='go'
+        onSubmitConfirm={resetPassword}
+      />
+      <Spacer height={20}/>
+      <Button
+        disabled={!passwordOk || newPassword.length === 0 || pending}
+        loading={pending}
+        mode='contained'
+        theme={{dark: true}}
+        onPress={resetPassword}
+      >{t('screens.resetPassword.resetPasswordButton')}</Button>
+    </>
   );
 
   const successView = (
-    <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <View style={CentralStyles.smallContentContainer}>
-        <Spacer height={20}/>
-        <Button mode='contained' theme={{dark: true}} onPress={goToLogin}>
-          Login
-        </Button>
-      </View>
-    </View>
+    <>
+      <Spacer height={20}/>
+      <Button mode='contained' theme={{dark: true}} onPress={goToLogin}>
+        Login
+      </Button>
+    </>
   );
 
   return (
     <LoginBackdrop>
-      <SuccessErrorBanner
-        error={!!error}
-        success={success}
-        pending={false}
-        pendingContent=""
-        errorContent={error ?? ''}
-        successContent={t('screens.resetPassword.successPasswordReset.message')}
-      />
-      {success ? successView : resetForm}
+      <LoginColumn>
+        <Text style={CentralStyles.loginTitle}>{t('screens.resetPassword.title')}</Text>
+        <SuccessErrorBanner
+          error={!!error}
+          success={success}
+          pending={false}
+          pendingContent=""
+          errorContent={error ?? ''}
+          successContent={t('screens.resetPassword.successPasswordReset.message')}
+        />
+        {success ? successView : resetForm}
+      </LoginColumn>
     </LoginBackdrop>
   );
 };

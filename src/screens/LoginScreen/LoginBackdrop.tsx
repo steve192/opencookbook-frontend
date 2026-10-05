@@ -45,12 +45,17 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     marginRight: 16,
   },
+  panel: {
+    backgroundColor: 'rgba(18, 20, 14, 0.75)',
+    borderRadius: 16,
+  },
 });
 
-// The column the login flow's forms sit in: centered, as wide as a form needs to be.
+// The column the login flow's forms sit in: centered, as wide as a form needs to be, on a dark panel
+// that keeps them readable over the photo.
 export const LoginColumn = (props: {children: React.ReactNode}) => (
   <View style={styles.column}>
-    <View style={CentralStyles.smallContentContainer}>{props.children}</View>
+    <View style={[CentralStyles.smallContentContainer, styles.panel]}>{props.children}</View>
   </View>
 );
 
