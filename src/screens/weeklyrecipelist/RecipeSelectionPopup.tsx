@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet, View} from 'react-native';
-import {Appbar, Button, Icon, List, Modal, Portal, Text, TextInput, TouchableRipple} from 'react-native-paper';
+import {Appbar, Button, Icon, List, Modal, Text, TextInput, TouchableRipple} from 'react-native-paper';
 import XDate from 'xdate';
 import {iconSide} from '../../components/listSides';
 import {RecipeList} from '../../components/RecipeList';
@@ -9,6 +9,7 @@ import {Recipe, RecipeGroup} from '../../api/types/recipes';
 import {LEFTOVERS_ICON} from '../../helper/leftovers';
 import {formatWeekdayAndDate} from '../../helper/weekplan';
 import {LEFTOVER_DAYS, LeftoverSource} from '../../helper/weekplanDay';
+import {withPortal} from '../../helper/withPortal';
 import {overlayStyles, useAppTheme} from '../../styles/CentralStyles';
 
 interface Props {
@@ -27,7 +28,7 @@ interface Props {
 
 type SelectionType = 'simple' | 'normal' | 'leftovers';
 
-export const RecipeSelectionPopup = (props: Props) => {
+export const RecipeSelectionPopup = withPortal(function RecipeSelectionPopup(props: Props) {
   const [selectionType, setSelectionType] = useState<SelectionType>();
   const [shownRecipeGroup, setShownRecipeGroup] = useState<RecipeGroup>();
   const [simpleRecipeName, setSimpleRecipeName] = useState('');
@@ -157,40 +158,38 @@ export const RecipeSelectionPopup = (props: Props) => {
   };
 
   return (
-    <Portal>
-      <Modal
-        visible={props.visible}
-        onDismiss={props.onClose}
-        contentContainerStyle={[overlayStyles.modalView, styles.modal, {backgroundColor: theme.colors.elevation.level3}]}>
-        {/* The popup is not under the system status bar, so the header must
-            not reserve room for it. */}
-        <Appbar.Header statusBarHeight={0} style={styles.header}>
-          {selectionType !== undefined &&
-            <Appbar.BackAction
-              accessibilityLabel={t('screens.recipeselectionpopup.back')}
-              onPress={goBack} />
-          }
-          <Appbar.Content title={headerTitle()} />
-          <Appbar.Action
-            icon="close"
-            accessibilityLabel={t('screens.recipeselectionpopup.close')}
-            onPress={props.onClose} />
-        </Appbar.Header>
-        {/* Appbar.Content drops its subtitle under MD3, so the day this is
-            planning for gets its own line. */}
-        {props.dayLabel ?
-          <View style={styles.dayContext}>
-            <Icon source="calendar-outline" size={16} color={theme.colors.onSurfaceVariant} />
-            <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>
-              {props.dayLabel}
-            </Text>
-          </View> :
-          null}
-        {renderContent()}
-      </Modal>
-    </Portal>
+    <Modal
+      visible={props.visible}
+      onDismiss={props.onClose}
+      contentContainerStyle={[overlayStyles.modalView, styles.modal, {backgroundColor: theme.colors.elevation.level3}]}>
+      {/* The popup is not under the system status bar, so the header must
+          not reserve room for it. */}
+      <Appbar.Header statusBarHeight={0} style={styles.header}>
+        {selectionType !== undefined &&
+          <Appbar.BackAction
+            accessibilityLabel={t('screens.recipeselectionpopup.back')}
+            onPress={goBack} />
+        }
+        <Appbar.Content title={headerTitle()} />
+        <Appbar.Action
+          icon="close"
+          accessibilityLabel={t('screens.recipeselectionpopup.close')}
+          onPress={props.onClose} />
+      </Appbar.Header>
+      {/* Appbar.Content drops its subtitle under MD3, so the day this is
+          planning for gets its own line. */}
+      {props.dayLabel ?
+        <View style={styles.dayContext}>
+          <Icon source="calendar-outline" size={16} color={theme.colors.onSurfaceVariant} />
+          <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>
+            {props.dayLabel}
+          </Text>
+        </View> :
+        null}
+      {renderContent()}
+    </Modal>
   );
-};
+});
 
 const styles = StyleSheet.create({
   modal: {

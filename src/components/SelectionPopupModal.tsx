@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {View} from 'react-native';
-import {Divider, List, Modal, Portal, TextInput} from 'react-native-paper';
+import {Divider, List, Modal, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
+import {withPortal} from '../helper/withPortal';
 import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 
@@ -28,7 +29,7 @@ interface Props {
 }
 
 
-export const SelectionPopupModal = (props: Props) => {
+export const SelectionPopupModal = withPortal(function SelectionPopupModal(props: Props) {
   const [value, setValue] = useState<string>('');
   const theme = useAppTheme();
 
@@ -89,41 +90,39 @@ export const SelectionPopupModal = (props: Props) => {
     onPress={() => data.option.newlyCreated ? props.onSelection({key: '', value: value, newlyCreated: true}) : props.onSelection(data.option)} />;
 
   return (
-    <Portal>
-      <Modal
-        visible={props.modalVisible}
-        onDismiss={props.onClose}
-        contentContainerStyle={[overlayStyles.modalView, {backgroundColor: theme.colors.elevation.level3}]}>
-        <View style={{flexDirection: 'row', alignContent: 'center'}}>
-          <TextInput
-            autoFocus={true}
-            placeholder={props.placeholder}
-            onChangeText={onSearchInputChange}
-            style={{flex: 1}}
-            value={value} />
-          <Spacer width={10} />
-        </View>
-        <Divider style={{paddingVertical: 2, marginVertical: 10}} />
-        {dataProvider.getSize() > 0 && <RecyclerListView
+    <Modal
+      visible={props.modalVisible}
+      onDismiss={props.onClose}
+      contentContainerStyle={[overlayStyles.modalView, {backgroundColor: theme.colors.elevation.level3}]}>
+      <View style={{flexDirection: 'row', alignContent: 'center'}}>
+        <TextInput
+          autoFocus={true}
+          placeholder={props.placeholder}
+          onChangeText={onSearchInputChange}
           style={{flex: 1}}
-          keyboardShouldPersistTaps={true}
-          rowRenderer={renderRow}
-          dataProvider={dataProvider}
-          forceNonDeterministicRendering={true}
-          layoutProvider={new LayoutProvider(
-              (index) => {
-                return 0; // Does not matter as only single type is used
-              },
-              (type, dim, index) => {
-                dim.width = 1000; // Just enough to fill parent, value does not matter
-                dim.height = 40; // Does not matter because of nonDeterministicRendering?
-              },
-          )}
-        >
-        </RecyclerListView>}
-      </Modal>
-    </Portal>
+          value={value} />
+        <Spacer width={10} />
+      </View>
+      <Divider style={{paddingVertical: 2, marginVertical: 10}} />
+      {dataProvider.getSize() > 0 && <RecyclerListView
+        style={{flex: 1}}
+        keyboardShouldPersistTaps={true}
+        rowRenderer={renderRow}
+        dataProvider={dataProvider}
+        forceNonDeterministicRendering={true}
+        layoutProvider={new LayoutProvider(
+            (index) => {
+              return 0; // Does not matter as only single type is used
+            },
+            (type, dim, index) => {
+              dim.width = 1000; // Just enough to fill parent, value does not matter
+              dim.height = 40; // Does not matter because of nonDeterministicRendering?
+            },
+        )}
+      >
+      </RecyclerListView>}
+    </Modal>
   );
-};
+});
 
 

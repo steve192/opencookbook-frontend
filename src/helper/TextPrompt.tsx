@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import {StyleSheet} from 'react-native';
-import {Button, Dialog, Portal, Text, TextInput} from 'react-native-paper';
+import {Button, Dialog, Text, TextInput} from 'react-native-paper';
 import {overlayStyles} from '../styles/CentralStyles';
 import {createGlobalOverlay} from './globalOverlay';
+import {withPortal} from './withPortal';
 
 interface Options {
   title: string;
@@ -34,21 +35,10 @@ export const TextPrompt = () => {
     return null;
   }
 
-  return (
-    <Portal>
-      <TextPromptDialog options={options} onClose={() => setOptions(undefined)} />
-    </Portal>
-  );
+  return <TextPromptDialog options={options} onClose={() => setOptions(undefined)} />;
 };
 
-/**
- * Holds the typed text itself, inside the portal. Held outside, each keystroke reached the field one
- * render late, and the field wrote the stale text back over what was typed, moving the cursor.
- *
- * @param {object} props what is asked, and how to close it
- * @return {React.ReactElement} the dialog
- */
-const TextPromptDialog = ({options, onClose}: {options: Options, onClose: () => void}) => {
+const TextPromptDialog = withPortal(function TextPromptDialog({options, onClose}: {options: Options, onClose: () => void}) {
   const [value, setValue] = useState(options.initialValue ?? '');
 
   const confirm = () => {
@@ -80,7 +70,7 @@ const TextPromptDialog = ({options, onClose}: {options: Options, onClose: () => 
       </Dialog.Actions>
     </Dialog>
   );
-};
+});
 
 const styles = StyleSheet.create({
   message: {

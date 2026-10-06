@@ -2,7 +2,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Linking, StyleSheet, TextInput as RNTextInput, View} from 'react-native';
-import {Button, Card, IconButton, Modal, Portal, Text, TextInput} from 'react-native-paper';
+import {Button, Card, IconButton, Modal, Text, TextInput} from 'react-native-paper';
 import Spacer from 'react-spacer';
 import {useGetInstanceInfoQuery, useSignInMutation} from '../../api/endpoints/account';
 import {FormErrorMessage} from '../../components/FormErrorMessage';
@@ -13,6 +13,7 @@ import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {resolveAppVersion} from '../../helper/appVersion';
 import {adminAddress} from '../../helper/instanceAddress';
 import {useInstanceFeatures} from '../../helper/useInstanceFeatures';
+import {withPortal} from '../../helper/withPortal';
 import {LoginNavigationProps} from '../../navigation/NavigationRoutes';
 import {switchServer} from '../../redux/sessionThunks';
 import {login} from '../../redux/features/authSlice';
@@ -30,7 +31,6 @@ const LoginScreen = ({route, navigation}: Props) => {
   const [password, setPassword] = useState<string>('');
   const [settingsModalVisible, setSettingsModalVisible] = useState<boolean>(false);
   const backendUrl = useAppSelector((state) => state.settings.backendUrl);
-  const [serverUrl, setServerUrl] = useState<string>(backendUrl);
   const [apiErrorMessage, setApiErrorMessage] = useState<string>();
   const [signIn, {isLoading: loginPending}] = useSignInMutation();
   const {setupRequired, signupMode} = useInstanceFeatures();
@@ -53,8 +53,6 @@ const LoginScreen = ({route, navigation}: Props) => {
         .catch((error) => setApiErrorMessage(t(errorMessageKey(error))));
   };
 
-  useEffect(() => setServerUrl(backendUrl), [backendUrl]);
-
   const newAccountAddress = route.params?.emailAddress;
   useEffect(() => {
     newAccountAddress && setEmail(newAccountAddress);
@@ -71,32 +69,6 @@ const LoginScreen = ({route, navigation}: Props) => {
       t('common.appVersionWithBuild', {version, build}) :
       t('common.appVersion', {version});
   };
-
-  const settingsModal = (
-    // Paper renders a Modal inline unless it is wrapped in a Portal, which left this one
-    // in the same stacking context as the login form - the floating labels of the e-mail
-    // and password fields drew on top of it. A Portal renders into the host that
-    // PaperProvider mounts at the root of the app, above every screen.
-    <Portal>
-      <Modal
-        visible={settingsModalVisible}
-        onDismiss={() => setSettingsModalVisible(false)}
-        // `style` is the full screen wrapper, the card belongs in the content style
-        contentContainerStyle={CentralStyles.smallContentContainer}>
-        <Card>
-          <TextInput label="Server URL" value={serverUrl} onChangeText={(text) => setServerUrl(text)} />
-          <Button onPress={() => {
-            dispatch(switchServer(serverUrl))
-                .then(() => setSettingsModalVisible(false))
-                .catch((error) => console.error('Saving the server address failed', error));
-          }}>
-            {t('common.save')}
-          </Button>
-        </Card>
-      </Modal>
-    </Portal>
-  );
-
 
   const signInForm = (
     <>
@@ -179,10 +151,42 @@ const LoginScreen = ({route, navigation}: Props) => {
         <LegalLinks color={OwnColors.bluishGrey} />
         <Text style={styles.version}>{versionLabel()}</Text>
       </View>
-      {settingsModal}
+      <ServerAddressModal visible={settingsModalVisible} onDismiss={() => setSettingsModalVisible(false)} />
     </LoginBackdrop>
   );
 };
+
+// Paper renders a Modal inline unless it is wrapped in a Portal, which left this one in the same
+// stacking context as the login form, so the floating labels of the e-mail and password fields drew
+// on top of it. A Portal renders into the host that PaperProvider mounts at the root of the app,
+// above every screen.
+const ServerAddressModal = withPortal(function ServerAddressModal(props: {visible: boolean, onDismiss: () => void}) {
+  const {t} = useTranslation('translation');
+  const dispatch = useAppDispatch();
+  const backendUrl = useAppSelector((state) => state.settings.backendUrl);
+  const [serverUrl, setServerUrl] = useState<string>(backendUrl);
+
+  useEffect(() => setServerUrl(backendUrl), [backendUrl]);
+
+  return (
+    <Modal
+      visible={props.visible}
+      onDismiss={props.onDismiss}
+      // `style` is the full screen wrapper, the card belongs in the content style
+      contentContainerStyle={CentralStyles.smallContentContainer}>
+      <Card>
+        <TextInput label="Server URL" value={serverUrl} onChangeText={setServerUrl} />
+        <Button onPress={() => {
+          dispatch(switchServer(serverUrl))
+              .then(props.onDismiss)
+              .catch((error) => console.error('Saving the server address failed', error));
+        }}>
+          {t('common.save')}
+        </Button>
+      </Card>
+    </Modal>
+  );
+});
 
 /**
  * Stands in for the form while the instance has no administrator: nobody can sign in or sign up
