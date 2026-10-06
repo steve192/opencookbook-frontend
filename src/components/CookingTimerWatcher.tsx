@@ -34,7 +34,7 @@ export const CookingTimerWatcher = () => {
   // them. Anything still in the shade from before is stale and is taken down on start.
   useEffect(() => {
     // On mount only: from here on, each timer takes its own reminder down
-    clearOrphanedRunningNotifications(Object.keys(timers));
+    void clearOrphanedRunningNotifications(Object.keys(timers));
   }, []);
 
   useEffect(() => {
@@ -45,9 +45,9 @@ export const CookingTimerWatcher = () => {
       elapsedTimerKeys(timers, Date.now()).forEach((key) => {
         const timer = timers[key];
         // The reminder that it was running has served its purpose
-        clearRunningTimerNotification(key);
+        void clearRunningTimerNotification(key);
         // A notification Android is holding back rings now, rather than minutes late
-        ringPendingAlertNow(key);
+        void ringPendingAlertNow(key);
         VibrationUtils.longPressFeedbackVibration();
         SnackbarUtil.show({
           message: t('screens.guidedCooking.timerDoneFor', {
@@ -66,7 +66,9 @@ export const CookingTimerWatcher = () => {
   // should ring on time from then on too.
   useEffect(() => {
     const subscription = AppState.addEventListener('change', (state) => {
-      state === 'active' && upgradeTimersToAlarms(timers, (timer) => timerNotificationTexts(t, timer));
+      if (state === 'active') {
+        void upgradeTimersToAlarms(timers, (timer) => timerNotificationTexts(t, timer));
+      }
     });
     return () => subscription.remove();
   }, [timers, t]);

@@ -78,7 +78,7 @@ export const PlanningDetailsPrompt = () => {
   const close = () => setRecipe(undefined);
 
   const neverAgain = () => {
-    AppPersistence.setAskForPlanningDetails(false);
+    void AppPersistence.setAskForPlanningDetails(false);
     close();
   };
 

@@ -15,7 +15,7 @@ export const resources = {
 
 console.debug('Detected locale', deviceLanguage);
 
-i18n.use(initReactI18next).init({
+void i18n.use(initReactI18next).init({
   lng: deviceLanguage,
   interpolation: {
     escapeValue: false, // not needed for react as it escapes by default
