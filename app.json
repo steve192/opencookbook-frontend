@@ -87,6 +87,7 @@
       "expo-font",
       "expo-localization",
       "expo-secure-store",
+      "expo-sqlite",
       [
         "expo-sharing",
         {
