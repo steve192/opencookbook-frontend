@@ -45,7 +45,7 @@ export const useShoppingImport = () => {
 
   const start = (target: ShoppingImportTarget) => {
     if (provider) {
-      proceed(target, provider);
+      void proceed(target, provider);
     } else {
       setAsking(target);
     }

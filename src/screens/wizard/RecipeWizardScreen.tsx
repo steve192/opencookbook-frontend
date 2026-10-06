@@ -252,7 +252,7 @@ const RecipeWizardScreen = (props: Props) => {
               title={t('common.delete')}
               onPress={() => {
                 setMenuOpen(false);
-                onDeleteRecipe();
+                void onDeleteRecipe();
               }} />
           </Menu>
         </>

@@ -43,7 +43,7 @@ export const StepTimer = (props: Props) => {
 
   const toggle = () => {
     if (running) {
-      stopTimerNotifications(key);
+      void stopTimerNotifications(key);
       dispatch(timerStopped(key));
       return;
     }
@@ -59,7 +59,7 @@ export const StepTimer = (props: Props) => {
 
     // The shade carries the timer while it runs and the alert when it is up, so putting the
     // phone down is safe. Both are posted by the system rather than kept alive by the app.
-    startTimerNotifications(key, started.endsAt, timerNotificationTexts(t, started), {
+    void startTimerNotifications(key, started.endsAt, timerNotificationTexts(t, started), {
       recipeId: props.recipeId,
       stepIndex: props.stepIndex,
     }).then((announcement) => {

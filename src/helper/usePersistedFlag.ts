@@ -15,11 +15,11 @@ export const usePersistedFlag = (
 ): [boolean, (value: boolean) => void] => {
   const [value, setValue] = useState(fallback);
   useEffect(() => {
-    read().then((stored) => setValue(stored ?? fallback));
+    void read().then((stored) => setValue(stored ?? fallback));
   }, []);
   const change = (next: boolean) => {
     setValue(next);
-    write(next);
+    void write(next);
   };
   return [value, change];
 };

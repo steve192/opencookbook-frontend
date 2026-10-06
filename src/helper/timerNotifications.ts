@@ -533,9 +533,11 @@ export const useTimerNotificationTap = (onTap: (target: TimerNotificationTarget)
       }
     };
 
-    readHandoff();
+    void readHandoff();
     const subscription = AppState.addEventListener('change', (state) => {
-      state === 'active' && readHandoff();
+      if (state === 'active') {
+        void readHandoff();
+      }
     });
     return () => subscription.remove();
   }, [onTap]);

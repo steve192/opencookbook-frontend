@@ -109,7 +109,7 @@ export const RecipeScanScreen = (props: Props) => {
 
     const uri = result.assets[0].uri;
     dispatch({type: 'added', uri});
-    findThePage(uri);
+    void findThePage(uri);
   };
 
   // Asks the server where the page is, and moves that page's crop onto it.

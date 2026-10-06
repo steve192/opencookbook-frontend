@@ -42,7 +42,7 @@ export class LiveChannel {
       return;
     }
     this.running = true;
-    this.connect();
+    void this.connect();
   }
 
   stop() {
@@ -113,7 +113,7 @@ export class LiveChannel {
     }
     this.retryTimer = setTimeout(() => {
       this.retryTimer = null;
-      this.connect();
+      void this.connect();
     }, this.retryMillis);
     this.retryMillis = Math.min(this.retryMillis * 2, LAST_RETRY_MILLIS);
   }

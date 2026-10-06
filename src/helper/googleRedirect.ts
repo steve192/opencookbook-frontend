@@ -31,7 +31,7 @@ const fragmentParams = (fragment: string) => new URLSearchParams(fragment.replac
 // The server checks the signature; this only reads the claim back.
 const nonceOf = (idToken: string): unknown => {
   try {
-    return JSON.parse(atob(idToken.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).nonce;
+    return JSON.parse(atob(idToken.split('.')[1].replaceAll('-', '+').replaceAll('_', '/'))).nonce;
   } catch {
     return undefined;
   }
