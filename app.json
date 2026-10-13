@@ -3,10 +3,10 @@
     "name": "CookPal",
     "slug": "opencookbook",
     "scheme": "cookpal",
-    "version": "1.24.6",
+    "version": "1.24.7",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "runtimeVersion": "55.0.0",
+    "runtimeVersion": "56.0.0",
     "updates": {
       "enabled": true,
       "fallbackToCacheTimeout": 20000,
@@ -53,7 +53,7 @@
         "POST_NOTIFICATIONS",
         "com.android.alarm.permission.SET_ALARM"
       ],
-      "versionCode": 55
+      "versionCode": 56
     },
     "web": {
       "favicon": "./assets/icon.png"
