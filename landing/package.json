@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Public landing page and self-hosting guide for CookPal.",
   "engines": {
-    "node": "v26.10.0"
+    "node": "26.11.1"
   },
   "scripts": {
     "sync-assets": "node scripts/sync-assets.mjs",
