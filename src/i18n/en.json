@@ -35,7 +35,9 @@
     "dismiss": "Dismiss",
     "experimental": "experimental",
     "mealTypeCoverageWarning": "{{untagged}} of your {{total}} recipes do not say which meals they suit. Until they do, suggestions and plans can only guess - set the meals when editing a recipe.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "change": "Change",
+    "moreAbout": "More about {{topic}}"
   },
   "navigation": {
     "screenTitleImportBrowser": "Recipe import browser",
@@ -774,6 +776,11 @@
       },
       "serverUnavailable": "The server's components could not be loaded.",
       "retry": "Try again"
+    },
+    "more": {
+      "screenTitle": "More",
+      "toolsSubtitle": "Calculators for dough, yeast, oven, parties, drinks and a seasonal calendar",
+      "settingsSubtitle": "Account, shopping, planning and how the app looks"
     }
   },
   "nutrition": {
@@ -939,7 +946,7 @@
     "neverSynced": "Not synced yet",
     "syncNow": "Sync now",
     "syncing": "Syncing",
-    "storageUsed": "{{size}} MB used, including the app"
+    "storageUsed": "{{size, number(minimumFractionDigits: 1; maximumFractionDigits: 1)}} MB used, including the app"
   },
   "pwa": {
     "install": {
@@ -958,5 +965,658 @@
       "available": "A new version of CookPal is available.",
       "reload": "Reload"
     }
+  },
+  "tools": {
+    "title": "Kitchen tools",
+    "unknown": "This tool does not exist (any more).",
+    "signInRequired": "Sign in to use the kitchen tools on this CookPal instance.",
+    "range": "{{low}} to {{high}}",
+    "categories": {
+      "baking": "Dough & baking",
+      "converters": "Converters",
+      "planning": "Planning",
+      "drinks": "Drinks"
+    },
+    "units": {
+      "metric": "Metric",
+      "imperial": "Imperial",
+      "hours": "h",
+      "minutes": "min",
+      "seconds": "s"
+    },
+    "result": {
+      "copy": "Copy",
+      "print": "Print",
+      "shareLink": "Share link",
+      "copied": "Copied",
+      "ingredients": "Ingredients",
+      "preparation": "Preparation"
+    },
+    "signupHint": {
+      "title": "There is more to CookPal",
+      "body": "Collect your recipes, plan your week and shop with one list. Free.",
+      "bodySignInOnly": "Have an account? Sign in to collect recipes, plan your week and shop with one list.",
+      "signUp": "Create free account",
+      "signIn": "Sign in",
+      "dismiss": "Hide for now"
+    },
+    "timer": {
+      "runningBody": "{{tool}}, done at {{time}}",
+      "alertBody": "{{tool}}",
+      "doneFor": "{{label}} are up ({{tool}})",
+      "openTool": "Open"
+    },
+    "pizzaDough": {
+      "name": "Pizza dough",
+      "summary": "Flour, water, salt and yeast or starter for your style and schedule",
+      "style": "Style",
+      "styles": {
+        "neapolitan": "Neapolitan",
+        "contemporary": "Contemporary Neapolitan",
+        "newYork": "New York",
+        "romanTonda": "Roman (tonda)",
+        "pinsa": "Pinsa",
+        "romanTeglia": "Roman (teglia)",
+        "detroit": "Detroit",
+        "sicilian": "Sicilian",
+        "blechpizza": "Sheet pan pizza",
+        "focaccia": "Focaccia"
+      },
+      "amount": "How much",
+      "amountModes": {
+        "balls": "Dough balls",
+        "pizzas": "Pizzas by size",
+        "trays": "Trays",
+        "flour": "Flour on hand"
+      },
+      "counts": {
+        "balls": "Number of balls",
+        "pizzas": "Number of pizzas",
+        "trays": "Number of trays"
+      },
+      "ballWeight": "Weight per ball",
+      "diameter": "Diameter",
+      "trayWidth": "Tray width",
+      "trayLength": "Tray length",
+      "knowsW": "I know the W value",
+      "knowsWHint": "Italian mills print the flour strength (W) on the bag. It decides how long the dough can ferment.",
+      "wValue": "W value",
+      "riceFlour": "Rice flour",
+      "soyFlour": "Soy flour",
+      "pieces": {
+        "balls_one": "{{count}} ball",
+        "balls_other": "{{count}} balls",
+        "trays_one": "{{count}} tray",
+        "trays_other": "{{count}} trays"
+      },
+      "bakeValue": "{{temperature}}, about {{duration}}",
+      "resultTitle": "{{style}} dough",
+      "styleDescriptions": {
+        "neapolitan": "Soft, airy rim with charred spots, thin in the middle. Made for a very hot pizza oven.",
+        "contemporary": "Neapolitan with an extra puffy, airy rim from a wetter dough.",
+        "newYork": "Large, thin and foldable with a crisp bottom. A little oil and sugar in the dough.",
+        "romanTonda": "Very thin and crisp, almost like a cracker. Rolled out with a pin.",
+        "pinsa": "Oval, crisp outside and airy inside. Wheat with rice and soy flour in a very wet dough.",
+        "romanTeglia": "Roman pan pizza: a very wet dough with big holes and a crisp bottom. Sold by the slice.",
+        "detroit": "Thick and airy from a deep rectangular pan, with crispy caramelised cheese at the edges.",
+        "sicilian": "Thick, soft and spongy like focaccia, baked in an oiled pan.",
+        "blechpizza": "The home classic: one big pizza on the oven tray.",
+        "focaccia": "Dimpled flatbread with plenty of olive oil, a crisp bottom and a soft crumb."
+      },
+      "ballMakes": "for {{diameter}}",
+      "oven": "Your oven",
+      "ovenInfo": "How long a pizza bakes depends on how hot the oven gets and what the pizza lies on. A stone or steel holds heat and bakes the bottom faster than a tray.",
+      "ovens": {
+        "tray": "Home oven, baking tray",
+        "stone": "Home oven, pizza stone",
+        "steel": "Home oven, pizza steel",
+        "pizzaOven": "Pizza oven"
+      },
+      "ovenDescriptions": {
+        "tray": "The tray that came with the oven.",
+        "stone": "A stone slab that soaks up heat and gives a crisper bottom.",
+        "steel": "A steel plate that passes on heat faster than stone, so the pizza is done sooner.",
+        "pizzaOven": "A gas or wood-fired oven that gets far hotter than a home oven."
+      },
+      "ovenTips": {
+        "tray": "Heat the tray upside down with the oven, on the middle rack, and slide the pizza onto it.",
+        "stone": "Put the stone into the cold oven on the lower or middle rack and heat it at the highest setting for 30 to 60 minutes, thicker stones longer.",
+        "steel": "Heat the steel with the oven for 30 to 60 minutes on the lower or middle rack. If the top stays pale, finish it under the grill.",
+        "pizzaOven": "Heat it for 20 to 30 minutes until the stone is hot, measured with an infrared thermometer, and turn the pizza every 20 to 30 seconds.",
+        "pan": "Start the pan on the lowest rack so the bottom turns crisp."
+      },
+      "ovenMax": "Hottest setting",
+      "ovenMaxInfo": "The highest temperature your oven can be set to with top and bottom heat. Most home ovens go up to 250 to 280 °C (480 to 535 °F).",
+      "bake": "Bake",
+      "madeForPizzaOven": "{{style}} is usually baked in a pizza oven at about {{temperature}}. Your oven reaches {{max}}, so the pizza needs longer; the time is what recipes give for {{surface}}.",
+      "madeForHotterOven": "{{style}} is usually baked at about {{temperature}}; at {{max}} it needs longer. The time is what recipes give near your oven's temperature.",
+      "recommendedFor": "Recommended for {{style}}",
+      "surfaces": {
+        "tray": "a preheated tray",
+        "stone": "a pizza stone",
+        "steel": "a pizza steel"
+      },
+      "bakeValueOrLess": "{{temperature}}, {{duration}} or less",
+      "bakeValueAtLeast": "{{temperature}}, at least {{duration}}"
+    },
+    "bread": {
+      "name": "Bread & sourdough",
+      "summary": "Sourdough, rye, hybrid or yeast bread with additions, soaker and timeline",
+      "type": "Bread",
+      "types": {
+        "wheatSourdough": "Wheat or spelt sourdough",
+        "ryeMixed": "Rye & mixed rye",
+        "hybrid": "Sourdough with yeast",
+        "yeast": "Yeast bread"
+      },
+      "flourMixHint": "The shares add up to 100 %; the water is set from what each flour takes.",
+      "share": "Share",
+      "addFlour": "Add flour",
+      "removeFlour": "Remove flour",
+      "hydration": "Water",
+      "hydrationHint": "In % of the flour; dough yield (TA) {{yield}}.",
+      "hydrationValue": "{{percent}} % (TA {{yield}})",
+      "doughWater": "Water in the dough",
+      "doughWaterValue": "{{grams}}, {{percent}} % (TA {{yield}})",
+      "fromAdditions": "Of it from the additions",
+      "amount": "How much",
+      "amountModes": {
+        "loaves": "Loaves",
+        "flour": "Flour on hand"
+      },
+      "loafCount": "Number of loaves",
+      "loafWeight": "Weight per loaf",
+      "loaves_one": "{{count}} loaf",
+      "loaves_other": "{{count}} loaves",
+      "hybridStarter": "Starter",
+      "hybridStarterHint": "In % of the flour. Yeast makes up what the starter lacks for the schedule.",
+      "additions": "Additions",
+      "additionsHint": "They count towards the loaf's weight, so more of them means less flour. The dough takes their water: all of quark's or eggs', what fruit and vegetables release, far more when cooked or puréed. Seeds and grains go into a soaker.",
+      "searchAddition": "Add pumpkin, quark, seeds…",
+      "searchFailed": "The food catalogue could not be reached.",
+      "removeAddition": "Remove",
+      "waterGiven": "{{percent}} % water; the dough takes {{grams}} g per 100 g",
+      "waterBound": "{{percent}} % water; its starch binds {{grams}} g of the dough's water per 100 g",
+      "soaks": "Soaks up {{grams, number}} g water per gram",
+      "ryeSchedule": "Rye needs an acid sour, made the day before. The dough then rises as fast as the sour lets it.",
+      "sourTitle": "Sour (the day before)",
+      "sourFlour": "Rye flour",
+      "sourStarter": "Starter",
+      "sourTime": "Ripens",
+      "sourTimeValue": "{{hours, number}} h at {{temperature}}",
+      "soakerTitle": "Soaker",
+      "soakerTime": "Soaks",
+      "soakerTimeValue": "about {{hours, number}} h",
+      "startSour": "Start the sour",
+      "startSoaker": "Start the soaker",
+      "resultTitle": "{{type}}",
+      "ownHydration": "Choose the water myself",
+      "recommendedHydration": "The calculator uses {{percent}} % water (dough yield {{yield}}), what bakers recommend for this flour mix.",
+      "typeDescriptions": {
+        "wheatSourdough": "Wheat or spelt dough raised by a ripe starter alone.",
+        "ryeMixed": "Rye needs acid, so part of the rye goes into a sour the day before.",
+        "hybrid": "A starter plus a little yeast, which makes up what the starter lacks for the schedule.",
+        "yeast": "Raised by baker's yeast alone."
+      },
+      "preparations": {
+        "raw": "Raw, grated or in pieces",
+        "cooked": "Cooked or puréed"
+      },
+      "flourTakes": "Recipes give it about {{water}} % water.",
+      "flourN": "Flour {{n}}",
+      "flourMaxShare": "Recipes use it for at most {{share}} % of the flour."
+    },
+    "dough": {
+      "flour": "Flour",
+      "water": "Water",
+      "salt": "Salt",
+      "oil": "Oil",
+      "sugar": "Sugar",
+      "total": "Dough",
+      "flourOnHand": "Flour on hand",
+      "flourType": "Flour",
+      "flours": {
+        "tipo00": "Tipo 00 for pizza",
+        "tipo00Strong": "Tipo 00, strong",
+        "manitoba": "Manitoba",
+        "type405": "Wheat 405 / all-purpose",
+        "type550": "Wheat 550 / bread flour",
+        "type1050": "Wheat 1050",
+        "wholeWheat": "Whole wheat",
+        "spelt630": "Spelt 630",
+        "speltWholegrain": "Whole spelt",
+        "rye1150": "Rye 1150",
+        "ryeWholegrain": "Whole rye",
+        "type812": "Wheat 812",
+        "type1600": "Wheat 1600",
+        "wheatMeal": "Wheat meal (Schrot)",
+        "durum": "Durum semolina, finely milled",
+        "spelt812": "Spelt 812",
+        "spelt1050": "Spelt 1050",
+        "speltMeal": "Spelt meal (Schrot)",
+        "rye815": "Rye 815",
+        "rye997": "Rye 997",
+        "rye1370": "Rye 1370",
+        "rye1740": "Rye 1740",
+        "ryeMeal": "Rye meal (Schrot)",
+        "einkorn": "Whole einkorn",
+        "emmer": "Whole emmer",
+        "barley": "Barley",
+        "buckwheat": "Buckwheat",
+        "millet": "Millet",
+        "quinoa": "Quinoa",
+        "amaranth": "Amaranth",
+        "teff": "Teff"
+      },
+      "leavener": "Leavened with",
+      "yeast": "Yeast",
+      "leaveners": {
+        "fresh": "Fresh yeast",
+        "instant": "Instant yeast",
+        "activeDry": "Active dry yeast",
+        "sourdough": "Ripe starter"
+      },
+      "schedule": "Schedule",
+      "presets": {
+        "sameDay": "Same day",
+        "overnight": "Overnight",
+        "fridge24": "24 h fridge",
+        "fridge48": "48 h fridge",
+        "fridge72": "72 h fridge",
+        "custom": "Your own",
+        "quick": "Quick"
+      },
+      "stageHours": "Duration",
+      "stageTemperature": "Temperature",
+      "addStage": "Add stage",
+      "removeStage": "Remove stage",
+      "bakeDay": "Bake",
+      "days": {
+        "0": "Today",
+        "1": "Tomorrow",
+        "2": "In 2 days",
+        "3": "In 3 days"
+      },
+      "bakeTime": "Time",
+      "temperatures": "Temperatures",
+      "temperaturesHint": "For the water temperature that brings the dough to the temperature it should have.",
+      "room": "Room temperature",
+      "kneading": {
+        "hand": "By hand",
+        "machine": "Stand mixer"
+      },
+      "waterTemperature": "Water temperature",
+      "timeline": "Timeline",
+      "bake": "Bake",
+      "stageLine": "{{hours, number}} h {{where}}",
+      "inTheFridge": "in the fridge",
+      "at": "at {{temperature}}",
+      "warnings": {
+        "flourTooWeakForTime": "This flour is made for shorter fermentation than this schedule. Choose a stronger flour or a shorter schedule.",
+        "flourTooWeakForWater": "This flour takes less water than this dough has. It may turn out slack.",
+        "tooLittleToWeigh": "That is less than 0.1 g of yeast, below what kitchen scales weigh.",
+        "impossibleSchedule": "No amount of leavener makes this schedule: it is too short or too cold.",
+        "soakerTooLarge": "The soaker is more than the dough can carry. Use fewer seeds or more flour.",
+        "additionsTooWet": "The additions bring more water than this flour takes, so the dough comes out wetter than the recipe aims for. Use less of them, more flour, or grate them instead of puréeing.",
+        "tooMuchYeast": "More yeast than any recipe uses: the dough tastes of yeast and has no time to develop flavour. Choose a longer schedule.",
+        "moreYeastThanStyleAllows": "More yeast than the Neapolitan rules allow (0.1 to 3 g fresh yeast per litre of water). Choose a longer schedule.",
+        "waterTooHot": "The water would have to be hotter than 45 °C, which starts to kill yeast. Let the flour warm up, or let the dough rise warmer.",
+        "waterTooCold": "The water would have to be colder than ice water. Chill the flour, or knead by hand, which warms the dough less.",
+        "tooManyAdditions": "More fruit or vegetables than flour: more than recipes use, so the crumb may not set and stay gummy.",
+        "ryeWithoutSour": "More than half rye makes a rye bread, and rye does not bake with yeast alone. Choose rye and mixed bread, which adds a sour.",
+        "flourShareTooHigh": "A flour with little or no gluten makes up more of the mix than recipes use (barley at most a quarter to half, buckwheat, millet, quinoa, amaranth and teff at most half): the loaf turns out dense and crumbly."
+      },
+      "roomInfo": "Where the dough rises, usually your kitchen. The flour counts as just as warm, as it is stored there.",
+      "temperaturesInfo": "Kneading warms the dough by friction, a stand mixer more than hands. The water temperature allows for it, for the room and for the flour.",
+      "flourDescriptions": {
+        "tipo00": "Finely milled Italian pizza flour of medium strength.",
+        "tipo00Strong": "Stronger Italian 00 flour, W about 300 to 320.",
+        "manitoba": "Very strong flour with 13 to 15 % protein.",
+        "type550": "German wheat flour with a little more of the grain than 405.",
+        "type405": "German wheat flour, the most finely sifted.",
+        "type1050": "Darker German wheat flour with more of the grain.",
+        "wholeWheat": "Ground from the whole grain.",
+        "spelt630": "Light spelt flour.",
+        "speltWholegrain": "Ground from the whole spelt grain.",
+        "rye1150": "Medium rye flour; rye needs a sour.",
+        "ryeWholegrain": "Ground from the whole rye grain; rye needs a sour.",
+        "type812": "Wheat flour between 550 and 1050, for light mixed breads.",
+        "type1600": "Dark wheat flour, close to whole grain.",
+        "wheatMeal": "Coarsely ground whole wheat.",
+        "durum": "Finely ground durum wheat, golden and firm.",
+        "spelt812": "Spelt flour between light and dark.",
+        "spelt1050": "Darker spelt flour with more of the grain.",
+        "speltMeal": "Coarsely ground whole spelt.",
+        "rye815": "The lightest rye flour; rye needs a sour.",
+        "rye997": "Light rye flour; rye needs a sour.",
+        "rye1370": "Dark rye flour; rye needs a sour.",
+        "rye1740": "Very dark rye flour, close to whole grain; rye needs a sour.",
+        "ryeMeal": "Coarsely ground whole rye; rye needs a sour.",
+        "einkorn": "Ground from the whole einkorn grain, an ancient wheat with weak gluten.",
+        "emmer": "Ground from the whole emmer grain, an ancient wheat.",
+        "barley": "Little gluten: only part of the mix.",
+        "buckwheat": "No gluten: only part of the mix.",
+        "millet": "No gluten: only part of the mix.",
+        "quinoa": "No gluten: only part of the mix.",
+        "amaranth": "No gluten: only part of the mix.",
+        "teff": "No gluten: only part of the mix."
+      },
+      "leavenerDescriptions": {
+        "fresh": "Moist pressed yeast, sold in 42 g cubes.",
+        "instant": "Fine dry granules, in Germany sold as Trockenhefe in 7 g sachets. Goes straight into the dough.",
+        "activeDry": "Coarser dry granules, sold in the US in 1/4 oz packets. Dissolve them in warm water first.",
+        "sourdough": "A ripe sourdough starter with as much water as flour: bubbly and about doubled, usually 6 to 8 hours after feeding."
+      },
+      "stageNumber": "Stage {{number}}",
+      "customSchedule": "Set each stage's hours and temperature yourself.",
+      "scheduleInfo": "How long the dough rises and where. Pick a schedule, or set your own stages. Up to {{max}} °C counts as the fridge.",
+      "bakeWhen": "When do you bake?",
+      "flourWater": "Recipes take it up to {{water}} % water.",
+      "flourHours": "Recipes let it ferment up to {{hours, number}} hours.",
+      "mixKnead": "Mix and knead ({{minutes, number}} min)"
+    },
+    "yeastConverter": {
+      "name": "Yeast converter",
+      "summary": "Fresh, instant and active dry yeast, cubes and sachets, sourdough",
+      "recipeSays": "The recipe says",
+      "iHave": "I have",
+      "amount": "Amount",
+      "units": {
+        "grams": "Grams",
+        "cube": "Cubes (42 g)",
+        "sachet": "Sachets (7 g)",
+        "packet": "US packets (1/4 oz)"
+      },
+      "recipeFlour": "Flour in the recipe",
+      "recipeFlourHint": "Leave at 0 to keep the recipe's amount.",
+      "doughTemperature": "Dough temperature",
+      "sourdoughHint": "Conversion guides put 100 to 140 g of ripe starter in place of a 7 g sachet of instant yeast, and take half of it as flour and half as water off the recipe. Sourdough leavens more slowly: the dough takes several times as long, and how long depends on this temperature.",
+      "readyIn": "Ready in about",
+      "hours_one": "{{count}} hour",
+      "hours_other": "{{count}} hours",
+      "tooCold": "Too cold to leaven",
+      "resultTitle": "Converted yeast",
+      "youNeed": "You need",
+      "flourAndWaterOff": "Less flour and less water, each"
+    },
+    "ovenConverter": {
+      "name": "Oven & air fryer",
+      "summary": "Top and bottom heat, fan oven and air fryer, °C and °F",
+      "recipeSays": "The recipe says",
+      "iUse": "I use",
+      "modes": {
+        "topBottom": "Top & bottom heat",
+        "fan": "Fan oven",
+        "airFryer": "Air fryer"
+      },
+      "temperature": "Temperature",
+      "time": "Time",
+      "timeHint": "0 when the recipe gives none.",
+      "frozen": "Frozen food",
+      "frozenHint": "Same temperature as the oven, a little over half the time.",
+      "minutes_one": "{{count}} minute",
+      "minutes_other": "{{count}} minutes",
+      "checkEarly": "Check",
+      "minutesEarly_one": "{{count}} minute early",
+      "minutesEarly_other": "{{count}} minutes early",
+      "resultTitle": "{{mode}}",
+      "yourSetting": "Your setting",
+      "noTime": "No time",
+      "modeDescriptions": {
+        "topBottom": "Heating elements at the top and the bottom.",
+        "fan": "A fan moves the heat to the food: {{offset}} lower than top and bottom heat.",
+        "airFryer": "A small, strong fan oven: {{offset}} lower than top and bottom heat, and shorter."
+      },
+      "warnings": {
+        "airFryerTooHot": "Many air fryers go up to 200 °C only; check what yours reaches.",
+        "ovenTooHot": "Home ovens reach 250 °C, some 275 °C; check what yours reaches."
+      }
+    },
+    "partyPlanner": {
+      "name": "Party planner",
+      "summary": "Food and drinks for your guests, buffet, barbecue, raclette and more",
+      "event": "Party",
+      "events": {
+        "buffet": "Buffet",
+        "platedDinner": "Seated dinner",
+        "fingerFood": "Finger food",
+        "bbq": "Barbecue",
+        "raclette": "Raclette",
+        "cheeseFondue": "Cheese fondue"
+      },
+      "guests": "Guests",
+      "guestsHint": "Groups count by their energy needs (DGE), for one meal.",
+      "groups": {
+        "men": "Men",
+        "women": "Women",
+        "teens": "Teenagers (13 to 18)",
+        "children": "Children (4 to 12)"
+      },
+      "meatFree": "Of them eating no meat",
+      "appetite": "Appetite",
+      "appetites": {
+        "light": "Light",
+        "normal": "Normal",
+        "hearty": "Hearty"
+      },
+      "when": "When",
+      "times": {
+        "lunch": "Lunch",
+        "evening": "Evening"
+      },
+      "hours": "Hours",
+      "menu": "Menu",
+      "accompaniments": "Served with",
+      "accompanimentsHint": "Vegetables such as mushrooms, onions, peppers or garlic; pickles such as gherkins and silver onions. Potatoes and bread together share the amount.",
+      "accompanimentNames": {
+        "potatoes": "Potatoes",
+        "bread": "Bread",
+        "vegetables": "Vegetables",
+        "meat": "Meat and fish",
+        "pickles": "Pickles"
+      },
+      "menuInfo": "Without a starter or dessert, sides, salad and bread get bigger, and what you leave out of them goes to the others. With several dishes the course stays the same; each dish gets 1.5 times its share.",
+      "courses": {
+        "starter": "Starters",
+        "main": "Main",
+        "sides": "Sides",
+        "salad": "Salad",
+        "bread": "Bread",
+        "dessert": "Dessert"
+      },
+      "dishes": "Dishes per course",
+      "reserve": "Plan for seconds",
+      "reserveHint": "12.5 % more food.",
+      "alcohol": "Alcohol",
+      "alcoholHint": "Share of adults drinking it. Who drinks beer and wine has half of each, and fewer soft drinks. Teenagers and children get none.",
+      "drinking": "How much people drink",
+      "drinkings": {
+        "little": "Little",
+        "normal": "Normal",
+        "aLot": "A lot"
+      },
+      "beerShare": "Beer",
+      "wineShare": "Wine",
+      "food": "Food",
+      "drinks": "Drinks",
+      "items": {
+        "coldStarters": "Cold starters",
+        "meat": "Meat or fish",
+        "vegetarianMain": "Vegetarian main",
+        "grillMeat": "Meat for the grill",
+        "warmSides": "Potatoes, pasta, rice",
+        "salad": "Salad",
+        "vegetables": "Vegetables",
+        "bread": "Bread",
+        "dessert": "Dessert",
+        "racletteCheese": "Raclette cheese",
+        "racletteMeat": "Meat and fish",
+        "potatoes": "Potatoes",
+        "racletteBread": "Bread",
+        "fondueCheese": "Fondue cheese",
+        "fondueBread": "Bread"
+      },
+      "perDish": "{{total}} ({{dish}} per dish)",
+      "pickles": "Gherkins and silver onions",
+      "jarsEach_one": "{{count}} jar each",
+      "jarsEach_other": "{{count}} jars each",
+      "softDrinks": "Soft drinks",
+      "water": "Water",
+      "beer": "Beer",
+      "wine": "Wine",
+      "bottles_one": "{{volume}}, {{count}} bottle of {{size}}",
+      "bottles_other": "{{volume}}, {{count}} bottles of {{size}}",
+      "resultTitle": "{{event}}",
+      "eventDescriptions": {
+        "buffet": "Guests serve themselves from starters, mains, sides, salads and desserts.",
+        "platedDinner": "Every guest gets a served plate for each course.",
+        "fingerFood": "Small bites eaten standing, without cutlery.",
+        "bbq": "Meat from the grill with salads, vegetables and bread.",
+        "raclette": "Cheese melted at the table, with potatoes or bread and whatever everyone likes.",
+        "cheeseFondue": "Bread dipped into melted cheese at the table."
+      }
+    },
+    "seasonalCalendar": {
+      "name": "Seasonal calendar",
+      "summary": "What grows in Germany now, what comes next, and how to keep it",
+      "categories": {
+        "ALL": "All",
+        "VEGETABLE": "Vegetables",
+        "FRUIT": "Fruit",
+        "SALAD": "Salads"
+      },
+      "search": "Find a food",
+      "inSeason": "In season in {{month}}",
+      "nothing": "Nothing grows outdoors this month.",
+      "startingSoon": "Starting next month",
+      "available": "Out of season, from stores or greenhouses",
+      "methods": {
+        "FIELD": "Field",
+        "PROTECTED": "Under fleece or foil",
+        "UNHEATED_GREENHOUSE": "Unheated greenhouse",
+        "HEATED_GREENHOUSE": "Heated greenhouse",
+        "STORED": "Stored"
+      },
+      "storage": {
+        "fridge": "Keeps best in the vegetable drawer.",
+        "coolDark": "Keeps best cool and dark, outside the fridge.",
+        "coldSensitive": "Sensitive to cold.",
+        "ethyleneProducer": "Gives off ethylene: store it apart from other produce.",
+        "ethyleneSensitive": "Ripens and wilts near ethylene, such as next to apples."
+      },
+      "region": "Germany, the average of several regional seasonal calendars.",
+      "loadFailed": "The seasonal calendar could not be loaded.",
+      "myRecipes": "Your recipes for {{month}}",
+      "noRecipes": "None of your recipes uses what is in season this month.",
+      "regionTitle": "Seasons in Germany",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "lastMonth": "Season ends",
+      "noOutdoorSeason": "No outdoor season",
+      "unavailable": "No German harvest in {{month}}",
+      "showUnavailable_one": "Show {{count}} food without a harvest in {{month}}",
+      "showUnavailable_other": "Show {{count}} foods without a harvest in {{month}}",
+      "noMatch": "No food matches \"{{search}}\".",
+      "inSeasonMonths": "In season {{months}}",
+      "storageTitle": "Keeping it"
+    },
+    "coffee": {
+      "name": "Coffee",
+      "summary": "Coffee and water for filter, French press, espresso, cold brew and more",
+      "method": "Method",
+      "methods": {
+        "pourOver": "Pour-over",
+        "filterMachine": "Filter machine",
+        "frenchPress": "French press",
+        "aeroPress": "AeroPress",
+        "moka": "Moka pot",
+        "espresso": "Espresso",
+        "coldBrewConcentrate": "Cold brew concentrate",
+        "coldBrewReady": "Cold brew, ready to drink",
+        "japaneseIced": "Japanese iced"
+      },
+      "strength": "Strength",
+      "strengths": {
+        "mild": "Mild",
+        "medium": "Medium",
+        "strong": "Strong"
+      },
+      "basis": "Starting from",
+      "bases": {
+        "water": "How much I want",
+        "coffee": "Coffee on hand"
+      },
+      "drink": "Water",
+      "coffeeOnHand": "Coffee",
+      "coffee": "Coffee",
+      "water": "Water",
+      "hotWater": "Hot water",
+      "ice": "Ice",
+      "ratio": "Ratio",
+      "ratioValue": "1 : {{water, number}}",
+      "waterTemperature": "Water",
+      "steep": "Steep",
+      "steepValue": {
+        "minutes": "{{low, number}} to {{high, number}} min",
+        "hours": "{{low, number}} to {{high, number}} h"
+      },
+      "dilution": "Add before drinking",
+      "resultTitle": "{{method}}",
+      "toWeigh": "To weigh",
+      "brewing": "Brewing",
+      "ratioRange": "1 : {{low, number}} to {{high, number}}",
+      "strengthInfo": "Strong uses the least water per gram of coffee that brewing guides give for the method, mild the most and medium the middle.",
+      "methodDescriptions": {
+        "pourOver": "Hot water poured by hand over ground coffee in a paper filter.",
+        "filterMachine": "A machine drips the hot water through the filter into a jug.",
+        "frenchPress": "The coffee steeps in the water, then a metal sieve presses it down.",
+        "aeroPress": "A plastic tube: a short steep, then pressed through a small paper filter.",
+        "moka": "A stovetop pot: steam pushes the water up through the coffee.",
+        "espresso": "A machine presses hot water through finely ground coffee.",
+        "coldBrewConcentrate": "Steeped cold for hours, then diluted to drink.",
+        "coldBrewReady": "Steeped cold for hours, ready to drink.",
+        "japaneseIced": "Brewed hot straight onto ice."
+      }
+    },
+    "tea": {
+      "name": "Tea",
+      "summary": "Amount, water temperature and steeping time, with a timer",
+      "type": "Tea",
+      "types": {
+        "black": "Black",
+        "green": "Green",
+        "white": "White",
+        "herbal": "Herbal & fruit",
+        "rooibos": "Rooibos",
+        "matchaUsucha": "Matcha (usucha)",
+        "matchaKoicha": "Matcha (koicha)"
+      },
+      "water": "Water",
+      "iced": "Iced tea",
+      "icedHint": "Brewed twice as strong and poured over the same weight of ice.",
+      "tea": "Tea",
+      "waterTemperature": "Water",
+      "steep": "Steep",
+      "minutes": "{{low, number}} to {{high, number}} min",
+      "whisk": "Whisk, do not steep",
+      "ice": "Ice",
+      "timerLabel": "{{minutes, number}} min",
+      "resultTitle": "{{type}}",
+      "toWeigh": "To weigh",
+      "brewing": "Brewing",
+      "howMuch": "How much",
+      "typeDescriptions": {
+        "black": "Fully oxidised tea leaves, strong and dark.",
+        "green": "Tea leaves that are not oxidised.",
+        "white": "Young leaves and buds, only withered and dried.",
+        "herbal": "Dried herbs, flowers or fruit, without tea leaves.",
+        "rooibos": "The red bush from South Africa, without caffeine.",
+        "matchaUsucha": "Thin matcha: powdered green tea whisked with more water.",
+        "matchaKoicha": "Thick matcha: more powder and little water."
+      }
+    },
+    "ownValue": "Own",
+    "fewer": "Fewer",
+    "more": "More"
   }
 }

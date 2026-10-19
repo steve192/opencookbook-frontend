@@ -10,11 +10,11 @@ import {IngredientList} from '../components/IngredientList';
 import {PreparationStepText} from '../components/PreparationStepText';
 import {SectionTitle} from '../components/SectionTitle';
 import {StepProgressBar} from '../components/StepProgressBar';
-import {StepTimer} from '../components/StepTimer';
+import {TimerControl} from '../components/TimerControl';
 import {ViewPager} from '../components/ViewPager';
 import {QueryFallback} from '../components/QueryFallback';
 import {IngredientUse, Recipe} from '../api/types/recipes';
-import {runningTimerCount} from '../helper/cookingTimers';
+import {runningTimerCount, timerKey} from '../helper/cookingTimers';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {findIngredientsWithoutStep, matchIngredientsInStep} from '../helper/ingredientMatching';
 import {useCheckedIngredients} from '../helper/useCheckedIngredients';
@@ -132,12 +132,12 @@ const GuidedCooking = (props: Props & {recipe: Recipe}) => {
         {/* Timers are identified by the recipe they belong to, so an unsaved recipe -
             which cooking mode is never reached from - simply offers none */}
         {recipe.id !== undefined && timers.map((duration) => (
-          <StepTimer
+          <TimerControl
             key={`${duration.seconds}-${duration.label}`}
+            timerKey={timerKey(recipe.id as number, stepIndex, duration.seconds)}
             duration={duration}
-            recipeId={recipe.id as number}
-            recipeTitle={recipe.title}
-            stepIndex={stepIndex} />
+            title={recipe.title}
+            target={{recipeId: recipe.id as number, stepIndex}} />
         ))}
 
         <Divider />

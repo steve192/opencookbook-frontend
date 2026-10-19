@@ -14,6 +14,7 @@ import authSlice, {logout} from './features/authSlice';
 import settingsSlice from './features/settingsSlice';
 import shoppingSlice from './features/shoppingSlice';
 import timersSlice from './features/timersSlice';
+import toolsSlice from './features/toolsSlice';
 import {listenerMiddleware} from './listenerMiddleware';
 
 const CACHE_VERSION = cacheVersionOf(Constants.expoConfig?.version ?? '0');
@@ -36,6 +37,7 @@ const rootReducer = combineReducers({
   timers: timersSlice,
   // Unsent shopping changes survive app updates; only the cache is tied to a version.
   shopping: persisted('shopping', shoppingSlice),
+  tools: persisted('tools', toolsSlice),
   connectivity: persisted('connectivity', connectivityReducer, {...ofThisVersion, whitelist: ['lastSyncedAt']}),
   // RTK Query restores its own entries from the rehydrate action (extractRehydrationInfo).
   [api.reducerPath]: persisted(api.reducerPath, api.reducer,

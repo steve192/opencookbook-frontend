@@ -26,6 +26,8 @@ export interface InstanceInfo {
   mailEnabled: boolean;
   /** Null when the instance does not offer signing in with Google. */
   googleSignIn: GoogleClients | null;
+  /** Whether the kitchen tools work without an account. */
+  toolsPublic: boolean;
 }
 
 /** OAuth client ids; public by design. */

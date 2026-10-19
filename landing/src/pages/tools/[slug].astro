@@ -1,0 +1,14 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+import ToolPage from '../../components/ToolPage.astro';
+import { TOOLS } from '../../tools';
+
+export const getStaticPaths = (() =>
+  TOOLS.map((tool) => ({ params: { slug: tool.slug }, props: { tool } }))) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { tool } = Astro.props;
+---
+
+<ToolPage lang="en" tool={tool} />

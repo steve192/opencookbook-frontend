@@ -1,4 +1,7 @@
 // Every URL of the site and every external link lives here.
+import { TOOLS, type ToolId } from './tools.ts';
+import type { Lang } from './content';
+
 export const SITE_URL = 'https://cookpal.io';
 
 export const links = {
@@ -14,16 +17,23 @@ export const links = {
   googlePlay: 'https://play.google.com/store/apps/details?id=com.sterul.opencookbook',
 } as const;
 
+/** A kitchen tool's screen in the app. */
+export const appToolLink = (slug: string) => `${links.app}tools/${slug}`;
+
 // Opens external links in a new tab.
 export const linkTarget = (href: string) => (href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {});
 
+export type PageKey = 'home' | 'selfHosting' | ToolId;
+type PagePair = Record<Lang, string>;
+
 // The localized page pairs; the sitemap and the build test use the same list.
-export const pagePaths = {
+export const pagePaths: Record<PageKey, PagePair> = {
   home: { en: '/', de: '/de/' },
   selfHosting: { en: '/self-hosting/', de: '/de/selbst-hosten/' },
-} as const;
-
-export type PageKey = keyof typeof pagePaths;
+  ...(Object.fromEntries(
+    TOOLS.map((tool) => [tool.id, { en: `/tools/${tool.slug}/`, de: `/de/kuechenhelfer/${tool.slugDe}/` }]),
+  ) as Record<ToolId, PagePair>),
+};
 
 /** The language versions of a page as absolute URLs; English is the default. */
 export const alternates = (page: PageKey) => {

@@ -120,8 +120,8 @@ describe('upgradeTimersToAlarms', () => {
   const timer = (endsInMs: number): CookingTimer => ({
     label: '5 minutes',
     endsAt: Date.now() + endsInMs,
-    recipeTitle: 'Lasagne',
-    stepIndex: 2,
+    title: 'Lasagne',
+    target: {recipeId: 7, stepIndex: 2},
   });
   const textsFor = () => texts;
 

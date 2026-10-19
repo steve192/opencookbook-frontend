@@ -13,7 +13,7 @@ import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {PromptUtil} from '../../helper/Prompt';
 import {usePersistedFlag} from '../../helper/usePersistedFlag';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
-import {SettingsPage} from './SettingsPage';
+import {PageFrame} from '../../components/PageFrame';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'ScanningSettingsScreen'>;
 
@@ -42,7 +42,7 @@ export const ScanningSettingsScreen = (_props: Props) => {
   };
 
   return (
-    <SettingsPage>
+    <PageFrame>
       <CustomCard style={styles.card}>
         <SwitchRow
           label={t('screens.settings.scanTrainingConsent')}
@@ -53,7 +53,7 @@ export const ScanningSettingsScreen = (_props: Props) => {
       <Button mode="outlined" icon="delete-outline" disabled={!online} onPress={onDeleteScanDataPress}>
         {t('screens.settings.deleteScanData')}
       </Button>
-    </SettingsPage>
+    </PageFrame>
   );
 };
 

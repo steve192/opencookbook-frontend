@@ -2,6 +2,7 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Text} from 'react-native-paper';
 import {useAppTheme} from '../styles/CentralStyles';
+import {InfoButton} from './InfoButton';
 import {SectionTitle} from './SectionTitle';
 
 // Secondary text explaining the element above it.
@@ -14,13 +15,18 @@ interface Props {
   /** Finished texts, because translation keys are typed and only the caller holds the literals. */
   title: string;
   hint?: string;
+  /** A longer explanation behind an info icon. */
+  info?: string;
   children: React.ReactNode;
 }
 
 // One question of a wizard: its title, what it is for, and the way to answer it.
 export const QuestionSection = (props: Props) => (
   <View style={styles.section}>
-    <SectionTitle>{props.title}</SectionTitle>
+    <View style={styles.title}>
+      <SectionTitle>{props.title}</SectionTitle>
+      {props.info && <InfoButton title={props.title} text={props.info} />}
+    </View>
     {props.hint && <HintText>{props.hint}</HintText>}
     {props.children}
   </View>
@@ -28,4 +34,5 @@ export const QuestionSection = (props: Props) => (
 
 const styles = StyleSheet.create({
   section: {gap: 8},
+  title: {flexDirection: 'row', alignItems: 'center', gap: 4},
 });

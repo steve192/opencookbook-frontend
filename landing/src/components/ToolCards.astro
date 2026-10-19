@@ -1,0 +1,38 @@
+---
+import type { Lang } from '../content';
+import { pagePaths } from '../site';
+import { getToolPages } from '../toolPages';
+import { TOOL_CATEGORIES, toolsOf, type ToolId } from '../tools';
+
+interface Props {
+  lang: Lang;
+  exclude?: ToolId;
+}
+
+const { lang, exclude } = Astro.props;
+const { categories: categoryNames, pages } = getToolPages(lang);
+const categories = TOOL_CATEGORIES.map((category) => ({
+  category,
+  tools: toolsOf(category).filter((tool) => tool.id !== exclude),
+})).filter(({ tools }) => tools.length > 0);
+---
+
+<div class="grid gap-10 md:grid-cols-2">
+  {
+    categories.map(({ category, tools }) => (
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider text-brand">{categoryNames[category]}</h3>
+        <ul class="mt-4 space-y-3">
+          {tools.map((tool) => (
+            <li>
+              <a href={pagePaths[tool.id][lang]} class="block rounded-2xl border border-line bg-surface p-5 transition hover:border-brand">
+                <span class="block font-semibold">{pages[tool.id].name}</span>
+                <span class="mt-1 block leading-7 text-muted">{pages[tool.id].summary}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</div>

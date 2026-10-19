@@ -56,6 +56,7 @@ export interface Content {
   features: Feature[];
   screenshotAlts: Record<ScreenshotName, string>;
   platforms: { title: string; android: Card; web: Card; offline: Card; webApp: string };
+  tools: { lead: string };
   ways: {
     title: string;
     hosted: Card & { cta: string };
@@ -205,6 +206,9 @@ const de: Content = {
       body: 'Rezepte, Wochenplan und Einkaufsliste kannst du offline lesen.',
     },
     webApp: 'Web-App öffnen',
+  },
+  tools: {
+    lead: 'Pizzateig und Brot berechnen, Hefe und Backofen-Temperaturen umrechnen, Mengen für die Party planen, Kaffee und Tee richtig dosieren und sehen, was gerade Saison hat. Kostenlos im Browser, ganz ohne Konto.',
   },
   ways: {
     title: 'Zwei Wege zu CookPal',
@@ -424,6 +428,9 @@ const en: Content = {
       body: 'Recipes, week plan and shopping list can be read offline.',
     },
     webApp: 'Open web app',
+  },
+  tools: {
+    lead: 'Calculate pizza and bread dough, convert yeast and oven temperatures, plan food for a party, get coffee and tea just right, and see what is in season. Free in your browser, no account needed.',
   },
   ways: {
     title: 'Two ways to use CookPal',

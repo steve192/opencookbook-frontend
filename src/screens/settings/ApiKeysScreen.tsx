@@ -15,7 +15,8 @@ import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
 import {ApiKeyCreateDialog} from './ApiKeyCreateDialog';
 import {ApiKeyCreatedDialog} from './ApiKeyCreatedDialog';
-import {SettingsHint, SettingsPage} from './SettingsPage';
+import {PageFrame} from '../../components/PageFrame';
+import {SettingsHint} from './SettingsHint';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'ApiKeysScreen'>;
 
@@ -49,7 +50,7 @@ export const ApiKeysScreen = (props: Props) => {
   }
 
   return (
-    <SettingsPage>
+    <PageFrame>
       <SettingsHint>{t('screens.apiKeys.explanation')}</SettingsHint>
       {keys.length === 0 && <Text>{t('screens.apiKeys.empty')}</Text>}
       {keys.map((key) => <ApiKeyCard key={key.id} apiKey={key} canRevoke={online} onRevoke={() => revoke(key)} />)}
@@ -58,7 +59,7 @@ export const ApiKeysScreen = (props: Props) => {
       </Button>
       {creating && <ApiKeyCreateDialog onDismiss={() => setCreating(false)} onCreated={onCreated} />}
       {issued && <ApiKeyCreatedDialog issued={issued} onDismiss={() => setIssued(undefined)} />}
-    </SettingsPage>
+    </PageFrame>
   );
 };
 

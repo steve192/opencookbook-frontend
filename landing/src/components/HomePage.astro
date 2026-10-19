@@ -6,6 +6,7 @@ import Footer from './Footer.astro';
 import Header from './Header.astro';
 import Hero from './Hero.astro';
 import Platforms from './Platforms.astro';
+import Tools from './Tools.astro';
 import Ways from './Ways.astro';
 import Layout from '../layouts/Layout.astro';
 import { getContent, type Lang } from '../content';
@@ -25,9 +26,10 @@ const t = getContent(lang);
     <div id="features">
       {t.features.map((feature, i) => <FeatureSection lang={lang} feature={feature} flip={i % 2 === 1} />)}
     </div>
+    <Tools lang={lang} />
     <Platforms lang={lang} />
     <Ways lang={lang} />
-    <Faq lang={lang} />
+    <Faq title={t.faq.title} items={t.faq.items} />
     <ClosingCta lang={lang} />
   </main>
   <Footer lang={lang} page="home" />

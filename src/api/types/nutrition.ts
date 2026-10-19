@@ -57,11 +57,3 @@ export interface NutritionOfRecipe {
     recipeId: number;
     nutrition: RecipeNutrition;
 }
-
-export interface CatalogueFood {
-    id: number;
-    displayName: string;
-    sourceName: string | null;
-    /** Per 100 g. */
-    energyKcal: number | null;
-}

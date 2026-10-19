@@ -11,7 +11,8 @@ import {useShoppingProvider} from '../../helper/shopping/useShoppingProvider';
 import {useIsOnline} from '../../offline/useIsOnline';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {SettingsEntry} from './SettingsEntry';
-import {SettingsHint, SettingsPage} from './SettingsPage';
+import {PageFrame} from '../../components/PageFrame';
+import {SettingsHint} from './SettingsHint';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'ShoppingSettingsScreen'>;
 
@@ -26,7 +27,7 @@ export const ShoppingSettingsScreen = (props: Props) => {
   };
 
   return (
-    <SettingsPage>
+    <PageFrame>
       <CustomCard style={styles.card}>
         <SettingsHint>{t('screens.shopping.provider.setting')}</SettingsHint>
         <SegmentedButtons
@@ -43,7 +44,7 @@ export const ShoppingSettingsScreen = (props: Props) => {
         subtitle={t('screens.shopping.staplesSubtitle')}
         icon="home-outline"
         onPress={() => props.navigation.navigate('StaplesScreen')} />
-    </SettingsPage>
+    </PageFrame>
   );
 };
 

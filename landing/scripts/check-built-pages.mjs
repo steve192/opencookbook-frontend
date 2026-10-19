@@ -1,7 +1,8 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SITE_URL, links, pagePaths } from '../src/site.ts';
+import { TOOLS } from '../src/tools.ts';
+import { SITE_URL, appToolLink, links, pagePaths } from '../src/site.ts';
 
 const dist = fileURLToPath(new URL('../dist', import.meta.url));
 const failures = [];
@@ -14,6 +15,15 @@ function read(file) {
     return '';
   }
   return readFileSync(path, 'utf8');
+}
+
+// Home links every tool page, and every tool page its screen in the app.
+function requiredLinks(key, lang) {
+  if (key === 'home') {
+    return [links.signup, links.imprint, links.privacy, links.terms, links.github, ...TOOLS.map((tool) => pagePaths[tool.id][lang])];
+  }
+  const tool = TOOLS.find((candidate) => candidate.id === key);
+  return tool ? [links.github, appToolLink(tool.slug)] : [links.github];
 }
 
 const fileFor = (path) => (path.endsWith('/') ? `${path.slice(1)}index.html` : path.slice(1));
@@ -42,17 +52,16 @@ for (const [key, pair] of Object.entries(pagePaths)) {
     expect(sitemap.includes(`<loc>${SITE_URL}${path}</loc>`), `${label}: not in sitemap`);
     expect(sitemap.includes(`hreflang="x-default" href="${SITE_URL}${pair.en}"`), `${label}: sitemap x-default`);
 
-    const required = [links.signup, links.imprint, links.privacy, links.terms, links.github];
-    for (const href of key === 'home' ? required : [links.github]) {
+    for (const href of requiredLinks(key, lang)) {
       expect(html.includes(`href="${href}"`), `${label}: missing link ${href}`);
     }
   }
+
+  const enIds = sectionIds(read(fileFor(pair.en)));
+  const deIds = sectionIds(read(fileFor(pair.de)));
+  expect(enIds.length > 0 && enIds.join() === deIds.join(), `${key}: section ids differ: ${enIds} vs ${deIds}`);
 }
 
-const enIds = sectionIds(read('index.html'));
-const deIds = sectionIds(read('de/index.html'));
-expect(enIds.length > 0 && enIds.join() === deIds.join(), `home section ids differ: ${enIds} vs ${deIds}`);
-expect(sectionIds(read('self-hosting/index.html')).join() === sectionIds(read('de/selbst-hosten/index.html')).join(), 'guide section ids differ');
 expect(read('self-hosting/index.html').includes('data-copy-code'), 'guide: copy button');
 
 const notFound = read('404.html');

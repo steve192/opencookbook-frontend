@@ -2,7 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {ScrollView, StyleSheet} from 'react-native';
 import {ActivityIndicator, Button, Dialog, List, Searchbar, Text} from 'react-native-paper';
-import {useLinkIngredientMutation, useSearchCatalogueQuery} from '../api/endpoints/nutrition';
+import {useSearchCatalogueQuery} from '../api/endpoints/catalogue';
+import {useLinkIngredientMutation} from '../api/endpoints/nutrition';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {formatNutrient} from '../helper/nutrition';
 import {withPortal} from '../helper/withPortal';
@@ -24,7 +25,7 @@ export const IngredientLinkDialog = withPortal(function IngredientLinkDialog(pro
 
   const [query, setQuery] = useState(props.ingredientName);
   const [searched, setSearched] = useState(props.ingredientName.trim());
-  const search = useSearchCatalogueQuery(searched, {skip: searched === ''});
+  const search = useSearchCatalogueQuery({q: searched}, {skip: searched === ''});
   const foods = searched === '' ? [] : search.data ?? [];
   const searching = search.isFetching;
   const [linkIngredient, {isLoading: saving}] = useLinkIngredientMutation();
