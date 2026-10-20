@@ -1,7 +1,7 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {Button, List, Surface, Text} from 'react-native-paper';
 import XDate from 'xdate';
 import {ScreenFooter} from '../../components/ScreenFooter';
@@ -32,6 +32,7 @@ import CentralStyles from '../../styles/CentralStyles';
 import {AisleSections} from './AisleSections';
 import {MealChoiceRow} from './import/MealChoiceRow';
 import {SheetLineRow} from './import/SheetLineRow';
+import {AppScrollView} from '../../components/AppScrollView';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'ShoppingImportScreen'>;
 
@@ -141,7 +142,7 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
 
   return (
     <Surface style={CentralStyles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <AppScrollView contentContainerStyle={styles.content}>
         <SectionTitle>{t('screens.shopping.import.meals')}</SectionTitle>
         {choices.length === 0 && <Text>{t('screens.shopping.import.noMeals')}</Text>}
         {earlier.length > 0 &&
@@ -166,7 +167,7 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
               onToggle={() => toggle(line.key, ticked)} />
           );
         })} />
-      </ScrollView>
+      </AppScrollView>
       <ScreenFooter>
         {provider === 'COOKPAL' && lists.length > 1 &&
           <ShoppingListMenu

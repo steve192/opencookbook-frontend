@@ -13,6 +13,7 @@ import {useAppSelector} from '../../redux/hooks';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {useInFloatingPanel} from '../FloatingPanel';
 import {resultHtml, ResultSection, resultText} from '../../tools/result';
+import {InfoButton} from '../InfoButton';
 import {SignupHintCard} from './SignupHintCard';
 
 interface Props {
@@ -54,9 +55,35 @@ export const ToolResult = (props: Props) => {
                   <Text variant="titleSmall" style={{color: theme.colors.primary}}>{section.title}</Text>
                 </View>}
               {section.lines.map((line, lineIndex) => (
-                <View key={lineIndex} style={styles.line}>
-                  <Text variant="bodyMedium" style={styles.label}>{line.label}</Text>
-                  <Text variant="bodyLarge" style={styles.value}>{line.value}</Text>
+                <View key={lineIndex}>
+                  <View style={styles.line}>
+                    <View style={styles.labelRow}>
+                      <Text variant="bodyMedium">{line.label}</Text>
+                      {line.info && <InfoButton title={line.label} text={line.info} />}
+                    </View>
+                    <Text variant="bodyLarge" style={styles.value}>{line.value}</Text>
+                  </View>
+                  {line.details &&
+                    <View style={[styles.details, {borderLeftColor: theme.colors.outlineVariant}]}>
+                      {line.details.map((detail, detailIndex) => (
+                        <View key={detailIndex} style={styles.line}>
+                          <Text variant="bodySmall" style={[styles.label, {color: theme.colors.onSurfaceVariant}]}>
+                            {detail.label}
+                          </Text>
+                          <Text variant="bodyMedium" style={[styles.detailValue, {color: theme.colors.onSurfaceVariant}]}>
+                            {detail.value}
+                          </Text>
+                        </View>
+                      ))}
+                    </View>}
+                </View>
+              ))}
+              {section.steps?.map((step, stepIndex) => (
+                <View key={stepIndex} style={styles.step}>
+                  <Text variant="bodyMedium" style={[styles.stepNumber, {color: theme.colors.primary}]}>
+                    {stepIndex + 1}.
+                  </Text>
+                  <Text variant="bodyMedium" style={styles.label}>{step}</Text>
                 </View>
               ))}
               {index < props.sections.length - 1 && <Divider />}
@@ -67,11 +94,13 @@ export const ToolResult = (props: Props) => {
         {/* Equal buttons that grow to fill each row, so a narrow card wraps them evenly. */}
         <View style={styles.actions}>
           <Button mode="contained-tonal" icon="content-copy" style={styles.action}
-            onPress={() => shareText(resultText(props.title, props.sections)).then(report).catch(() => undefined)}>
+            onPress={() => shareText(resultText(props.title, props.sections, t('tools.result.disclaimer')))
+                .then(report).catch(() => undefined)}>
             {t('tools.result.copy')}
           </Button>
           <Button mode="contained-tonal" icon="printer" style={styles.action}
-            onPress={() => printHtmlDocument(resultHtml(props.title, props.sections)).catch(() => undefined)}>
+            onPress={() => printHtmlDocument(resultHtml(props.title, props.sections, t('tools.result.disclaimer')))
+                .catch(() => undefined)}>
             {t('tools.result.print')}
           </Button>
           <Button mode="contained-tonal" icon="link-variant" style={styles.action}
@@ -79,6 +108,9 @@ export const ToolResult = (props: Props) => {
             {t('tools.result.shareLink')}
           </Button>
         </View>
+        <Text variant="bodySmall" style={[styles.disclaimer, {color: theme.colors.onSurfaceVariant}]}>
+          {t('tools.result.disclaimer')}
+        </Text>
       </Card>
       <SignupHintCard />
     </>
@@ -91,8 +123,14 @@ const styles = StyleSheet.create({
   header: {flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 2},
   line: {flexDirection: 'row', alignItems: 'baseline', gap: 12},
   label: {flex: 1},
+  labelRow: {flex: 1, flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap'},
   value: {fontWeight: 'bold', textAlign: 'right'},
+  details: {borderLeftWidth: 2, marginTop: 4, marginLeft: 4, paddingLeft: 10, gap: 2},
+  detailValue: {textAlign: 'right'},
+  step: {flexDirection: 'row', gap: 8},
+  stepNumber: {fontWeight: 'bold', minWidth: 18},
   actions: {flexDirection: 'row', flexWrap: 'wrap', gap: 8, padding: 16},
+  disclaimer: {paddingHorizontal: 16, paddingBottom: 16},
   action: {flexGrow: 1},
   inPanel: {backgroundColor: 'transparent'},
 });

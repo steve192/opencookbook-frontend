@@ -3,7 +3,7 @@ import {CompositeScreenProps} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {RefreshControl, ScrollView, StyleSheet, View} from 'react-native';
+import {RefreshControl, StyleSheet, View} from 'react-native';
 import {Appbar, Button, IconButton, Surface, Text} from 'react-native-paper';
 import XDate from 'xdate';
 import {useSetWeekplanDayMutation} from '../../api/endpoints/weekplan';
@@ -45,6 +45,7 @@ import {useIsOnline} from '../../offline/useIsOnline';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {RecipeSelectionPopup} from './RecipeSelectionPopup';
 import {WeekplanDayCard} from './WeekplanDayCard';
+import {AppScrollView} from '../../components/AppScrollView';
 
 
 type Props =
@@ -278,7 +279,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
         </Button>
       }
 
-      <ScrollView
+      <AppScrollView
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={reload} />}>
         {week.map(({date, dayPlans, weekdayName}) => (
@@ -297,7 +298,7 @@ export const WeeklyRecipeListScreen = (props: Props) => {
             leftoverSourcesOf={leftoverSourcesOf}
             onLeftoverChange={changeLeftover} />
         ))}
-      </ScrollView>
+      </AppScrollView>
 
       {planTarget.dialog}
       {shoppingImport.dialog}

@@ -23,9 +23,9 @@ describe('convertOven', () => {
         .toMatchObject({temperatureC: 160, minutes: 24});
   });
 
-  it('cooks frozen food in the air fryer at the oven temperature for a little over half the time', () => {
+  it('cooks frozen food in the air fryer 20 °C below the package, in about two thirds of the time', () => {
     expect(convert({from: 'topBottom', to: 'airFryer', temperatureC: 200, minutes: 20, frozen: true}))
-        .toMatchObject({temperatureC: 200, minutes: 11});
+        .toMatchObject({temperatureC: 180, minutes: 13});
   });
 
   it('turns an air fryer recipe back into an oven one', () => {
@@ -35,6 +35,13 @@ describe('convertOven', () => {
 
   it('gives no time when the recipe has none', () => {
     expect(convert({minutes: 0}).minutes).toBeUndefined();
+  });
+});
+
+describe('checking early', () => {
+  it('checks 5 minutes early, but not on a time short enough that it would be half of it', () => {
+    expect(convertOven({...DEFAULT_OVEN_INPUTS, minutes: 30}).checkEarlyMinutes).toBe(5);
+    expect(convertOven({...DEFAULT_OVEN_INPUTS, minutes: 10}).checkEarlyMinutes).toBeUndefined();
   });
 });
 

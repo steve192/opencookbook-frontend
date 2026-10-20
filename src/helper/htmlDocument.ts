@@ -1,3 +1,5 @@
+import {PRINT_BRAND_NAME, PRINT_LOGO} from './printBrand';
+
 export interface HtmlDocumentColors {
   onBackground: string;
   background: string;
@@ -65,10 +67,13 @@ export const toPrintDocument = (title: string, style: string, body: string): str
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+  .brand { display: flex; align-items: center; gap: 2.5mm; margin: 0 0 6mm; font-size: 13pt; font-weight: 700; }
+  .brand img { width: 8mm; height: 8mm; border-radius: 1.5mm; }
 ${style}
 </style>
 </head>
 <body>
+<div class="brand"><img src="${PRINT_LOGO}" alt="" />${PRINT_BRAND_NAME}</div>
 ${body}
 </body>
 </html>`;

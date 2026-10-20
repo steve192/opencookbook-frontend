@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {calculateBread, DEFAULT_BREAD_INPUTS, flourWater, maxFlourShare, parseBreadInputs, recommendedHydration,
-  withFlourShare, withoutFlour} from './bread';
+  sourRiseHours, withFlourShare, withoutFlour} from './bread';
 
 const bread = (changes: Partial<typeof DEFAULT_BREAD_INPUTS>) => calculateBread({...DEFAULT_BREAD_INPUTS, ...changes});
 
@@ -16,38 +16,94 @@ describe('recommendedHydration', () => {
 
 describe('calculateBread', () => {
   it('weighs a sourdough loaf, counting the starter\'s flour and water', () => {
-    const result = bread({type: 'wheatSourdough', amountMode: 'flour', flourG: 500});
+    const result = bread({method: 'starter', amountMode: 'flour', flourG: 500});
     expect(result.amounts.totalFlour).toBe(500);
     expect(result.flourSplit[0].grams + result.amounts.leavener / 2).toBeCloseTo(500);
     expect(result.amounts.salt).toBeCloseTo(500 * 0.01825);
   });
 
   it('leavens a yeast bread with the yeast at hand', () => {
-    const fresh = bread({type: 'yeast', yeast: 'fresh'});
-    const instant = bread({type: 'yeast', yeast: 'instant'});
+    const fresh = bread({method: 'yeast', yeast: 'fresh'});
+    const instant = bread({method: 'yeast', yeast: 'instant'});
     expect(instant.amounts.leavener).toBeCloseTo(fresh.amounts.leavener / 3, 1);
   });
 
-  it('makes up a hybrid\'s small starter with yeast', () => {
-    const result = bread({type: 'hybrid', hybridStarterPercent: 5, preset: 'custom', stages: [{hours: 6, temperatureC: 24}]});
+  it('makes up a small starter with yeast', () => {
+    const result = bread({withYeast: true, starterPercent: 5, preset: 'custom', stages: [{hours: 6, temperatureC: 24}]});
     expect(result.yeastGrams).toBeGreaterThan(0);
-    expect(bread({type: 'hybrid', hybridStarterPercent: 49, preset: 'custom', stages: [{hours: 48, temperatureC: 24}]}).yeastGrams)
-        .toBe(0);
+    const enough = bread({withYeast: true, starterPercent: 49, preset: 'custom', stages: [{hours: 48, temperatureC: 24}]});
+    expect(enough.yeastGrams).toBe(0);
+    expect(enough.warnings).toContain('yeastNotNeeded');
   });
 
-  it('puts about 38 % of the rye into a sour of dough yield 200 with about 18 % starter', () => {
-    const result = bread({type: 'ryeMixed', flours: [{flour: 'rye1150', share: 100}], amountMode: 'flour', flourG: 1000});
-    expect(result.sour!.flour).toBeCloseTo(378.5, 1);
-    expect(result.sour!.water).toBeCloseTo(378.5, 1);
-    expect(result.sour!.starter).toBeCloseTo(69.4, 1);
-    expect(result.sour!.hours).toBe(12.5);
-    expect(result.stages[0].hours).toBeGreaterThan(0);
+  const rye = [{flour: 'rye1150', share: 100}] as const;
+
+  it('puts 37.5 % of the rye into a sour of dough yield 200, all of it in the dough', () => {
+    const result = bread({method: 'sour', withYeast: true, flours: [...rye], amountMode: 'flour', flourG: 1000});
+    const {flour, water, starter, hours} = result.sour!;
+    expect(flour + starter / 2).toBeCloseTo(375, 1);
+    expect(water).toBeCloseTo(flour);
+    expect(flour + water + starter).toBeCloseTo(result.amounts.leavener);
+    expect(hours).toBe(12.5);
   });
 
-  it('acidifies only the rye of a mixed bread', () => {
-    const result = bread({type: 'ryeMixed', amountMode: 'flour', flourG: 1000,
+  it('gives the sour as much starter as recipes do for their hours, and less the longer it ripens', () => {
+    const starterShare = (sourHours: number) => {
+      const {flour, starter} = bread({method: 'sour', withYeast: true, flours: [...rye], sourHours}).sour!;
+      return starter / (flour + starter / 2) * 100;
+    };
+    // 50 g starter on 300 g rye for 14 h, and on 250 g for 11 h: 15.4 and 18.2 % of the sour's flour.
+    expect(starterShare(14) / (50 / 325 * 100)).toBeGreaterThan(0.8);
+    expect(starterShare(14) / (50 / 325 * 100)).toBeLessThan(1.25);
+    expect(starterShare(11) / (50 / 275 * 100)).toBeGreaterThan(0.8);
+    expect(starterShare(11) / (50 / 275 * 100)).toBeLessThan(1.25);
+    expect(starterShare(20)).toBeLessThan(starterShare(10));
+  });
+
+  it('lets a dough with a sour and no yeast rise as long as chosen, within what the acid allows', () => {
+    const hours = sourRiseHours({...DEFAULT_BREAD_INPUTS, method: 'sour', flours: [...rye], roomC: 23});
+    expect(hours.low).toBeLessThan(hours.usual);
+    expect(hours.usual).toBeLessThan(hours.high);
+    const sour = (sourRiseHours?: number) => bread({method: 'sour', flours: [...rye], roomC: 23, sourRiseHours});
+    expect(sour().stages).toEqual([{hours: hours.usual, temperatureC: 23}]);
+    expect(sour(hours.high).amounts.leavener).toBeLessThan(sour(hours.low).amounts.leavener);
+    // Outside the range the dough rises as long as the acid allows.
+    expect(sour(48).stages[0].hours).toBe(hours.high);
+    expect(sour().yeastGrams).toBeUndefined();
+  });
+
+  it('rises on the chosen schedule with yeast, which makes up what the usual sour lacks', () => {
+    const withYeast = bread({method: 'sour', withYeast: true, flours: [...rye], preset: 'quick', roomC: 23,
+      stages: []});
+    expect(withYeast.stages).toEqual([{hours: 1, temperatureC: 23}]);
+    expect(withYeast.yeastGrams).toBeGreaterThan(0);
+  });
+
+  it('acidifies only the rye of a mixed bread, and takes the sour\'s flour from it', () => {
+    const result = bread({method: 'sour', withYeast: true, amountMode: 'flour', flourG: 1000,
       flours: [{flour: 'type1050', share: 40}, {flour: 'rye1150', share: 60}]});
-    expect(result.sour!.flour).toBeCloseTo(227.1, 1);
+    expect(result.sour!.flour + result.sour!.starter / 2).toBeCloseTo(225, 1);
+    expect(result.flourSplit[0].grams).toBeCloseTo(400);
+    expect(result.flourSplit[1].grams).toBeCloseTo(600 - 225, 1);
+  });
+
+  it('makes a sour only with rye in the mix', () => {
+    expect(parseBreadInputs({method: 'sour', flours: [{flour: 'type550', share: 100}]}).method).toBe('starter');
+    expect(parseBreadInputs({method: 'sour', flours: [...rye]}).method).toBe('sour');
+  });
+
+  it('bakes a 1 kg loaf about 49 min, a 500 g one about 35, as the guides\' pairs fit', () => {
+    expect(bread({loafWeightG: 1000}).guide.minutes).toBeCloseTo(49.1, 0);
+    expect(bread({loafWeightG: 500}).guide.minutes).toBeCloseTo(34.7, 0);
+    expect(bread({}).guide).toMatchObject({startC: 225, lowerC: 185, lowerAfterMinutes: 12.5, coreC: 97});
+  });
+
+  it('folds a wheat sourdough, and only mixes a rye dough', () => {
+    expect(bread({}).guide).toMatchObject({foldSets: 4, ryeDough: false});
+    expect(bread({method: 'sour', flours: [...rye]}).guide).toMatchObject({foldSets: 0, ryeDough: true});
+    expect(bread({method: 'yeast'}).guide.foldSets).toBe(0);
+    expect(bread({method: 'sour', flours: [{flour: 'type550', share: 50}, {flour: 'rye1150', share: 50}]})
+        .guide).toMatchObject({foldSets: 0, ryeDough: true});
   });
 
   it('takes the water of additions off the water to weigh in', () => {
@@ -72,17 +128,17 @@ describe('calculateBread', () => {
 
   it('reproduces the sample recipes within their spread', () => {
     // 400 g pressed potatoes on 500 g flour 550 with 300 ml water.
-    const potato = bread({type: 'yeast', amountMode: 'flour', flourG: 500,
+    const potato = bread({method: 'yeast', amountMode: 'flour', flourG: 500,
       additions: [{foodId: 1, name: 'Kartoffel', grams: 400, waterPer100g: 76.3, preparation: 'cooked', starchPer100g: 15.2}]});
     expect(potato.amounts.water).toBeCloseTo(300, -1);
     // 150 g grated carrot on 500 g flour 550 with 325 ml water.
-    const carrot = bread({type: 'yeast', amountMode: 'flour', flourG: 500,
+    const carrot = bread({method: 'yeast', amountMode: 'flour', flourG: 500,
       additions: [{foodId: 2, name: 'Karotte', grams: 150, waterPer100g: 88, preparation: 'raw'}]});
     expect(Math.abs(carrot.amounts.water - 325)).toBeLessThan(25);
   });
 
   it('says when the additions bring more water than the flour takes, and counts it in the dough', () => {
-    const pumpkin = (grams: number) => bread({type: 'yeast', yeast: 'instant', count: 1, loafWeightG: 1500,
+    const pumpkin = (grams: number) => bread({method: 'yeast', yeast: 'instant', count: 1, loafWeightG: 1500,
       additions: [{foodId: 1, name: 'Kürbis', grams, waterPer100g: 84.7, preparation: 'cooked', starchPer100g: 0.7}]});
     // 1 kg purée in a 1.5 kg loaf brings about 660 g water; its 306 g flour take 187 g.
     expect(pumpkin(1000).amounts.water).toBe(0);
@@ -99,17 +155,17 @@ describe('calculateBread', () => {
   });
 
   it('warns about a rye bread without a sour', () => {
-    expect(bread({type: 'yeast', flours: [{flour: 'rye1150', share: 60}, {flour: 'type550', share: 40}]}).warnings)
+    expect(bread({method: 'yeast', flours: [{flour: 'rye1150', share: 60}, {flour: 'type550', share: 40}]}).warnings)
         .toContain('ryeWithoutSour');
-    expect(bread({type: 'ryeMixed', flours: [{flour: 'rye1150', share: 100}]}).warnings).not.toContain('ryeWithoutSour');
-    expect(bread({type: 'yeast', flours: [{flour: 'rye1150', share: 30}, {flour: 'type550', share: 70}]}).warnings)
+    expect(bread({method: 'sour', flours: [{flour: 'rye1150', share: 100}]}).warnings).not.toContain('ryeWithoutSour');
+    expect(bread({method: 'yeast', flours: [{flour: 'rye1150', share: 30}, {flour: 'type550', share: 70}]}).warnings)
         .not.toContain('ryeWithoutSour');
   });
 
   it('warns about more yeast than any recipe uses', () => {
-    expect(bread({type: 'yeast', preset: 'custom', stages: [{hours: 0.5, temperatureC: 21}]}).warnings)
+    expect(bread({method: 'yeast', preset: 'custom', stages: [{hours: 0.5, temperatureC: 21}]}).warnings)
         .toContain('tooMuchYeast');
-    expect(bread({type: 'yeast', preset: 'sameDay'}).warnings).not.toContain('tooMuchYeast');
+    expect(bread({method: 'yeast', preset: 'sameDay'}).warnings).not.toContain('tooMuchYeast');
   });
 
   it('soaks seeds in their own water, inside the loaf\'s weight', () => {
@@ -184,14 +240,14 @@ describe('the flours', () => {
   it('warns when a flour with little gluten makes up more than recipes use', () => {
     expect(maxFlourShare('buckwheat')).toBe(50);
     expect(maxFlourShare('spelt630')).toBeUndefined();
-    const mix = (share: number) => calculateBread({...DEFAULT_BREAD_INPUTS, type: 'yeast',
+    const mix = (share: number) => calculateBread({...DEFAULT_BREAD_INPUTS, method: 'yeast',
       flours: [{flour: 'type550', share: 100 - share}, {flour: 'buckwheat', share}]}).warnings;
     expect(mix(60)).toContain('flourShareTooHigh');
     expect(mix(40)).not.toContain('flourShareTooHigh');
   });
 
   it('counts every rye flour as rye', () => {
-    expect(calculateBread({...DEFAULT_BREAD_INPUTS, type: 'yeast', flours: [{flour: 'rye997', share: 100}]}).warnings)
+    expect(calculateBread({...DEFAULT_BREAD_INPUTS, method: 'yeast', flours: [{flour: 'rye997', share: 100}]}).warnings)
         .toContain('ryeWithoutSour');
   });
 });

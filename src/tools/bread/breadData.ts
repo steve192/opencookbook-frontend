@@ -67,18 +67,20 @@ export const MAX_FLOUR_SHARE: Partial<Record<BreadFlour, number[]>> = {
 /** Salt in % of the flour; the sources give it for bread in general, so every bread type uses it. */
 export const BREAD_SALT: number[] = [1.9, 1.75];
 
-/** Rye needs acid: the share of its flour that goes into the sour, in %, from the recipes' grams. */
-export const RYE_ACIDIFIED: number[] = [300 / 900 * 100, 250 / 590 * 100];
+/**
+ * Rye needs acid: the share of its flour that goes into the sour, in %, from two recipes' grams and a bakery's table
+ * (60 % rye 50, 70 % 40, 80 % and 90 % 35). The median is the usual; the lowest and highest are what a sour can be.
+ */
+export const RYE_ACIDIFIED: number[] = [300 / 900 * 100, 250 / 590 * 100, 50, 40, 35, 35];
 
 /**
- * A one-stage sour ripening overnight, from the recipes' grams and times. Its temperature: 20 to 22 °C, room
- * temperature, and 28 °C in a bakery academy's recipe.
+ * A one-stage sour, from the recipes' grams and times: as much water as flour, overnight. It ripens where the dough
+ * goes, and its starter follows its hours as a dough's does; the recipes' 50 g starter on 300 g and on 250 g rye
+ * check that (§15.17).
  */
 export const SOUR = {
   hydration: [100, 100],
-  starterOfSourFlour: [50 / 300 * 100, 50 / 250 * 100],
   hours: [14, 11],
-  temperatureC: [21, ROOM_C, 28],
 };
 
 /**
@@ -92,6 +94,30 @@ export const SOAKER = {
 
 /** The most fruit or vegetables the sample recipes use: 500 g puréed pumpkin on 500 g flour, in % of the flour. */
 export const MAX_FRUIT_VEG_SHARE = 100;
+
+/**
+ * Baking a loaf with top and bottom heat, from bakers' guides, an oven maker's table and recipes: the oven to start
+ * with; the lower one it drops to, and after how many minutes; and when it is done, at its core.
+ */
+export const BAKING = {
+  startC: [225, 215, 230, 250, 220, 218, 232],
+  lowerC: [195, 185, 180, 200, 180],
+  lowerAfterMin: [12.5, 12.5, 10, 20, 10],
+  coreC: [97, 98, 96, 96, 97, (207.5 - 32) / 1.8, 96.1],
+};
+
+/**
+ * Minutes a loaf bakes, against its dough in g, from the same guides and recipes. Across them the time grows with
+ * the square root of the weight.
+ */
+export const BAKE_MINUTES: [number, number][] = [[500, 37.5], [875, 47.5], [750, 42.5], [1500, 57.5], [1010, 47.5],
+  [1240, 55], [591, 27.5], [900, 50], [1000, 32.5]];
+
+/** Hours the shaped loaf proofs before it is baked, at room temperature, from the recipes. */
+export const PROOF_HOURS: number[] = [1.5, 0.75, 1, 2.25, 0.5, 1 / 3];
+
+/** Sets of stretch and folds in a wheat sourdough's bulk, 30 min apart. */
+export const FOLD_SETS: number[] = [4, 4, 3, 3, 5.5];
 
 /** Above this share of rye a bread is a rye bread (Leitsätze für Brot und Kleingebäck), and rye needs a sour. */
 export const RYE_BREAD_SHARE = 50;

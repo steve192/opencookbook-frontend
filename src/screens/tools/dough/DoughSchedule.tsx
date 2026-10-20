@@ -29,6 +29,7 @@ const DAYS: (0 | 1 | 2 | 3)[] = [0, 1, 2, 3];
 const ICONS: Record<ScheduleChoice, string> = {
   quick: 'clock-fast',
   sameDay: 'white-balance-sunny',
+  daylong: 'weather-sunset',
   overnight: 'weather-night',
   fridge24: 'fridge-outline',
   fridge48: 'fridge-outline',

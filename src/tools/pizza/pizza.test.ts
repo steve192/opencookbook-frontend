@@ -1,6 +1,7 @@
 import {describe, expect, it} from 'vitest';
 import {amountModesOf, bakeAdvice, ballPresets, calculatePizza, defaultPizzaInputs, parsePizzaInputs,
   styleFormula} from './pizza';
+import {clockHours, FRIDGE_MAX_C, presetStages, ROOM_C, scheduleStages, totalHours} from '../dough/stages';
 import {FLOURS, PIZZA_DIAMETERS, PIZZA_FLOURS, PIZZA_STYLES, STYLES} from './pizzaData';
 
 describe('styleFormula', () => {
@@ -9,6 +10,15 @@ describe('styleFormula', () => {
     expect(formula.salt).toBeCloseTo(0.05 * formula.hydration);
     expect(formula.oil).toBe(0);
     expect(formula.sugar).toBe(0);
+  });
+
+  it('gives a flour that takes more water more, and one that takes less less, as the style\'s own flour', () => {
+    const own = styleFormula('neapolitan').hydration;
+    expect(styleFormula('neapolitan', 'tipo00').hydration).toBeCloseTo(own);
+    expect(styleFormula('neapolitan', 'manitoba').hydration).toBeGreaterThan(own);
+    expect(styleFormula('neapolitan', 'type405').hydration).toBeLessThan(own);
+    expect(styleFormula('neapolitan', 'manitoba').salt / styleFormula('neapolitan', 'manitoba').hydration)
+        .toBeCloseTo(styleFormula('neapolitan').salt / own);
   });
 
   it('takes the median of what the sources say', () => {
@@ -76,6 +86,12 @@ describe('calculatePizza', () => {
     // The median recipe puts 40 g rice flour in 655 g.
     expect(result.blend!.rice).toBeCloseTo(480 * 40 / 655, 1);
     expect(result.amounts.flour + result.blend!.rice + result.blend!.soy).toBeCloseTo(480);
+  });
+
+  it('says how much water another flour gets, and nothing for the style\'s own', () => {
+    expect(calculatePizza(defaultPizzaInputs('neapolitan')).waterForFlour).toBeUndefined();
+    expect(calculatePizza({...defaultPizzaInputs('neapolitan'), flour: 'manitoba'}).waterForFlour)
+        .toEqual({percent: 69, stylePercent: 60});
   });
 
   it('warns when a flour does not last as long as the schedule', () => {
@@ -230,7 +246,28 @@ describe('the dough temperature', () => {
 
 describe('the recommendations of a style', () => {
   it('start a style with the flour and schedule its recipes use', () => {
-    expect(defaultPizzaInputs('neapolitan')).toMatchObject({flour: 'tipo00', preset: 'overnight'});
+    expect(defaultPizzaInputs('neapolitan')).toMatchObject({flour: 'tipo00', preset: 'daylong'});
     expect(defaultPizzaInputs('blechpizza')).toMatchObject({flour: 'type405', preset: 'quick'});
+  });
+
+  it('recommends a Neapolitan dough only what its rules allow: 12 to 24 hours out of the fridge', () => {
+    for (const preset of STYLES.neapolitan.schedules!) {
+      const stages = presetStages(preset, ROOM_C);
+      expect(totalHours(stages)).toBeGreaterThanOrEqual(12);
+      expect(totalHours(stages)).toBeLessThanOrEqual(24);
+      expect(stages.every((stage) => stage.temperatureC > FRIDGE_MAX_C)).toBe(true);
+      expect(calculatePizza({...defaultPizzaInputs('neapolitan'), preset}).warnings)
+          .not.toContain('moreYeastThanStyleAllows');
+    }
+  });
+
+  it('starts every style\'s default dough at a waking hour for the default dinner bake', () => {
+    for (const style of PIZZA_STYLES) {
+      const inputs = defaultPizzaInputs(style);
+      const hours = totalHours(scheduleStages(inputs.preset, inputs.stages, inputs.roomC));
+      const mixAt = ((clockHours(inputs.bakeTime) - hours) % 24 + 24) % 24;
+      expect(mixAt).toBeGreaterThanOrEqual(7);
+      expect(mixAt).toBeLessThanOrEqual(22);
+    }
   });
 });

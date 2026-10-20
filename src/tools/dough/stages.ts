@@ -2,10 +2,10 @@ import {Stage} from '../fermentation/fermentation';
 import {asRawInputs, RawInputs, readList, readNumber} from '../inputs';
 
 /** A ready-made schedule; its stages follow the room temperature. */
-export type SchedulePreset = 'quick' | 'sameDay' | 'overnight' | 'fridge24' | 'fridge48' | 'fridge72';
+export type SchedulePreset = 'quick' | 'sameDay' | 'daylong' | 'overnight' | 'fridge24' | 'fridge48' | 'fridge72';
 
-export const SCHEDULE_PRESETS: readonly SchedulePreset[] = ['quick', 'sameDay', 'overnight', 'fridge24', 'fridge48',
-  'fridge72'];
+export const SCHEDULE_PRESETS: readonly SchedulePreset[] = ['quick', 'sameDay', 'daylong', 'overnight', 'fridge24',
+  'fridge48', 'fridge72'];
 
 /** A preset, or stages of one's own. */
 export type ScheduleChoice = SchedulePreset | 'custom';
@@ -21,8 +21,12 @@ export const FRIDGE_MAX_C = 8;
 /** Room temperature as recipes mean it: 65 to 70 °F and 70 to 72 °F, to whole degrees. */
 export const ROOM_C = 21;
 
-/** Hours at room temperature: medians of published quick, same-day and overnight schedules, to whole hours. */
-const ROOM_HOURS: Record<'quick' | 'sameDay' | 'overnight', number> = {quick: 1, sameDay: 7, overnight: 16};
+/**
+ * Hours at room temperature: medians of published quick, same-day and overnight schedules, to whole hours. A whole day
+ * is the shortest long rise published (12 to 24 hours, at least 12, 12 to 18), from breakfast to dinner.
+ */
+const ROOM_HOURS: Record<'quick' | 'sameDay' | 'daylong' | 'overnight', number> = {quick: 1, sameDay: 7, daylong: 12,
+  overnight: 16};
 
 /** Hours at room temperature before and after the fridge: medians of published schedules, to whole hours. */
 const BEFORE_FRIDGE_H = 1;
@@ -42,6 +46,7 @@ export const presetStages = (preset: SchedulePreset, roomC: number): Stage[] => 
   switch (preset) {
     case 'quick':
     case 'sameDay':
+    case 'daylong':
     case 'overnight': return [{hours: ROOM_HOURS[preset], temperatureC: roomC}];
     case 'fridge24': return fridge(24);
     case 'fridge48': return fridge(48);

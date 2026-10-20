@@ -11,9 +11,10 @@ import {ToolFrame} from '../../../components/tools/ToolFrame';
 import {ToolResult} from '../../../components/tools/ToolResult';
 import {UnitSwitch} from '../../../components/tools/UnitSwitch';
 import {useUnitSystem} from '../../../helper/useUnitSystem';
-import {Appetite, APPETITES, BEER_BOTTLE_L, coursesOf, parsePartyInputs, planParty, WINE_BOTTLE_L}
-  from '../../../tools/party/party';
-import {ACCOMPANIMENTS, Drinking, DRINKINGS, GUEST_GROUPS, PARTY_EVENTS} from '../../../tools/party/partyData';
+import {Appetite, APPETITES, BEER_BOTTLE_L, choosableSides, coursesOf, parsePartyInputs, planParty, portion,
+  WINE_BOTTLE_L} from '../../../tools/party/party';
+import {ACCOMPANIMENTS, Drinking, DRINKINGS, GUEST_GROUPS, PARTY_EVENTS, STARCHES, VEGETABLES}
+  from '../../../tools/party/partyData';
 import {ResultLine} from '../../../tools/result';
 import {formatVolume, formatWeight} from '../../../tools/units';
 import {PARTY_EVENT_PHOTOS} from '../toolPhotos';
@@ -21,6 +22,9 @@ import {useToolInputs} from '../useToolInputs';
 
 const MAX_GUESTS = 1000;
 const percent = (value: number) => `${Math.round(value)} %`;
+// The last one stays: a course is always served as something.
+const toggled = <T, >(chosen: T[], value: T): T[] => chosen.includes(value) ?
+  (chosen.length > 1 ? chosen.filter((other) => other !== value) : chosen) : [...chosen, value];
 
 export const PartyTool = () => {
   const {t, i18n} = useTranslation('translation');
@@ -31,6 +35,9 @@ export const PartyTool = () => {
   const weight = (grams: number) => formatWeight(grams, system, locale);
   const litres = (value: number) => formatVolume(value * 1000, system, locale);
   const guests = GUEST_GROUPS.reduce((sum, group) => sum + inputs.guests[group], 0);
+  const sides = choosableSides(inputs.event);
+  const showStarches = sides.starches && inputs.courses.includes('sides');
+  const showVegetables = sides.vegetables && inputs.courses.includes('salad');
   const stepper = (label: string, value: number, max: number, onChange: (value: number) => void) => (
     <CountStepper key={label} label={label} value={String(value)} decreaseLabel={t('tools.fewer')}
       increaseLabel={t('tools.more')} canDecrease={value > 0} canIncrease={value < max}
@@ -40,9 +47,11 @@ export const PartyTool = () => {
   const food: ResultLine[] = [
     ...result.food.map((line) => ({
       label: t(`tools.partyPlanner.items.${line.item}`),
-      value: line.gramsPerDish != null ?
-        t('tools.partyPlanner.perDish', {total: weight(line.grams), dish: weight(line.gramsPerDish)}) :
-        weight(line.grams),
+      value: line.servings ?
+        t('tools.partyPlanner.servings', {count: line.servings.count, size: weight(line.servings.grams)}) :
+        line.gramsPerDish != null ?
+          t('tools.partyPlanner.perDish', {total: weight(line.grams), dish: weight(line.gramsPerDish)}) :
+          weight(line.grams),
     })),
     ...(result.pickleJars > 0 ? [{label: t('tools.partyPlanner.pickles'),
       value: t('tools.partyPlanner.jarsEach', {count: Math.ceil(result.pickleJars)})}] : []),
@@ -114,6 +123,21 @@ export const PartyTool = () => {
         <SwitchRow label={t('tools.partyPlanner.reserve')} explanation={t('tools.partyPlanner.reserveHint')}
           value={inputs.reserve} onChange={(reserve) => change({reserve})} />
       </QuestionSection>
+
+      {(showStarches || showVegetables) &&
+        <QuestionSection title={t('tools.partyPlanner.sides')} hint={t('tools.partyPlanner.sidesHint')}
+          info={t('tools.partyPlanner.sidesInfo', {potatoes: weight(portion('potatoes')), pasta: weight(portion('pasta')),
+            rice: weight(portion('rice')), vegetables: weight(portion('vegetablesToCook')),
+            raw: weight(portion('rawVegetables')), leaf: weight(portion('leafSalad'))})}>
+          {showStarches &&
+            <ChoiceChips values={[...STARCHES]} label={(food) => t(`tools.partyPlanner.items.${food}`)}
+              isChosen={(food) => inputs.starches.includes(food)}
+              onToggle={(food) => change({starches: toggled(inputs.starches, food)})} />}
+          {showVegetables &&
+            <ChoiceChips values={[...VEGETABLES]} label={(food) => t(`tools.partyPlanner.items.${food}`)}
+              isChosen={(food) => inputs.vegetables.includes(food)}
+              onToggle={(food) => change({vegetables: toggled(inputs.vegetables, food)})} />}
+        </QuestionSection>}
 
       <QuestionSection title={t('tools.partyPlanner.alcohol')} hint={t('tools.partyPlanner.alcoholHint')}>
         <SegmentedButtons value={inputs.drinking} onValueChange={(drinking) => change({drinking: drinking as Drinking})}

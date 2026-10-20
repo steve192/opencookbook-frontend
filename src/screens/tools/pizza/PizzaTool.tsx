@@ -92,15 +92,22 @@ export const PizzaTool = () => {
           max: temperature(result.bake.temperatureC)})}
     </Notice>;
 
+  const water = result.waterForFlour;
   const resultColumn = <>
     {result.warnings.map((warning) => (
       <Notice key={warning} icon="alert-outline" tone="warning">{t(`tools.dough.warnings.${warning}`)}</Notice>
     ))}
+    {water &&
+      <Notice icon="water-outline" tone="information">
+        {t('tools.pizzaDough.waterForFlour', {flour: t(`tools.dough.flours.${inputs.flour}`), percent: water.percent,
+          stylePercent: water.stylePercent,
+          direction: t(`tools.pizzaDough.waterDirection.${water.percent > water.stylePercent ? 'more' : 'less'}`)})}
+      </Notice>}
     <ToolResult
       title={t('tools.pizzaDough.resultTitle', {style: styleName})}
       sections={[
         {title: t('tools.result.ingredients'), icon: 'basket-outline',
-          lines: ingredientLines(format, result.amounts, inputs.leavener, result.blend && [
+          lines: ingredientLines(format, result.amounts, t(`tools.dough.leaveners.${inputs.leavener}`), result.blend && [
             {label: t('tools.dough.flour'), value: weight(result.amounts.flour)},
             {label: t('tools.pizzaDough.riceFlour'), value: weight(result.blend.rice)},
             {label: t('tools.pizzaDough.soyFlour'), value: weight(result.blend.soy)},

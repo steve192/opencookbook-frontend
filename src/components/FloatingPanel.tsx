@@ -1,6 +1,7 @@
 import React, {createContext, useContext} from 'react';
-import {Platform, ScrollView, StyleSheet, ViewStyle} from 'react-native';
+import {Platform, StyleSheet, ViewStyle} from 'react-native';
 import {Surface} from 'react-native-paper';
+import {AppScrollView} from './AppScrollView';
 
 const InFloatingPanel = createContext(false);
 
@@ -19,9 +20,9 @@ const STICKY = Platform.OS === 'web' ? {position: 'sticky', top: 24} as unknown 
 // A panel floating above the page: rounded, with a shadow, beside what it belongs to.
 export const FloatingPanel = (props: Props) => (
   <Surface elevation={3} style={[styles.panel, STICKY, {maxHeight: props.maxHeight}]}>
-    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+    <AppScrollView contentContainerStyle={styles.content}>
       <InFloatingPanel.Provider value={true}>{props.children}</InFloatingPanel.Provider>
-    </ScrollView>
+    </AppScrollView>
   </Surface>
 );
 

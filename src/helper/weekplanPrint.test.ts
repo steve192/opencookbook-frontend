@@ -19,6 +19,12 @@ describe('buildWeekplanPrintHtml', () => {
     expect(html.trimEnd().endsWith('</html>')).toBe(true);
   });
 
+  it('heads the page with the CookPal logo and name', () => {
+    const html = buildWeekplanPrintHtml(weekplan());
+    expect(html).toContain('<div class="brand"><img src="data:image/png;base64,');
+    expect(html).toContain('/>CookPal</div>');
+  });
+
   it('puts the week in the heading and the document title', () => {
     const html = buildWeekplanPrintHtml(weekplan({title: 'Week 42'}));
     expect(html).toContain('<title>Week 42</title>');

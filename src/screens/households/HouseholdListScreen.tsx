@@ -1,7 +1,7 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, View} from 'react-native';
+import {View} from 'react-native';
 import {Button, Card, Chip, Surface, Text} from 'react-native-paper';
 import {useGetUserInfoQuery} from '../../api/endpoints/account';
 import {useCreateHouseholdMutation, useGetHouseholdsQuery} from '../../api/endpoints/households';
@@ -14,6 +14,7 @@ import {TextPromptUtil} from '../../helper/TextPrompt';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
+import {AppScrollView} from '../../components/AppScrollView';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'HouseholdListScreen'>;
 
@@ -60,7 +61,7 @@ export const HouseholdListScreen = (props: Props) => {
 
   return (
     <Surface style={CentralStyles.screen}>
-      <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
+      <AppScrollView contentContainerStyle={CentralStyles.contentContainer}>
         {households.length === 0 &&
           <Text style={CentralStyles.elementSpacing}>{t('screens.households.empty')}</Text>}
 
@@ -79,7 +80,7 @@ export const HouseholdListScreen = (props: Props) => {
           onPress={create}>
           {t('screens.households.create')}
         </Button>
-      </ScrollView>
+      </AppScrollView>
     </Surface>
   );
 };

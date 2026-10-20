@@ -4,16 +4,17 @@ import {DoughAmounts, DoughLeavener, doughWarnings, DoughWarning, isTooLittleToW
 import {BakeTime, presetStages, readBakeTime, readStages, ROOM_C, SCHEDULE_CHOICES, ScheduleChoice,
   scheduleStages} from '../dough/stages';
 import {hoursUntilReady, Stage} from '../fermentation/fermentation';
-import {asRawInputs, readChoice, readList, readNumber, readOptionalNumber} from '../inputs';
+import {asRawInputs, readBoolean, readChoice, readList, readNumber, readOptionalNumber} from '../inputs';
 import {median, requiredMedian} from '../sources';
 import {convertYeast, YEAST_TYPES, YeastType} from '../yeast/yeast';
-import {ADDITION_PREPARATIONS, AdditionPreparation, BREAD_FLOURS, BREAD_SALT, BreadFlour, FLOUR_TYPES, Grain,
-  LIKE_WHEAT_405, MAX_FLOUR_SHARE, MAX_FRUIT_VEG_SHARE, RECIPE_WATER, RYE_ACIDIFIED, RYE_BREAD_SHARE, RYE_FLOURS, SOAKER,
-  SOLIDS_KEEP, SOUR, TYPE_WATER} from './breadData';
+import {ADDITION_PREPARATIONS, AdditionPreparation, BAKE_MINUTES, BAKING, BREAD_FLOURS, BREAD_SALT, BreadFlour,
+  FLOUR_TYPES, FOLD_SETS, Grain, LIKE_WHEAT_405, MAX_FLOUR_SHARE, MAX_FRUIT_VEG_SHARE, PROOF_HOURS, RECIPE_WATER,
+  RYE_ACIDIFIED, RYE_BREAD_SHARE, RYE_FLOURS, SOAKER, SOLIDS_KEEP, SOUR, TYPE_WATER} from './breadData';
 
-export type BreadType = 'wheatSourdough' | 'ryeMixed' | 'hybrid' | 'yeast';
+/** How the dough rises: ripe starter straight in, a sour of part of the rye made the day before, or yeast. */
+export type BreadMethod = 'starter' | 'sour' | 'yeast';
 
-export const BREAD_TYPES: readonly BreadType[] = ['wheatSourdough', 'ryeMixed', 'hybrid', 'yeast'];
+export const BREAD_METHODS: readonly BreadMethod[] = ['starter', 'sour', 'yeast'];
 
 export interface FlourShare {
   flour: BreadFlour;
@@ -85,7 +86,10 @@ export interface Addition {
 }
 
 export interface BreadInputs extends BakeTime {
-  type: BreadType;
+  /** A sour needs rye in the mix. */
+  method: BreadMethod;
+  /** Sourdough with some yeast, which makes up what the starter or sour lacks for the schedule. */
+  withYeast: boolean;
   flours: FlourShare[];
   amountMode: 'loaves' | 'flour';
   count: number;
@@ -93,10 +97,14 @@ export interface BreadInputs extends BakeTime {
   flourG: number;
   /** % of the flour; undefined uses what the flours take. */
   hydration?: number;
-  /** The yeast at hand, for yeast and hybrid breads. */
+  /** The yeast at hand. */
   yeast: YeastType;
-  /** Hybrid breads: the starter in % of the flour; the yeast makes up the rest. */
-  hybridStarterPercent: number;
+  /** Starter with yeast: the starter in % of the flour. */
+  starterPercent: number;
+  /** Hours the sour ripens; its starter follows. */
+  sourHours: number;
+  /** A sour without yeast: hours the dough rises at room temperature; undefined takes the usual sour. */
+  sourRiseHours?: number;
   preset: ScheduleChoice;
   /** The stages of one's own schedule; a preset's follow the room temperature. */
   stages: Stage[];
@@ -110,12 +118,13 @@ export interface BreadResult {
   amounts: DoughAmounts;
   /** Flour per flour type, out of the flour to weigh in. */
   flourSplit: {flour: BreadFlour, grams: number}[];
-  /** Hybrid breads carry yeast besides the starter. */
+  /** Sourdough with yeast carries yeast besides the starter. */
   yeastGrams?: number;
-  /** Rye breads: the sour to make the day before. */
+  /** The sour to make the day before, with its starter; it all goes into the dough. */
   sour?: {flour: number, water: number, starter: number, hours: number, temperatureC: number};
-  /** The schedule; a rye dough rises at room temperature as fast as its sour lets it. */
+  /** The schedule; a dough with a sour and no yeast rises at room temperature as fast as its sour lets it. */
   stages: Stage[];
+  guide: BreadGuide;
   /** All the water in the dough, the starter's and the additions' included. */
   doughWater: number;
   soaker?: {seeds: number, water: number, hours: number};
@@ -123,7 +132,22 @@ export interface BreadResult {
   pieceWeight: number;
   waterTemperatureC: number;
   warnings: ('impossibleSchedule' | 'tooLittleToWeigh' | 'soakerTooLarge' | 'additionsTooWet' | 'tooManyAdditions' |
-    'ryeWithoutSour' | 'flourShareTooHigh' | DoughWarning)[];
+    'ryeWithoutSour' | 'flourShareTooHigh' | 'yeastNotNeeded' | DoughWarning)[];
+}
+
+/** How the dough is worked and the loaf baked: the oven to start with, the one it drops to and when, the minutes. */
+export interface BreadGuide {
+  /** Half rye or more: mixed, not kneaded or folded, and left to set as it cools. */
+  ryeDough: boolean;
+  /** Stretch and folds in a mostly wheat sourdough's bulk; 0 from half rye on and for yeast doughs. */
+  foldSets: number;
+  /** Hours before baking the loaf is shaped, so it proofs. */
+  shapeHoursBefore: number;
+  startC: number;
+  lowerC: number;
+  lowerAfterMinutes: number;
+  minutes: number;
+  coreC: number;
 }
 
 /**
@@ -183,14 +207,16 @@ export const recommendedHydration = (flours: FlourShare[]): number => {
 };
 
 export const DEFAULT_BREAD_INPUTS: BreadInputs = {
-  type: 'wheatSourdough',
+  method: 'starter',
+  withYeast: false,
   flours: [{flour: 'type550', share: 100}],
   amountMode: 'loaves',
   count: 1,
   loafWeightG: 1000,
   flourG: 500,
   yeast: 'fresh',
-  hybridStarterPercent: 10,
+  starterPercent: 10,
+  sourHours: requiredMedian(SOUR.hours, 'the hours of the sour'),
   preset: 'overnight',
   stages: presetStages('overnight', ROOM_C),
   roomC: ROOM_C,
@@ -209,19 +235,23 @@ const normalised = (flours: FlourShare[]): FlourShare[] => {
 export const parseBreadInputs = (raw: unknown): BreadInputs => {
   const fields = asRawInputs(raw);
   const d = DEFAULT_BREAD_INPUTS;
+  const flours = normalised(readList(fields, 'flours', (entry) => ({
+    flour: readChoice(entry, 'flour', BREAD_FLOURS, 'type550'),
+    share: readNumber(entry, 'share', 100, 0, 100),
+  }), 4, d.flours));
   return {
-    type: readChoice(fields, 'type', BREAD_TYPES, d.type),
-    flours: normalised(readList(fields, 'flours', (entry) => ({
-      flour: readChoice(entry, 'flour', BREAD_FLOURS, 'type550'),
-      share: readNumber(entry, 'share', 100, 0, 100),
-    }), 4, d.flours)),
+    method: methodFor(readChoice(fields, 'method', BREAD_METHODS, d.method), flours),
+    withYeast: readBoolean(fields, 'withYeast', d.withYeast),
+    flours,
     amountMode: readChoice(fields, 'amountMode', ['loaves', 'flour'] as const, d.amountMode),
     count: Math.round(readNumber(fields, 'count', d.count, 1, 50)),
     loafWeightG: readNumber(fields, 'loafWeightG', d.loafWeightG, 100, 5000),
     flourG: readNumber(fields, 'flourG', d.flourG, 50, 50000),
     hydration: readOptionalNumber(fields, 'hydration', 40, 120),
     yeast: readChoice(fields, 'yeast', YEAST_TYPES, d.yeast),
-    hybridStarterPercent: readNumber(fields, 'hybridStarterPercent', d.hybridStarterPercent, 1, 50),
+    starterPercent: readNumber(fields, 'starterPercent', d.starterPercent, 1, 50),
+    sourHours: readNumber(fields, 'sourHours', d.sourHours, SOUR_HOURS.low, SOUR_HOURS.high),
+    sourRiseHours: readOptionalNumber(fields, 'sourRiseHours', 0.5, 48),
     preset: readChoice(fields, 'preset', SCHEDULE_CHOICES, d.preset),
     stages: readStages(fields, d.stages),
     roomC: readNumber(fields, 'roomC', d.roomC, 10, 35),
@@ -261,64 +291,160 @@ export const doughWaterPer100g = (addition: Addition): number => {
   return water;
 };
 
-const ryeShare = (flours: FlourShare[]): number => {
+/**
+ * The share of rye in a mix.
+ *
+ * @param {FlourShare[]} flours the mix
+ * @return {number} 0 to 1
+ */
+export const ryeShare = (flours: FlourShare[]): number => {
   const total = flours.reduce((sum, part) => sum + part.share, 0) || 1;
   return flours.filter((part) => RYE_FLOURS.includes(part.flour)).reduce((sum, part) => sum + part.share, 0) / total;
 };
 
 /**
- * The stages the dough goes through: the preset's at the room temperature, or one's own.
+ * A method the mix allows: a sour acidifies rye, so without rye the starter goes in directly.
  *
- * @param {BreadInputs} inputs the schedule
+ * @param {BreadMethod} method the method chosen
+ * @param {FlourShare[]} flours the mix
+ * @return {BreadMethod} the method
+ */
+export const methodFor = (method: BreadMethod, flours: FlourShare[]): BreadMethod =>
+  method === 'sour' && ryeShare(flours) === 0 ? 'starter' : method;
+
+/** The hours a sour may ripen, to choose from: overnight, as recipes do, up to a day. */
+export const SOUR_HOURS = {low: 8, high: 24};
+
+const sourWater = () => requiredMedian(SOUR.hydration, 'the hydration of the sour') / 100;
+
+/**
+ * A sour in % of all the flour for a share of the rye acidified, with as much water as its hydration.
+ *
+ * @param {FlourShare[]} flours the mix
+ * @param {number} acidified % of the rye in the sour
+ * @return {number} its flour and water in % of the flour
+ */
+const sourOf = (flours: FlourShare[], acidified: number): number => acidified * ryeShare(flours) * (1 + sourWater());
+
+const acidified = () => ({usual: requiredMedian(RYE_ACIDIFIED, 'the acidified rye'), least: Math.min(...RYE_ACIDIFIED),
+  most: Math.max(...RYE_ACIDIFIED)});
+
+const toQuarter = (hours: number) => Math.round(hours * 4) / 4;
+
+/**
+ * Hours a dough rises at room temperature on the sour of a share of its rye.
+ *
+ * @param {BreadInputs} inputs the bread
+ * @param {number} acidifiedPercent % of the rye in the sour
+ * @return {number} hours
+ */
+const riseOnSour = (inputs: BreadInputs, acidifiedPercent: number) =>
+  hoursUntilReady(BREAD_CALIBRATION, 'sourdough', sourOf(inputs.flours, acidifiedPercent), inputs.roomC);
+
+/**
+ * How long a dough with a sour and no yeast can rise at room temperature: the most acid rye takes raises it fastest,
+ * the least slowest, to the quarter hour.
+ *
+ * @param {BreadInputs} inputs the bread
+ * @return {object} the shortest, usual and longest hours
+ */
+export const sourRiseHours = (inputs: BreadInputs): {low: number, usual: number, high: number} => {
+  const {usual, least, most} = acidified();
+  return {low: toQuarter(riseOnSour(inputs, most)), usual: toQuarter(riseOnSour(inputs, usual)),
+    high: toQuarter(riseOnSour(inputs, least))};
+};
+
+/**
+ * The stages the dough goes through: with a sour and no yeast at room temperature for the hours chosen within what
+ * the sour allows; otherwise the preset's at the room temperature, or one's own.
+ *
+ * @param {BreadInputs} inputs the bread
  * @return {Stage[]} the stages
  */
-export const breadStages = (inputs: BreadInputs): Stage[] => scheduleStages(inputs.preset, inputs.stages, inputs.roomC);
-
-/**
- * A rye dough's schedule: at room temperature for as long as its sour takes, to the quarter hour.
- *
- * @param {BreadInputs} inputs the bread
- * @param {number} sourPercent the sour in % of the flour
- * @return {Stage[]} the stages; the chosen schedule's when the sour cannot raise it
- */
-const ryeStages = (inputs: BreadInputs, sourPercent: number): Stage[] => {
-  const hours = hoursUntilReady(BREAD_CALIBRATION, 'sourdough', sourPercent, inputs.roomC);
-  return Number.isFinite(hours) ? [{hours: Math.round(hours * 4) / 4, temperatureC: inputs.roomC}] :
-    breadStages(inputs);
+export const breadStages = (inputs: BreadInputs): Stage[] => {
+  const chosen = scheduleStages(inputs.preset, inputs.stages, inputs.roomC);
+  if (inputs.method !== 'sour' || inputs.withYeast) {
+    return chosen;
+  }
+  const {low, usual, high} = sourRiseHours(inputs);
+  if (!Number.isFinite(high)) {
+    return chosen;
+  }
+  const hours = Math.min(high, Math.max(low, inputs.sourRiseHours ?? usual));
+  return [{hours, temperatureC: inputs.roomC}];
 };
 
-const targetDoughC = (inputs: BreadInputs): number => recommendedDoughC('bread', breadStages(inputs));
-
 /**
- * How much leavener, of what, the bread type needs for the schedule.
+ * The sour in % of all the flour: the usual with yeast, else the one that raises the dough in its hours, found by
+ * halving the range of acid rye takes; more sour raises it faster.
  *
  * @param {BreadInputs} inputs the bread
- * @return {object} the leavener, its % of the flour and, for hybrids, the yeast's
+ * @param {Stage[]} stages its stages, one at room temperature without yeast
+ * @return {number} the sour's flour and water in % of the flour
  */
-const leavening = (inputs: BreadInputs): {leavener: DoughLeavener, percent: number, yeastPercent?: number} => {
-  const targetC = targetDoughC(inputs);
-  const stages = breadStages(inputs);
-  switch (inputs.type) {
-    case 'yeast':
-      return {leavener: inputs.yeast, percent: leavenerNeeded(BREAD_CALIBRATION, inputs.yeast, stages, targetC)};
-    case 'wheatSourdough':
-      return {leavener: 'sourdough', percent: leavenerNeeded(BREAD_CALIBRATION, 'sourdough', stages, targetC)};
-    case 'hybrid': {
-      // The starter is given; fresh yeast makes up what it lacks for the schedule.
-      const sourdoughAlone = leavenerNeeded(BREAD_CALIBRATION, 'sourdough', stages, targetC);
-      const missingShare = Math.max(0, 1 - inputs.hybridStarterPercent / sourdoughAlone);
-      const freshYeast = leavenerNeeded(BREAD_CALIBRATION, 'fresh', stages, targetC) * missingShare;
-      return {leavener: 'sourdough', percent: inputs.hybridStarterPercent,
-        yeastPercent: convertYeast(freshYeast, 'fresh', inputs.yeast)};
-    }
-    case 'ryeMixed': {
-      // The sour carries the acidified share of the rye at dough yield 200: its flour and as much water.
-      const acidified = requiredMedian(RYE_ACIDIFIED, 'the acidified rye') / 100 * ryeShare(inputs.flours);
-      const sourHydration = requiredMedian(SOUR.hydration, 'the hydration of the sour') / 100;
-      return {leavener: 'sourdough', percent: acidified * (1 + sourHydration) * 100};
+const sourPercent = (inputs: BreadInputs, stages: Stage[]): number => {
+  const {usual, least, most} = acidified();
+  if (inputs.withYeast) {
+    return sourOf(inputs.flours, usual);
+  }
+  let low = least;
+  let high = most;
+  for (let step = 0; step < 40; step++) {
+    const middle = (low + high) / 2;
+    if (riseOnSour(inputs, middle) > stages[0].hours) {
+      low = middle;
+    } else {
+      high = middle;
     }
   }
+  return sourOf(inputs.flours, (low + high) / 2);
 };
+
+/**
+ * How much leavener, of what, the bread needs for its stages.
+ *
+ * @param {BreadInputs} inputs the bread
+ * @param {Stage[]} stages its stages
+ * @return {object} the leavener, its % of the flour and, with yeast besides sourdough, the yeast's
+ */
+const leavening = (inputs: BreadInputs, stages: Stage[]):
+    {leavener: DoughLeavener, percent: number, yeastPercent?: number} => {
+  const targetC = recommendedDoughC('bread', stages);
+  const needed = (leavener: DoughLeavener) => leavenerNeeded(BREAD_CALIBRATION, leavener, stages, targetC);
+  if (inputs.method === 'yeast') {
+    return {leavener: inputs.yeast, percent: needed(inputs.yeast)};
+  }
+  if (!inputs.withYeast) {
+    return {leavener: 'sourdough',
+      percent: inputs.method === 'sour' ? sourPercent(inputs, stages) : needed('sourdough')};
+  }
+  // The starter or sour is given; fresh yeast makes up what it lacks for the schedule.
+  const percent = inputs.method === 'sour' ? sourPercent(inputs, stages) : inputs.starterPercent;
+  const missingShare = Math.max(0, 1 - percent / needed('sourdough'));
+  return {leavener: 'sourdough', percent, yeastPercent: convertYeast(needed('fresh') * missingShare, 'fresh', inputs.yeast)};
+};
+
+const BAKE_MINUTES_PER_ROOT_KG = requiredMedian(BAKE_MINUTES.map(([grams, minutes]) => minutes / Math.sqrt(grams / 1000)),
+    'the bake time');
+
+/**
+ * How to work a dough and bake a loaf of it.
+ *
+ * @param {BreadMethod} method how the dough rises
+ * @param {number} ryePercent its rye in % of the flour
+ * @param {number} loafGrams the dough of a loaf
+ * @return {BreadGuide} the guide
+ */
+const breadGuide = (method: BreadMethod, ryePercent: number, loafGrams: number): BreadGuide => ({
+  ryeDough: ryePercent >= RYE_BREAD_SHARE,
+  foldSets: method !== 'yeast' && ryePercent < RYE_BREAD_SHARE ? requiredMedian(FOLD_SETS, 'the sets of folds') : 0,
+  shapeHoursBefore: requiredMedian(PROOF_HOURS, 'the proof of the shaped loaf'),
+  startC: requiredMedian(BAKING.startC, 'the oven at the start'),
+  lowerC: requiredMedian(BAKING.lowerC, 'the oven after the drop'),
+  lowerAfterMinutes: requiredMedian(BAKING.lowerAfterMin, 'the minutes before the drop'),
+  minutes: BAKE_MINUTES_PER_ROOT_KG * Math.sqrt(loafGrams / 1000),
+  coreC: requiredMedian(BAKING.coreC, 'the core of a baked loaf'),
+});
 
 /**
  * Everything to weigh for a bread, with the sour or soaker to prepare and the water temperature.
@@ -331,7 +457,8 @@ export const calculateBread = (inputs: BreadInputs): BreadResult => {
   const hydration = inputs.hydration ?? recommendedHydration(inputs.flours);
   const salt = requiredMedian(BREAD_SALT, 'the salt of bread') / 100;
   const formula = {hydration: hydration / 100, salt, oil: 0, sugar: 0};
-  const {leavener, percent, yeastPercent} = leavening(inputs);
+  const stages = breadStages(inputs);
+  const {leavener, percent, yeastPercent} = leavening(inputs, stages);
   let leavenerPct = percent;
   if (!Number.isFinite(leavenerPct)) {
     warnings.push('impossibleSchedule');
@@ -351,14 +478,20 @@ export const calculateBread = (inputs: BreadInputs): BreadResult => {
     warnings.push('additionsTooWet');
   }
   const yeastGrams = yeastPercent != null ? yeastPercent / 100 * amounts.totalFlour : undefined;
+  if (yeastPercent === 0) {
+    warnings.push('yeastNotNeeded');
+  }
   if ((leavener !== 'sourdough' && isTooLittleToWeigh(amounts.leavener)) || isTooLittleToWeigh(yeastGrams ?? 0)) {
     warnings.push('tooLittleToWeigh');
   }
 
   const total = inputs.flours.reduce((sum, part) => sum + part.share, 0) || 1;
   const starterFlour = leavener === 'sourdough' ? amounts.leavener / 2 : 0;
-  const flourSplit = inputs.flours.map((part) => ({flour: part.flour,
-    grams: part.share / total * amounts.totalFlour - starterFlour * part.share / total}));
+  // A sour is made of the rye; a starter takes from every flour.
+  const carriers = inputs.flours.filter((part) => inputs.method !== 'sour' || RYE_FLOURS.includes(part.flour));
+  const carrierTotal = carriers.reduce((sum, part) => sum + part.share, 0) || 1;
+  const flourSplit = inputs.flours.map((part) => ({flour: part.flour, grams: part.share / total * amounts.totalFlour -
+    (carriers.includes(part) ? starterFlour * part.share / carrierTotal : 0)}));
 
   if (soakerSeeds > requiredMedian(SOAKER.maxShareOfFlour, 'the largest soaker') / 100 * amounts.totalFlour) {
     warnings.push('soakerTooLarge');
@@ -368,39 +501,44 @@ export const calculateBread = (inputs: BreadInputs): BreadResult => {
   if (fruitVeg > MAX_FRUIT_VEG_SHARE / 100 * amounts.totalFlour) {
     warnings.push('tooManyAdditions');
   }
-  if (inputs.type !== 'ryeMixed' && ryeShare(inputs.flours) * 100 > RYE_BREAD_SHARE) {
+  const rye = ryeShare(inputs.flours) * 100;
+  if (inputs.method !== 'sour' && rye > RYE_BREAD_SHARE) {
     warnings.push('ryeWithoutSour');
   }
   if (inputs.flours.some((part) => part.share > (maxFlourShare(part.flour) ?? Infinity))) {
     warnings.push('flourShareTooHigh');
   }
-  const waterTemperatureC = waterTemperature({targetC: targetDoughC(inputs), roomC: inputs.roomC,
+  const waterTemperatureC = waterTemperature({targetC: recommendedDoughC('bread', stages), roomC: inputs.roomC,
     flourC: inputs.roomC, starterC: leavener === 'sourdough' ? inputs.roomC : undefined}, inputs.kneading);
   const freshYeast = leavener !== 'sourdough' ? convertYeast(leavenerPct, leavener, 'fresh') :
     convertYeast(yeastPercent ?? 0, inputs.yeast, 'fresh');
   warnings.push(...doughWarnings(freshYeast, waterTemperatureC));
 
-  const sour = inputs.type === 'ryeMixed' ? (() => {
+  const sour = inputs.method === 'sour' ? (() => {
     const sourFlour = amounts.leavener / 2;
-    return {flour: sourFlour, water: sourFlour,
-      starter: requiredMedian(SOUR.starterOfSourFlour, 'the starter of the sour') / 100 * sourFlour,
-      hours: requiredMedian(SOUR.hours, 'the hours of the sour'),
-      temperatureC: requiredMedian(SOUR.temperatureC, 'the temperature of the sour')};
+    // The starter, half flour and half water, is part of the sour.
+    // It ripens where the dough goes, its starter as for a dough of its hours.
+    const ripening = [{hours: inputs.sourHours, temperatureC: inputs.roomC}];
+    const starter = leavenerNeeded(BREAD_CALIBRATION, 'sourdough', ripening, inputs.roomC) / 100 * sourFlour;
+    return {flour: sourFlour - starter / 2, water: sourFlour - starter / 2, starter, hours: inputs.sourHours,
+      temperatureC: inputs.roomC};
   })() : undefined;
 
   const loaves = inputs.amountMode === 'loaves' ? inputs.count : 1;
+  const pieceWeight = (amounts.total + soakerSeeds + soakerWater) / loaves;
   return {
     hydration,
     amounts,
     flourSplit,
     yeastGrams,
     sour,
-    stages: inputs.type === 'ryeMixed' ? ryeStages(inputs, leavenerPct) : breadStages(inputs),
+    stages,
+    guide: breadGuide(inputs.method, rye, pieceWeight),
     doughWater: hydration / 100 * amounts.totalFlour + amounts.excessWater,
     soaker: soakerSeeds > 0 ?
       {seeds: soakerSeeds, water: soakerWater, hours: requiredMedian(SOAKER.hours, 'the hours of a soaker')} : undefined,
     pieces: loaves,
-    pieceWeight: (amounts.total + soakerSeeds + soakerWater) / loaves,
+    pieceWeight,
     waterTemperatureC,
     warnings,
   };

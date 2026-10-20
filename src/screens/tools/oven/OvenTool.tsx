@@ -37,8 +37,8 @@ export const OvenTool = () => {
             value: formatTemperature(result.temperatureC, system, i18n.language)},
           ...(result.minutes != null ? [{label: t('tools.ovenConverter.time'),
             value: t('tools.ovenConverter.minutes', {count: result.minutes})}] : []),
-          {label: t('tools.ovenConverter.checkEarly'),
-            value: t('tools.ovenConverter.minutesEarly', {count: result.checkEarlyMinutes})},
+          ...(result.checkEarlyMinutes != null ? [{label: t('tools.ovenConverter.checkEarly'),
+            value: t('tools.ovenConverter.minutesEarly', {count: result.checkEarlyMinutes})}] : []),
         ]}]} />
     </>}>
       <UnitSwitch />

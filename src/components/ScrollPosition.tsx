@@ -1,5 +1,6 @@
 import React, {createContext, useContext, useMemo, useRef} from 'react';
 import {ScrollView, ScrollViewProps} from 'react-native';
+import {AppScrollView} from './AppScrollView';
 
 interface ScrollPosition {
   /** How far the page is scrolled now. */
@@ -25,10 +26,10 @@ export const ScrollViewWithPosition = ({children, onScroll, ...props}: ScrollVie
   // The provider sits outside, as sticky header indices count the scroll view's own children.
   return (
     <ScrollPositionContext.Provider value={position}>
-      <ScrollView ref={ref} scrollEventThrottle={16} {...props} onScroll={(event) => {
+      <AppScrollView ref={ref} scrollEventThrottle={16} {...props} onScroll={(event) => {
         offset.current = event.nativeEvent.contentOffset.y;
         onScroll?.(event);
-      }}>{children}</ScrollView>
+      }}>{children}</AppScrollView>
     </ScrollPositionContext.Provider>
   );
 };

@@ -3,7 +3,7 @@ import {CompositeScreenProps} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Pressable, RefreshControl, ScrollView, StyleSheet, View} from 'react-native';
+import {Pressable, RefreshControl, StyleSheet, View} from 'react-native';
 import Animated, {FadeIn, FadeOut} from 'react-native-reanimated';
 import {Appbar, Surface, Text} from 'react-native-paper';
 import {TileLook} from '../../components/shopping/FlyingTile';
@@ -40,6 +40,7 @@ import {TILE_LAYOUT, TileGrid} from './TileGrid';
 import {useFollowNewest} from './useFollowNewest';
 import {useItemSelection} from './useItemSelection';
 import {useQuickAdd} from './useQuickAdd';
+import {AppScrollView} from '../../components/AppScrollView';
 
 type Props =
     CompositeScreenProps<
@@ -210,7 +211,7 @@ export const ShoppingListScreen = (props: Props) => {
     <Surface style={CentralStyles.screen}>
       {!isOnline && <Text variant="bodySmall" style={styles.hint}>{t('screens.shopping.offlineHint')}</Text>}
       <View ref={follow.areaRef} style={styles.listArea} collapsable={false}>
-        <ScrollView
+        <AppScrollView
           {...follow.listProps}
           contentContainerStyle={styles.content}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => {
@@ -237,7 +238,7 @@ export const ShoppingListScreen = (props: Props) => {
                     viewRef={flights.register(boughtKey(item.name))} onPress={onRestore} onLongPress={setOpenItem} />
                 )} />
             </Animated.View>}
-        </ScrollView>
+        </AppScrollView>
         {quickAdd.adding &&
           <Pressable style={StyleSheet.absoluteFill} accessibilityRole="button" accessibilityLabel={t('common.done')}
             onPress={quickAdd.stop} />}

@@ -23,8 +23,8 @@ export interface OvenResult {
   warnings: ('airFryerTooHot' | 'ovenTooHot')[];
   /** Undefined when the recipe gave no time. */
   minutes?: number;
-  /** Start checking this many minutes before the converted time. */
-  checkEarlyMinutes: number;
+  /** Start checking this many minutes before the converted time; undefined when that would be half of it or more. */
+  checkEarlyMinutes?: number;
 }
 
 /** Fan ovens move the heat to the food, so the common rule sets them 20 °C lower than top and bottom heat. */
@@ -34,10 +34,15 @@ const AIR_FRYER_OFFSET_C = 20;
 /** Air fryers need about a fifth less time than an oven. */
 const AIR_FRYER_TIME_FACTOR = 0.8;
 /**
- * Frozen food in the air fryer: same temperature, half the oven time; or what a table gives for frozen rolls, pizza,
- * fries and nuggets: 5 of 6 to 6.5 min, 7 to 9 of 12 to 15, 12 to 15 of 20 to 25, 10 to 12 of 15 to 20.
+ * Frozen food in the air fryer, against the package's oven setting: packs that print both (four kinds of fries, two
+ * of nuggets) set it 20 °C lower five times and 10 °C lower once; guides say the same temperature (three), 25 °F
+ * lower, 20 °C lower or 50 °F lower. Times: the packs 9 of 13, 10 of 16.5, 11 of 14, 7 of 8, 12.5 of 18 and 7.5 of 11
+ * minutes; a table 5 of 6.25, 8 of 13.5, 13.5 of 22.5 and 11 of 17.5; guides half the time, 30 to 50 % less, and a
+ * third to a half less.
  */
-const FROZEN_TIME_FACTOR = median([0.5, median([5 / 6.25, 8 / 13.5, 13.5 / 22.5, 11 / 17.5])!])!;
+const FROZEN_OFFSET_C = median([20, 20, 20, 20, 20, 10, 0, 0, 0, 25 * 5 / 9, 20, 50 * 5 / 9])!;
+const FROZEN_TIME_FACTOR = median([9 / 13, 10 / 16.5, 11 / 14, 7 / 8, 12.5 / 18, 7.5 / 11, 5 / 6.25, 8 / 13.5,
+  13.5 / 22.5, 11 / 17.5, 0.5, 0.6, (2 / 3 + 1 / 2) / 2])!;
 /** Many air fryers go up to 200 °C; some reach 230 to 240 °C. */
 const AIR_FRYER_MAX_C = 200;
 
@@ -77,15 +82,16 @@ export const parseOvenInputs = (raw: unknown): OvenInputs => {
  */
 export const convertOven = (inputs: OvenInputs): OvenResult => {
   const frozenInAirFryer = inputs.frozen && inputs.to === 'airFryer' && inputs.from !== 'airFryer';
-  const temperatureC = frozenInAirFryer ? inputs.temperatureC : inputs.temperatureC + OFFSETS[inputs.from] -
-    OFFSETS[inputs.to];
+  const temperatureC = frozenInAirFryer ? inputs.temperatureC - FROZEN_OFFSET_C :
+    inputs.temperatureC + OFFSETS[inputs.from] - OFFSETS[inputs.to];
   const airFryer = inputs.to === 'airFryer';
+  const minutes = inputs.minutes > 0 ? Math.round(inputs.minutes * timeFactor(inputs, frozenInAirFryer)) : undefined;
   return {
     temperatureC,
     warnings: airFryer && temperatureC > AIR_FRYER_MAX_C ? ['airFryerTooHot'] :
       !airFryer && temperatureC > OVEN_MAX_C ? ['ovenTooHot'] : [],
-    minutes: inputs.minutes > 0 ? Math.round(inputs.minutes * timeFactor(inputs, frozenInAirFryer)) : undefined,
-    checkEarlyMinutes: CHECK_EARLY_MINUTES,
+    minutes,
+    checkEarlyMinutes: minutes != null && minutes <= 2 * CHECK_EARLY_MINUTES ? undefined : CHECK_EARLY_MINUTES,
   };
 };
 

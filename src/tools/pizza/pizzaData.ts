@@ -85,9 +85,11 @@ export const STYLES: Record<PizzaStyle, StyleData> = {
       {temperatureC: 405, minutes: {low: 1, high: 1.5}},
       {temperatureC: 425, minutes: {low: 1, high: 1.5}},
     ]},
-    // 00 or 0, W 250 to 320; 12 to 24 hours at 18 to 20 °C.
+    // 00 or 0, W 250 to 320. The Neapolitan rules: 12 to 24 hours at room temperature or 18 to 20 °C, no fridge; the
+    // EU specification: 2 hours, then 4 to 6 hours as balls at 25 °C. The whole day comes first, as the default: for a
+    // dinner bake, 16 hours overnight would start at 3 at night.
     flour: 'tipo00',
-    schedules: ['overnight'],
+    schedules: ['daylong', 'overnight'],
     // The Neapolitan rules: 0.1 to 3 g fresh yeast per litre of water; the EU specification: 3 g.
     maxFreshYeastPerLitreWater: 3,
     // 0.1 g dry yeast per 500 g, 16 h, 4 to 10 h in the fridge, 3 to 5 h; 1 g fresh per 550 g, 18 to 48 h in the

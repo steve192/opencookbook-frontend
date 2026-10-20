@@ -3,7 +3,7 @@ import {useKeepAwake} from 'expo-keep-awake';
 import React, {useEffect, useLayoutEffect, useMemo, useState} from 'react';
 import {useRecipe} from '../api/endpoints/recipes';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Appbar, Button, Divider, Icon, Surface, Text} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {IngredientList} from '../components/IngredientList';
@@ -23,6 +23,7 @@ import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {setAppbarOptions} from '../navigation/appbarOptions';
 import {useAppSelector} from '../redux/hooks';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
+import {AppScrollView} from '../components/AppScrollView';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 
@@ -123,7 +124,7 @@ const GuidedCooking = (props: Props & {recipe: Recipe}) => {
     const timers = findStepDurations(step);
 
     return (
-      <ScrollView key={stepIndex} contentContainerStyle={[CentralStyles.contentContainer, styles.content]}>
+      <AppScrollView key={stepIndex} contentContainerStyle={[CentralStyles.contentContainer, styles.content]}>
         <PreparationStepText
           style={{fontSize: TEXT_SIZES[textSizeIndex], lineHeight: TEXT_SIZES[textSizeIndex] * 1.4}}
           value={step}
@@ -183,7 +184,7 @@ const GuidedCooking = (props: Props & {recipe: Recipe}) => {
             {t('screens.guidedCooking.screenStaysOn')}
           </Text>
         </View>
-      </ScrollView>
+      </AppScrollView>
     );
   };
 

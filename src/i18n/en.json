@@ -990,7 +990,8 @@
       "shareLink": "Share link",
       "copied": "Copied",
       "ingredients": "Ingredients",
-      "preparation": "Preparation"
+      "preparation": "Preparation",
+      "disclaimer": "Guide values from published recipes and guides, not guarantees: ingredients, appliances and kitchens differ. Do not rely on them blindly."
     },
     "signupHint": {
       "title": "There is more to CookPal",
@@ -1097,23 +1098,22 @@
         "steel": "a pizza steel"
       },
       "bakeValueOrLess": "{{temperature}}, {{duration}} or less",
-      "bakeValueAtLeast": "{{temperature}}, at least {{duration}}"
+      "bakeValueAtLeast": "{{temperature}}, at least {{duration}}",
+      "waterForFlour": "{{flour}} takes {{direction}} water than the recipes' flour: the dough gets {{percent}} % instead of {{stylePercent}} %. Hold some water back and add it by feel.",
+      "waterDirection": {
+        "more": "more",
+        "less": "less"
+      }
     },
     "bread": {
       "name": "Bread & sourdough",
-      "summary": "Sourdough, rye, hybrid or yeast bread with additions, soaker and timeline",
-      "type": "Bread",
-      "types": {
-        "wheatSourdough": "Wheat or spelt sourdough",
-        "ryeMixed": "Rye & mixed rye",
-        "hybrid": "Sourdough with yeast",
-        "yeast": "Yeast bread"
-      },
+      "summary": "Sourdough, rye or yeast bread with ingredients, sour, soaker, schedule and method",
       "flourMixHint": "The shares add up to 100 %; the water is set from what each flour takes.",
       "share": "Share",
       "addFlour": "Add flour",
       "removeFlour": "Remove flour",
       "hydration": "Water",
+      "hydrationInfo": "Bakers give the water as a percentage of the flour: 63 % means 63 g of water for 100 g of flour. German recipes often give the dough yield instead, Teigausbeute or TA: the weight of dough from 100 g of flour. TA 163 is the same as 63 % water. The higher it is, the softer the dough.",
       "hydrationHint": "In % of the flour; dough yield (TA) {{yield}}.",
       "hydrationValue": "{{percent}} % (TA {{yield}})",
       "doughWater": "Water in the dough",
@@ -1128,8 +1128,6 @@
       "loafWeight": "Weight per loaf",
       "loaves_one": "{{count}} loaf",
       "loaves_other": "{{count}} loaves",
-      "hybridStarter": "Starter",
-      "hybridStarterHint": "In % of the flour. Yeast makes up what the starter lacks for the schedule.",
       "additions": "Additions",
       "additionsHint": "They count towards the loaf's weight, so more of them means less flour. The dough takes their water: all of quark's or eggs', what fruit and vegetables release, far more when cooked or puréed. Seeds and grains go into a soaker.",
       "searchAddition": "Add pumpkin, quark, seeds…",
@@ -1138,8 +1136,7 @@
       "waterGiven": "{{percent}} % water; the dough takes {{grams}} g per 100 g",
       "waterBound": "{{percent}} % water; its starch binds {{grams}} g of the dough's water per 100 g",
       "soaks": "Soaks up {{grams, number}} g water per gram",
-      "ryeSchedule": "Rye needs an acid sour, made the day before. The dough then rises as fast as the sour lets it.",
-      "sourTitle": "Sour (the day before)",
+      "sourTitle": "The day before: make the sour",
       "sourFlour": "Rye flour",
       "sourStarter": "Starter",
       "sourTime": "Ripens",
@@ -1149,22 +1146,61 @@
       "soakerTimeValue": "about {{hours, number}} h",
       "startSour": "Start the sour",
       "startSoaker": "Start the soaker",
-      "resultTitle": "{{type}}",
       "ownHydration": "Choose the water myself",
       "recommendedHydration": "The calculator uses {{percent}} % water (dough yield {{yield}}), what bakers recommend for this flour mix.",
-      "typeDescriptions": {
-        "wheatSourdough": "Wheat or spelt dough raised by a ripe starter alone.",
-        "ryeMixed": "Rye needs acid, so part of the rye goes into a sour the day before.",
-        "hybrid": "A starter plus a little yeast, which makes up what the starter lacks for the schedule.",
-        "yeast": "Raised by baker's yeast alone."
-      },
       "preparations": {
         "raw": "Raw, grated or in pieces",
         "cooked": "Cooked or puréed"
       },
       "flourTakes": "Recipes give it about {{water}} % water.",
       "flourN": "Flour {{n}}",
-      "flourMaxShare": "Recipes use it for at most {{share}} % of the flour."
+      "flourMaxShare": "Recipes use it for at most {{share}} % of the flour.",
+      "method": "Method",
+      "methods": {
+        "starter": "Starter straight in",
+        "sour": "Rye sour the day before",
+        "yeast": "Yeast only"
+      },
+      "methodDescriptions": {
+        "starter": "Ripe starter goes straight into the dough. Most wheat and spelt sourdough loaves are made this way.",
+        "sour": "Part of the rye ripens the day before with a little starter into a sour, which then goes into the dough whole. Rye needs this acid to bake.",
+        "yeast": "Raised with baker's yeast only, no sourdough."
+      },
+      "sourNeedsRye": "With rye in the flour you can also make a rye sour the day before.",
+      "withYeast": "With a little yeast",
+      "withYeastHint": "Yeast makes up what the sourdough lacks for your schedule, so the dough rises faster and more reliably.",
+      "starterPercent": "Starter",
+      "starterPercentHint": "In % of the flour. The yeast makes up what it lacks for the schedule.",
+      "inDough": {
+        "starter": "Ripe starter",
+        "sour": "All of the sour from the day before"
+      },
+      "resultTitles": {
+        "starter": "Sourdough bread",
+        "sour": "Bread with a rye sour",
+        "yeast": "Yeast bread"
+      },
+      "resultWithYeast": "{{bread}} with a little yeast",
+      "stepsTitle": "How to bake it",
+      "steps": {
+        "sour": "The day before, make the sour: stir the starter into the water, mix in the rye flour and leave it covered to ripen. The next day all of the sour goes into the dough.",
+        "soaker": "The day before, pour the soaker's water over the seeds and leave them covered to soak.",
+        "mixRye": "Mix all the ingredients only until the dough is even. Rye dough is not kneaded and stays sticky.",
+        "knead": "Knead all the ingredients for {{minutes, number}} min, until the dough is smooth and comes away from the bowl.",
+        "fold": "Leave it covered to rise, and stretch and fold it {{count, number}} times, 30 min apart: pull up one side of the dough, lay it over the middle, and so on all around.",
+        "rise": "Leave it covered to rise, as in the schedule.",
+        "shape": "About {{hours, number}} h before baking, shape a loaf, lay it seam up in a floured proofing basket or in a loaf tin, and leave it covered to finish rising.",
+        "bake": "Preheat the oven with a tray or pot to {{start}}, top and bottom heat. Score the loaf and bake it with steam: a dish of water on the oven floor, or with the lid on the pot. After {{after, number}} min, turn it down to {{lower}}; about {{minutes, number}} min in all.",
+        "done": "It is done at about {{core}} in the middle, or when it sounds hollow as you tap its base. Let it cool on a rack before you cut it.",
+        "doneRye": "It is done at about {{core}} in the middle, or when it sounds hollow as you tap its base. Let it cool completely on a rack before you cut it: rye bread keeps setting as it cools."
+      },
+      "sourHours": "The sour ripens",
+      "sourHoursHint": "The longer it may ripen, the less starter it needs.",
+      "hoursValue": "{{hours, number}} h",
+      "sourRise": "How long the dough rises",
+      "sourRiseLabel": "At {{temperature}}",
+      "sourRiseHint": "Without yeast the sour raises the dough: less time needs more sour. Between {{low, number}} and {{high, number}} h the acid stays as rye needs it. For another schedule, add a little yeast.",
+      "mixOnly": "Mix, do not knead"
     },
     "dough": {
       "flour": "Flour",
@@ -1224,7 +1260,8 @@
         "fridge48": "48 h fridge",
         "fridge72": "72 h fridge",
         "custom": "Your own",
-        "quick": "Quick"
+        "quick": "Quick",
+        "daylong": "All day"
       },
       "stageHours": "Duration",
       "stageTemperature": "Temperature",
@@ -1253,7 +1290,6 @@
       "at": "at {{temperature}}",
       "warnings": {
         "flourTooWeakForTime": "This flour is made for shorter fermentation than this schedule. Choose a stronger flour or a shorter schedule.",
-        "flourTooWeakForWater": "This flour takes less water than this dough has. It may turn out slack.",
         "tooLittleToWeigh": "That is less than 0.1 g of yeast, below what kitchen scales weigh.",
         "impossibleSchedule": "No amount of leavener makes this schedule: it is too short or too cold.",
         "soakerTooLarge": "The soaker is more than the dough can carry. Use fewer seeds or more flour.",
@@ -1263,8 +1299,9 @@
         "waterTooHot": "The water would have to be hotter than 45 °C, which starts to kill yeast. Let the flour warm up, or let the dough rise warmer.",
         "waterTooCold": "The water would have to be colder than ice water. Chill the flour, or knead by hand, which warms the dough less.",
         "tooManyAdditions": "More fruit or vegetables than flour: more than recipes use, so the crumb may not set and stay gummy.",
-        "ryeWithoutSour": "More than half rye makes a rye bread, and rye does not bake with yeast alone. Choose rye and mixed bread, which adds a sour.",
-        "flourShareTooHigh": "A flour with little or no gluten makes up more of the mix than recipes use (barley at most a quarter to half, buckwheat, millet, quinoa, amaranth and teff at most half): the loaf turns out dense and crumbly."
+        "ryeWithoutSour": "With more than half rye it becomes a rye bread, and rye needs acid. Choose a rye sour the day before.",
+        "flourShareTooHigh": "A flour with little or no gluten makes up more of the mix than recipes use (barley at most a quarter to half, buckwheat, millet, quinoa, amaranth and teff at most half): the loaf turns out dense and crumbly.",
+        "yeastNotNeeded": "The sourdough alone raises the dough in this time, so it needs no yeast. Choose a shorter schedule for the yeast to help, or leave it out."
       },
       "roomInfo": "Where the dough rises, usually your kitchen. The flour counts as just as warm, as it is stored there.",
       "temperaturesInfo": "Kneading warms the dough by friction, a stand mixer more than hands. The water temperature allows for it, for the room and for the flour.",
@@ -1353,9 +1390,9 @@
       "time": "Time",
       "timeHint": "0 when the recipe gives none.",
       "frozen": "Frozen food",
-      "frozenHint": "Same temperature as the oven, a little over half the time.",
-      "minutes_one": "{{count}} minute",
-      "minutes_other": "{{count}} minutes",
+      "frozenHint": "About 20 °C below the package and just under two thirds of the time.",
+      "minutes_one": "{{count, number}} minute",
+      "minutes_other": "{{count, number}} minutes",
       "checkEarly": "Check",
       "minutesEarly_one": "{{count}} minute early",
       "minutesEarly_other": "{{count}} minutes early",
@@ -1420,7 +1457,7 @@
         "starter": "Starters",
         "main": "Main",
         "sides": "Sides",
-        "salad": "Salad",
+        "salad": "Vegetables and salad",
         "bread": "Bread",
         "dessert": "Dessert"
       },
@@ -1444,8 +1481,6 @@
         "meat": "Meat or fish",
         "vegetarianMain": "Vegetarian main",
         "grillMeat": "Meat for the grill",
-        "warmSides": "Potatoes, pasta, rice",
-        "salad": "Salad",
         "vegetables": "Vegetables",
         "bread": "Bread",
         "dessert": "Dessert",
@@ -1454,9 +1489,17 @@
         "potatoes": "Potatoes",
         "racletteBread": "Bread",
         "fondueCheese": "Fondue cheese",
-        "fondueBread": "Bread"
+        "fondueBread": "Bread",
+        "bbqSalads": "Salads such as potato or pasta salad",
+        "pasta": "Pasta (dry)",
+        "rice": "Rice (raw)",
+        "vegetablesToCook": "Vegetables to cook",
+        "rawVegetables": "Raw vegetables",
+        "leafSalad": "Leaf salad"
       },
       "perDish": "{{total}} ({{dish}} per dish)",
+      "servings_one": "{{count}} serving of {{size}}",
+      "servings_other": "{{count}} servings of {{size}}",
       "pickles": "Gherkins and silver onions",
       "jarsEach_one": "{{count}} jar each",
       "jarsEach_other": "{{count}} jars each",
@@ -1474,7 +1517,10 @@
         "bbq": "Meat from the grill with salads, vegetables and bread.",
         "raclette": "Cheese melted at the table, with potatoes or bread and whatever everyone likes.",
         "cheeseFondue": "Bread dipped into melted cheese at the table."
-      }
+      },
+      "sides": "Sides and vegetables",
+      "sidesHint": "Pick what you serve. With several, the course is shared: each gets one and a half times its share, as guests take more of their favourite.",
+      "sidesInfo": "For as much on the plate, an adult needs about {{potatoes}} potatoes, {{pasta}} pasta or {{rice}} rice, weighed raw: pasta and rice swell to two and a half times their weight. For vegetables it is {{vegetables}} vegetables to cook, {{raw}} raw vegetables or {{leaf}} leaf salad, as leaf salad is light and takes up a lot of room. That is what portion planners and guides give."
     },
     "seasonalCalendar": {
       "name": "Seasonal calendar",
@@ -1522,7 +1568,7 @@
     },
     "coffee": {
       "name": "Coffee",
-      "summary": "Coffee and water for filter, French press, espresso, cold brew and more",
+      "summary": "Coffee and water for filter, French press, espresso, bean-to-cup machines, cold brew and more, with grind, taste profile and steps",
       "method": "Method",
       "methods": {
         "pourOver": "Pour-over",
@@ -1533,13 +1579,21 @@
         "espresso": "Espresso",
         "coldBrewConcentrate": "Cold brew concentrate",
         "coldBrewReady": "Cold brew, ready to drink",
-        "japaneseIced": "Japanese iced"
+        "japaneseIced": "Japanese iced",
+        "fullyAutomatic": "Bean-to-cup machine"
       },
       "strength": "Strength",
       "strengths": {
-        "mild": "Mild",
-        "medium": "Medium",
-        "strong": "Strong"
+        "brew": {
+          "mild": "Mild",
+          "medium": "Medium",
+          "strong": "Strong"
+        },
+        "espresso": {
+          "mild": "Lungo",
+          "medium": "Normale",
+          "strong": "Ristretto"
+        }
       },
       "basis": "Starting from",
       "bases": {
@@ -1555,17 +1609,12 @@
       "ratio": "Ratio",
       "ratioValue": "1 : {{water, number}}",
       "waterTemperature": "Water",
-      "steep": "Steep",
-      "steepValue": {
-        "minutes": "{{low, number}} to {{high, number}} min",
-        "hours": "{{low, number}} to {{high, number}} h"
-      },
       "dilution": "Add before drinking",
       "resultTitle": "{{method}}",
       "toWeigh": "To weigh",
       "brewing": "Brewing",
       "ratioRange": "1 : {{low, number}} to {{high, number}}",
-      "strengthInfo": "Strong uses the least water per gram of coffee that brewing guides give for the method, mild the most and medium the middle.",
+      "strengthInfo": "Mild, medium and strong follow what coffee calculators give for the method: strong takes the least water per gram of coffee. For espresso they are lungo, normale and ristretto.",
       "methodDescriptions": {
         "pourOver": "Hot water poured by hand over ground coffee in a paper filter.",
         "filterMachine": "A machine drips the hot water through the filter into a jug.",
@@ -1575,12 +1624,159 @@
         "espresso": "A machine presses hot water through finely ground coffee.",
         "coldBrewConcentrate": "Steeped cold for hours, then diluted to drink.",
         "coldBrewReady": "Steeped cold for hours, ready to drink.",
-        "japaneseIced": "Brewed hot straight onto ice."
-      }
+        "japaneseIced": "Brewed hot straight onto ice.",
+        "fullyAutomatic": "Grinds the beans and brews at the press of a button, with levels for strength and temperature."
+      },
+      "beans": "Beans and water",
+      "beansInfo": "Dark roasts give up their flavour at cooler water, light roasts need it hotter. Water too cool dissolves too little and the coffee tastes sour; too hot dissolves too much and it turns bitter.",
+      "roasts": {
+        "light": "Light",
+        "medium": "Medium",
+        "dark": "Dark"
+      },
+      "roastWater": "For this roast: {{range}}",
+      "grind": "Grind",
+      "grinds": {
+        "extraFine": "Extra fine",
+        "fine": "Fine",
+        "mediumFine": "Medium fine",
+        "medium": "Medium",
+        "mediumCoarse": "Medium coarse",
+        "coarse": "Coarse"
+      },
+      "brewTime": "Brew time",
+      "brewTimeValue": {
+        "clock": "{{time}} min",
+        "seconds": "{{value, number}} s",
+        "hours": "{{value, number}} h"
+      },
+      "taste": {
+        "title": "Taste",
+        "strength": "Strength",
+        "extraction": "Extraction",
+        "extractionValue": "about {{percent}} %, estimated",
+        "extractionInfo": "How much of the ground coffee dissolves in the water. Brewing standards aim for 18 to 22 %: below, coffee tastes sour and thin; above, bitter and dry. It is measured with a refractometer; CookPal estimates it from grind, water temperature, brew time and roast, after measurements and guides.",
+        "profile": "Profile",
+        "strengths": {
+          "weak": "Weak",
+          "balanced": "Balanced",
+          "strong": "Strong"
+        },
+        "sectors": {
+          "strong": {
+            "under": "strong, sour",
+            "ideal": "strong, round",
+            "over": "strong, bitter"
+          },
+          "balanced": {
+            "under": "sour, grassy",
+            "ideal": "balanced, sweet",
+            "over": "bitter, dry"
+          },
+          "weak": {
+            "under": "thin, sour",
+            "ideal": "light, mild",
+            "over": "thin, bitter"
+          }
+        },
+        "axisExtraction": "Extraction in %",
+        "legend": "Like a brewing control chart: to the right, more dissolves from the grounds (extraction); upwards, the drink gets stronger (TDS, the dissolved solids in the drink). Each line is one ratio of coffee to water, and more coffee makes it steeper. Grind, water temperature, brew time, roast and method move your coffee along its line. The green field is balanced, as brewing standards recommend. All values are estimates, not measurements.",
+        "chartTitle": "Flavour profile",
+        "axisStrength": "Strength (TDS) in %",
+        "legendBrew": "Your coffee",
+        "legendRatio": "Your ratio",
+        "legendOthers": "Other ratios",
+        "legendBalanced": "Balanced",
+        "enlarge": "Enlarge"
+      },
+      "cup": "Cup",
+      "automat": {
+        "title": "Your bean-to-cup machine",
+        "hint": "Every machine grinds and brews a little differently. CookPal assumes 6 to 12 g of coffee by strength level and 90 to 95 °C: take the result as a direction, not a measurement.",
+        "drinks": {
+          "espresso": "Espresso",
+          "coffee": "Coffee"
+        },
+        "level": "Level {{level}} of {{levels}}, about {{dose}}",
+        "temperatures": {
+          "low": "Low",
+          "normal": "Normal",
+          "high": "High"
+        },
+        "drink": "Drink",
+        "temperature": "Brewing temperature",
+        "espressoHint": "A fully automatic machine usually grinds less coffee per cup than a portafilter and runs more water through it, so its espresso often comes out thinner. A higher level, a smaller cup or two grinds for one cup (such as a double shot), if your machine offers it, make it stronger."
+      },
+      "grindHint": "Recommended: {{grind}}. Finer dissolves more from the coffee, coarser less.",
+      "machineWater": "For this roast: {{range}}. Set it if your machine allows.",
+      "fixedWater": "The machine brews at about {{range}}.",
+      "brewTimeHint": "Guides: {{range}}; longer dissolves more, until it hardly grows.",
+      "stepsTitle": "How to brew it",
+      "steps": {
+        "pourOver": [
+          "Rinse the paper filter with hot water and pour the water away.",
+          "Put {{coffee}} of coffee, ground {{grind}}, into the filter.",
+          "Pour on {{bloom}} of water at {{temperature}} and let it bloom for 30 to 45 seconds.",
+          "Pour the rest in slow circles until {{water}} is in; after about {{time}} it has all run through.",
+          "If it runs through faster, grind finer; if it takes longer, coarser."
+        ],
+        "filterMachine": [
+          "Fill the tank with {{water}} of water.",
+          "Put in a paper filter and {{coffee}} of coffee, ground {{grind}}.",
+          "Switch the machine on and let it run through."
+        ],
+        "frenchPress": [
+          "Put {{coffee}} of coffee, ground {{grind}}, into the press.",
+          "Pour on {{water}} of water at {{temperature}}.",
+          "Let it steep for {{time}}, then break the crust with a spoon and skim off the foam and floating bits.",
+          "Let it settle for a few minutes, press the plunger only to the surface and pour carefully.",
+          "Serve straight away: left in the press it keeps steeping and turns bitter."
+        ],
+        "aeroPress": [
+          "Put in {{coffee}} of coffee, ground {{grind}}.",
+          "Pour on {{water}} of water at {{temperature}} and stir for 10 seconds.",
+          "Put on the plunger and, after about {{time}} in all, press gently for 20 to 30 seconds."
+        ],
+        "moka": [
+          "Fill the base with water to just below the valve.",
+          "Fill the funnel with {{coffee}} of coffee, ground {{grind}}, without pressing it down.",
+          "Heat on medium and take it off the heat as soon as no more coffee flows."
+        ],
+        "espresso": [
+          "Grind {{coffee}} of coffee {{grind}}, spread it evenly in the portafilter and tamp it level.",
+          "Start the shot and stop it after about {{time}} at {{water}} in the cup.",
+          "If it runs faster, grind finer; if slower, coarser."
+        ],
+        "fullyAutomatic": [
+          "Set the strength, cup size and temperature.",
+          "Change the grind only while the grinder runs: standing still, it can be damaged.",
+          "If the coffee only drips, grind coarser; if it runs fast and watery, finer.",
+          "For dark roasts, lower the temperature by one level."
+        ],
+        "coldBrewConcentrate": [
+          "Grind {{coffee}} of coffee {{grind}} and stir it into {{water}} of cold water.",
+          "Cover and let it steep in the fridge for about {{time}}.",
+          "Strain through a sieve lined with a paper filter, without pressing.",
+          "Dilute with {{dilution}} of water before drinking. In the fridge the concentrate keeps about two weeks."
+        ],
+        "coldBrewReady": [
+          "Grind {{coffee}} of coffee {{grind}} and stir it into {{water}} of cold water.",
+          "Cover and let it steep in the fridge for about {{time}}.",
+          "Strain through a sieve lined with a paper filter, without pressing.",
+          "In the fridge it keeps about a week."
+        ],
+        "japaneseIced": [
+          "Put {{ice}} of ice into the carafe.",
+          "Put {{coffee}} of coffee, ground {{grind}}, into the filter, pour on {{bloom}} of hot water at {{temperature}} and let it bloom for 30 to 45 seconds.",
+          "Pour on the rest of the hot water until {{water}} is in, and let it run through.",
+          "Swirl the carafe until the ice has melted."
+        ]
+      },
+      "waterTemperatureTitle": "Water temperature"
     },
     "tea": {
       "name": "Tea",
-      "summary": "Amount, water temperature and steeping time, with a timer",
+      "summary": "Amount, water temperature and steeping time, hot, cold or iced, with infusions and a timer",
       "type": "Tea",
       "types": {
         "black": "Black",
@@ -1589,19 +1785,16 @@
         "herbal": "Herbal & fruit",
         "rooibos": "Rooibos",
         "matchaUsucha": "Matcha (usucha)",
-        "matchaKoicha": "Matcha (koicha)"
+        "matchaKoicha": "Matcha (koicha)",
+        "oolong": "Oolong"
       },
       "water": "Water",
-      "iced": "Iced tea",
-      "icedHint": "Brewed twice as strong and poured over the same weight of ice.",
       "tea": "Tea",
       "waterTemperature": "Water",
       "steep": "Steep",
       "minutes": "{{low, number}} to {{high, number}} min",
       "whisk": "Whisk, do not steep",
       "ice": "Ice",
-      "timerLabel": "{{minutes, number}} min",
-      "resultTitle": "{{type}}",
       "toWeigh": "To weigh",
       "brewing": "Brewing",
       "howMuch": "How much",
@@ -1612,8 +1805,63 @@
         "herbal": "Dried herbs, flowers or fruit, without tea leaves.",
         "rooibos": "The red bush from South Africa, without caffeine.",
         "matchaUsucha": "Thin matcha: powdered green tea whisked with more water.",
-        "matchaKoicha": "Thick matcha: more powder and little water."
-      }
+        "matchaKoicha": "Thick matcha: more powder and little water.",
+        "oolong": "Partly oxidised tea leaves, between green and black, often rolled."
+      },
+      "method": "Method",
+      "methods": {
+        "hot": "Hot",
+        "coldBrew": "Cold brew",
+        "iced": "Iced"
+      },
+      "methodHints": {
+        "hot": "Steeped the usual way, in hot water.",
+        "coldBrew": "Steeped in cold water for hours in the fridge: milder and hardly bitter.",
+        "iced": "Steeped hot at twice the strength, then poured over as much ice."
+      },
+      "strength": "Strength",
+      "strengthHint": "How much tea goes on the water: more leaves, more of everything.",
+      "strengths": {
+        "light": "Light",
+        "normal": "Normal",
+        "strong": "Strong"
+      },
+      "coldWater": "Cold",
+      "inTheFridge": "About {{hours, number}} h in the fridge",
+      "infusions": "Infusions",
+      "infusionsValue_one": "{{count}} infusion",
+      "infusionsValue_other": "{{count}} infusions",
+      "infusion": "Infusion {{n}}",
+      "clock": "{{minutes}}:{{seconds}} min",
+      "resultTitles": {
+        "hot": "{{type}}",
+        "coldBrew": "{{type}}, cold brewed",
+        "iced": "{{type}}, iced"
+      },
+      "amountAndTimeInfo": "Amount and steeping time work differently. The amount sets how concentrated the whole cup is: more leaves give more of everything, in the same balance. The time changes the balance: caffeine, aroma and the sweet amino acids dissolve in the first one to three minutes, tannins keep coming until about six to eight minutes. Steeped briefly, tea tastes fresh and light; longer, fuller and more astringent; after that only more bitter. Herbal and fruit teas have few tannins: there, longer mostly means stronger.",
+      "steepTime": "Steeping time",
+      "steepFor": "Steep for",
+      "steepTimeHint": "Shorter: fresher and lighter. Longer: fuller and more astringent, past the recommendation only more bitter.",
+      "steepTimeHintHerbs": "Shorter: milder. Longer: stronger in flavour.",
+      "steepGuides": "Guides recommend {{low}} to {{high}}.",
+      "taste": "Taste",
+      "tasteValue": "{{strength}}, {{steep}}",
+      "strengthTastes": {
+        "light": "Light",
+        "normal": "Balanced",
+        "strong": "Strong"
+      },
+      "steepTastes": {
+        "fresh": "fresh and light",
+        "full": "full and astringent",
+        "bitter": "bitter, longer than recommended",
+        "mild": "rather mild",
+        "strong": "full of flavour",
+        "intense": "very intense, longer than recommended",
+        "round": "round"
+      },
+      "infusionsInfo": "Good tea leaves can be steeped more than once, these about {{count}} times. As they give less each time, steep each further infusion about {{seconds}} seconds longer than the one before. When it tastes thin, the leaves are spent.",
+      "rawHerbsWarning": "Herbs, fruit and rooibos are only dried, not heated, and can carry germs that only boiling water kills. Consumer advice is therefore to pour on boiling water, steep at least 5 minutes and then let it cool. Only cold brew teas sold for cold brewing."
     },
     "ownValue": "Own",
     "fewer": "Fewer",

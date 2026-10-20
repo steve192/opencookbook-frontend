@@ -150,25 +150,25 @@ describe('pizza dough against published recipes', () => {
 const BREADS: {name: string, inputs: Partial<BreadInputs>, recipe: DoughRecipe}[] = [
   {
     name: 'No-knead yeast bread, 1 g instant yeast for 430 g flour, 18 h on the counter and 2 h',
-    inputs: {type: 'yeast', yeast: 'instant', amountMode: 'flour', flourG: 430, hydration: 345 / 430 * 100,
+    inputs: {method: 'yeast', yeast: 'instant', amountMode: 'flour', flourG: 430, hydration: 345 / 430 * 100,
       stages: [room(20.25)]},
     recipe: {salt: 8 / 430 * 100, leavener: 1 / 430 * 100},
   },
   {
     name: 'Quick white bread, half a 42 g cube for 500 g flour, 90 min',
-    inputs: {type: 'yeast', yeast: 'fresh', amountMode: 'flour', flourG: 500, flours: [{flour: 'type405', share: 100}],
+    inputs: {method: 'yeast', yeast: 'fresh', amountMode: 'flour', flourG: 500, flours: [{flour: 'type405', share: 100}],
       stages: [room(1.54)]},
     recipe: {hydration: 300 / 500 * 100, salt: 2 * 5 * 1.2 / 500 * 100, leavener: 21 / 500 * 100},
   },
   {
     name: 'Sourdough the same day, half its flour as ripe starter, 5 h',
-    inputs: {type: 'wheatSourdough', amountMode: 'flour', flourG: 912,
+    inputs: {method: 'starter', amountMode: 'flour', flourG: 912,
       flours: [{flour: 'type550', share: 90}, {flour: 'wholeWheat', share: 10}], stages: [room(4.92)]},
     recipe: {hydration: (397 + 227) / 912 * 100, salt: 15 / 912 * 100, leavener: 454 / 912 * 100},
   },
   {
     name: 'Sourdough overnight in the fridge, 100 g starter for 500 g flour',
-    inputs: {type: 'wheatSourdough', amountMode: 'flour', flourG: 550, flours: [{flour: 'type405', share: 100}],
+    inputs: {method: 'starter', amountMode: 'flour', flourG: 550, flours: [{flour: 'type405', share: 100}],
       hydration: 400 / 550 * 100, stages: [room(5.75), cold(11)]},
     recipe: {salt: 12 / 550 * 100, leavener: 100 / 550 * 100},
   },
@@ -213,8 +213,12 @@ const OVENS: {name: string, inputs: Partial<OvenInputs>, published: {temperature
     temperatureC: 180, minutes: 20}, published: {temperatureC: 160, minutes: 13.5}},
   {name: 'cake, fan 180 °C for 50 to 60 min: air fryer 160 °C for 40 to 50 min', inputs: {from: 'fan',
     to: 'airFryer', temperatureC: 180, minutes: 55}, published: {temperatureC: 160, minutes: 45}},
-  {name: 'frozen food, 180 °C for 20 min: air fryer 180 °C for 10 min', inputs: {from: 'fan', to: 'airFryer',
-    temperatureC: 180, minutes: 20, frozen: true}, published: {temperatureC: 180, minutes: 10}},
+  {name: 'frozen fries, oven 220 °C for 15 to 18 min: pack says air fryer 200 °C for 9 to 11 min', inputs: {
+    from: 'fan', to: 'airFryer', temperatureC: 220, minutes: 16.5, frozen: true}, published: {temperatureC: 200,
+    minutes: 10}},
+  {name: 'frozen nuggets, oven 220 °C for 16 to 20 min: pack says air fryer 200 °C for 10 to 15 min', inputs: {
+    from: 'topBottom', to: 'airFryer', temperatureC: 220, minutes: 18, frozen: true}, published: {temperatureC: 200,
+    minutes: 12.5}},
   {name: 'frozen pizza, 12 to 15 min in the oven: 7 to 9 min in the air fryer', inputs: {from: 'fan', to: 'airFryer',
     temperatureC: 220, minutes: 13.5, frozen: true}, published: {minutes: 8}},
 ];
@@ -265,14 +269,19 @@ interface TeaRecipe {
 }
 
 const TEAS: TeaRecipe[] = [
-  {name: 'green tea, 10 g for a litre at 70 to 80 °C', inputs: {type: 'green', waterMl: 1000, iced: false},
+  {name: 'green tea, 10 g for a litre at 70 to 80 °C', inputs: {type: 'green', method: 'hot', strength: 'normal', waterMl: 1000},
     published: {teaG: 10, temperatureC: {low: 70, high: 80}}},
-  {name: 'black tea, 3 g for a 200 ml cup at 95 to 100 °C', inputs: {type: 'black', waterMl: 200, iced: false},
+  {name: 'black tea, 3 g for a 200 ml cup at 95 to 100 °C', inputs: {type: 'black', method: 'hot', strength: 'normal', waterMl: 200},
     published: {teaG: 3, temperatureC: {low: 95, high: 100}}},
-  {name: 'usucha, 2 g with 65 to 70 ml', inputs: {type: 'matchaUsucha', waterMl: 67.5, iced: false},
+  {name: 'usucha, 2 g with 65 to 70 ml', inputs: {type: 'matchaUsucha', method: 'hot', strength: 'normal', waterMl: 67.5},
     published: {teaG: 2}},
-  {name: 'iced black tea, twice the tea for 500 ml over 500 g ice', inputs: {type: 'black', waterMl: 500, iced: true},
+  {name: 'iced black tea, twice the tea for 500 ml over 500 g ice', inputs: {type: 'black', method: 'iced', strength: 'normal', waterMl: 500},
     published: {teaG: 2 * 3 / 200 * 500, iceG: 500}},
+  {name: 'oolong, 3 g for a 200 ml cup at 85 to 95 °C',
+    inputs: {type: 'oolong', method: 'hot', strength: 'normal', waterMl: 200},
+    published: {teaG: 3, temperatureC: {low: 85, high: 95}}},
+  {name: 'cold brewed green tea, 12 g for a litre',
+    inputs: {type: 'green', method: 'coldBrew', strength: 'normal', waterMl: 1000}, published: {teaG: 12}},
 ];
 
 describe('tea against published guides', () => {
@@ -280,8 +289,8 @@ describe('tea against published guides', () => {
     const result = calculateTea(inputs);
     expectShare(result.teaG, published.teaG);
     if (published.temperatureC) {
-      expectPoints(result.temperatureC.low, published.temperatureC.low, TOLERANCE.temperature);
-      expectPoints(result.temperatureC.high, published.temperatureC.high, TOLERANCE.temperature);
+      expectPoints(result.temperatureC!.low, published.temperatureC.low, TOLERANCE.temperature);
+      expectPoints(result.temperatureC!.high, published.temperatureC.high, TOLERANCE.temperature);
     }
     if (published.iceG != null) {
       expectShare(result.iceG!, published.iceG);

@@ -47,6 +47,7 @@ import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
 import {SuggestionResultCard} from './SuggestionResultCard';
+import {AppScrollView} from '../../components/AppScrollView';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeSuggestionScreen'>;
 
@@ -222,12 +223,12 @@ export const RecipeSuggestionScreen = (props: Props) => {
 
   return (
     <Surface style={styles.screen}>
-      <ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContent}>
+      <AppScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContent}>
         <View style={[CentralStyles.contentContainer, styles.content]}>
           {searching && <ActivityIndicator accessibilityLabel={t('screens.suggestion.searching')} />}
           {showingResults ? renderResults(suggestions) : renderQuestions()}
         </View>
-      </ScrollView>
+      </AppScrollView>
       <ScreenFooter>
         <Button mode="contained" icon={showingResults ? 'dice-multiple-outline' : 'chef-hat'} onPress={search}
           disabled={searching || !online}>

@@ -35,7 +35,7 @@ export interface PizzaInputs extends BakeTime {
   ovenMaxC: number;
 }
 
-export type PizzaWarning = 'flourTooWeakForTime' | 'flourTooWeakForWater' | 'tooLittleToWeigh' | 'impossibleSchedule' |
+export type PizzaWarning = 'flourTooWeakForTime' | 'tooLittleToWeigh' | 'impossibleSchedule' |
   'moreYeastThanStyleAllows' | DoughWarning;
 
 export interface BakeAdvice {
@@ -56,6 +56,8 @@ export interface PizzaResult {
   waterTemperatureC: number;
   bake: BakeAdvice;
   warnings: PizzaWarning[];
+  /** The water in % of the flour, when the flour takes another amount than the style's own. */
+  waterForFlour?: {percent: number, stylePercent: number};
 }
 
 export const AMOUNT_MODES: readonly AmountMode[] = ['balls', 'pizzas', 'trays', 'flour'];
@@ -75,14 +77,26 @@ export const amountModesOf = (style: PizzaStyle): AmountMode[] => {
 };
 
 /**
- * A style's dough formula: the median of what its sources say. Neapolitan salt follows its water.
+ * The flour a style's recipes use, whose water its hydration is.
  *
  * @param {PizzaStyle} style the style
+ * @return {PizzaFlour} its flour
+ */
+const styleFlour = (style: PizzaStyle): PizzaFlour => STYLES[style].flour ?? 'tipo00';
+
+/**
+ * A style's dough formula: the median of what its sources say. Every flour takes its own amount of water, so another
+ * flour gets the style's water in proportion to the most its recipes take. Neapolitan salt follows its water.
+ *
+ * @param {PizzaStyle} style the style
+ * @param {PizzaFlour} flour the flour used
  * @return {object} hydration, salt, oil and sugar as fractions of the flour
  */
-export const styleFormula = (style: PizzaStyle) => {
+export const styleFormula = (style: PizzaStyle, flour: PizzaFlour = styleFlour(style)) => {
   const data = STYLES[style];
-  const hydration = requiredMedian(data.hydration, `the hydration of ${style}`) / 100;
+  const takes = (of: PizzaFlour) => requiredMedian(FLOURS[of].maxHydration, `the water ${of} takes`);
+  const hydration = requiredMedian(data.hydration, `the hydration of ${style}`) / 100 * takes(flour) /
+    takes(styleFlour(style));
   const saltPerLitre = median(data.saltPerLitreWater ?? []);
   return {
     hydration,
@@ -286,7 +300,7 @@ const CALIBRATIONS = Object.fromEntries(PIZZA_STYLES.map((style) =>
  * @return {PizzaResult} the dough
  */
 export const calculatePizza = (inputs: PizzaInputs): PizzaResult => {
-  const formula = styleFormula(inputs.style);
+  const formula = styleFormula(inputs.style, inputs.flour);
   const warnings: PizzaWarning[] = [];
   const stages = pizzaStages(inputs);
   const targetC = recommendedDoughC('pizza', stages);
@@ -303,11 +317,6 @@ export const calculatePizza = (inputs: PizzaInputs): PizzaResult => {
   const maxHours = maxHoursOf(inputs);
   if (maxHours != null && totalHours(stages) > maxHours) {
     warnings.push('flourTooWeakForTime');
-  }
-  const maxHydration = median(FLOURS[inputs.flour].maxHydration);
-  // The style's own flour takes its water: its recipes use it so.
-  if (maxHydration != null && formula.hydration * 100 > maxHydration && inputs.flour !== STYLES[inputs.style].flour) {
-    warnings.push('flourTooWeakForWater');
   }
   const data = STYLES[inputs.style];
   const freshYeast = inputs.leavener === 'sourdough' ? 0 : convertYeast(leavenerPct, inputs.leavener, 'fresh');
@@ -332,5 +341,12 @@ export const calculatePizza = (inputs: PizzaInputs): PizzaResult => {
     waterTemperatureC,
     bake: bakeAdvice(inputs),
     warnings,
+    waterForFlour: waterForFlour(inputs, formula.hydration),
   };
+};
+
+const waterForFlour = (inputs: PizzaInputs, hydration: number): PizzaResult['waterForFlour'] => {
+  const percent = Math.round(hydration * 100);
+  const stylePercent = Math.round(styleFormula(inputs.style).hydration * 100);
+  return percent !== stylePercent ? {percent, stylePercent} : undefined;
 };

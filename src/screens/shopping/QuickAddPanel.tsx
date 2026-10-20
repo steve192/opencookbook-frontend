@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {ShoppingItemTile} from '../../components/shopping/ShoppingItemTile';
 import {Aisle} from '../../api/aisles';
 import {ShoppingItem, ShoppingTile} from '../../api/types/shopping';
@@ -10,6 +10,7 @@ import {TYPED_TILE_KEY} from '../../helper/shopping/tileKeys';
 import {searchTiles, tileName, typedEntry} from '../../helper/shopping/tiles';
 import {TileGrid} from './TileGrid';
 import {VirtualTileGrid} from './VirtualTileGrid';
+import {AppScrollView} from '../../components/AppScrollView';
 
 // A tile to add from: a known tile, or what is typed, which the server places.
 interface Offer {
@@ -67,7 +68,7 @@ export const QuickAddPanel = (props: Props) => {
     [] : [{key: TYPED_TILE_KEY, name: entry.name, aisle: 'OTHER', icon: null}];
   const fitting = searchTiles(props.tiles, entry.name, language).map((tile) => offerOf(tile, language));
   return (
-    <ScrollView contentContainerStyle={styles.panel} keyboardShouldPersistTaps="always">
+    <AppScrollView contentContainerStyle={styles.panel} keyboardShouldPersistTaps="always">
       {recent.length > 0 &&
         <TileGrid items={recent} keyOf={itemKey} renderTile={(item) => (
           <ShoppingItemTile name={item.name} icon={item.icon} aisle={item.aisle} muted
@@ -75,7 +76,7 @@ export const QuickAddPanel = (props: Props) => {
             onPress={() => props.onRestore(item, item.id)} />
         )} />}
       <TileGrid items={[...typedOffer, ...fitting]} keyOf={offerKey} renderTile={renderOffer} />
-    </ScrollView>
+    </AppScrollView>
   );
 };
 

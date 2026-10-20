@@ -990,7 +990,8 @@
       "shareLink": "Link teilen",
       "copied": "Kopiert",
       "ingredients": "Zutaten",
-      "preparation": "Zubereitung"
+      "preparation": "Zubereitung",
+      "disclaimer": "Richtwerte aus veröffentlichten Rezepten und Ratgebern, keine Garantie: Zutaten, Geräte und Küchen sind verschieden. Verlass dich nicht blind darauf."
     },
     "signupHint": {
       "title": "CookPal kann noch mehr",
@@ -1097,23 +1098,22 @@
         "steel": "einen Pizzastahl"
       },
       "bakeValueOrLess": "{{temperature}}, {{duration}} oder weniger",
-      "bakeValueAtLeast": "{{temperature}}, mindestens {{duration}}"
+      "bakeValueAtLeast": "{{temperature}}, mindestens {{duration}}",
+      "waterForFlour": "{{flour}} nimmt {{direction}} Wasser auf als das Mehl der Rezepte: Der Teig bekommt {{percent}} % statt {{stylePercent}} %. Halte etwas Wasser zurück und gib es nach Gefühl dazu.",
+      "waterDirection": {
+        "more": "mehr",
+        "less": "weniger"
+      }
     },
     "bread": {
       "name": "Brot & Sauerteig",
-      "summary": "Sauerteig-, Roggen-, Hybrid- oder Hefebrot mit Zutaten, Quellstück und Zeitplan",
-      "type": "Brot",
-      "types": {
-        "wheatSourdough": "Weizen- oder Dinkelsauerteig",
-        "ryeMixed": "Roggen- & Roggenmischbrot",
-        "hybrid": "Sauerteig mit Hefe",
-        "yeast": "Hefebrot"
-      },
+      "summary": "Sauerteig-, Roggen- oder Hefebrot mit Zutaten, Sauer, Quellstück, Zeitplan und Anleitung",
       "flourMixHint": "Die Anteile ergeben zusammen 100 %; das Wasser richtet sich danach, wie viel jedes Mehl aufnimmt.",
       "share": "Anteil",
       "addFlour": "Mehl hinzufügen",
       "removeFlour": "Mehl entfernen",
       "hydration": "Wasser",
+      "hydrationInfo": "Bäcker geben das Wasser in Prozent des Mehls an: 63 % heißt 63 g Wasser auf 100 g Mehl. Oft steht stattdessen die Teigausbeute, kurz TA: das Gewicht des Teigs aus 100 g Mehl. TA 163 ist also dasselbe wie 63 % Wasser. Je höher der Wert, desto weicher der Teig.",
       "hydrationHint": "In % des Mehls; Teigausbeute (TA) {{yield}}.",
       "hydrationValue": "{{percent}} % (TA {{yield}})",
       "doughWater": "Wasser im Teig",
@@ -1128,8 +1128,6 @@
       "loafWeight": "Gewicht pro Brot",
       "loaves_one": "{{count}} Brot",
       "loaves_other": "{{count}} Brote",
-      "hybridStarter": "Sauerteig",
-      "hybridStarterHint": "In % des Mehls. Hefe gleicht aus, was dem Sauerteig für den Zeitplan fehlt.",
       "additions": "Zutaten",
       "additionsHint": "Sie zählen zum Brotgewicht, mehr davon heißt also weniger Mehl. Ihr Wasser geht in den Teig: das von Quark oder Ei ganz, das von Obst und Gemüse, soweit es frei wird, gekocht oder püriert viel mehr. Saaten und Körner kommen in ein Quellstück.",
       "searchAddition": "Kürbis, Quark, Saaten hinzufügen…",
@@ -1138,8 +1136,7 @@
       "waterGiven": "{{percent}} % Wasser, davon gehen {{grams}} g pro 100 g in den Teig",
       "waterBound": "{{percent}} % Wasser, die Stärke bindet {{grams}} g Teigwasser pro 100 g",
       "soaks": "Nimmt {{grams, number}} g Wasser pro Gramm auf",
-      "ryeSchedule": "Roggen braucht einen Sauerteig, angesetzt am Vortag. Der Teig geht dann so schnell, wie der Sauer es zulässt.",
-      "sourTitle": "Sauerteig (am Vortag)",
+      "sourTitle": "Am Vortag: Sauer ansetzen",
       "sourFlour": "Roggenmehl",
       "sourStarter": "Anstellgut",
       "sourTime": "Reift",
@@ -1147,24 +1144,63 @@
       "soakerTitle": "Quellstück",
       "soakerTime": "Quillt",
       "soakerTimeValue": "etwa {{hours, number}} Std.",
-      "startSour": "Sauerteig ansetzen",
+      "startSour": "Sauer ansetzen",
       "startSoaker": "Quellstück ansetzen",
-      "resultTitle": "{{type}}",
       "ownHydration": "Wassermenge selbst wählen",
       "recommendedHydration": "Der Rechner nimmt {{percent}} % Wasser (TA {{yield}}), was Bäcker für diese Mehlmischung empfehlen.",
-      "typeDescriptions": {
-        "wheatSourdough": "Weizen- oder Dinkelteig, nur mit reifem Anstellgut gelockert.",
-        "ryeMixed": "Roggen braucht Säure, deshalb kommt ein Teil des Roggens am Vortag in einen Sauerteig.",
-        "hybrid": "Anstellgut plus etwas Hefe, die ergänzt, was dem Anstellgut für den Zeitplan fehlt.",
-        "yeast": "Nur mit Backhefe gelockert."
-      },
       "preparations": {
         "raw": "Roh, geraspelt oder in Stücken",
         "cooked": "Gekocht oder püriert"
       },
       "flourTakes": "Rezepte geben ihm etwa {{water}} % Wasser.",
       "flourN": "Mehl {{n}}",
-      "flourMaxShare": "Rezepte nehmen davon höchstens {{share}} % des Mehls."
+      "flourMaxShare": "Rezepte nehmen davon höchstens {{share}} % des Mehls.",
+      "method": "Zubereitung",
+      "methods": {
+        "starter": "Sauerteig direkt",
+        "sour": "Sauer am Vortag",
+        "yeast": "Nur Hefe"
+      },
+      "methodDescriptions": {
+        "starter": "Reifes Anstellgut kommt direkt in den Teig. So entstehen die meisten Weizen- und Dinkelsauerteigbrote.",
+        "sour": "Ein Teil des Roggens reift am Vortag mit etwas Anstellgut zum Sauer, der dann ganz in den Teig kommt. Roggen braucht diese Säure, um zu backen.",
+        "yeast": "Nur mit Backhefe gelockert, ohne Sauerteig."
+      },
+      "sourNeedsRye": "Mit Roggen im Mehl kannst du auch einen Sauer am Vortag ansetzen.",
+      "withYeast": "Mit etwas Hefe",
+      "withYeastHint": "Hefe gleicht aus, was dem Sauerteig für deinen Zeitplan fehlt. So geht der Teig schneller und verlässlicher.",
+      "starterPercent": "Anstellgut",
+      "starterPercentHint": "In % des Mehls. Die Hefe gleicht aus, was ihm für den Zeitplan fehlt.",
+      "inDough": {
+        "starter": "Reifes Anstellgut",
+        "sour": "Der ganze Sauer vom Vortag"
+      },
+      "resultTitles": {
+        "starter": "Sauerteigbrot",
+        "sour": "Brot mit Roggensauer",
+        "yeast": "Hefebrot"
+      },
+      "resultWithYeast": "{{bread}} mit etwas Hefe",
+      "stepsTitle": "So backst du es",
+      "steps": {
+        "sour": "Am Vortag den Sauer ansetzen: das Anstellgut im Wasser verrühren, das Roggenmehl untermischen und zugedeckt reifen lassen. Am nächsten Tag kommt der ganze Sauer in den Teig.",
+        "soaker": "Am Vortag die Saaten mit dem Wasser des Quellstücks übergießen und zugedeckt quellen lassen.",
+        "mixRye": "Alle Zutaten nur so lange mischen, bis der Teig gleichmäßig ist. Roggenteig wird nicht geknetet und bleibt klebrig.",
+        "knead": "Alle Zutaten {{minutes, number}} Min. kneten, bis der Teig glatt ist und sich vom Schüsselrand löst.",
+        "fold": "Zugedeckt gehen lassen und dabei {{count, number}}-mal im Abstand von 30 Min. dehnen und falten: den Teig an einer Seite hochziehen, über die Mitte legen, und so rundum.",
+        "rise": "Zugedeckt gehen lassen, wie im Zeitplan.",
+        "shape": "Etwa {{hours, number}} Std. vor dem Backen zu einem Laib formen, mit dem Schluss nach oben in ein bemehltes Gärkörbchen oder in eine Kastenform legen und zugedeckt fertig gehen lassen.",
+        "bake": "Den Ofen mit Blech oder Topf auf {{start}} Ober- und Unterhitze vorheizen. Das Brot einschneiden und mit Dampf backen: eine Schale Wasser auf dem Ofenboden, oder mit Deckel im Topf. Nach {{after, number}} Min. auf {{lower}} herunterschalten, insgesamt etwa {{minutes, number}} Min.",
+        "done": "Fertig ist es bei etwa {{core}} im Kern, oder wenn es beim Klopfen auf die Unterseite hohl klingt. Auf einem Gitter auskühlen lassen, bevor du es anschneidest.",
+        "doneRye": "Fertig ist es bei etwa {{core}} im Kern, oder wenn es beim Klopfen auf die Unterseite hohl klingt. Auf einem Gitter ganz auskühlen lassen, bevor du es anschneidest: Roggenbrot reift dabei nach."
+      },
+      "sourHours": "Sauer reift",
+      "sourHoursHint": "Je länger er reifen darf, desto weniger Anstellgut braucht er.",
+      "hoursValue": "{{hours, number}} Std.",
+      "sourRise": "Wie lange der Teig geht",
+      "sourRiseLabel": "Bei {{temperature}}",
+      "sourRiseHint": "Ohne Hefe hebt der Sauer den Teig: Für weniger Zeit braucht es mehr Sauer. Zwischen {{low, number}} und {{high, number}} Std. bleibt die Säure so, wie Roggen sie braucht. Für einen anderen Zeitplan nimm etwas Hefe dazu.",
+      "mixOnly": "Mischen, nicht kneten"
     },
     "dough": {
       "flour": "Mehl",
@@ -1224,7 +1260,8 @@
         "fridge48": "48 Std. Kühlschrank",
         "fridge72": "72 Std. Kühlschrank",
         "custom": "Eigener",
-        "quick": "Schnell"
+        "quick": "Schnell",
+        "daylong": "Den ganzen Tag"
       },
       "stageHours": "Dauer",
       "stageTemperature": "Temperatur",
@@ -1253,7 +1290,6 @@
       "at": "bei {{temperature}}",
       "warnings": {
         "flourTooWeakForTime": "Dieses Mehl ist für kürzere Gare gemacht als dieser Zeitplan. Nimm ein stärkeres Mehl oder einen kürzeren Plan.",
-        "flourTooWeakForWater": "Dieses Mehl nimmt weniger Wasser auf, als der Teig hat. Er kann zu weich werden.",
         "tooLittleToWeigh": "Das ist weniger als 0,1 g Hefe, weniger als Küchenwaagen wiegen.",
         "impossibleSchedule": "Keine Menge Triebmittel schafft diesen Zeitplan: Er ist zu kurz oder zu kalt.",
         "soakerTooLarge": "Das Quellstück ist mehr, als der Teig tragen kann. Nimm weniger Saaten oder mehr Mehl.",
@@ -1263,8 +1299,9 @@
         "waterTooHot": "Das Wasser müsste wärmer als 45 °C sein, ab da stirbt Hefe ab. Lass das Mehl warm werden oder den Teig wärmer gehen.",
         "waterTooCold": "Das Wasser müsste kälter als Eiswasser sein. Kühle das Mehl oder knete von Hand, das wärmt den Teig weniger.",
         "tooManyAdditions": "Mehr Obst oder Gemüse als Mehl: mehr, als Rezepte nehmen, die Krume wird womöglich nicht fest und bleibt klitschig.",
-        "ryeWithoutSour": "Mit mehr als der Hälfte Roggen wird es ein Roggenbrot, und Roggen bäckt nicht mit Hefe allein. Wähle Roggen- und Mischbrot, das einen Sauerteig ansetzt.",
-        "flourShareTooHigh": "Ein Mehl mit wenig oder keinem Kleber macht mehr von der Mischung aus, als Rezepte nehmen (Gerste höchstens ein Viertel bis die Hälfte, Buchweizen, Hirse, Quinoa, Amaranth und Teff höchstens die Hälfte): Das Brot wird dicht und krümelig."
+        "ryeWithoutSour": "Mit mehr als der Hälfte Roggen wird es ein Roggenbrot, und Roggen braucht Säure. Wähle Sauer am Vortag.",
+        "flourShareTooHigh": "Ein Mehl mit wenig oder keinem Kleber macht mehr von der Mischung aus, als Rezepte nehmen (Gerste höchstens ein Viertel bis die Hälfte, Buchweizen, Hirse, Quinoa, Amaranth und Teff höchstens die Hälfte): Das Brot wird dicht und krümelig.",
+        "yeastNotNeeded": "Der Sauerteig allein lässt den Teig in dieser Zeit schon gehen, Hefe braucht es dafür nicht. Wähle einen kürzeren Zeitplan, damit die Hefe etwas beiträgt, oder lass sie weg."
       },
       "roomInfo": "Wo der Teig geht, meist in der Küche. Das Mehl gilt als genauso warm, weil es dort lagert.",
       "temperaturesInfo": "Kneten erwärmt den Teig durch Reibung, eine Küchenmaschine mehr als die Hände. Die Wassertemperatur berücksichtigt das, den Raum und das Mehl.",
@@ -1353,9 +1390,9 @@
       "time": "Zeit",
       "timeHint": "0, wenn das Rezept keine nennt.",
       "frozen": "Tiefkühlware",
-      "frozenHint": "Gleiche Temperatur wie im Ofen, etwas mehr als die halbe Zeit.",
-      "minutes_one": "{{count}} Minute",
-      "minutes_other": "{{count}} Minuten",
+      "frozenHint": "Etwa 20 °C weniger als auf der Packung und knapp zwei Drittel der Zeit.",
+      "minutes_one": "{{count, number}} Minute",
+      "minutes_other": "{{count, number}} Minuten",
       "checkEarly": "Prüfen",
       "minutesEarly_one": "{{count}} Minute früher",
       "minutesEarly_other": "{{count}} Minuten früher",
@@ -1420,7 +1457,7 @@
         "starter": "Vorspeisen",
         "main": "Hauptgang",
         "sides": "Beilagen",
-        "salad": "Salat",
+        "salad": "Gemüse und Salat",
         "bread": "Brot",
         "dessert": "Dessert"
       },
@@ -1444,8 +1481,6 @@
         "meat": "Fleisch oder Fisch",
         "vegetarianMain": "Vegetarischer Hauptgang",
         "grillMeat": "Grillfleisch",
-        "warmSides": "Kartoffeln, Nudeln, Reis",
-        "salad": "Salat",
         "vegetables": "Gemüse",
         "bread": "Brot",
         "dessert": "Dessert",
@@ -1454,9 +1489,17 @@
         "potatoes": "Kartoffeln",
         "racletteBread": "Brot",
         "fondueCheese": "Fonduekäse",
-        "fondueBread": "Brot"
+        "fondueBread": "Brot",
+        "bbqSalads": "Salate wie Kartoffel- oder Nudelsalat",
+        "pasta": "Nudeln (roh)",
+        "rice": "Reis (roh)",
+        "vegetablesToCook": "Gemüse zum Garen",
+        "rawVegetables": "Rohkost",
+        "leafSalad": "Blattsalat"
       },
       "perDish": "{{total}} ({{dish}} pro Gericht)",
+      "servings_one": "{{count}} Portion à {{size}}",
+      "servings_other": "{{count}} Portionen à {{size}}",
       "pickles": "Cornichons und Silberzwiebeln",
       "jarsEach_one": "je {{count}} Glas",
       "jarsEach_other": "je {{count}} Gläser",
@@ -1474,7 +1517,10 @@
         "bbq": "Fleisch vom Grill mit Salaten, Gemüse und Brot.",
         "raclette": "Am Tisch geschmolzener Käse, mit Kartoffeln oder Brot und was jeder mag.",
         "cheeseFondue": "Brot, am Tisch in geschmolzenen Käse getaucht."
-      }
+      },
+      "sides": "Beilagen und Gemüse",
+      "sidesHint": "Wähle, was es gibt. Mit mehreren teilt sich der Gang: Jedes bekommt das Anderthalbfache seines Anteils, weil die Gäste vom Liebsten mehr nehmen.",
+      "sidesInfo": "Für gleich viel auf dem Teller braucht es pro Erwachsenem roh etwa {{potatoes}} Kartoffeln, {{pasta}} Nudeln oder {{rice}} Reis: Nudeln und Reis quellen beim Kochen auf das Zweieinhalbfache. Beim Gemüse sind es {{vegetables}} Gemüse zum Garen, {{raw}} Rohkost oder {{leaf}} Blattsalat, denn Blattsalat ist leicht und füllt viel Platz. So geben es Portionsplaner und Ratgeber an."
     },
     "seasonalCalendar": {
       "name": "Saisonkalender",
@@ -1522,7 +1568,7 @@
     },
     "coffee": {
       "name": "Kaffee",
-      "summary": "Kaffee und Wasser für Filter, French Press, Espresso, Cold Brew und mehr",
+      "summary": "Kaffee und Wasser für Filter, French Press, Espresso, Vollautomat, Cold Brew und mehr, mit Mahlgrad, Geschmacksprofil und Anleitung",
       "method": "Zubereitung",
       "methods": {
         "pourOver": "Handfilter",
@@ -1533,13 +1579,21 @@
         "espresso": "Espresso",
         "coldBrewConcentrate": "Cold-Brew-Konzentrat",
         "coldBrewReady": "Cold Brew, trinkfertig",
-        "japaneseIced": "Japanischer Eiskaffee"
+        "japaneseIced": "Japanischer Eiskaffee",
+        "fullyAutomatic": "Kaffeevollautomat"
       },
       "strength": "Stärke",
       "strengths": {
-        "mild": "Mild",
-        "medium": "Mittel",
-        "strong": "Stark"
+        "brew": {
+          "mild": "Mild",
+          "medium": "Mittel",
+          "strong": "Stark"
+        },
+        "espresso": {
+          "mild": "Lungo",
+          "medium": "Normale",
+          "strong": "Ristretto"
+        }
       },
       "basis": "Ausgehend von",
       "bases": {
@@ -1555,17 +1609,12 @@
       "ratio": "Verhältnis",
       "ratioValue": "1 : {{water, number}}",
       "waterTemperature": "Wasser",
-      "steep": "Ziehen lassen",
-      "steepValue": {
-        "minutes": "{{low, number}} bis {{high, number}} Min.",
-        "hours": "{{low, number}} bis {{high, number}} Std."
-      },
       "dilution": "Vor dem Trinken dazugeben",
       "resultTitle": "{{method}}",
       "toWeigh": "Abwiegen",
       "brewing": "Zubereitung",
       "ratioRange": "1 : {{low, number}} bis {{high, number}}",
-      "strengthInfo": "Stark nimmt am wenigsten Wasser pro Gramm Kaffee, das Brühanleitungen für die Zubereitung nennen, mild am meisten und mittel die Mitte.",
+      "strengthInfo": "Mild, mittel und stark folgen dem, was Kaffeerechner für die Zubereitung angeben: Stark nimmt am wenigsten Wasser pro Gramm Kaffee. Beim Espresso sind es Lungo, Normale und Ristretto.",
       "methodDescriptions": {
         "pourOver": "Heißes Wasser von Hand über Kaffeepulver im Papierfilter gegossen.",
         "filterMachine": "Die Maschine tropft das heiße Wasser durch den Filter in die Kanne.",
@@ -1575,12 +1624,159 @@
         "espresso": "Eine Maschine presst heißes Wasser durch fein gemahlenen Kaffee.",
         "coldBrewConcentrate": "Stundenlang kalt angesetzt, zum Trinken verdünnt.",
         "coldBrewReady": "Stundenlang kalt angesetzt, trinkfertig.",
-        "japaneseIced": "Heiß direkt auf Eis gebrüht."
-      }
+        "japaneseIced": "Heiß direkt auf Eis gebrüht.",
+        "fullyAutomatic": "Mahlt die Bohnen und brüht auf Knopfdruck, mit Stufen für Stärke und Temperatur."
+      },
+      "beans": "Bohnen und Wasser",
+      "beansInfo": "Dunkle Röstungen geben ihr Aroma schon bei kühlerem Wasser ab, helle brauchen es heißer. Zu kühles Wasser löst zu wenig, der Kaffee schmeckt sauer; zu heißes zu viel, er wird bitter.",
+      "roasts": {
+        "light": "Hell",
+        "medium": "Mittel",
+        "dark": "Dunkel"
+      },
+      "roastWater": "Für diese Röstung: {{range}}",
+      "grind": "Mahlgrad",
+      "grinds": {
+        "extraFine": "Sehr fein",
+        "fine": "Fein",
+        "mediumFine": "Mittelfein",
+        "medium": "Mittel",
+        "mediumCoarse": "Mittelgrob",
+        "coarse": "Grob"
+      },
+      "brewTime": "Brühzeit",
+      "brewTimeValue": {
+        "clock": "{{time}} Min.",
+        "seconds": "{{value, number}} Sek.",
+        "hours": "{{value, number}} Std."
+      },
+      "taste": {
+        "title": "Geschmack",
+        "strength": "Stärke",
+        "extraction": "Extraktion",
+        "extractionValue": "etwa {{percent}} %, geschätzt",
+        "extractionInfo": "Wie viel vom Kaffeepulver sich im Wasser löst. Brühstandards streben 18 bis 22 % an: Darunter schmeckt Kaffee sauer und dünn, darüber bitter und trocken. Gemessen wird das mit einem Refraktometer; CookPal schätzt es aus Mahlgrad, Wassertemperatur, Brühzeit und Röstung, nach Messungen und Ratgebern.",
+        "profile": "Profil",
+        "strengths": {
+          "weak": "Dünn",
+          "balanced": "Ausgewogen",
+          "strong": "Kräftig"
+        },
+        "sectors": {
+          "strong": {
+            "under": "kräftig, sauer",
+            "ideal": "kräftig, rund",
+            "over": "kräftig, bitter"
+          },
+          "balanced": {
+            "under": "sauer, grasig",
+            "ideal": "ausgewogen, süß",
+            "over": "bitter, trocken"
+          },
+          "weak": {
+            "under": "dünn, sauer",
+            "ideal": "leicht, mild",
+            "over": "dünn, bitter"
+          }
+        },
+        "axisExtraction": "Extraktion in %",
+        "legend": "Wie eine Brühkontrollkarte: Nach rechts löst sich mehr aus dem Kaffeepulver (Extraktion), nach oben wird das Getränk stärker (TDS, gelöste Stoffe im Getränk). Jede Linie steht für ein Verhältnis von Kaffee zu Wasser, mit mehr Kaffee wird sie steiler. Mahlgrad, Wassertemperatur, Brühzeit, Röstung und Zubereitung verschieben deinen Kaffee entlang seiner Linie. Das grüne Feld ist ausgewogen, wie Brühstandards es empfehlen. Alle Werte sind geschätzt, nicht gemessen.",
+        "chartTitle": "Geschmacksprofil",
+        "axisStrength": "Stärke (TDS) in %",
+        "legendBrew": "Dein Kaffee",
+        "legendRatio": "Dein Verhältnis",
+        "legendOthers": "Andere Verhältnisse",
+        "legendBalanced": "Ausgewogen",
+        "enlarge": "Vergrößern"
+      },
+      "cup": "Tasse",
+      "automat": {
+        "title": "Dein Vollautomat",
+        "hint": "Jeder Vollautomat mahlt und brüht etwas anders. CookPal rechnet mit 6 bis 12 g Kaffee je nach Stärkestufe und 90 bis 95 °C: Nimm das Ergebnis als Richtung, nicht als Messung.",
+        "drinks": {
+          "espresso": "Espresso",
+          "coffee": "Kaffee"
+        },
+        "level": "Stufe {{level}} von {{levels}}, etwa {{dose}}",
+        "temperatures": {
+          "low": "Niedrig",
+          "normal": "Normal",
+          "high": "Hoch"
+        },
+        "drink": "Getränk",
+        "temperature": "Brühtemperatur",
+        "espressoHint": "Ein Vollautomat mahlt je Tasse meist weniger Kaffee als ein Siebträger und lässt mehr Wasser durch, sein Espresso wird deshalb oft dünner. Kräftiger wird er mit einer höheren Stufe, einer kleineren Tasse oder zwei Mahlgängen für eine Tasse (etwa Double Shot), wenn dein Gerät das kann."
+      },
+      "grindHint": "Empfohlen: {{grind}}. Feiner löst mehr aus dem Kaffee, gröber weniger.",
+      "machineWater": "Für diese Röstung: {{range}}. Stell es ein, wenn deine Maschine das erlaubt.",
+      "fixedWater": "Die Maschine brüht mit etwa {{range}}.",
+      "brewTimeHint": "Ratgeber: {{range}}; länger löst mehr, bis es kaum noch zunimmt.",
+      "stepsTitle": "So brühst du ihn",
+      "steps": {
+        "pourOver": [
+          "Den Papierfilter mit heißem Wasser ausspülen und das Wasser weggießen.",
+          "{{coffee}} Kaffee {{grind}} gemahlen in den Filter geben.",
+          "Mit {{bloom}} Wasser von {{temperature}} übergießen und 30 bis 45 Sekunden quellen lassen.",
+          "Den Rest in langsamen Kreisen aufgießen, bis {{water}} im Filter sind; nach etwa {{time}} ist alles durchgelaufen.",
+          "Läuft es schneller durch, mahle feiner; dauert es länger, gröber."
+        ],
+        "filterMachine": [
+          "{{water}} Wasser in den Tank füllen.",
+          "Eine Filtertüte einlegen und {{coffee}} Kaffee {{grind}} gemahlen hineingeben.",
+          "Die Maschine einschalten und durchlaufen lassen."
+        ],
+        "frenchPress": [
+          "{{coffee}} Kaffee {{grind}} gemahlen in die Kanne geben.",
+          "{{water}} Wasser von {{temperature}} aufgießen.",
+          "{{time}} ziehen lassen, dann die Kruste mit einem Löffel aufbrechen und Schaum und schwimmende Teilchen abschöpfen.",
+          "Ein paar Minuten setzen lassen, den Stempel nur bis zur Oberfläche drücken und vorsichtig ausgießen.",
+          "Gleich ausschenken: In der Kanne zieht er weiter und wird bitter."
+        ],
+        "aeroPress": [
+          "{{coffee}} Kaffee {{grind}} gemahlen hineingeben.",
+          "{{water}} Wasser von {{temperature}} aufgießen und 10 Sekunden umrühren.",
+          "Den Stempel aufsetzen und nach insgesamt etwa {{time}} sanft in 20 bis 30 Sekunden herunterdrücken."
+        ],
+        "moka": [
+          "Den Wasserkessel bis knapp unter das Ventil mit Wasser füllen.",
+          "Den Trichter mit {{coffee}} Kaffee {{grind}} gemahlen füllen, nicht andrücken.",
+          "Auf mittlerer Hitze erhitzen und vom Herd nehmen, sobald kein Kaffee mehr nachfließt."
+        ],
+        "espresso": [
+          "{{coffee}} Kaffee {{grind}} mahlen, im Siebträger gleichmäßig verteilen und gerade tampen.",
+          "Den Bezug starten und nach etwa {{time}} bei {{water}} in der Tasse stoppen.",
+          "Läuft er schneller, mahle feiner; läuft er langsamer, gröber."
+        ],
+        "fullyAutomatic": [
+          "Stärke, Tassengröße und Temperatur einstellen.",
+          "Den Mahlgrad nur verstellen, während das Mahlwerk läuft: Im Stillstand kann es Schaden nehmen.",
+          "Tropft der Kaffee nur, stell gröber; läuft er schnell und wässrig durch, feiner.",
+          "Für dunkle Röstungen die Temperatur eine Stufe senken."
+        ],
+        "coldBrewConcentrate": [
+          "{{coffee}} Kaffee {{grind}} mahlen und mit {{water}} kaltem Wasser verrühren.",
+          "Abgedeckt etwa {{time}} im Kühlschrank ziehen lassen.",
+          "Durch ein Sieb mit Papierfilter abgießen, ohne zu drücken.",
+          "Vor dem Trinken mit {{dilution}} Wasser verdünnen. Im Kühlschrank hält sich das Konzentrat etwa zwei Wochen."
+        ],
+        "coldBrewReady": [
+          "{{coffee}} Kaffee {{grind}} mahlen und mit {{water}} kaltem Wasser verrühren.",
+          "Abgedeckt etwa {{time}} im Kühlschrank ziehen lassen.",
+          "Durch ein Sieb mit Papierfilter abgießen, ohne zu drücken.",
+          "Im Kühlschrank hält er sich etwa eine Woche."
+        ],
+        "japaneseIced": [
+          "{{ice}} Eis in die Kanne geben.",
+          "{{coffee}} Kaffee {{grind}} gemahlen in den Filter geben, mit {{bloom}} heißem Wasser von {{temperature}} übergießen und 30 bis 45 Sekunden quellen lassen.",
+          "Das restliche heiße Wasser aufgießen, bis {{water}} im Filter sind, und durchlaufen lassen.",
+          "Die Kanne schwenken, bis das Eis geschmolzen ist."
+        ]
+      },
+      "waterTemperatureTitle": "Wassertemperatur"
     },
     "tea": {
       "name": "Tee",
-      "summary": "Menge, Wassertemperatur und Ziehzeit, mit Timer",
+      "summary": "Menge, Wassertemperatur und Ziehzeit, heiß, kalt oder als Eistee, mit Aufgüssen und Timer",
       "type": "Tee",
       "types": {
         "black": "Schwarztee",
@@ -1589,19 +1785,16 @@
         "herbal": "Kräuter- & Früchtetee",
         "rooibos": "Rooibos",
         "matchaUsucha": "Matcha (Usucha)",
-        "matchaKoicha": "Matcha (Koicha)"
+        "matchaKoicha": "Matcha (Koicha)",
+        "oolong": "Oolong"
       },
       "water": "Wasser",
-      "iced": "Eistee",
-      "icedHint": "Doppelt so stark aufgießen und über die gleiche Menge Eis gießen.",
       "tea": "Tee",
       "waterTemperature": "Wasser",
       "steep": "Ziehen lassen",
       "minutes": "{{low, number}} bis {{high, number}} Min.",
       "whisk": "Aufschlagen, nicht ziehen lassen",
       "ice": "Eis",
-      "timerLabel": "{{minutes, number}} Min.",
-      "resultTitle": "{{type}}",
       "toWeigh": "Abwiegen",
       "brewing": "Zubereitung",
       "howMuch": "Wie viel",
@@ -1612,8 +1805,63 @@
         "herbal": "Getrocknete Kräuter, Blüten oder Früchte, ohne Teeblätter.",
         "rooibos": "Rotbusch aus Südafrika, ohne Koffein.",
         "matchaUsucha": "Dünner Matcha: grünes Teepulver mit mehr Wasser aufgeschlagen.",
-        "matchaKoicha": "Dicker Matcha: mehr Pulver und wenig Wasser."
-      }
+        "matchaKoicha": "Dicker Matcha: mehr Pulver und wenig Wasser.",
+        "oolong": "Teilweise oxidierte Teeblätter, zwischen grün und schwarz, oft gerollt."
+      },
+      "method": "Zubereitung",
+      "methods": {
+        "hot": "Heiß",
+        "coldBrew": "Cold Brew",
+        "iced": "Eistee"
+      },
+      "methodHints": {
+        "hot": "Klassisch mit heißem Wasser aufgegossen.",
+        "coldBrew": "Mit kaltem Wasser angesetzt und für Stunden in den Kühlschrank gestellt: milder, kaum bitter.",
+        "iced": "Heiß und doppelt so stark aufgegossen, dann über die gleiche Menge Eis."
+      },
+      "strength": "Stärke",
+      "strengthHint": "Wie viel Tee auf das Wasser kommt: mehr Blätter, mehr von allem.",
+      "strengths": {
+        "light": "Mild",
+        "normal": "Normal",
+        "strong": "Kräftig"
+      },
+      "coldWater": "Kalt",
+      "inTheFridge": "Etwa {{hours, number}} Std. im Kühlschrank",
+      "infusions": "Aufgüsse",
+      "infusionsValue_one": "{{count}} Aufguss",
+      "infusionsValue_other": "{{count}} Aufgüsse",
+      "infusion": "{{n}}. Aufguss",
+      "clock": "{{minutes}}:{{seconds}} Min.",
+      "resultTitles": {
+        "hot": "{{type}}",
+        "coldBrew": "{{type}} als Cold Brew",
+        "iced": "{{type}} als Eistee"
+      },
+      "amountAndTimeInfo": "Menge und Ziehzeit wirken verschieden. Die Menge bestimmt, wie konzentriert der ganze Tee ist: Mehr Blätter geben mehr von allem, im gleichen Verhältnis. Die Ziehzeit verändert die Mischung: Koffein, Aroma und die süßlichen Aminosäuren lösen sich in den ersten ein bis drei Minuten, Gerbstoffe kommen bis etwa sechs bis acht Minuten nach. Kurz gezogen schmeckt Tee frisch und leicht, länger voller und herber, danach nur noch bitterer. Kräuter- und Früchtetee haben kaum Gerbstoffe: Länger heißt dort vor allem kräftiger.",
+      "steepTime": "Ziehzeit",
+      "steepFor": "Ziehen lassen",
+      "steepTimeHint": "Kürzer: frischer und leichter. Länger: voller und herber, über die Empfehlung hinaus nur noch bitterer.",
+      "steepTimeHintHerbs": "Kürzer: milder. Länger: kräftiger im Geschmack.",
+      "steepGuides": "Ratgeber empfehlen {{low}} bis {{high}}",
+      "taste": "Geschmack",
+      "tasteValue": "{{strength}}, {{steep}}",
+      "strengthTastes": {
+        "light": "Mild",
+        "normal": "Ausgewogen",
+        "strong": "Kräftig"
+      },
+      "steepTastes": {
+        "fresh": "frisch und leicht",
+        "full": "voll und herb",
+        "bitter": "bitter, länger als empfohlen",
+        "mild": "eher mild",
+        "strong": "kräftig im Geschmack",
+        "intense": "sehr intensiv, länger als empfohlen",
+        "round": "rund"
+      },
+      "infusionsInfo": "Gute Teeblätter lassen sich mehrmals aufgießen, diese hier etwa {{count}}-mal. Weil sie jedes Mal weniger abgeben, lässt du jeden weiteren Aufguss etwa {{seconds}} Sekunden länger ziehen als den davor. Schmeckt er dünn, sind die Blätter ausgelaugt.",
+      "rawHerbsWarning": "Kräuter, Früchte und Rooibos werden nur getrocknet, nicht erhitzt, und können Keime tragen, die erst kochendes Wasser abtötet. Verbraucherschützer raten deshalb: mit sprudelnd kochendem Wasser aufgießen, mindestens 5 Minuten ziehen lassen und dann abkühlen. Kalt ansetzen nur Tees, die ausdrücklich für Cold Brew verkauft werden."
     },
     "ownValue": "Eigene",
     "fewer": "Weniger",

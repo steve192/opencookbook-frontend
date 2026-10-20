@@ -1,5 +1,5 @@
 import {ImageSourcePropType} from 'react-native';
-import {BreadType} from '../../tools/bread/bread';
+import {BreadMethod} from '../../tools/bread/bread';
 import {CoffeeMethod} from '../../tools/coffee/coffee';
 import {DoughLeavener} from '../../tools/dough/dough';
 import {PartyEvent} from '../../tools/party/partyData';
@@ -28,11 +28,10 @@ export const LEAVENER_PHOTOS: Record<DoughLeavener, ImageSourcePropType> = {
   sourdough: require('../../../assets/tools/leaveners/sourdough.webp'),
 };
 
-export const BREAD_TYPE_PHOTOS: Record<BreadType, ImageSourcePropType> = {
-  wheatSourdough: require('../../../assets/tools/bread-types/wheatSourdough.webp'),
-  ryeMixed: require('../../../assets/tools/bread-types/ryeMixed.webp'),
-  hybrid: require('../../../assets/tools/bread-types/hybrid.webp'),
-  yeast: require('../../../assets/tools/bread-types/yeast.webp'),
+export const BREAD_METHOD_PHOTOS: Record<BreadMethod, ImageSourcePropType> = {
+  starter: require('../../../assets/tools/bread-methods/starter.webp'),
+  sour: require('../../../assets/tools/bread-methods/sour.webp'),
+  yeast: require('../../../assets/tools/bread-methods/yeast.webp'),
 };
 
 export const COFFEE_METHOD_PHOTOS: Record<CoffeeMethod, ImageSourcePropType> = {
@@ -42,6 +41,7 @@ export const COFFEE_METHOD_PHOTOS: Record<CoffeeMethod, ImageSourcePropType> = {
   aeroPress: require('../../../assets/tools/coffee-methods/aeroPress.webp'),
   moka: require('../../../assets/tools/coffee-methods/moka.webp'),
   espresso: require('../../../assets/tools/coffee-methods/espresso.webp'),
+  fullyAutomatic: require('../../../assets/tools/coffee-methods/fullyAutomatic.webp'),
   coldBrewConcentrate: require('../../../assets/tools/coffee-methods/coldBrewConcentrate.webp'),
   coldBrewReady: require('../../../assets/tools/coffee-methods/coldBrewReady.webp'),
   japaneseIced: require('../../../assets/tools/coffee-methods/japaneseIced.webp'),
@@ -51,6 +51,7 @@ export const TEA_TYPE_PHOTOS: Record<TeaType, ImageSourcePropType> = {
   black: require('../../../assets/tools/tea-types/black.webp'),
   green: require('../../../assets/tools/tea-types/green.webp'),
   white: require('../../../assets/tools/tea-types/white.webp'),
+  oolong: require('../../../assets/tools/tea-types/oolong.webp'),
   herbal: require('../../../assets/tools/tea-types/herbal.webp'),
   rooibos: require('../../../assets/tools/tea-types/rooibos.webp'),
   matchaUsucha: require('../../../assets/tools/tea-types/matchaUsucha.webp'),

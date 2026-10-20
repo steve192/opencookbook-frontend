@@ -16,10 +16,10 @@ export type BaseNavigatorProps = {
     ToolsOverviewScreen: undefined
     /** `i` holds the inputs as JSON, so a link reopens the same calculation. */
     ToolScreen: { slug: string, i?: string }
-    // Holds the login stack until somebody is signed in and the main one afterwards. Typed
-    // as the main one so that reaching a screen from outside the app - from a notification,
-    // say - is checked rather than cast away.
-    default: NavigatorScreenParams<MainNavigationProps> | undefined
+    // Holds the login stack until somebody is signed in and the main one afterwards. Typed as
+    // either, so that reaching a screen from outside the app - from a notification, say - is
+    // checked rather than cast away.
+    default: NavigatorScreenParams<MainNavigationProps> | NavigatorScreenParams<LoginNavigationProps> | undefined
 }
 export type LoginNavigationProps = {
     /** The address of a new account, filled in so that signing in is the next thing to do. */

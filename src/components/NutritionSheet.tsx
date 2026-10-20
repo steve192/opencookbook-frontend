@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Linking, ScrollView, StyleSheet, View} from 'react-native';
+import {Linking, StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Button, Divider, Icon, IconButton, Modal, Portal, Text, TouchableRipple} from 'react-native-paper';
 import {NutritionLine, NutritionSummary, RecipeNutrition} from '../api/types/nutrition';
 import {errorMessageKey} from '../helper/apiErrorMessage';
@@ -9,6 +9,7 @@ import {useIsOnline} from '../offline/useIsOnline';
 import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
 import {IngredientLinkDialog} from './IngredientLinkDialog';
 import {OwnPortionDialog} from './OwnPortionDialog';
+import {AppScrollView} from './AppScrollView';
 
 export interface NutritionSheetProps {
   summary: NutritionSummary;
@@ -55,7 +56,7 @@ export const NutritionSheet = (props: Props) => {
           <Text variant="titleLarge" style={styles.title}>{t('nutrition.sheetTitle')}</Text>
           <IconButton icon="close" accessibilityLabel={t('common.close')} onPress={props.onDismiss} />
         </View>
-        <ScrollView contentContainerStyle={styles.body} testID='nutrition-sheet'>
+        <AppScrollView contentContainerStyle={styles.body} testID='nutrition-sheet'>
           <Text variant="bodySmall" style={{color: theme.colors.onSurfaceVariant}}>{t('nutrition.estimateNotice')}</Text>
           <SummaryNotice summary={summary} canCorrect={props.canCorrect} />
           {summary.status !== 'UNAVAILABLE' && <ValueTable summary={summary} scaledServings={props.scaledServings} />}
@@ -101,7 +102,7 @@ export const NutritionSheet = (props: Props) => {
               ))}
             </View>
           }
-        </ScrollView>
+        </AppScrollView>
       </Modal>
       {correcting?.ingredientId != null &&
         <IngredientLinkDialog

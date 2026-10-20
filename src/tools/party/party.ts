@@ -1,8 +1,9 @@
 import {asRawInputs, RawInputs, readBoolean, readChoice, readNumber} from '../inputs';
-import {median, medianRange, midpoint, Range} from '../sources';
-import {Accompaniment, ACCOMPANIMENTS, COURSES, Course, DRINKINGS, Drinking, DRINKS, ENERGY, EXTRA_COURSES,
-  FILLER_COURSES, FILLERS, GUEST_GROUPS, GuestGroup, ItemData, MENUS, PARTY_EVENTS, PartyEvent, PartyItem,
-  PICKLE_JARS_PER_GUEST, RESERVE, SHARE_PER_DISH, WITHOUT_EXTRA_COURSE} from './partyData';
+import {median, medianRange, midpoint, Range, requiredMedian} from '../sources';
+import {Accompaniment, ACCOMPANIMENTS, CHILDREN_OF_ADULT, COURSES, Course, DRINKINGS, Drinking, DRINKS, ENERGY,
+  EXTRA_COURSES, FILLER_COURSES, FILLERS, GUEST_GROUPS, GuestGroup, ItemData, MENUS, PARTY_EVENTS, PartyEvent,
+  PartyItem, PICKLE_JARS_PER_GUEST, RESERVE, SHARE_PER_DISH, SIDE_PORTIONS, Starch, STARCHES, Vegetable, VEGETABLES,
+  WITHOUT_EXTRA_COURSE} from './partyData';
 
 export type Appetite = 'light' | 'normal' | 'hearty';
 
@@ -19,6 +20,9 @@ export interface PartyInputs {
   courses: Course[];
   /** What a raclette is eaten with. */
   accompaniments: Accompaniment[];
+  /** What the warm sides and the vegetables are; never empty. */
+  starches: Starch[];
+  vegetables: Vegetable[];
   /** Dishes per course on the table. */
   dishes: number;
   reserve: boolean;
@@ -28,12 +32,17 @@ export interface PartyInputs {
   drinking: Drinking;
 }
 
+/** The courses served as what the host picks. */
+type ChosenCourse = 'warmSides' | 'salad';
+
 export interface PartyLine {
-  item: PartyItem;
+  item: Exclude<PartyItem, ChosenCourse>;
   course: Course;
   grams: number;
   /** Each dish of a course with several, when there are. */
   gramsPerDish?: number;
+  /** Starters and desserts, as servings of what an adult eats. */
+  servings?: {count: number, grams: number};
 }
 
 export interface PartyResult {
@@ -61,13 +70,16 @@ const PICK: Record<Appetite, (range: Range) => number> = {
 const energy = (group: GuestGroup) => median(ENERGY[group])!;
 
 /**
- * How much a guest of a group eats compared with an average adult: their energy needs, relative to the
- * mean of men and women.
+ * How much a guest of a group eats compared with an average adult: their energy needs, relative to the mean of men
+ * and women; for children together with what party calculators give them.
  *
  * @param {GuestGroup} group the group
  * @return {number} the factor
  */
-export const appetiteFactor = (group: GuestGroup): number => energy(group) / ((energy('men') + energy('women')) / 2);
+export const appetiteFactor = (group: GuestGroup): number => {
+  const byEnergy = energy(group) / ((energy('men') + energy('women')) / 2);
+  return group === 'children' ? requiredMedian([byEnergy, ...CHILDREN_OF_ADULT], 'a child\'s share') : byEnergy;
+};
 
 /**
  * The courses an event serves that the host can switch on and off; a raclette's sides are its accompaniments.
@@ -87,6 +99,8 @@ export const DEFAULT_PARTY_INPUTS: PartyInputs = {
   appetite: 'normal',
   courses: [...COURSES],
   accompaniments: ['potatoes', 'vegetables', 'pickles'],
+  starches: ['potatoes'],
+  vegetables: ['vegetablesToCook', 'leafSalad'],
   dishes: 1,
   reserve: true,
   beerShare: 50,
@@ -96,6 +110,11 @@ export const DEFAULT_PARTY_INPUTS: PartyInputs = {
 
 const knownOf = <T, >(raw: unknown, known: readonly T[], fallback: T[]): T[] =>
   Array.isArray(raw) ? known.filter((value) => (raw as unknown[]).includes(value)) : fallback;
+
+const someOf = <T, >(raw: unknown, known: readonly T[], fallback: T[]): T[] => {
+  const chosen = knownOf(raw, known, fallback);
+  return chosen.length > 0 ? chosen : fallback;
+};
 
 export const parsePartyInputs = (raw: unknown): PartyInputs => {
   const fields = asRawInputs(raw);
@@ -111,6 +130,8 @@ export const parsePartyInputs = (raw: unknown): PartyInputs => {
     appetite: readChoice(fields, 'appetite', APPETITES, d.appetite),
     courses: knownOf(fields.courses, COURSES, d.courses),
     accompaniments: knownOf(fields.accompaniments, ACCOMPANIMENTS, d.accompaniments),
+    starches: someOf(fields.starches, STARCHES, d.starches),
+    vegetables: someOf(fields.vegetables, VEGETABLES, d.vegetables),
     dishes: Math.round(readNumber(fields, 'dishes', d.dishes, 1, 10)),
     reserve: readBoolean(fields, 'reserve', d.reserve),
     beerShare: readNumber(fields, 'beerShare', d.beerShare, 0, 100),
@@ -118,6 +139,44 @@ export const parsePartyInputs = (raw: unknown): PartyInputs => {
     drinking: readChoice(fields, 'drinking', DRINKINGS, d.drinking),
   };
 };
+
+/**
+ * A side of a food per adult, raw or dry, as the portion guides give it.
+ *
+ * @param {Starch | Vegetable} food the food
+ * @return {number} grams
+ */
+export const portion = (food: Starch | Vegetable): number =>
+  requiredMedian(SIDE_PORTIONS[food], `a side of ${food}`);
+
+/**
+ * Whether an event serves warm sides and vegetables the host picks.
+ *
+ * @param {PartyEvent} event the event
+ * @return {object} for each, whether its menu has it
+ */
+export const choosableSides = (event: PartyEvent) => ({
+  starches: MENUS[event].some((data) => data.item === 'warmSides'),
+  vegetables: MENUS[event].some((data) => data.item === 'salad'),
+});
+
+/**
+ * The foods a course is served as, each with its share of the course in its own weight: what replaces the course's
+ * measure on the plate, and with several, 1.5 times an even share each, as dishes of a course.
+ *
+ * @param {ChosenCourse} item the course
+ * @param {PartyInputs} inputs the party
+ * @return {Array} the foods
+ */
+const servedAs = (item: ChosenCourse, inputs: PartyInputs): {food: Starch | Vegetable, factor: number}[] => {
+  const course = item === 'warmSides' ? {measure: 'potatoes' as const, foods: inputs.starches} :
+    {measure: 'vegetablesToCook' as const, foods: inputs.vegetables};
+  const share = course.foods.length > 1 ? SHARE_PER_DISH / course.foods.length : 1;
+  return course.foods.map((food) => ({food, factor: portion(food) / portion(course.measure) * share}));
+};
+
+/** Courses a host plans as servings of a recipe. */
+const IN_SERVINGS: readonly Course[] = ['starter', 'dessert'];
 
 const served = (data: ItemData, inputs: PartyInputs) => data.accompaniment ?
   inputs.accompaniments.includes(data.accompaniment) : inputs.courses.includes(data.course);
@@ -155,8 +214,9 @@ const perAdult = (inputs: PartyInputs): {data: ItemData, grams: number}[] => {
 };
 
 /**
- * The drinks for a party: one allowance of alcohol per adult who drinks, as beer, as wine or split between both,
- * drunk instead of soft drinks. Shares above 100 % together mean that many adults drink both.
+ * The drinks for a party: half a litre per guest and hour in all, and one allowance of alcohol per adult who drinks,
+ * as beer, as wine or split between both, drunk instead of water and soft drinks. Shares above 100 % together mean
+ * that many adults drink both.
  *
  * @param {PartyInputs} inputs the party
  * @return {object} litres of soft drinks, water, beer and wine
@@ -170,7 +230,7 @@ const planDrinks = (inputs: PartyInputs) => {
   const allowance = (median(DRINKS.beerFirstHour)! + Math.max(0, inputs.hours - 1) * median(DRINKS.beerPerHour)!) *
     median(DRINKS.drinking[inputs.drinking])!;
   const beerPerWine = median(DRINKS.beerPerWine)!;
-  const thirst = inputs.hours * median(DRINKS.softDrinksPerHour)!;
+  const allIn = inputs.hours * median(DRINKS.perHour)!;
 
   // Each kind of adult, by share: what they drink instead of soft drinks.
   const drinkers = [
@@ -179,10 +239,12 @@ const planDrinks = (inputs: PartyInputs) => {
     {share: both, alcohol: allowance / 2 + allowance / 2 / beerPerWine},
     {share: 1 - beerShare - wineShare + both, alcohol: 0},
   ];
-  const adultSoftDrinks = drinkers.reduce((sum, kind) => sum + kind.share * Math.max(0, thirst - kind.alcohol), 0);
+  const adultNonAlcoholic = drinkers.reduce((sum, kind) => sum + kind.share * Math.max(0, allIn - kind.alcohol), 0);
+  const nonAlcoholic = (guests - adults) * allIn + adults * adultNonAlcoholic;
+  const waterShare = median(DRINKS.waterShare)!;
   return {
-    softDrinks: (guests - adults) * thirst + adults * adultSoftDrinks,
-    water: guests * median(DRINKS.water)!,
+    softDrinks: nonAlcoholic * (1 - waterShare),
+    water: nonAlcoholic * waterShare,
     beer: adults * allowance * (beerShare - both / 2),
     wine: adults * allowance * (wineShare - both / 2) / beerPerWine,
   };
@@ -201,11 +263,17 @@ export const planParty = (inputs: PartyInputs): PartyResult => {
   const reserve = 1 + (inputs.reserve ? midpoint(RESERVE) : 0);
 
   const food = perAdult(inputs)
-      .map(({data, grams}): PartyLine => {
+      .flatMap(({data, grams}): PartyLine[] => {
         const eaters = data.item === 'vegetarianMain' ? meatFreeShare : data.meat ? 1 - meatFreeShare : 1;
         const total = adultEquivalents * eaters * grams * reserve;
-        return {item: data.item, course: data.course, grams: total,
-          gramsPerDish: inputs.dishes > 1 ? Math.min(total, total / inputs.dishes * SHARE_PER_DISH) : undefined};
+        // The host's starches and vegetables are the course's dishes.
+        if (data.item === 'warmSides' || data.item === 'salad') {
+          return servedAs(data.item, inputs).map(({food, factor}) =>
+            ({item: food, course: data.course, grams: total * factor}));
+        }
+        return [{item: data.item, course: data.course, grams: total,
+          gramsPerDish: inputs.dishes > 1 ? Math.min(total, total / inputs.dishes * SHARE_PER_DISH) : undefined,
+          ...(IN_SERVINGS.includes(data.course) ? {servings: {count: Math.ceil(total / grams), grams}} : {})}];
       })
       .filter((line) => line.grams > 0);
 

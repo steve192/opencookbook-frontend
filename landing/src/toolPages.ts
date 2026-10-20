@@ -36,6 +36,8 @@ export interface ToolPagesContent {
     openNote: string;
     faq: string;
     moreTools: string;
+    /** Under every tool: the numbers are guides, not guarantees. */
+    disclaimer: string;
   };
   pages: Record<ToolId, ToolPageCopy>;
 }
@@ -48,6 +50,8 @@ const de: ToolPagesContent = {
     openNote: 'Kostenlos, im Browser, ohne Konto',
     faq: 'Häufige Fragen',
     moreTools: 'Weitere Küchenhelfer',
+    disclaimer:
+      'Alle Werte sind Richtwerte aus veröffentlichten Rezepten und Ratgebern, keine Garantie. Mehl, Hefe, Bohnen, Geräte und Küchen sind verschieden: Verlass dich nicht blind darauf, sondern behalte dein Essen im Blick.',
   },
   pages: {
     pizzaDough: {
@@ -74,6 +78,7 @@ const de: ToolPagesContent = {
           paragraphs: [
             'Am Wasseranteil erkennst du den Stil. Ein neapolitanischer Teig liegt um 60 %, lässt sich gut formen und bekommt im heißen Ofen seinen luftigen Rand. New York Style hat etwas mehr Wasser. Pinsa und römische Pizza in der Teglia gehen auf 75 bis 80 %: ein sehr weicher Teig, der zu einer lockeren, knusprigen Krume backt.',
             'Mehr Wasser braucht ein kräftigeres Mehl. Italienische Mehle geben ihre Stärke als W-Wert an. Ein Tipo 00 mittlerer Stärke verträgt bis knapp 70 % Wasser und eine Gare von etwa einem Tag. Für weichere Teige und längere Zeiten nimmst du ein starkes Mehl mit hohem W-Wert oder Manitoba, das fast 80 % aufnimmt. Weizenmehl 550 passt gut für New York Style, Weizenmehl 405 für die Blechpizza.',
+            'Jedes Mehl nimmt dabei seine eigene Menge Wasser auf. Ein Rezept mit 60 % Wasser für Tipo 00 wird mit Manitoba zu fest und mit Weizenmehl 405 zu weich. Wechselst du das Mehl, passt du deshalb auch das Wasser an: mehr für ein starkes Mehl, weniger für ein schwaches. Halte am besten etwas zurück und gib es nach Gefühl dazu.',
           ],
         },
         {
@@ -88,7 +93,7 @@ const de: ToolPagesContent = {
           paragraphs: [
             'Wie viel Hefe du brauchst, hängt davon ab, wie lange und wie warm der Teig geht. Hefe vermehrt sich im Teig, und je mehr Zeit sie dafür hat, desto weniger musst du am Anfang hineingeben. Eine schnelle Blechpizza, die nach einer halben bis ganzen Stunde in den Ofen soll, nimmt einen ganzen Würfel Frischhefe auf etwa 600 g Mehl.',
             'Ein neapolitanischer Teig dagegen reift 12 bis 24 Stunden. Die Regeln für echte neapolitanische Pizza erlauben dafür 0,1 bis 3 g Frischhefe pro Liter Wasser, und manche Rezepte kommen mit einem Drittel Gramm für vier Pizzen aus. Das klingt nach einem Tippfehler, reicht aber, weil die Hefe genug Zeit hat.',
-            'Die lange Reifezeit lohnt sich, denn der Teig wird deutlich aromatischer. Wenn du am Vortag keine Zeit hast, kann er auch 24 bis 72 Stunden im Kühlschrank reifen: In der Kälte arbeitet die Hefe nur langsam.',
+            'Die lange Reifezeit lohnt sich, denn der Teig wird deutlich aromatischer. Die Regeln sehen dafür Raumtemperatur vor, ideal sind 18 bis 20 °C: Morgens angesetzt, ist der Teig zum Abendessen fertig. Viele Rezepte für zu Hause lassen ihn stattdessen 24 bis 72 Stunden im Kühlschrank reifen. Das ist nicht mehr streng neapolitanisch, lässt sich aber gut planen, weil die Hefe in der Kälte nur langsam arbeitet.',
           ],
         },
         {
@@ -167,14 +172,16 @@ const de: ToolPagesContent = {
           heading: 'Sauerteig: wie viel und wie lange?',
           paragraphs: [
             'Reifer Sauerteig, das Anstellgut, lockert den Teig und gibt ihm Geschmack. Viele Rezepte nehmen knapp 20 % des Mehls, also etwa 100 g auf 500 g Mehl. Mit mehr Anstellgut geht der Teig schneller, mit weniger braucht er länger.',
-            'Ein Weizensauerteig mit 20 % Anstellgut braucht bei 21 °C einen ganzen Arbeitstag, bis er backfertig ist. Wenn du lieber über Nacht wartest, nimmst du weniger Anstellgut oder stellst den Teig in den Kühlschrank.',
+            'Ein Weizensauerteig mit 20 % Anstellgut braucht bei 21 °C einen ganzen Arbeitstag, bis er backfertig ist. Wenn du lieber über Nacht wartest, nimmst du weniger Anstellgut oder stellst den Teig in den Kühlschrank. Während er geht, dehnst und faltest du ihn etwa viermal im Abstand von einer halben Stunde, das gibt ihm Halt.',
+            'Mit etwas Hefe neben dem Sauerteig geht der Teig schneller und verlässlicher. Die Hefe gleicht aus, was dem Anstellgut für deinen Zeitplan fehlt, der Sauerteig bleibt für den Geschmack.',
           ],
         },
         {
           heading: 'Warum Roggenbrot Sauerteig braucht',
           paragraphs: [
             'Roggen backt anders als Weizen. Sein Teig braucht Säure, sonst bleibt die Krume nach dem Backen klebrig und feucht. Deshalb backt man Brot mit mehr als der Hälfte Roggen mit Sauerteig.',
-            'Dafür setzt du am Vortag einen Sauer an: knapp 40 % des Roggenmehls mit der gleichen Menge Wasser und etwas Anstellgut. Er reift über Nacht bei Raumtemperatur, etwa 12 Stunden, und kommt am nächsten Tag mit dem restlichen Mehl in den Teig.',
+            'Dafür setzt du am Vortag einen Sauer an: knapp 40 % des Roggenmehls mit der gleichen Menge Wasser und etwas Anstellgut. Er reift über Nacht bei Raumtemperatur, etwa 12 Stunden, und kommt am nächsten Tag ganz mit dem restlichen Mehl in den Teig. Das ist mehr, als man denkt: Für 1 kg Brot aus halb Weizen- und halb Roggenmehl sind es gut 200 g Sauer, angesetzt mit nur 20 g Anstellgut.',
+            'Wie lange der Sauer reift, kannst du dir aussuchen: Darf er länger reifen, braucht er weniger Anstellgut, für einen Tag nur wenig. Ohne Hefe hebt der Sauer danach den Teig: Für weniger Zeit braucht es mehr Sauer, für mehr Zeit weniger, solange der Roggen genug Säure bekommt. Bei halb Roggen und 23 °C sind das knapp vier bis gut fünfeinhalb Stunden. Soll es schneller oder über Nacht gehen, nimm etwas Hefe dazu. Roggenteig wird nur gemischt, bis er gleichmäßig ist, nicht geknetet und nicht gefaltet. Nach dem Backen reift er beim Auskühlen nach, schneide ihn deshalb erst an, wenn er ganz kalt ist.',
           ],
         },
         {
@@ -188,6 +195,13 @@ const de: ToolPagesContent = {
           heading: 'Vom Ofen aus rückwärts planen',
           paragraphs: [
             'Am einfachsten planst du vom Backen aus rückwärts: Wann soll das Brot aus dem Ofen kommen? Davon ziehst du Gare, Kneten, Sauer und Quellstück ab und weißt, wann du anfangen musst. Für ein Brot zum Frühstück heißt das oft: am Vorabend den Teig ansetzen.',
+          ],
+        },
+        {
+          heading: 'Backen: heiß anfangen, dann herunterschalten',
+          paragraphs: [
+            'Heize den Ofen mit Blech oder Topf auf etwa 225 °C Ober- und Unterhitze vor. Schieß das Brot mit Dampf ein, mit einer Schale Wasser auf dem Ofenboden oder mit Deckel im Topf, und schalte nach etwa einer Viertelstunde auf rund 185 °C herunter.',
+            'Die Backzeit wächst langsamer als das Gewicht: Ein Brot von 500 g braucht etwa 35 Minuten, eines von 1 kg knapp 50 und eines von 1,5 kg etwa eine Stunde. Fertig ist es bei etwa 97 °C im Kern, oder wenn es beim Klopfen auf die Unterseite hohl klingt.',
           ],
         },
       ],
@@ -220,6 +234,16 @@ const de: ToolPagesContent = {
         {
           question: 'Wie lange muss ein Quellstück quellen?',
           answer: 'Am besten über Nacht, etwa zwölf Stunden.',
+        },
+        {
+          question: 'Wie lange backt ein Brot von 1 kg?',
+          answer:
+            'Knapp 50 Minuten: bei etwa 225 °C mit Dampf anbacken und nach einer Viertelstunde auf rund 185 °C herunterschalten. Ein Brot von 500 g braucht etwa 35 Minuten.',
+        },
+        {
+          question: 'Was ist der Unterschied zwischen Sauerteig und Sauer?',
+          answer:
+            'Sauerteig ist der Oberbegriff. Weizen- und Dinkelbrote bekommen meist reifes Anstellgut direkt in den Teig. Für Roggenbrot setzt man am Vortag aus etwas Anstellgut und einem Teil des Roggens einen Sauer an, der dann ganz in den Teig kommt.',
         },
       ],
     },
@@ -342,7 +366,7 @@ const de: ToolPagesContent = {
         {
           heading: 'Tiefkühlpommes und Co. im Airfryer',
           paragraphs: [
-            'Für Tiefkühlware gilt eine andere Regel: Nimm die Temperatur von der Packung und etwas mehr als die halbe Zeit. Stehen dort 12 bis 15 Minuten im Ofen, sieh in der Heißluftfritteuse nach 7 bis 8 Minuten nach. Schüttle den Korb zwischendurch einmal, damit alles gleichmäßig bräunt.',
+            'Für Tiefkühlware gilt eine eigene Regel, und viele Packungen nennen sie inzwischen selbst: etwa 20 °C weniger als im Ofen und knapp zwei Drittel der Zeit. Pommes, die im Ofen bei 220 °C 16 bis 17 Minuten brauchen, sind in der Heißluftfritteuse bei 200 °C nach gut 10 Minuten fertig. Schüttle den Korb zwischendurch einmal, damit alles gleichmäßig bräunt.',
           ],
         },
         {
@@ -376,7 +400,7 @@ const de: ToolPagesContent = {
         {
           question: 'Wie lange braucht Tiefkühlware in der Heißluftfritteuse?',
           answer:
-            'Gut die Hälfte der Zeit von der Packung, bei gleicher Temperatur. Stehen dort 12 bis 15 Minuten, sieh nach 7 bis 8 Minuten nach.',
+            'Knapp zwei Drittel der Ofenzeit von der Packung, bei etwa 20 °C weniger. Stehen dort 15 Minuten bei 220 °C, sieh bei 200 °C nach 9 bis 10 Minuten nach.',
         },
         {
           question: 'Was ist der Unterschied zwischen Umluft und Heißluft?',
@@ -403,15 +427,16 @@ const de: ToolPagesContent = {
             'Bei einem Buffet isst ein Erwachsener insgesamt etwa 750 g bis 1 kg. Diese Menge verteilt sich auf Vorspeisen, Hauptgericht, Beilagen, Salat, Brot und Nachtisch:',
           ],
           after: [
-            'Gibt es keine Vorspeise oder kein Dessert, werden die Gäste nicht vom Fleisch satter, sondern von den Beilagen: Plane Kartoffeln, Nudeln, Brot und Salat dann etwa ein Viertel bis ein Drittel größer.',
+            'Nudeln und Reis rechnest du roh gewogen: Für so viel auf dem Teller wie 200 g Kartoffeln reichen etwa 70 g Nudeln oder 60 g Reis, denn beim Kochen quellen sie auf das Zweieinhalbfache. Beim Gemüse wiegt Blattsalat am wenigsten: Statt 200 g Gemüse zum Garen nimmst du etwa gleich viel Rohkost oder 50 g Blattsalat. Gibt es mehrere Beilagen, plane jede etwa anderthalbmal so groß wie ihren rechnerischen Anteil, weil die Gäste vom Liebsten mehr nehmen. Vorspeisen und Desserts planst du am besten als Portionen deines Rezepts, eine pro Gast.',
+            'Gibt es keine Vorspeise oder kein Dessert, werden die Gäste nicht vom Fleisch satter, sondern von den Beilagen: Plane Kartoffeln, Nudeln, Brot und Gemüse dann etwa ein Viertel bis ein Drittel größer.',
           ],
           items: [
-            'Kalte Vorspeisen: 80 bis 120 g',
-            'Fleisch oder Fisch: 200 bis 250 g, ein vegetarisches Hauptgericht 150 bis 200 g',
-            'Warme Beilagen wie Kartoffeln, Nudeln oder Reis: 150 bis 200 g',
-            'Salat: 150 bis 200 g',
-            'Brot: 80 bis 100 g',
-            'Nachtisch: 80 bis 120 g',
+            'Kalte Vorspeisen: 115 bis 135 g',
+            'Fleisch oder Fisch: 225 bis 250 g, ein vegetarisches Hauptgericht 150 bis 200 g',
+            'Kartoffeln: etwa 200 g, oder roh gewogen gut ein Drittel davon an Nudeln oder Reis',
+            'Gemüse zum Garen: 150 bis 200 g, oder etwa gleich viel Rohkost oder ein Viertel davon an Blattsalat',
+            'Brot: 50 bis 100 g',
+            'Nachtisch: 100 bis 120 g',
           ],
         },
         {
@@ -431,14 +456,14 @@ const de: ToolPagesContent = {
         {
           heading: 'Kinder, Jugendliche und großer Hunger',
           paragraphs: [
-            'Nicht alle essen gleich viel. Kinder von 4 bis 12 Jahren essen etwa drei Viertel einer Erwachsenenportion, Jugendliche ungefähr so viel wie Erwachsene, Männer meist etwas mehr als Frauen. Diese Verhältnisse folgen den Richtwerten der Deutschen Gesellschaft für Ernährung für den Energiebedarf der einzelnen Altersgruppen.',
+            'Nicht alle essen gleich viel. Kinder von 4 bis 12 Jahren essen gut die Hälfte bis zwei Drittel einer Erwachsenenportion, Jugendliche ungefähr so viel wie Erwachsene, Männer meist etwas mehr als Frauen. Männer, Frauen und Jugendliche folgen den Richtwerten der Deutschen Gesellschaft für Ernährung für den Energiebedarf, Kinder dem, was Partyrechner und Ratgeber ansetzen.',
             'Plane außerdem 10 bis 15 % Reserve ein, für Nachschlag und späte Gäste. Mehrere Gerichte pro Gang erhöhen die Gesamtmenge übrigens nicht, weil jeder von allem ein bisschen nimmt. Plane jedes Gericht aber etwas großzügiger als seinen rechnerischen Anteil.',
           ],
         },
         {
           heading: 'Getränke für die ganze Feier',
           paragraphs: [
-            'Getränke richten sich nicht nach der Mahlzeit, sondern nach der Dauer der Feier. Rechne pro Gast und Stunde mit 0,4 bis 0,5 l zu trinken und zusätzlich etwa einem halben Liter Wasser pro Gast. Wer Alkohol trinkt, trinkt ihn statt eines Teils der alkoholfreien Getränke.',
+            'Getränke richten sich nicht nach der Mahlzeit, sondern nach der Dauer der Feier. Rechne pro Gast und Stunde mit einem halben Liter, alles eingerechnet, auch Bier und Wein: Bei vier Stunden sind das 2 l pro Gast. Wer Alkohol trinkt, trinkt ihn statt eines Teils der alkoholfreien Getränke, und was nicht Alkohol ist, teilt sich etwa zur Hälfte in Wasser und Softdrinks.',
             'Ein Biertrinker trinkt in der ersten Stunde etwa 0,4 l, danach rund 0,3 l pro Stunde, bei vier Stunden also gut 1,3 l. Ein Weintrinker trinkt so viel Alkohol als Wein, bei vier Stunden knapp 0,6 l oder gut drei Viertel einer Flasche. Wer Bier und Wein trinkt, trinkt von jedem die Hälfte.',
             'Trinken deine Gäste wenig, plane etwa 30 % weniger Alkohol ein, trinken sie viel, etwa 40 % mehr. Zur Einordnung: Ab fünf Standardgläsern an einem Abend, rund 50 g Alkohol, sind die meisten Menschen berauscht. Ein Standardglas ist 0,25 l Bier oder 0,1 l Wein.',
           ],
@@ -462,6 +487,11 @@ const de: ToolPagesContent = {
             'Ein Biertrinker trinkt auf einer Feier von vier Stunden gut 1,3 l, also zwei bis drei Flaschen à 0,5 l. Wer auch Wein trinkt, trinkt von beidem etwa die Hälfte.',
         },
         {
+          question: 'Wie viel Getränke pro Person auf einer Party?',
+          answer:
+            'Etwa einen halben Liter pro Gast und Stunde, Bier und Wein eingerechnet, bei vier Stunden also 2 l. Was nicht Alkohol ist, zur Hälfte Wasser und zur Hälfte Softdrinks.',
+        },
+        {
           question: 'Wie viel Essen pro Person beim Buffet?',
           answer: 'Insgesamt etwa 750 g bis 1 kg pro Erwachsenem, davon 200 bis 250 g Fleisch oder ein vegetarisches Hauptgericht.',
         },
@@ -471,7 +501,7 @@ const de: ToolPagesContent = {
         },
         {
           question: 'Wie viel essen Kinder auf einer Party?',
-          answer: 'Kinder von 4 bis 12 Jahren essen etwa drei Viertel einer Erwachsenenportion, Jugendliche ungefähr so viel wie Erwachsene.',
+          answer: 'Kinder von 4 bis 12 Jahren essen gut die Hälfte bis zwei Drittel einer Erwachsenenportion, Jugendliche ungefähr so viel wie Erwachsene.',
         },
       ],
     },
@@ -575,15 +605,15 @@ const de: ToolPagesContent = {
         {
           heading: 'Filterkaffee: rund 60 g pro Liter',
           paragraphs: [
-            'Für Filterkaffee aus dem Handfilter oder der Maschine liegt das übliche Verhältnis zwischen 1:15 und 1:18. Das sind etwa 55 bis 65 g Kaffee pro Liter Wasser. Magst du ihn kräftiger, nimmst du mehr, magst du ihn milder, weniger. Für eine Tasse mit 200 ml reichen 12 bis 13 g.',
-            'Das Wasser sollte kurz unter dem Kochen sein, etwa 91 bis 96 °C. Lass es nach dem Aufkochen einen Moment stehen, bevor du aufgießt.',
+            'Für Filterkaffee aus dem Handfilter geben Kaffeerechner mild 1:18, mittel 1:16 und stark 1:13 an. Das sind etwa 55, 63 und 77 g Kaffee pro Liter Wasser. Für eine Tasse mit 200 ml reichen bei mittlerer Stärke 12 bis 13 g. Gemahlen wird mittel, und das Wasser läuft in knapp drei bis vier Minuten durch.',
+            'Wie heiß das Wasser sein sollte, hängt von der Röstung ab: Helle Röstungen brauchen 95 bis 96 °C, mittlere 90 bis 94 °C und dunkle 86 bis 90 °C. Ist das Wasser zu kühl, löst es zu wenig aus dem Kaffee, und er schmeckt sauer. Ist es zu heiß, löst es zu viel, und er wird bitter.',
           ],
         },
         {
           heading: 'French Press, AeroPress und Mokkakanne',
           paragraphs: [
-            'In der French Press zieht der Kaffee vier Minuten, bevor du den Stempel herunterdrückst. Üblich sind 1:14 bis 1:17, also ähnlich wie beim Filterkaffee. Die AeroPress setzt man etwas stärker an, meist zwischen 1:12 und 1:16.',
-            'Die Mokkakanne macht einen kräftigen, espressoähnlichen Kaffee mit 1:7 bis 1:9. Espresso selbst liegt bei 1:2: Aus 18 g Kaffeepulver werden etwa 36 g Espresso in der Tasse.',
+            'In der French Press zieht grob gemahlener Kaffee vier Minuten, bevor du den Stempel herunterdrückst. Kaffeerechner geben mild 1:17, mittel 1:15 und stark 1:13 an. Die AeroPress setzt man etwas stärker an, meist zwischen 1:12 und 1:16, mittelfein gemahlen und mit anderthalb bis gut zwei Minuten Brühzeit.',
+            'Die Mokkakanne macht mit fein gemahlenem Kaffee einen kräftigen, espressoähnlichen Kaffee mit 1:6 bis 1:9. Espresso selbst liegt bei 1:2: Aus 18 g Kaffeepulver werden in 25 bis 30 Sekunden etwa 36 g Espresso in der Tasse. Ein Lungo läuft länger, etwa 1:3, ein Ristretto kürzer, etwa 1:1,4.',
           ],
         },
         {
@@ -591,6 +621,22 @@ const de: ToolPagesContent = {
           paragraphs: [
             'Cold Brew wird gar nicht erhitzt: Der Kaffee zieht 12 bis 21 Stunden in kaltem Wasser. Meist setzt man ein Konzentrat an, etwa 1:6, und verdünnt es vor dem Trinken etwa 1:1 mit Wasser. Cold Brew zum direkten Trinken braucht weniger Kaffee, etwa 1:10 bis 1:11,5.',
             'Japanese Iced Coffee geht schneller: Du brühst den Kaffee heiß direkt auf Eis. Etwa ein Drittel des Wassers kommt als Eiswürfel in die Kanne, der Rest wird heiß darübergegossen. So kühlt der Kaffee sofort ab, ohne zu verwässern.',
+            'Cold Brew seihst du nach dem Ziehen durch ein Sieb mit Papierfilter ab, ohne zu drücken. Im Kühlschrank hält sich das Konzentrat etwa zwei Wochen, verdünnter Cold Brew etwa eine Woche.',
+          ],
+        },
+        {
+          heading: 'Kaffeevollautomat richtig einstellen',
+          paragraphs: [
+            'Ein Vollautomat mahlt je nach Stärkestufe etwa 6 bis 12 g Kaffee pro Tasse und brüht mit 90 bis 95 °C. Für einen milden Kaffee nimm eine niedrige Stufe und eine größere Tasse, für einen kräftigen eine hohe Stufe und weniger Wasser. Dunkle Röstungen schmecken mit der Temperatur eine Stufe niedriger weniger bitter.',
+            'Espresso aus dem Vollautomaten wird meist dünner als aus dem Siebträger, weil die Maschine weniger Kaffee mahlt und mehr Wasser durchlaufen lässt. Gemessen haben solche Espressi oft 3 bis 5 % gelöste Stoffe, aus dem Siebträger sind es 7 bis 9 %. Eine kleine Tasse von 25 bis 30 ml und eine hohe Stufe bringen ihn näher heran, und manche Geräte mahlen für eine Tasse auf Wunsch zweimal.',
+            'Den Mahlgrad verstellst du nur, während das Mahlwerk läuft, sonst kann es Schaden nehmen. Tropft der Kaffee nur, stell gröber; läuft er schnell und wässrig durch, feiner. Jeder Automat dosiert etwas anders, nimm diese Werte deshalb als Richtung.',
+          ],
+        },
+        {
+          heading: 'Stark, dünn, sauer oder bitter?',
+          paragraphs: [
+            'Wie stark ein Kaffee schmeckt, hängt davon ab, wie viel sich vom Pulver in der Tasse löst. Für Filterkaffee gelten etwa 1,15 bis 1,45 % gelöste Stoffe als ausgewogen, für Espresso 8 bis 12 %. Löst sich etwa ein Fünftel des Pulvers, wie es die Brühstandards anstreben, landet Filterkaffee mit 1:16 bis 1:18 genau dort. Mit 1:13 schmeckt er deutlich kräftiger, mit 1:20 dünn.',
+            'Ob er dabei sauer oder bitter wird, entscheidet die Extraktion, also wie viel vom Pulver sich löst: Brühstandards streben 18 bis 22 % an. Darunter schmeckt Kaffee sauer und dünn, darüber bitter und trocken. Feiner gemahlen, heißer und länger gebrüht löst sich mehr. Schmeckt dein Kaffee sauer, nimm heißeres Wasser, mahle feiner oder brühe länger. Schmeckt er bitter, mach es umgekehrt.',
           ],
         },
       ],
@@ -602,12 +648,16 @@ const de: ToolPagesContent = {
         },
         {
           question: 'Wie viel Kaffee für einen Liter?',
-          answer: 'Etwa 55 bis 65 g Kaffeepulver für einen Liter Filterkaffee, je nachdem, wie stark du ihn magst.',
+          answer: 'Mild etwa 55 g, mittel gut 60 g und stark rund 77 g Kaffeepulver für einen Liter Filterkaffee.',
         },
         {
           question: 'Wie viel Kaffee für die French Press?',
           answer:
-            'Etwa 1:14 bis 1:17, in der Mitte also rund 65 g Kaffee für einen Liter Wasser. Lass ihn 4 Minuten ziehen, bevor du den Stempel herunterdrückst.',
+            'Mittel sind 1:15, also knapp 67 g grob gemahlener Kaffee für einen Liter Wasser. Lass ihn 4 Minuten ziehen, bevor du den Stempel herunterdrückst.',
+        },
+        {
+          question: 'Wie heiß muss das Wasser für Kaffee sein?',
+          answer: 'Je nach Röstung: hell 95 bis 96 °C, mittel 90 bis 94 °C, dunkel 86 bis 90 °C. Zu kühles Wasser macht Kaffee sauer, zu heißes bitter.',
         },
         {
           question: 'Welches Verhältnis für Cold Brew?',
@@ -629,13 +679,14 @@ const de: ToolPagesContent = {
       heading: 'Tee richtig zubereiten: Menge, Temperatur und Ziehzeit für jede Sorte',
       intro: [
         'Bitterer Grüntee, dünner Schwarztee? Meist liegt es nicht am Tee, sondern an der Zubereitung. Jede Teesorte braucht ihre eigene Wassertemperatur und Ziehzeit, und schon ein paar Grad oder Minuten machen einen großen Unterschied.',
-        'Hier findest du die wichtigsten Regeln für schwarzen, grünen und weißen Tee, Kräutertee, Rooibos und Matcha.',
+        'Hier findest du die wichtigsten Regeln für schwarzen, grünen und weißen Tee, Oolong, Kräutertee, Rooibos und Matcha, heiß, kalt angesetzt oder als Eistee.',
       ],
       sections: [
         {
           heading: 'Wie viel Tee pro Tasse?',
           paragraphs: [
             'Als Faustregel nimmst du 2 bis 3 g losen Tee für eine Tasse mit 200 ml, für einen Liter also 10 bis 15 g. Zarte grüne und weiße Tees dosierst du eher sparsam, kräftigen Schwarztee, Kräuter- und Früchtetee etwas großzügiger.',
+            'Menge und Ziehzeit wirken dabei verschieden. Mehr Blätter machen den ganzen Tee konzentrierter, in derselben Mischung: Für kräftigen Tee nimmst du etwa die Hälfte mehr, für milden etwa 40 % weniger. Die Ziehzeit verändert dagegen die Mischung. Koffein, Aroma und die süßlichen Aminosäuren lösen sich in den ersten ein bis drei Minuten, Gerbstoffe kommen bis etwa sechs bis acht Minuten nach. Kurz gezogen schmeckt Tee deshalb frisch und leicht, länger voller und herber und danach nur noch bitterer. Kräuter- und Früchtetee haben kaum Gerbstoffe, bei ihnen heißt länger vor allem kräftiger.',
           ],
         },
         {
@@ -648,6 +699,18 @@ const de: ToolPagesContent = {
           heading: 'Grüner und weißer Tee: lieber etwas kühler',
           paragraphs: [
             'Mit kochendem Wasser wird grüner Tee schnell bitter. Lass das Wasser deshalb ein paar Minuten abkühlen, auf etwa 70 bis 85 °C, und gieß den Tee nur 1 bis 3 Minuten auf. Weißer Tee mag es ähnlich, etwa 75 bis 80 °C für 2 bis 4 Minuten.',
+          ],
+        },
+        {
+          heading: 'Oolong: zwischen grün und schwarz',
+          paragraphs: [
+            'Oolong ist teilweise oxidiert und liegt im Geschmack zwischen grünem und schwarzem Tee, oft sind seine Blätter zu kleinen Kugeln gerollt. Er braucht etwas mehr Blätter, etwa 3 g für 200 ml, Wasser von 85 bis 93 °C und 2,5 bis 4,5 Minuten.',
+          ],
+        },
+        {
+          heading: 'Wie oft kann man Tee aufgießen?',
+          paragraphs: [
+            'Gute grüne und weiße Tees kannst du etwa dreimal aufgießen, Oolong sogar viermal. Lass jeden weiteren Aufguss etwa 45 Sekunden länger ziehen als den davor, denn die Blätter geben mit jedem Mal weniger ab. Schwarzer Tee gibt meist schon beim ersten Aufguss fast alles her, Kräutertee und Rooibos ebenso.',
           ],
         },
         {
@@ -665,7 +728,14 @@ const de: ToolPagesContent = {
         {
           heading: 'Eistee selbst machen',
           paragraphs: [
-            'Für Eistee brühst du den Tee doppelt so stark auf wie sonst, also mit der doppelten Teemenge, und gießt ihn direkt über die gleiche Menge Eis. Das Eis kühlt den Tee sofort ab und verdünnt ihn auf normale Stärke. Am besten eignen sich schwarzer und grüner Tee.',
+            'Für Eistee brühst du den Tee doppelt so stark auf wie sonst, also mit der doppelten Teemenge, und gießt ihn direkt über die gleiche Menge Eis. Das Eis kühlt den Tee sofort ab und verdünnt ihn auf normale Stärke. Das klappt mit jedem Tee, auch mit Kräuter- und Früchtetee.',
+          ],
+        },
+        {
+          heading: 'Cold Brew: Tee kalt ansetzen',
+          paragraphs: [
+            'Für Cold Brew gibst du etwa 12 g Tee auf einen Liter kaltes Wasser und lässt ihn im Kühlschrank ziehen: grünen Tee etwa 3 Stunden, weißen Tee und Oolong 7,5 bis 8 Stunden, schwarzen etwa 10. Kalt angesetzt schmeckt Tee milder und kaum bitter.',
+            'Vorsicht bei Kräuter- und Früchtetee und Rooibos: Sie werden nur getrocknet, nicht erhitzt, und können Keime tragen, die erst kochendes Wasser abtötet. Verbraucherschützer raten deshalb, sie mit sprudelnd kochendem Wasser aufzugießen, mindestens fünf Minuten ziehen zu lassen und dann abzukühlen. Kalt ansetzen solltest du nur Tees, die ausdrücklich für Cold Brew verkauft werden; Früchte- und Kräutertee brauchen dann etwa 10 Stunden, Rooibos etwa 8.',
           ],
         },
       ],
@@ -689,6 +759,21 @@ const de: ToolPagesContent = {
           answer: 'Für einen dünnen Usucha etwa 2 g Matcha mit 65 bis 70 ml Wasser von 70 bis 80 °C.',
         },
         {
+          question: 'Wie oft kann man Tee aufgießen?',
+          answer:
+            'Grünen und weißen Tee etwa dreimal, Oolong viermal, jeden Aufguss etwa 45 Sekunden länger. Schwarzer Tee, Kräutertee und Rooibos geben meist nur einen guten Aufguss.',
+        },
+        {
+          question: 'Wie lange muss Cold Brew Tee ziehen?',
+          answer:
+            'Mit etwa 12 g Tee pro Liter im Kühlschrank: grüner Tee etwa 3 Stunden, weißer Tee und Oolong 7,5 bis 8, schwarzer etwa 10. Kräuter- und Früchtetee lieber heiß aufbrühen und abkühlen lassen, außer er ist für Cold Brew gemacht.',
+        },
+        {
+          question: 'Macht längeres Ziehen Tee stärker?',
+          answer:
+            'Ja, aber anders als mehr Tee. Länger gezogen löst sich vor allem mehr Gerbstoff, der Tee wird voller und herber und nach sechs bis acht Minuten nur noch bitterer. Mehr Blätter machen ihn dagegen kräftiger, ohne die Mischung zu verändern.',
+        },
+        {
           question: 'Wie mache ich Eistee aus heißem Tee?',
           answer:
             'Brühe den Tee doppelt so stark auf, also mit doppelter Teemenge, und gieß ihn über die gleiche Menge Eis. So ist er sofort kalt und nicht verwässert.',
@@ -706,6 +791,8 @@ const en: ToolPagesContent = {
     openNote: 'Free, in your browser, no account needed',
     faq: 'Frequently asked questions',
     moreTools: 'More kitchen tools',
+    disclaimer:
+      'All values are guides from published recipes and guides, not guarantees. Flour, yeast, beans, appliances and kitchens differ: do not rely on them blindly, keep an eye on your food.',
   },
   pages: {
     pizzaDough: {
@@ -732,6 +819,7 @@ const en: ToolPagesContent = {
           paragraphs: [
             'Hydration is what sets the styles apart. Neapolitan dough sits around 60 %: easy to shape, with an airy rim from a very hot oven. New York style takes a little more water. Pinsa and Roman pizza in teglia go up to 75 to 80 %, a very soft dough that bakes into a light, crisp crumb.',
             'More water needs stronger flour. Italian flours state their strength as a W value: a medium Tipo 00 handles up to almost 70 % water and a rise of about a day. Wetter doughs and longer rises call for a strong flour with a high W value, or Manitoba, which takes almost 80 %. Bread flour suits New York style, all-purpose flour a sheet pan pizza.',
+            "Every flour takes its own amount of water. A recipe with 60 % water for Tipo 00 turns stiff with Manitoba and slack with all-purpose flour. So when you swap the flour, adjust the water too: more for a strong flour, less for a weak one. Best hold some back and add it by feel.",
           ],
         },
         {
@@ -746,7 +834,7 @@ const en: ToolPagesContent = {
           paragraphs: [
             'How much yeast you need depends on how long and how warm the dough rises. Yeast multiplies in the dough, so the more time it has, the less you need to start with. A quick sheet pan pizza that goes into the oven after half an hour to an hour takes a whole 42 g cube of fresh yeast for about 600 g of flour.',
             "A Neapolitan dough, on the other hand, matures for 12 to 24 hours. The rules for true Neapolitan pizza allow 0.1 to 3 g of fresh yeast per litre of water, and some recipes use a third of a gram for four pizzas. It looks like a typo, but with that much time it's plenty.",
-            "The long rise is worth it: the dough gets far more flavour. If you can't start the day before, let it mature in the fridge for 24 to 72 hours instead, where the yeast works slowly in the cold.",
+            "The long rise is worth it: the dough gets far more flavour. The rules have it rise at room temperature, ideally 18 to 20 °C (64 to 68 °F): mixed in the morning, it's ready for dinner. Many home recipes let it mature in the fridge for 24 to 72 hours instead. That is no longer strictly Neapolitan, but it's easy to plan, as the yeast works slowly in the cold.",
           ],
         },
         {
@@ -825,14 +913,16 @@ const en: ToolPagesContent = {
           heading: 'Sourdough: how much starter, and how long?',
           paragraphs: [
             'Ripe starter raises the dough and gives it flavour. Many recipes use just under 20 % of the flour, about 100 g for 500 g. More starter makes the dough rise faster, less makes it slower.',
-            "A wheat sourdough with 20 % starter takes a whole working day at 21 °C until it's ready to bake. If you'd rather wait overnight, use less starter or let the dough rise in the fridge.",
+            "A wheat sourdough with 20 % starter takes a whole working day at 21 °C until it's ready to bake. If you'd rather wait overnight, use less starter or let the dough rise in the fridge. While it rises, stretch and fold it about four times, half an hour apart, to give it strength.",
+            'A little yeast beside the starter makes the dough rise faster and more reliably. The yeast makes up what the starter lacks for your schedule, and the sourdough stays for the flavour.',
           ],
         },
         {
           heading: 'Why rye bread needs sourdough',
           paragraphs: [
             "Rye behaves differently from wheat. Its dough needs acid, or the crumb stays sticky and wet after baking. That's why bread with more than half rye is made with sourdough.",
-            'For that you start a sour the day before: just under 40 % of the rye flour with the same weight of water and a little starter. It ripens overnight at room temperature, about 12 hours, and goes into the dough the next day with the rest of the flour.',
+            'For that you start a sour the day before: just under 40 % of the rye flour with the same weight of water and a little starter. It ripens overnight at room temperature, about 12 hours, and all of it goes into the dough the next day with the rest of the flour. That is more than you might expect: for a 1 kg loaf of half wheat and half rye flour it is a little over 200 g of sour, started with just 20 g of starter.',
+            'How long the sour ripens is up to you: the longer it may ripen, the less starter it needs, little for a whole day. Without yeast the sour then raises the dough: less time needs more sour, more time less, as long as the rye gets enough acid. With half rye at 23 °C that is just under four to a good five and a half hours. For faster, or overnight, add a little yeast. Rye dough is only mixed until even, not kneaded or folded. After baking it keeps setting as it cools, so cut it only once it is completely cold.',
           ],
         },
         {
@@ -846,6 +936,13 @@ const en: ToolPagesContent = {
           heading: 'Plan backwards from the oven',
           paragraphs: [
             'The easiest way to plan is backwards from baking: when should the loaf come out of the oven? Take away the proof, the kneading, the sour and the soaker, and you know when to start. For bread at breakfast, that often means mixing the dough the evening before.',
+          ],
+        },
+        {
+          heading: 'Baking: start hot, then turn it down',
+          paragraphs: [
+            'Preheat the oven with a tray or pot to about 225 °C, top and bottom heat. Load the loaf with steam, from a dish of water on the oven floor or with the lid on the pot, and turn it down to about 185 °C after a quarter of an hour.',
+            'Baking time grows more slowly than the weight: a 500 g loaf takes about 35 minutes, a 1 kg loaf just under 50 and a 1.5 kg loaf about an hour. It is done at about 97 °C in the middle, or when it sounds hollow as you tap its base.',
           ],
         },
       ],
@@ -878,6 +975,16 @@ const en: ToolPagesContent = {
         {
           question: 'How long should a soaker soak?',
           answer: 'Ideally overnight, about twelve hours.',
+        },
+        {
+          question: 'How long does a 1 kg loaf bake?',
+          answer:
+            'Just under 50 minutes: start at about 225 °C with steam and turn it down to about 185 °C after a quarter of an hour. A 500 g loaf takes about 35 minutes.',
+        },
+        {
+          question: 'What is the difference between starter and a rye sour?',
+          answer:
+            'Wheat and spelt loaves mostly get ripe starter straight into the dough. For rye bread you make a sour the day before from a little starter and part of the rye, and all of it then goes into the dough.',
         },
       ],
     },
@@ -1000,7 +1107,7 @@ const en: ToolPagesContent = {
         {
           heading: 'Frozen fries and co. in the air fryer',
           paragraphs: [
-            'Frozen food follows a different rule: keep the temperature on the package and allow just over half the time. If the package says 12 to 15 minutes in the oven, check after 7 to 8 minutes in the air fryer. Shake the basket once halfway, so everything browns evenly.',
+            'Frozen food follows its own rule, and many packages now print it: about 20 °C less than in the oven and just under two thirds of the time. Fries that take 16 to 17 minutes at 220 °C in the oven are done in the air fryer at 200 °C after a little over 10 minutes. Shake the basket once halfway, so everything browns evenly.',
           ],
         },
         {
@@ -1034,7 +1141,7 @@ const en: ToolPagesContent = {
         {
           question: 'How long does frozen food take in the air fryer?',
           answer:
-            'A little over half the time on the package, at the same temperature. If the package says 12 to 15 minutes, check after 7 to 8 minutes.',
+            'Just under two thirds of the oven time on the package, at about 20 °C less. If it says 15 minutes at 220 °C, check after 9 to 10 minutes at 200 °C.',
         },
         {
           question: 'How do I convert Celsius to Fahrenheit?',
@@ -1060,15 +1167,16 @@ const en: ToolPagesContent = {
             'At a buffet an adult eats about 750 g to 1 kg in all, spread over starters, the main dish, sides, salad, bread and dessert:',
           ],
           after: [
-            "Without a starter or dessert, guests don't fill up on meat but on the sides: plan potatoes, pasta, bread and salad about a quarter to a third bigger.",
+            'Pasta and rice are weighed raw: for as much on the plate as 200 g of potatoes, about 70 g of pasta or 60 g of rice will do, as they swell to two and a half times their weight. Among vegetables, leaf salad weighs least: instead of 200 g of vegetables to cook, take about as much raw vegetables or 50 g of leaf salad. With several sides, plan each about one and a half times its share, as guests take more of their favourite. Starters and desserts are best planned as servings of your recipe, one per guest.',
+            "Without a starter or dessert, guests don't fill up on meat but on the sides: plan potatoes, pasta, bread and vegetables about a quarter to a third bigger.",
           ],
           items: [
-            'Cold starters: 80 to 120 g',
-            'Meat or fish: 200 to 250 g, or a vegetarian main of 150 to 200 g',
-            'Warm sides such as potatoes, pasta or rice: 150 to 200 g',
-            'Salad: 150 to 200 g',
-            'Bread: 80 to 100 g',
-            'Dessert: 80 to 120 g',
+            'Cold starters: 115 to 135 g',
+            'Meat or fish: 225 to 250 g, or a vegetarian main of 150 to 200 g',
+            'Potatoes: about 200 g, or, weighed raw, a good third of that in pasta or rice',
+            'Vegetables to cook: 150 to 200 g, or about as much raw vegetables or a quarter in leaf salad',
+            'Bread: 50 to 100 g',
+            'Dessert: 100 to 120 g',
           ],
         },
         {
@@ -1088,14 +1196,14 @@ const en: ToolPagesContent = {
         {
           heading: 'Children, teenagers and big appetites',
           paragraphs: [
-            "Not everyone eats the same. Children aged 4 to 12 eat about three quarters of an adult portion, teenagers about as much as adults, and men usually a little more than women. These ratios follow the German Nutrition Society's energy reference values for each age group.",
+            "Not everyone eats the same. Children aged 4 to 12 eat a good half to two thirds of an adult portion, teenagers about as much as adults, and men usually a little more than women. Men, women and teenagers follow the German Nutrition Society's energy reference values, children what party calculators and guides allow them.",
             "Plan 10 to 15 % extra for seconds and late arrivals. Several dishes per course don't raise the total, as everyone takes a little of each, but plan each dish a bit above its plain share.",
           ],
         },
         {
           heading: 'Drinks for the whole party',
           paragraphs: [
-            'Drinks depend on how long the party lasts, not on the meal. Allow 0.4 to 0.5 l to drink per guest and hour, plus about half a litre of water per guest. Guests who drink alcohol drink it instead of part of the soft drinks.',
+            'Drinks depend on how long the party lasts, not on the meal. Allow half a litre per guest and hour, everything included, beer and wine too: 2 l per guest over four hours. Guests who drink alcohol drink it instead of part of the soft drinks, and what is not alcohol splits about half and half into water and soft drinks.',
             'A beer drinker has about 0.4 l in the first hour and around 0.3 l each hour after that, a little over 1.3 l in four hours. A wine drinker has the same alcohol as wine, just under 0.6 l or three quarters of a bottle in four hours. Guests who drink beer and wine have half of each.',
             'If your guests drink little, plan about 30 % less alcohol; if they drink a lot, about 40 % more. For a sense of scale: from five standard glasses in an evening, around 50 g of alcohol, most people are drunk. A standard glass is 0.25 l of beer or 0.1 l of wine.',
           ],
@@ -1118,6 +1226,11 @@ const en: ToolPagesContent = {
             'A beer drinker has a little over 1.3 l at a four-hour party, two to three 0.5 l bottles. Guests who also drink wine have about half of each.',
         },
         {
+          question: 'How much to drink per person at a party?',
+          answer:
+            'About half a litre per guest and hour, beer and wine included, so 2 l over four hours. What is not alcohol is half water and half soft drinks.',
+        },
+        {
           question: 'How much food per person for a buffet?',
           answer: 'About 750 g to 1 kg in all per adult, of which 200 to 250 g is meat or a vegetarian main.',
         },
@@ -1127,7 +1240,7 @@ const en: ToolPagesContent = {
         },
         {
           question: 'How much do children eat at a party?',
-          answer: 'Children aged 4 to 12 eat about three quarters of an adult portion, teenagers about as much as adults.',
+          answer: 'Children aged 4 to 12 eat a good half to two thirds of an adult portion, teenagers about as much as adults.',
         },
       ],
     },
@@ -1231,15 +1344,15 @@ const en: ToolPagesContent = {
         {
           heading: 'Filter coffee: about 60 g per litre',
           paragraphs: [
-            'For filter coffee, by hand or from a machine, the usual ratio is between 1:15 and 1:18, about 55 to 65 g of coffee per litre of water. Use more if you like it stronger, less if you like it milder. A 200 ml cup takes 12 to 13 g.',
-            'The water should be just off the boil, about 91 to 96 °C. Let it rest a moment after boiling before you pour.',
+            'For pour-over, coffee calculators give 1:18 for mild, 1:16 for medium and 1:13 for strong: about 55, 63 and 77 g of coffee per litre of water. A 200 ml cup takes 12 to 13 g at medium strength. Grind it medium; the water runs through in just under three to four minutes.',
+            'How hot the water should be depends on the roast: light roasts want 95 to 96 °C, medium 90 to 94 °C and dark 86 to 90 °C. Water too cool dissolves too little from the coffee, and it tastes sour. Too hot dissolves too much, and it turns bitter.',
           ],
         },
         {
           heading: 'French press, AeroPress and moka pot',
           paragraphs: [
-            'In a French press the coffee steeps for four minutes before you press the plunger. The usual ratio is 1:14 to 1:17, much like filter coffee. The AeroPress is brewed a little stronger, mostly between 1:12 and 1:16.',
-            'A moka pot makes a strong, espresso-like coffee at 1:7 to 1:9. Espresso itself runs at 1:2: 18 g of ground coffee make about 36 g of espresso in the cup.',
+            'In a French press coarsely ground coffee steeps for four minutes before you press the plunger. Coffee calculators give 1:17 for mild, 1:15 for medium and 1:13 for strong. The AeroPress is brewed a little stronger, mostly between 1:12 and 1:16, ground medium fine and brewed for one and a half to a little over two minutes.',
+            'A moka pot makes a strong, espresso-like coffee from finely ground coffee at 1:6 to 1:9. Espresso itself runs at 1:2: 18 g of ground coffee make about 36 g of espresso in the cup in 25 to 30 seconds. A lungo runs longer, about 1:3, a ristretto shorter, about 1:1.4.',
           ],
         },
         {
@@ -1247,6 +1360,22 @@ const en: ToolPagesContent = {
           paragraphs: [
             'Cold brew is never heated: the coffee steeps in cold water for 12 to 21 hours. Most people make a concentrate at about 1:6 and dilute it about 1:1 with water before drinking. Cold brew to drink straight needs less coffee, about 1:10 to 1:11.5.',
             'Japanese iced coffee is quicker: you brew hot coffee straight onto ice. About a third of the water goes into the jug as ice, and the rest is poured over hot. The coffee chills at once without getting watery.',
+            'After steeping, strain cold brew through a sieve lined with a paper filter, without pressing. In the fridge the concentrate keeps about two weeks, diluted cold brew about a week.',
+          ],
+        },
+        {
+          heading: 'Setting up a bean-to-cup machine',
+          paragraphs: [
+            'A bean-to-cup machine grinds about 6 to 12 g of coffee per cup, depending on the strength level, and brews at 90 to 95 °C. For mild coffee choose a low level and a larger cup, for strong a high level and less water. Dark roasts taste less bitter with the temperature one level lower.',
+            'Espresso from a bean-to-cup machine usually comes out thinner than from a portafilter machine, because it grinds less coffee and runs more water through it. Measured, such espressos often have 3 to 5 % dissolved solids, against 7 to 9 % from a portafilter. A small cup of 25 to 30 ml and a high level bring it closer, and some machines grind twice for one cup on request.',
+            'Change the grind only while the grinder runs, or it can be damaged. If the coffee only drips, grind coarser; if it runs fast and watery, finer. Every machine doses a little differently, so take these values as a direction.',
+          ],
+        },
+        {
+          heading: 'Strong, weak, sour or bitter?',
+          paragraphs: [
+            'How strong a coffee tastes depends on how much of the grounds ends up dissolved in the cup. For filter coffee about 1.15 to 1.45 % dissolved solids count as balanced, for espresso 8 to 12 %. When about a fifth of the grounds dissolves, as brewing standards aim for, filter coffee at 1:16 to 1:18 lands right there. At 1:13 it tastes clearly stronger, at 1:20 weak.',
+            'Whether it turns sour or bitter depends on the extraction, how much of the grounds dissolves: brewing standards aim for 18 to 22 %. Below, coffee tastes sour and thin; above, bitter and dry. Finer grinding, hotter water and a longer brew dissolve more. If your coffee tastes sour, use hotter water, grind finer or brew longer. If it tastes bitter, do the opposite.',
           ],
         },
       ],
@@ -1258,12 +1387,16 @@ const en: ToolPagesContent = {
         },
         {
           question: 'How much coffee for a litre?',
-          answer: 'About 55 to 65 g of ground coffee for a litre of filter coffee, depending on how strong you like it.',
+          answer: 'About 55 g for mild, a little over 60 g for medium and around 77 g for strong, per litre of filter coffee.',
         },
         {
           question: 'How much coffee for a French press?',
           answer:
-            'About 1:14 to 1:17, so roughly 65 g of coffee for a litre of water in the middle. Let it steep for 4 minutes before you press.',
+            'Medium is 1:15, so just under 67 g of coarsely ground coffee for a litre of water. Let it steep for 4 minutes before you press.',
+        },
+        {
+          question: 'How hot should the water be for coffee?',
+          answer: 'It depends on the roast: light 95 to 96 °C, medium 90 to 94 °C, dark 86 to 90 °C. Water too cool makes coffee sour, too hot bitter.',
         },
         {
           question: 'What ratio for cold brew?',
@@ -1285,13 +1418,14 @@ const en: ToolPagesContent = {
       heading: 'How to brew tea: amount, temperature and steeping time for every kind',
       intro: [
         "Bitter green tea, weak black tea? Usually it's not the tea but the brewing. Every kind of tea needs its own water temperature and steeping time, and a few degrees or minutes make a big difference.",
-        'Here are the key rules for black, green and white tea, herbal tea, rooibos and matcha.',
+        'Here are the key rules for black, green and white tea, oolong, herbal tea, rooibos and matcha, hot, cold brewed or iced.',
       ],
       sections: [
         {
           heading: 'How much tea per cup?',
           paragraphs: [
             'As a rule of thumb, use 2 to 3 g of loose tea for a 200 ml cup, so 10 to 15 g for a litre. Go easy with delicate green and white teas, and be a little more generous with strong black tea and with herbal and fruit tea.',
+            'Amount and steeping time work differently, though. More leaves make the whole cup more concentrated, in the same balance: for strong tea use about half as much again, for light tea about 40 % less. The steeping time changes the balance. Caffeine, aroma and the sweet amino acids dissolve in the first one to three minutes, tannins keep coming until about six to eight minutes. So tea steeped briefly tastes fresh and light, longer fuller and more astringent, and after that only more bitter. Herbal and fruit teas have few tannins: for them, longer mostly means stronger.',
           ],
         },
         {
@@ -1304,6 +1438,18 @@ const en: ToolPagesContent = {
           heading: 'Green and white tea: a little cooler',
           paragraphs: [
             'Boiling water quickly makes green tea bitter. So let the water cool for a few minutes, to about 70 to 85 °C, and steep the tea for just 1 to 3 minutes. White tea likes it similar, about 75 to 80 °C for 2 to 4 minutes.',
+          ],
+        },
+        {
+          heading: 'Oolong: between green and black',
+          paragraphs: [
+            'Oolong is partly oxidised and tastes somewhere between green and black tea; its leaves are often rolled into small balls. It takes a little more leaf, about 3 g for 200 ml, water at 85 to 93 °C and 2.5 to 4.5 minutes.',
+          ],
+        },
+        {
+          heading: 'How often can you steep tea?',
+          paragraphs: [
+            'Good green and white teas can be steeped about three times, oolong even four. Steep each further infusion about 45 seconds longer than the one before, as the leaves give less each time. Black tea gives nearly everything in the first infusion, and so do herbal tea and rooibos.',
           ],
         },
         {
@@ -1321,7 +1467,14 @@ const en: ToolPagesContent = {
         {
           heading: 'Making iced tea',
           paragraphs: [
-            'For iced tea, brew the tea twice as strong as usual, with double the amount of tea, and pour it straight over the same weight of ice. The ice chills the tea at once and dilutes it to normal strength. Black and green tea work best.',
+            'For iced tea, brew the tea twice as strong as usual, with double the amount of tea, and pour it straight over the same weight of ice. The ice chills the tea at once and dilutes it to normal strength. It works with any tea, herbal and fruit tea included.',
+          ],
+        },
+        {
+          heading: 'Cold brew tea',
+          paragraphs: [
+            'For cold brew, put about 12 g of tea in a litre of cold water and let it steep in the fridge: green tea about 3 hours, white tea and oolong 7.5 to 8 hours, black tea about 10. Cold brewed tea tastes milder and hardly bitter.',
+            'Take care with herbal and fruit tea and rooibos: they are only dried, not heated, and can carry germs that only boiling water kills. Consumer advice is to pour on boiling water, steep at least five minutes and then let them cool. Only cold brew teas sold for cold brewing; fruit and herbal tea then take about 10 hours, rooibos about 8.',
           ],
         },
       ],
@@ -1342,6 +1495,21 @@ const en: ToolPagesContent = {
         {
           question: 'How much matcha for a bowl?',
           answer: 'For a thin usucha, about 2 g of matcha with 65 to 70 ml of water at 70 to 80 °C.',
+        },
+        {
+          question: 'How often can you steep tea?',
+          answer:
+            'Green and white tea about three times, oolong four, each infusion about 45 seconds longer. Black tea, herbal tea and rooibos mostly give one good infusion.',
+        },
+        {
+          question: 'How long should cold brew tea steep?',
+          answer:
+            'With about 12 g of tea per litre in the fridge: green tea about 3 hours, white tea and oolong 7.5 to 8, black tea about 10. Better brew herbal and fruit tea hot and let it cool, unless it is made for cold brewing.',
+        },
+        {
+          question: 'Does steeping longer make tea stronger?',
+          answer:
+            'Yes, but differently from more tea. Steeped longer, mostly more tannin dissolves: the tea gets fuller and more astringent, and after six to eight minutes only more bitter. More leaves make it stronger without changing the balance.',
         },
         {
           question: 'How do I make iced tea from hot tea?',
