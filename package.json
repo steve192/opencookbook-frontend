@@ -1,6 +1,6 @@
 {
   "main": "node_modules/expo/AppEntry.js",
-  "version": "1.24.19",
+  "version": "1.24.20",
   "scripts": {
     "start": "expo start --tunnel",
     "android": "expo start --tunnel --android",
