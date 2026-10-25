@@ -14,6 +14,8 @@ export const LINKING_SCREENS = {
   LegalDocumentScreen: 'legal/:document',
   SharedRecipeScreen: `${LINK_SEGMENTS.share}/:shareId`,
   InvitationScreen: `${LINK_SEGMENTS.invitation}/:token`,
+  ToolsOverviewScreen: 'tools',
+  ToolScreen: 'tools/:slug',
   default: {
     // Beneath any linked screen, so it has somewhere to go back to. The login stack
     // has no such route and drops it.
@@ -43,10 +45,11 @@ export const LINKING_SCREENS = {
       PlanningSettingsScreen: 'settings/planning',
       ScanningSettingsScreen: 'settings/scanning',
       AppearanceSettingsScreen: 'settings/appearance',
+      SettingsScreen: 'settings',
       ApiKeysScreen: 'settings/apiKeys',
       OverviewScreen: {
         screens: {
-          SettingsScreen: 'settings',
+          MoreScreen: 'more',
           WeeklyScreen: 'weekly',
           ShoppingScreen: 'shopping',
           RecipesListScreen: {

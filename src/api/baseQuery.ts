@@ -15,6 +15,8 @@ export interface ApiRequest {
   timeout?: number;
   /** Sent without the access token: public endpoints and signing in. */
   anonymous?: boolean;
+  /** Sent with the access token when signed in and without it otherwise: endpoints that also serve visitors. */
+  signInOptional?: boolean;
 }
 
 const OFFLINE: ApiError = {code: NETWORK_UNREACHABLE, retryable: true};
@@ -26,8 +28,9 @@ export const baseQuery: BaseQueryFn<ApiRequest, unknown, ApiError> = async (requ
   if (!selectIsOnline(state)) {
     return {error: OFFLINE};
   }
+  const signedIn = selectLoggedIn(state);
   // Nothing is read as an account that signed out, not even by a screen still on its way out.
-  if (!request.anonymous && !selectLoggedIn(state)) {
+  if (!request.anonymous && !request.signInOptional && !signedIn) {
     return {error: SIGNED_OUT};
   }
   const method = request.method ?? 'GET';
@@ -39,7 +42,7 @@ export const baseQuery: BaseQueryFn<ApiRequest, unknown, ApiError> = async (requ
     timeout: request.timeout ?? (method === 'GET' ? READ_TIMEOUT_MILLIS : WRITE_TIMEOUT_MILLIS),
   };
   try {
-    const response = await sendRequest(config, request.anonymous);
+    const response = await sendRequest(config, request.anonymous || !signedIn);
     return {data: response.data};
   } catch (error) {
     if (wasUnreachable(error)) {

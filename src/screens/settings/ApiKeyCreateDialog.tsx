@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {Button, Checkbox, Dialog, Text, TextInput} from 'react-native-paper';
 import {useCreateApiKeyMutation} from '../../api/endpoints/account';
 import {ApiScope, IssuedApiKey} from '../../api/types/account';
@@ -11,6 +11,7 @@ import {withPortal} from '../../helper/withPortal';
 import {OfflineSaveHint} from '../../offline/OfflineSaveHint';
 import {useIsOnline} from '../../offline/useIsOnline';
 import {overlayStyles} from '../../styles/CentralStyles';
+import {AppScrollView} from '../../components/AppScrollView';
 
 const NAME_MAX_LENGTH = 60;
 
@@ -36,7 +37,7 @@ export const ApiKeyCreateDialog = withPortal(function ApiKeyCreateDialog({onDism
     <Dialog visible style={overlayStyles.dialogView} onDismiss={onDismiss}>
       <Dialog.Title>{t('screens.apiKeys.create')}</Dialog.Title>
       <Dialog.ScrollArea>
-        <ScrollView contentContainerStyle={styles.content}>
+        <AppScrollView contentContainerStyle={styles.content}>
           <OfflineSaveHint />
           <TextInput mode="outlined" label={t('screens.apiKeys.name')} value={name} onChangeText={setName}
             maxLength={NAME_MAX_LENGTH} />
@@ -51,7 +52,7 @@ export const ApiKeyCreateDialog = withPortal(function ApiKeyCreateDialog({onDism
               ))}
             </React.Fragment>
           ))}
-        </ScrollView>
+        </AppScrollView>
       </Dialog.ScrollArea>
       <Dialog.Actions>
         <Button onPress={onDismiss}>{t('common.cancel')}</Button>

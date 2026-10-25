@@ -9,9 +9,9 @@ export interface AisleGroup<T> {
 /**
  * The icon to show: the item's own, or its aisle's.
  *
- * @param {string} icon the item's Fluent Emoji name, if it has one
+ * @param {string} icon the item's icon name, Fluent Emoji or CookPal's own, if it has one
  * @param {Aisle} aisle where it is sold
- * @return {string} a Fluent Emoji name
+ * @return {string} an icon name
  */
 export const iconOf = (icon: string | null | undefined, aisle: Aisle): string => icon ?? aisleIcons[aisle];
 

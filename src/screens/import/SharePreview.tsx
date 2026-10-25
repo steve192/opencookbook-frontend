@@ -1,12 +1,13 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {Image, ScrollView, StyleSheet, View} from 'react-native';
+import {Image, StyleSheet, View} from 'react-native';
 import {Avatar, Button, Chip, HelperText, Text} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Notice} from '../../components/Notice';
 import {MAX_SCAN_PAGES} from '../../helper/recipeScanPages';
 import {hostOf, MAX_IMPORT_INPUT, SharedContent} from '../../helper/sharedContent';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
+import {AppScrollView} from '../../components/AppScrollView';
 
 interface Props {
   share: SharedContent;
@@ -46,9 +47,9 @@ export const SharePreview = ({share, canScan, importDisabled, onImport, onDismis
 
   const renderPhotos = (uris: string[]) => (
     <View style={[styles.stretch, styles.photoSection]}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.photos}>
+      <AppScrollView horizontal contentContainerStyle={styles.photos}>
         {uris.slice(0, MAX_SCAN_PAGES).map((uri) => <Image key={uri} source={{uri}} style={styles.photo} />)}
-      </ScrollView>
+      </AppScrollView>
       {!canScan && <Notice icon="camera-off" tone="information">{t('screens.import.share.photosUnavailable')}</Notice>}
       {canScan && uris.length > MAX_SCAN_PAGES &&
         <Text variant="bodyMedium" style={[styles.centered, muted]}>
@@ -91,7 +92,7 @@ export const SharePreview = ({share, canScan, importDisabled, onImport, onDismis
 
   return (
     <View style={styles.preview}>
-      <ScrollView contentContainerStyle={[CentralStyles.smallContentContainer, styles.body]}>
+      <AppScrollView contentContainerStyle={[CentralStyles.smallContentContainer, styles.body]}>
         <Avatar.Icon
           size={88}
           icon={preview.icon}
@@ -99,7 +100,7 @@ export const SharePreview = ({share, canScan, importDisabled, onImport, onDismis
           style={{backgroundColor: theme.colors.primaryContainer}} />
         <Text variant="headlineSmall" style={styles.centered}>{preview.title}</Text>
         {preview.body}
-      </ScrollView>
+      </AppScrollView>
       <View style={[CentralStyles.smallContentContainer, styles.actions, {paddingBottom: insets.bottom + 16}]}>
         {preview.action &&
           <Button mode="contained" icon={share.kind === 'photos' ? 'text-recognition' : 'import'}

@@ -2,7 +2,7 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useState} from 'react';
 import {useGetAvailableImportHostsQuery} from '../api/endpoints/recipes';
 import {useTranslation} from 'react-i18next';
-import {Platform, ScrollView, StyleSheet, View} from 'react-native';
+import {Platform, StyleSheet, View} from 'react-native';
 import {Button, Chip, Divider, HelperText, Icon, List, Surface, Text, TextInput} from 'react-native-paper';
 import {Notice} from '../components/Notice';
 import {RECEIVES_SHARES, useIncomingShare} from '../helper/incomingShare';
@@ -13,6 +13,7 @@ import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {useIsOnline} from '../offline/useIsOnline';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
 import {SharePreview} from './import/SharePreview';
+import {AppScrollView} from '../components/AppScrollView';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'ImportScreen'>;
@@ -211,11 +212,11 @@ export const ImportScreen = (props: Props) => {
           importDisabled={!online || importing}
           onImport={() => importShare(share)}
           onDismiss={dismiss} /> :
-        <ScrollView keyboardShouldPersistTaps="handled">
+        <AppScrollView keyboardShouldPersistTaps="handled">
           <View style={CentralStyles.contentContainer}>
             {renderImport()}
           </View>
-        </ScrollView>}
+        </AppScrollView>}
     </Surface>
   );
 };

@@ -32,6 +32,7 @@ import {FoodSection} from './wizard/FoodSection';
 import {HouseholdSection} from './wizard/HouseholdSection';
 import {WeekSection} from './wizard/WeekSection';
 import {useHouseholds} from '../households/useHouseholds';
+import {AppScrollView} from '../../components/AppScrollView';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'WeekplanWizardScreen'>;
 
@@ -162,12 +163,12 @@ export const WeekplanWizardScreen = (props: Props) => {
 
   return (
     <Surface style={styles.screen}>
-      <ScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContent}>
+      <AppScrollView ref={scrollRef} keyboardShouldPersistTaps="handled" contentContainerStyle={styles.scrollContent}>
         <View style={[CentralStyles.contentContainer, styles.content]}>
           <MealTypeCoverageWarning />
           {guidedStep === undefined ? renderOverview() : renderGuided(guidedStep)}
         </View>
-      </ScrollView>
+      </AppScrollView>
       <ScreenFooter>
         {guidedStep !== undefined && guidedStep > 0 &&
           <Button mode="outlined" onPress={() => goToStep(guidedStep - 1)}>{t('screens.planning.back')}</Button>

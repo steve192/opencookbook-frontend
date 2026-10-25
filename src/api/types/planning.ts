@@ -16,6 +16,8 @@ export interface RecipeSuggestionRequest {
   macroStyle?: MacroStyle | null;
   /** Also draw on the household cookbooks you may read; left out means no. */
   includeHouseholdRecipes?: boolean;
+  /** Also want what is in season in Germany in that month, 1 to 12. */
+  inSeasonMonth?: number;
   limit?: number;
   /** Repeat a seed to get that result set back; leave it out for a new draw. */
   seed?: number | null;

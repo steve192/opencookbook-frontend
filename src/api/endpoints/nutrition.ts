@@ -1,6 +1,6 @@
-import {api, KEEP_BRIEFLY_SECONDS} from '../api';
+import {api} from '../api';
 import {queryString} from '../queryString';
-import {CatalogueFood, NutritionOfRecipe, RecipeNutrition} from '../types/nutrition';
+import {NutritionOfRecipe, RecipeNutrition} from '../types/nutrition';
 
 // A correction changes the lines and the summary the recipe carries.
 const NUTRITION_CHANGED = ['Nutrition', 'Recipe'] as const;
@@ -13,10 +13,6 @@ const nutritionApi = api.injectEndpoints({
       transformResponse: (sheets: NutritionOfRecipe[]) =>
         Object.fromEntries(sheets.map((sheet) => [sheet.recipeId, sheet.nutrition])),
       providesTags: ['Nutrition'],
-    }),
-    searchCatalogue: builder.query<CatalogueFood[], string>({
-      query: (text) => ({url: '/catalogue/search' + queryString({q: text})}),
-      keepUnusedDataFor: KEEP_BRIEFLY_SECONDS,
     }),
     // Without a food the ingredient counts for nothing.
     linkIngredient: builder.mutation<void, {ingredientId: number, catalogueFoodId: number | null}>({
@@ -40,7 +36,6 @@ const nutritionApi = api.injectEndpoints({
 
 export const {
   useGetNutritionQuery,
-  useSearchCatalogueQuery,
   useLinkIngredientMutation,
   useSetOwnPortionMutation,
   useRemoveOwnPortionMutation,

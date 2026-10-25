@@ -61,4 +61,15 @@ describe('linking', () => {
   it('keeps the import at its own address', () => {
     expect(pathOf('ImportScreen', {})).toBe('/import');
   });
+
+  it('opens the kitchen tools and a tool with the inputs of a shared link', () => {
+    expect(routeOf('/tools')?.name).toBe('ToolsOverviewScreen');
+    expect(routeOf('/tools/pizza-dough?i=%7B%22balls%22%3A4%7D')).toMatchObject(
+        {name: 'ToolScreen', params: {slug: 'pizza-dough', i: '{"balls":4}'}});
+  });
+
+  it('keeps the settings at their address now that the last tab is More', () => {
+    expect(routeOf('/settings')?.name).toBe('SettingsScreen');
+    expect(routeOf('/more')?.name).toBe('MoreScreen');
+  });
 });

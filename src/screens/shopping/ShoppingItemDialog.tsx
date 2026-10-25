@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Button, Chip, Dialog, Menu, Text, TextInput} from 'react-native-paper';
 import XDate from 'xdate';
 import {ShoppingIcon} from '../../components/shopping/ShoppingIcon';
@@ -10,6 +10,7 @@ import {ShoppingItem, ShoppingItemSource, ShoppingOp} from '../../api/types/shop
 import {formatShortWeekday} from '../../helper/weekplan';
 import {withPortal} from '../../helper/withPortal';
 import {overlayStyles, useAppTheme} from '../../styles/CentralStyles';
+import {AppScrollView} from '../../components/AppScrollView';
 
 /** What the dialog lets a person change: an update op without its ids. */
 export type ItemEdit = Pick<Extract<ShoppingOp, {type: 'UPDATE'}>, 'name' | 'spec' | 'aisle' | 'prioritized'>;
@@ -50,7 +51,7 @@ export const ShoppingItemDialog = withPortal(function ShoppingItemDialog({item, 
     <Dialog visible style={overlayStyles.dialogView} onDismiss={onDismiss}>
       <Dialog.Title>{t('screens.shopping.itemTitle')}</Dialog.Title>
       <Dialog.ScrollArea>
-        <ScrollView contentContainerStyle={styles.content}>
+        <AppScrollView contentContainerStyle={styles.content}>
           <TextInput mode="outlined" label={t('screens.shopping.itemName')} value={name} onChangeText={setName}
             maxLength={120} />
           <TextInput mode="outlined" label={t('screens.shopping.itemSpec')} value={spec} onChangeText={setSpec}
@@ -85,7 +86,7 @@ export const ShoppingItemDialog = withPortal(function ShoppingItemDialog({item, 
               {t('screens.shopping.forMeals', {meals: item.sources.map(sourceLabel).join(', ')})}
             </Text>}
           {item.addedBy && <Text variant="bodySmall">{t('screens.shopping.addedBy', {name: item.addedBy})}</Text>}
-        </ScrollView>
+        </AppScrollView>
       </Dialog.ScrollArea>
       <Dialog.Actions>
         <View style={styles.grow}>

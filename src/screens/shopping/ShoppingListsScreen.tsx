@@ -1,7 +1,7 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView} from 'react-native';
+
 import {Button, List, Surface} from 'react-native-paper';
 import {usePlanTarget} from '../../components/PlanTargetDialog';
 import {actionsSide, iconSide, SideAction} from '../../components/listSides';
@@ -22,6 +22,7 @@ import {useIsOnline} from '../../offline/useIsOnline';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles from '../../styles/CentralStyles';
 import {useHouseholds} from '../households/useHouseholds';
+import {AppScrollView} from '../../components/AppScrollView';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'ShoppingListsScreen'>;
 
@@ -80,7 +81,7 @@ export const ShoppingListsScreen = (props: Props) => {
 
   return (
     <Surface style={CentralStyles.screen}>
-      <ScrollView>
+      <AppScrollView>
         {lists.map((list) => (
           <List.Item
             key={list.id}
@@ -89,7 +90,7 @@ export const ShoppingListsScreen = (props: Props) => {
             left={iconSide(listIcon(list))}
             right={actionsSide(actionsOf(list))} />
         ))}
-      </ScrollView>
+      </AppScrollView>
       <ScreenFooter>
         <Button key="new" mode="contained" icon="plus" disabled={!online}
           onPress={() => scope.choose(t('screens.shopping.whoseList'), create)}>

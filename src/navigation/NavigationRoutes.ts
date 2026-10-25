@@ -12,10 +12,14 @@ export type BaseNavigatorProps = {
     SharedRecipeScreen: { shareId: string }
     // Outside the authenticated navigator for the same reason: the invited have no account yet.
     InvitationScreen: { token: string }
-    // Holds the login stack until somebody is signed in and the main one afterwards. Typed
-    // as the main one so that reaching a screen from outside the app - from a notification,
-    // say - is checked rather than cast away.
-    default: NavigatorScreenParams<MainNavigationProps> | undefined
+    // Outside the authenticated navigator, so an instance can offer them to everybody (TOOLS_PUBLIC).
+    ToolsOverviewScreen: undefined
+    /** `i` holds the inputs as JSON, so a link reopens the same calculation. */
+    ToolScreen: { slug: string, i?: string }
+    // Holds the login stack until somebody is signed in and the main one afterwards. Typed as
+    // either, so that reaching a screen from outside the app - from a notification, say - is
+    // checked rather than cast away.
+    default: NavigatorScreenParams<MainNavigationProps> | NavigatorScreenParams<LoginNavigationProps> | undefined
 }
 export type LoginNavigationProps = {
     /** The address of a new account, filled in so that signing in is the next thing to do. */
@@ -57,6 +61,7 @@ export type MainNavigationProps = {
     ShoppingSettingsScreen: undefined
     PlanningSettingsScreen: undefined
     ScanningSettingsScreen: undefined
+    SettingsScreen: undefined
     AppearanceSettingsScreen: undefined
     ApiKeysScreen: undefined
 };
@@ -65,7 +70,7 @@ export type OverviewNavigationProps = {
     RecipesListScreen: NavigatorScreenParams<RecipeScreenNavigation>,
     WeeklyScreen: undefined,
     ShoppingScreen: undefined,
-    SettingsScreen: undefined,
+    MoreScreen: undefined,
 }
 
 export type RecipeScreenNavigation = {

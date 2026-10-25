@@ -35,7 +35,9 @@
     "dismiss": "Schließen",
     "experimental": "experimentell",
     "mealTypeCoverageWarning": "{{untagged}} von {{total}} Rezepten sagen nicht, zu welchen Mahlzeiten sie passen. Solange das fehlt, können Vorschläge und Pläne nur raten - lege die Mahlzeiten beim Bearbeiten eines Rezepts fest.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "change": "Ändern",
+    "moreAbout": "Mehr zu {{topic}}"
   },
   "navigation": {
     "screenTitleImportBrowser": "Rezept Import Browser",
@@ -774,6 +776,11 @@
       },
       "serverUnavailable": "Die Komponenten des Servers konnten nicht geladen werden.",
       "retry": "Erneut versuchen"
+    },
+    "more": {
+      "screenTitle": "Mehr",
+      "toolsSubtitle": "Rechner für Teig, Hefe, Backofen, Partys, Getränke und ein Saisonkalender",
+      "settingsSubtitle": "Konto, Einkauf, Planung und Aussehen der App"
     }
   },
   "nutrition": {
@@ -939,7 +946,7 @@
     "neverSynced": "Noch nicht abgeglichen",
     "syncNow": "Jetzt abgleichen",
     "syncing": "Wird abgeglichen",
-    "storageUsed": "{{size}} MB belegt, inklusive App"
+    "storageUsed": "{{size, number(minimumFractionDigits: 1; maximumFractionDigits: 1)}} MB belegt, inklusive App"
   },
   "pwa": {
     "install": {
@@ -958,5 +965,934 @@
       "available": "Eine neue Version von CookPal ist verfügbar.",
       "reload": "Neu laden"
     }
+  },
+  "tools": {
+    "title": "Küchenhelfer",
+    "unknown": "Diesen Küchenhelfer gibt es (nicht mehr).",
+    "signInRequired": "Melde dich an, um die Küchenhelfer dieser CookPal-Instanz zu nutzen.",
+    "range": "{{low}} bis {{high}}",
+    "categories": {
+      "baking": "Teig & Backen",
+      "converters": "Umrechner",
+      "planning": "Planen",
+      "drinks": "Getränke"
+    },
+    "units": {
+      "metric": "Metrisch",
+      "imperial": "Imperial",
+      "hours": "Std.",
+      "minutes": "Min.",
+      "seconds": "Sek."
+    },
+    "result": {
+      "copy": "Kopieren",
+      "print": "Drucken",
+      "shareLink": "Link teilen",
+      "copied": "Kopiert",
+      "ingredients": "Zutaten",
+      "preparation": "Zubereitung",
+      "disclaimer": "Richtwerte, keine Garantie: Zutaten, Geräte und Küchen sind verschieden. Verlass dich nicht blind darauf."
+    },
+    "signupHint": {
+      "title": "CookPal kann noch mehr",
+      "body": "Sammle deine Rezepte, plane deine Woche und kaufe mit einer Liste ein. Kostenlos.",
+      "bodySignInOnly": "Du hast ein Konto? Melde dich an, um Rezepte zu sammeln, deine Woche zu planen und mit einer Liste einzukaufen.",
+      "signUp": "Kostenloses Konto erstellen",
+      "signIn": "Anmelden",
+      "dismiss": "Vorerst ausblenden"
+    },
+    "timer": {
+      "runningBody": "{{tool}}, fertig um {{time}}",
+      "alertBody": "{{tool}}",
+      "doneFor": "{{label}} sind um ({{tool}})",
+      "openTool": "Öffnen"
+    },
+    "pizzaDough": {
+      "name": "Pizzateig",
+      "summary": "Mehl, Wasser, Salz und Hefe oder Sauerteig für deinen Stil und Zeitplan",
+      "style": "Stil",
+      "styles": {
+        "neapolitan": "Neapolitanisch",
+        "contemporary": "Neapolitanisch modern",
+        "newYork": "New York",
+        "romanTonda": "Römisch (tonda)",
+        "pinsa": "Pinsa",
+        "romanTeglia": "Römisch (teglia)",
+        "detroit": "Detroit",
+        "sicilian": "Sizilianisch",
+        "blechpizza": "Blechpizza",
+        "focaccia": "Focaccia"
+      },
+      "amount": "Wie viel",
+      "amountModes": {
+        "balls": "Teiglinge",
+        "pizzas": "Pizzen nach Größe",
+        "trays": "Bleche",
+        "flour": "Vorhandenes Mehl"
+      },
+      "counts": {
+        "balls": "Anzahl Teiglinge",
+        "pizzas": "Anzahl Pizzen",
+        "trays": "Anzahl Bleche"
+      },
+      "ballWeight": "Gewicht pro Teigling",
+      "diameter": "Durchmesser",
+      "trayWidth": "Blechbreite",
+      "trayLength": "Blechlänge",
+      "knowsW": "Ich kenne den W-Wert",
+      "knowsWHint": "Italienische Mühlen drucken die Mehlstärke (W) auf die Tüte. Sie bestimmt, wie lange der Teig gehen kann.",
+      "wValue": "W-Wert",
+      "riceFlour": "Reismehl",
+      "soyFlour": "Sojamehl",
+      "pieces": {
+        "balls_one": "{{count}} Teigling",
+        "balls_other": "{{count}} Teiglinge",
+        "trays_one": "{{count}} Blech",
+        "trays_other": "{{count}} Bleche"
+      },
+      "bakeValue": "{{temperature}}, etwa {{duration}}",
+      "resultTitle": "Teig: {{style}}",
+      "styleDescriptions": {
+        "neapolitan": "Weicher, luftiger Rand mit dunklen Flecken, dünn in der Mitte. Gemacht für einen sehr heißen Pizzaofen.",
+        "contemporary": "Neapolitanisch mit besonders hohem, luftigem Rand aus einem weicheren Teig.",
+        "newYork": "Groß, dünn und faltbar mit knusprigem Boden. Etwas Öl und Zucker im Teig.",
+        "romanTonda": "Sehr dünn und knusprig, fast wie ein Cracker. Mit dem Nudelholz ausgerollt.",
+        "pinsa": "Oval, außen knusprig und innen luftig. Weizen mit Reis- und Sojamehl in einem sehr weichen Teig.",
+        "romanTeglia": "Römische Blechpizza: sehr weicher Teig mit großen Poren und knusprigem Boden. Verkauft in Stücken.",
+        "detroit": "Dick und luftig aus einer tiefen, eckigen Form, mit knusprig karamellisiertem Käserand.",
+        "sicilian": "Dick, weich und fluffig wie Focaccia, in einer geölten Form gebacken.",
+        "blechpizza": "Der Klassiker zu Hause: eine große Pizza auf dem Backblech.",
+        "focaccia": "Fladenbrot mit Mulden und viel Olivenöl, knusprigem Boden und weicher Krume."
+      },
+      "ballMakes": "für {{diameter}}",
+      "oven": "Dein Ofen",
+      "ovenInfo": "Wie lange eine Pizza backt, hängt davon ab, wie heiß der Ofen wird und worauf die Pizza liegt. Stein oder Stahl speichern Hitze und backen den Boden schneller als ein Blech.",
+      "ovens": {
+        "tray": "Backofen, Backblech",
+        "stone": "Backofen, Pizzastein",
+        "steel": "Backofen, Pizzastahl",
+        "pizzaOven": "Pizzaofen"
+      },
+      "ovenDescriptions": {
+        "tray": "Das Blech, das zum Ofen gehört.",
+        "stone": "Eine Steinplatte, die Hitze speichert und den Boden knuspriger macht.",
+        "steel": "Eine Stahlplatte, die Hitze schneller abgibt als Stein, die Pizza ist früher fertig.",
+        "pizzaOven": "Ein Gas- oder Holzofen, der viel heißer wird als ein Backofen."
+      },
+      "ovenTips": {
+        "tray": "Das Blech umgedreht auf der mittleren Schiene mit aufheizen und die Pizza darauf gleiten lassen.",
+        "stone": "Den Stein in den kalten Ofen auf die untere oder mittlere Schiene legen und auf höchster Stufe 30 bis 60 Minuten aufheizen, dicke Steine länger.",
+        "steel": "Den Stahl 30 bis 60 Minuten mit dem Ofen auf der unteren oder mittleren Schiene aufheizen. Bleibt die Oberseite blass, unter dem Grill fertig backen.",
+        "pizzaOven": "20 bis 30 Minuten aufheizen, bis der Stein heiß ist, gemessen mit einem Infrarotthermometer, und die Pizza alle 20 bis 30 Sekunden drehen.",
+        "pan": "Die Form auf der untersten Schiene backen, damit der Boden knusprig wird."
+      },
+      "ovenMax": "Höchste Stufe",
+      "ovenMaxInfo": "Die höchste Temperatur, die dein Ofen mit Ober- und Unterhitze schafft. Die meisten Backöfen kommen auf 250 bis 280 °C.",
+      "bake": "Backen",
+      "madeForPizzaOven": "{{style}} wird meist im Pizzaofen bei etwa {{temperature}} gebacken. Dein Ofen schafft {{max}}, die Pizza braucht daher länger; die Zeit gilt für {{surface}}.",
+      "madeForHotterOven": "{{style}} wird meist bei etwa {{temperature}} gebacken; bei {{max}} dauert es länger. Die Zeit gilt für die Temperatur deines Ofens.",
+      "recommendedFor": "Empfohlen für {{style}}",
+      "surfaces": {
+        "tray": "ein vorgeheiztes Blech",
+        "stone": "einen Pizzastein",
+        "steel": "einen Pizzastahl"
+      },
+      "bakeValueOrLess": "{{temperature}}, {{duration}} oder weniger",
+      "bakeValueAtLeast": "{{temperature}}, mindestens {{duration}}",
+      "waterForFlour": "{{flour}} nimmt {{direction}} Wasser auf als das übliche Mehl dieses Stils: Der Teig bekommt {{percent}} % statt {{stylePercent}} %. Halte etwas Wasser zurück und gib es nach Gefühl dazu.",
+      "waterDirection": {
+        "more": "mehr",
+        "less": "weniger"
+      }
+    },
+    "bread": {
+      "name": "Brot & Sauerteig",
+      "summary": "Sauerteig-, Roggen- oder Hefebrot mit Zutaten, Sauer, Quellstück, Zeitplan und Anleitung",
+      "flourMixHint": "Die Anteile ergeben zusammen 100 %; das Wasser richtet sich danach, wie viel jedes Mehl aufnimmt.",
+      "share": "Anteil",
+      "addFlour": "Mehl hinzufügen",
+      "removeFlour": "Mehl entfernen",
+      "hydration": "Wasser",
+      "hydrationInfo": "Bäcker geben das Wasser in Prozent des Mehls an: 63 % heißt 63 g Wasser auf 100 g Mehl. Oft steht stattdessen die Teigausbeute, kurz TA: das Gewicht des Teigs aus 100 g Mehl. TA 163 ist also dasselbe wie 63 % Wasser. Je höher der Wert, desto weicher der Teig.",
+      "hydrationHint": "In % des Mehls; Teigausbeute (TA) {{yield}}.",
+      "hydrationValue": "{{percent}} % (TA {{yield}})",
+      "doughWater": "Wasser im Teig",
+      "doughWaterValue": "{{grams}}, {{percent}} % (TA {{yield}})",
+      "fromAdditions": "Davon aus den Zutaten",
+      "amount": "Wie viel",
+      "amountModes": {
+        "loaves": "Brote",
+        "flour": "Vorhandenes Mehl"
+      },
+      "loafCount": "Anzahl Brote",
+      "loafWeight": "Gewicht pro Brot",
+      "loaves_one": "{{count}} Brot",
+      "loaves_other": "{{count}} Brote",
+      "additions": "Zutaten",
+      "additionsHint": "Sie zählen zum Brotgewicht, mehr davon heißt also weniger Mehl. Ihr Wasser geht in den Teig: das von Quark oder Ei ganz, das von Obst und Gemüse, soweit es frei wird, gekocht oder püriert viel mehr. Saaten und Körner kommen in ein Quellstück.",
+      "searchAddition": "Kürbis, Quark, Saaten hinzufügen…",
+      "searchFailed": "Der Lebensmittelkatalog ist nicht erreichbar.",
+      "removeAddition": "Entfernen",
+      "waterGiven": "{{percent}} % Wasser, davon gehen {{grams}} g pro 100 g in den Teig",
+      "waterBound": "{{percent}} % Wasser, die Stärke bindet {{grams}} g Teigwasser pro 100 g",
+      "soaks": "Nimmt {{grams, number}} g Wasser pro Gramm auf",
+      "sourTitle": "Am Vortag: Sauer ansetzen",
+      "sourFlour": "Roggenmehl",
+      "sourStarter": "Anstellgut",
+      "sourTime": "Reift",
+      "sourTimeValue": "{{hours, number}} Std. bei {{temperature}}",
+      "soakerTitle": "Quellstück",
+      "soakerTime": "Quillt",
+      "soakerTimeValue": "etwa {{hours, number}} Std.",
+      "startSour": "Sauer ansetzen",
+      "startSoaker": "Quellstück ansetzen",
+      "ownHydration": "Wassermenge selbst wählen",
+      "recommendedHydration": "Der Rechner nimmt {{percent}} % Wasser (TA {{yield}}), wie es für diese Mehlmischung üblich ist.",
+      "preparations": {
+        "raw": "Roh, geraspelt oder in Stücken",
+        "cooked": "Gekocht oder püriert"
+      },
+      "flourTakes": "Es nimmt etwa {{water}} % Wasser auf.",
+      "flourN": "Mehl {{n}}",
+      "flourMaxShare": "Es macht höchstens {{share}} % des Mehls aus.",
+      "method": "Zubereitung",
+      "methods": {
+        "starter": "Sauerteig direkt",
+        "sour": "Sauer am Vortag",
+        "yeast": "Nur Hefe"
+      },
+      "methodDescriptions": {
+        "starter": "Reifes Anstellgut kommt direkt in den Teig. So entstehen die meisten Weizen- und Dinkelsauerteigbrote.",
+        "sour": "Ein Teil des Roggens reift am Vortag mit etwas Anstellgut zum Sauer, der dann ganz in den Teig kommt. Roggen braucht diese Säure, um zu backen.",
+        "yeast": "Nur mit Backhefe gelockert, ohne Sauerteig."
+      },
+      "sourNeedsRye": "Mit Roggen im Mehl kannst du auch einen Sauer am Vortag ansetzen.",
+      "withYeast": "Mit etwas Hefe",
+      "withYeastHint": "Hefe gleicht aus, was dem Sauerteig für deinen Zeitplan fehlt. So geht der Teig schneller und verlässlicher.",
+      "starterPercent": "Anstellgut",
+      "starterPercentHint": "In % des Mehls. Die Hefe gleicht aus, was ihm für den Zeitplan fehlt.",
+      "inDough": {
+        "starter": "Reifes Anstellgut",
+        "sour": "Der ganze Sauer vom Vortag"
+      },
+      "resultTitles": {
+        "starter": "Sauerteigbrot",
+        "sour": "Brot mit Roggensauer",
+        "yeast": "Hefebrot"
+      },
+      "resultWithYeast": "{{bread}} mit etwas Hefe",
+      "stepsTitle": "So backst du es",
+      "steps": {
+        "sour": "Am Vortag den Sauer ansetzen: das Anstellgut im Wasser verrühren, das Roggenmehl untermischen und zugedeckt reifen lassen. Am nächsten Tag kommt der ganze Sauer in den Teig.",
+        "soaker": "Am Vortag die Saaten mit dem Wasser des Quellstücks übergießen und zugedeckt quellen lassen.",
+        "mixRye": "Alle Zutaten nur so lange mischen, bis der Teig gleichmäßig ist. Roggenteig wird nicht geknetet und bleibt klebrig.",
+        "knead": "Alle Zutaten {{minutes, number}} Min. kneten, bis der Teig glatt ist und sich vom Schüsselrand löst.",
+        "fold": "Zugedeckt gehen lassen und dabei {{count, number}}-mal im Abstand von 30 Min. dehnen und falten: den Teig an einer Seite hochziehen, über die Mitte legen, und so rundum.",
+        "rise": "Zugedeckt gehen lassen, wie im Zeitplan.",
+        "bake": "Den Ofen mit Blech oder Topf auf {{start}} Ober- und Unterhitze vorheizen. Das Brot einschneiden und mit Dampf backen: eine Schale Wasser auf dem Ofenboden, oder mit Deckel im Topf. Nach {{after, number}} Min. auf {{lower}} herunterschalten, insgesamt etwa {{minutes, number}} Min.",
+        "done": "Fertig ist es bei etwa {{core}} im Kern, oder wenn es beim Klopfen auf die Unterseite hohl klingt. Auf einem Gitter auskühlen lassen, bevor du es anschneidest.",
+        "doneRye": "Fertig ist es bei etwa {{core}} im Kern, oder wenn es beim Klopfen auf die Unterseite hohl klingt. Auf einem Gitter ganz auskühlen lassen, bevor du es anschneidest: Roggenbrot reift dabei nach.",
+        "shape_one": "Etwa {{hours, number}} Std. vor dem Backen zu einem Laib formen, mit dem Schluss nach oben in ein bemehltes Gärkörbchen oder in eine Kastenform legen und zugedeckt fertig gehen lassen.",
+        "shape_other": "Etwa {{hours, number}} Std. vor dem Backen den Teig in {{count, number}} gleiche Stücke teilen und zu Laiben formen, jeweils mit dem Schluss nach oben in bemehlte Gärkörbchen oder Kastenformen legen und zugedeckt fertig gehen lassen."
+      },
+      "sourHours": "Sauer reift",
+      "sourHoursHint": "Je länger er reifen darf, desto weniger Anstellgut braucht er.",
+      "hoursValue": "{{hours, number}} Std.",
+      "sourRise": "Wie lange der Teig geht",
+      "sourRiseLabel": "Bei {{temperature}}",
+      "sourRiseHint": "Ohne Hefe hebt der Sauer den Teig: Für weniger Zeit braucht es mehr Sauer. Zwischen {{low, number}} und {{high, number}} Std. bleibt die Säure so, wie Roggen sie braucht. Für einen anderen Zeitplan nimm etwas Hefe dazu.",
+      "mixOnly": "Mischen, nicht kneten"
+    },
+    "dough": {
+      "flour": "Mehl",
+      "water": "Wasser",
+      "salt": "Salz",
+      "oil": "Öl",
+      "sugar": "Zucker",
+      "total": "Teig",
+      "flourOnHand": "Vorhandenes Mehl",
+      "flourType": "Mehl",
+      "flours": {
+        "tipo00": "Tipo 00 für Pizza",
+        "tipo00Strong": "Tipo 00, stark",
+        "manitoba": "Manitoba",
+        "type405": "Weizen 405",
+        "type550": "Weizen 550",
+        "type1050": "Weizen 1050",
+        "wholeWheat": "Weizenvollkorn",
+        "spelt630": "Dinkel 630",
+        "speltWholegrain": "Dinkelvollkorn",
+        "rye1150": "Roggen 1150",
+        "ryeWholegrain": "Roggenvollkorn",
+        "type812": "Weizen 812",
+        "type1600": "Weizen 1600",
+        "wheatMeal": "Weizenschrot",
+        "durum": "Hartweizenmehl (Semola rimacinata)",
+        "spelt812": "Dinkel 812",
+        "spelt1050": "Dinkel 1050",
+        "speltMeal": "Dinkelschrot",
+        "rye815": "Roggen 815",
+        "rye997": "Roggen 997",
+        "rye1370": "Roggen 1370",
+        "rye1740": "Roggen 1740",
+        "ryeMeal": "Roggenschrot",
+        "einkorn": "Einkornvollkorn",
+        "emmer": "Emmervollkorn",
+        "barley": "Gerste",
+        "buckwheat": "Buchweizen",
+        "millet": "Hirse",
+        "quinoa": "Quinoa",
+        "amaranth": "Amaranth",
+        "teff": "Teff"
+      },
+      "leavener": "Triebmittel",
+      "yeast": "Hefe",
+      "leaveners": {
+        "fresh": "Frischhefe",
+        "instant": "Trockenhefe (instant)",
+        "activeDry": "Aktive Trockenhefe",
+        "sourdough": "Reifer Sauerteig"
+      },
+      "schedule": "Zeitplan",
+      "presets": {
+        "sameDay": "Am selben Tag",
+        "overnight": "Über Nacht",
+        "fridge24": "24 Std. Kühlschrank",
+        "fridge48": "48 Std. Kühlschrank",
+        "fridge72": "72 Std. Kühlschrank",
+        "custom": "Eigener",
+        "quick": "Schnell",
+        "daylong": "Den ganzen Tag"
+      },
+      "stageHours": "Dauer",
+      "stageTemperature": "Temperatur",
+      "addStage": "Phase hinzufügen",
+      "removeStage": "Phase entfernen",
+      "bakeDay": "Backen",
+      "days": {
+        "0": "Heute",
+        "1": "Morgen",
+        "2": "In 2 Tagen",
+        "3": "In 3 Tagen"
+      },
+      "bakeTime": "Uhrzeit",
+      "temperatures": "Temperaturen",
+      "temperaturesHint": "Für die Wassertemperatur, die den Teig auf die richtige Temperatur bringt.",
+      "room": "Raumtemperatur",
+      "kneading": {
+        "hand": "Von Hand",
+        "machine": "Küchenmaschine"
+      },
+      "waterTemperature": "Wassertemperatur",
+      "timeline": "Zeitplan",
+      "bake": "Backen",
+      "stageLine": "{{hours, number}} Std. {{where}}",
+      "inTheFridge": "im Kühlschrank",
+      "at": "bei {{temperature}}",
+      "warnings": {
+        "flourTooWeakForTime": "Dieses Mehl ist für kürzere Gare gemacht als dieser Zeitplan. Nimm ein stärkeres Mehl oder einen kürzeren Plan.",
+        "tooLittleToWeigh": "Das ist weniger als 0,1 g Hefe, weniger als Küchenwaagen wiegen.",
+        "impossibleSchedule": "Keine Menge Triebmittel schafft diesen Zeitplan: Er ist zu kurz oder zu kalt.",
+        "soakerTooLarge": "Das Quellstück ist mehr, als der Teig tragen kann. Nimm weniger Saaten oder mehr Mehl.",
+        "additionsTooWet": "Die Zutaten bringen mehr Wasser mit, als dieses Mehl aufnimmt, der Teig wird also feuchter als geplant. Nimm weniger davon, mehr Mehl, oder raspel sie, statt sie zu pürieren.",
+        "tooMuchYeast": "Weit mehr Hefe als üblich: Der Teig schmeckt nach Hefe und hat keine Zeit für Aroma. Wähle einen längeren Zeitplan.",
+        "moreYeastThanStyleAllows": "Mehr Hefe, als die neapolitanischen Regeln erlauben (0,1 bis 3 g Frischhefe pro Liter Wasser). Wähle einen längeren Zeitplan.",
+        "waterTooHot": "Das Wasser müsste wärmer als 45 °C sein, ab da stirbt Hefe ab. Lass das Mehl warm werden oder den Teig wärmer gehen.",
+        "waterTooCold": "Das Wasser müsste kälter als Eiswasser sein. Kühle das Mehl oder knete von Hand, das wärmt den Teig weniger.",
+        "tooManyAdditions": "Mehr Obst oder Gemüse als Mehl: Die Krume wird womöglich nicht fest und bleibt klitschig.",
+        "ryeWithoutSour": "Mit mehr als der Hälfte Roggen wird es ein Roggenbrot, und Roggen braucht Säure. Wähle Sauer am Vortag.",
+        "flourShareTooHigh": "Ein Mehl mit wenig oder keinem Kleber macht mehr von der Mischung aus als üblich (Gerste höchstens ein Viertel bis die Hälfte, Buchweizen, Hirse, Quinoa, Amaranth und Teff höchstens die Hälfte): Das Brot wird dicht und krümelig.",
+        "yeastNotNeeded": "Der Sauerteig allein lässt den Teig in dieser Zeit schon gehen, Hefe braucht es dafür nicht. Wähle einen kürzeren Zeitplan, damit die Hefe etwas beiträgt, oder lass sie weg."
+      },
+      "roomInfo": "Wo der Teig geht, meist in der Küche. Das Mehl gilt als genauso warm, weil es dort lagert.",
+      "temperaturesInfo": "Kneten erwärmt den Teig durch Reibung, eine Küchenmaschine mehr als die Hände. Die Wassertemperatur berücksichtigt das, den Raum und das Mehl.",
+      "flourDescriptions": {
+        "tipo00": "Fein gemahlenes italienisches Pizzamehl mittlerer Stärke.",
+        "tipo00Strong": "Stärkeres italienisches 00-Mehl, W etwa 300 bis 320.",
+        "manitoba": "Sehr starkes Mehl mit 13 bis 15 % Eiweiß.",
+        "type550": "Weizenmehl mit etwas mehr vom Korn als 405.",
+        "type405": "Weizenmehl, am feinsten ausgesiebt.",
+        "type1050": "Dunkleres Weizenmehl mit mehr vom Korn.",
+        "wholeWheat": "Aus dem ganzen Korn gemahlen.",
+        "spelt630": "Helles Dinkelmehl.",
+        "speltWholegrain": "Aus dem ganzen Dinkelkorn gemahlen.",
+        "rye1150": "Mittleres Roggenmehl; Roggen braucht Sauerteig.",
+        "ryeWholegrain": "Aus dem ganzen Roggenkorn gemahlen; Roggen braucht Sauerteig.",
+        "type812": "Weizenmehl zwischen 550 und 1050, für helle Mischbrote.",
+        "type1600": "Dunkles Weizenmehl, nah am Vollkorn.",
+        "wheatMeal": "Grob geschroteter ganzer Weizen.",
+        "durum": "Fein gemahlener Hartweizen, goldgelb und fest.",
+        "spelt812": "Dinkelmehl zwischen hell und dunkel.",
+        "spelt1050": "Dunkleres Dinkelmehl mit mehr vom Korn.",
+        "speltMeal": "Grob geschroteter ganzer Dinkel.",
+        "rye815": "Das hellste Roggenmehl; Roggen braucht Sauerteig.",
+        "rye997": "Helles Roggenmehl; Roggen braucht Sauerteig.",
+        "rye1370": "Dunkles Roggenmehl; Roggen braucht Sauerteig.",
+        "rye1740": "Sehr dunkles Roggenmehl, nah am Vollkorn; Roggen braucht Sauerteig.",
+        "ryeMeal": "Grob geschroteter ganzer Roggen; Roggen braucht Sauerteig.",
+        "einkorn": "Aus dem ganzen Einkornkorn, einem Urweizen mit schwachem Kleber.",
+        "emmer": "Aus dem ganzen Emmerkorn, einem Urweizen.",
+        "barley": "Wenig Kleber: nur als Teil der Mischung.",
+        "buckwheat": "Ohne Kleber: nur als Teil der Mischung.",
+        "millet": "Ohne Kleber: nur als Teil der Mischung.",
+        "quinoa": "Ohne Kleber: nur als Teil der Mischung.",
+        "amaranth": "Ohne Kleber: nur als Teil der Mischung.",
+        "teff": "Ohne Kleber: nur als Teil der Mischung."
+      },
+      "leavenerDescriptions": {
+        "fresh": "Feuchte, gepresste Hefe im 42-g-Würfel.",
+        "instant": "Feines Granulat, in Deutschland als Trockenhefe im 7-g-Päckchen. Kommt direkt in den Teig.",
+        "activeDry": "Gröberes Granulat, in den USA im Päckchen zu 1/4 oz. Vorher in warmem Wasser auflösen.",
+        "sourdough": "Reifes Anstellgut mit gleich viel Wasser wie Mehl: blubbernd und etwa verdoppelt, meist 6 bis 8 Stunden nach dem Füttern."
+      },
+      "stageNumber": "Stufe {{number}}",
+      "customSchedule": "Stunden und Temperatur jeder Stufe selbst festlegen.",
+      "scheduleInfo": "Wie lange der Teig wo geht. Wähle einen Zeitplan oder lege eigene Stufen an. Bis {{max}} °C zählt als Kühlschrank.",
+      "bakeWhen": "Wann backst du?",
+      "flourWater": "Es nimmt bis {{water}} % Wasser auf.",
+      "flourHours": "Der Teig darf damit bis {{hours, number}} Stunden gehen.",
+      "mixKnead": "Mischen und kneten ({{minutes, number}} Min.)"
+    },
+    "yeastConverter": {
+      "name": "Hefe-Umrechner",
+      "summary": "Frisch-, Trocken- und Instanthefe, Würfel und Päckchen, Sauerteig",
+      "recipeSays": "Im Rezept steht",
+      "iHave": "Ich habe",
+      "amount": "Menge",
+      "units": {
+        "grams": "Gramm",
+        "cube": "Würfel (42 g)",
+        "sachet": "Päckchen (7 g)",
+        "packet": "US-Päckchen (1/4 oz)"
+      },
+      "recipeFlour": "Mehl im Rezept",
+      "recipeFlourHint": "Auf 0 lassen, um die Menge des Rezepts zu behalten.",
+      "doughTemperature": "Teigtemperatur",
+      "sourdoughHint": "Ein Päckchen Trockenhefe (7 g) entspricht etwa 100 bis 140 g reifem Sauerteig; die Hälfte davon kommt als Mehl und die Hälfte als Wasser vom Rezept ab. Sauerteig treibt langsamer: Der Teig braucht ein Mehrfaches der Zeit, wie lange, hängt von dieser Temperatur ab.",
+      "readyIn": "Fertig in etwa",
+      "hours_one": "{{count}} Stunde",
+      "hours_other": "{{count}} Stunden",
+      "tooCold": "Zu kalt zum Treiben",
+      "resultTitle": "Umgerechnete Hefe",
+      "youNeed": "Du brauchst",
+      "flourAndWaterOff": "Weniger Mehl und weniger Wasser, je"
+    },
+    "ovenConverter": {
+      "name": "Backofen & Heißluftfritteuse",
+      "summary": "Ober-/Unterhitze, Umluft und Heißluftfritteuse, °C und °F",
+      "recipeSays": "Im Rezept steht",
+      "iUse": "Ich nutze",
+      "modes": {
+        "topBottom": "Ober-/Unterhitze",
+        "fan": "Umluft",
+        "airFryer": "Heißluftfritteuse"
+      },
+      "temperature": "Temperatur",
+      "time": "Zeit",
+      "timeHint": "0, wenn das Rezept keine nennt.",
+      "frozen": "Tiefkühlware",
+      "frozenHint": "Etwa 20 °C weniger als auf der Packung und knapp zwei Drittel der Zeit.",
+      "minutes_one": "{{count, number}} Minute",
+      "minutes_other": "{{count, number}} Minuten",
+      "checkEarly": "Prüfen",
+      "minutesEarly_one": "{{count}} Minute früher",
+      "minutesEarly_other": "{{count}} Minuten früher",
+      "resultTitle": "{{mode}}",
+      "yourSetting": "Deine Einstellung",
+      "noTime": "Keine Zeit",
+      "modeDescriptions": {
+        "topBottom": "Heizstäbe oben und unten.",
+        "fan": "Ein Ventilator bringt die Hitze ans Essen: {{offset}} niedriger als Ober- und Unterhitze.",
+        "airFryer": "Ein kleiner, starker Umluftofen: {{offset}} niedriger als Ober- und Unterhitze, und kürzer."
+      },
+      "warnings": {
+        "airFryerTooHot": "Viele Heißluftfritteusen schaffen nur 200 °C; prüfe, was deine erreicht.",
+        "ovenTooHot": "Backöfen schaffen 250 °C, manche 275 °C; prüfe, was deiner erreicht."
+      }
+    },
+    "partyPlanner": {
+      "name": "Party-Mengenrechner",
+      "summary": "Essen und Getränke für deine Gäste, Buffet, Grillen, Raclette und mehr",
+      "event": "Party",
+      "events": {
+        "buffet": "Buffet",
+        "platedDinner": "Menü am Tisch",
+        "fingerFood": "Fingerfood",
+        "bbq": "Grillen",
+        "raclette": "Raclette",
+        "cheeseFondue": "Käsefondue"
+      },
+      "guests": "Gäste",
+      "guestsHint": "Gruppen zählen nach ihrem Energiebedarf, für eine Mahlzeit.",
+      "groups": {
+        "men": "Männer",
+        "women": "Frauen",
+        "teens": "Jugendliche (13 bis 18)",
+        "children": "Kinder (4 bis 12)"
+      },
+      "meatFree": "Davon ohne Fleisch",
+      "appetite": "Appetit",
+      "appetites": {
+        "light": "Klein",
+        "normal": "Normal",
+        "hearty": "Groß"
+      },
+      "when": "Wann",
+      "times": {
+        "lunch": "Mittags",
+        "evening": "Abends"
+      },
+      "hours": "Stunden",
+      "menu": "Menü",
+      "accompaniments": "Dazu gibt es",
+      "accompanimentsHint": "Gemüse wie Pilze, Zwiebeln, Paprika oder Knoblauch; Eingelegtes wie Cornichons und Silberzwiebeln. Kartoffeln und Brot zusammen teilen sich die Menge.",
+      "accompanimentNames": {
+        "potatoes": "Kartoffeln",
+        "bread": "Brot",
+        "vegetables": "Gemüse",
+        "meat": "Fleisch und Fisch",
+        "pickles": "Eingelegtes"
+      },
+      "menuInfo": "Ohne Vorspeise oder Dessert werden Beilagen, Salat und Brot größer, und was du davon weglässt, geht an die anderen. Mit mehreren Gerichten bleibt der Gang gleich; jedes Gericht bekommt das Anderthalbfache seines Anteils.",
+      "courses": {
+        "starter": "Vorspeisen",
+        "main": "Hauptgang",
+        "sides": "Beilagen",
+        "salad": "Gemüse und Salat",
+        "bread": "Brot",
+        "dessert": "Dessert"
+      },
+      "dishes": "Gerichte pro Gang",
+      "reserve": "Nachschlag einplanen",
+      "reserveHint": "12,5 % mehr Essen.",
+      "alcohol": "Alkohol",
+      "alcoholHint": "Anteil der Erwachsenen, die ihn trinken. Wer Bier und Wein trinkt, trinkt von jedem die Hälfte und dafür weniger Alkoholfreies. Jugendliche und Kinder bekommen keinen.",
+      "drinking": "Wie viel getrunken wird",
+      "drinkings": {
+        "little": "Wenig",
+        "normal": "Normal",
+        "aLot": "Viel"
+      },
+      "beerShare": "Bier",
+      "wineShare": "Wein",
+      "food": "Essen",
+      "drinks": "Getränke",
+      "items": {
+        "coldStarters": "Kalte Vorspeisen",
+        "meat": "Fleisch oder Fisch",
+        "vegetarianMain": "Vegetarischer Hauptgang",
+        "grillMeat": "Grillfleisch",
+        "vegetables": "Gemüse",
+        "bread": "Brot",
+        "dessert": "Dessert",
+        "racletteCheese": "Raclettekäse",
+        "racletteMeat": "Fleisch und Fisch",
+        "potatoes": "Kartoffeln",
+        "racletteBread": "Brot",
+        "fondueCheese": "Fonduekäse",
+        "fondueBread": "Brot",
+        "bbqSalads": "Salate wie Kartoffel- oder Nudelsalat",
+        "pasta": "Nudeln (roh)",
+        "rice": "Reis (roh)",
+        "vegetablesToCook": "Gemüse zum Garen",
+        "rawVegetables": "Rohkost",
+        "leafSalad": "Blattsalat"
+      },
+      "perDish": "{{total}} ({{dish}} pro Gericht)",
+      "servings_one": "{{count}} Portion à {{size}}",
+      "servings_other": "{{count}} Portionen à {{size}}",
+      "pickles": "Cornichons und Silberzwiebeln",
+      "jarsEach_one": "je {{count}} Glas",
+      "jarsEach_other": "je {{count}} Gläser",
+      "softDrinks": "Alkoholfreie Getränke",
+      "water": "Wasser",
+      "beer": "Bier",
+      "wine": "Wein",
+      "bottles_one": "{{volume}}, {{count}} Flasche à {{size}}",
+      "bottles_other": "{{volume}}, {{count}} Flaschen à {{size}}",
+      "resultTitle": "{{event}}",
+      "eventDescriptions": {
+        "buffet": "Die Gäste bedienen sich an Vorspeisen, Hauptgerichten, Beilagen, Salaten und Desserts.",
+        "platedDinner": "Jeder Gast bekommt pro Gang einen angerichteten Teller.",
+        "fingerFood": "Kleine Happen, im Stehen und ohne Besteck.",
+        "bbq": "Fleisch vom Grill mit Salaten, Gemüse und Brot.",
+        "raclette": "Am Tisch geschmolzener Käse, mit Kartoffeln oder Brot und was jeder mag.",
+        "cheeseFondue": "Brot, am Tisch in geschmolzenen Käse getaucht."
+      },
+      "sides": "Beilagen und Gemüse",
+      "sidesHint": "Wähle, was es gibt. Mit mehreren teilt sich der Gang: Jedes bekommt das Anderthalbfache seines Anteils, weil die Gäste vom Liebsten mehr nehmen.",
+      "sidesInfo": "Für gleich viel auf dem Teller braucht es pro Erwachsenem roh etwa {{potatoes}} Kartoffeln, {{pasta}} Nudeln oder {{rice}} Reis: Nudeln und Reis quellen beim Kochen auf das Zweieinhalbfache. Beim Gemüse sind es {{vegetables}} Gemüse zum Garen, {{raw}} Rohkost oder {{leaf}} Blattsalat, denn Blattsalat ist leicht und füllt viel Platz.",
+      "mainAlone": "Ohne Beilagen, Salat und Brot plant CookPal nur den Hauptgang, so viel, wie neben anderen Gerichten gegessen wird. Ist er ein Eintopf, ein Auflauf oder ein anderes Gericht, das allein satt macht, plane mehr davon ein."
+    },
+    "seasonalCalendar": {
+      "name": "Saisonkalender",
+      "summary": "Was in Deutschland gerade wächst, was als Nächstes kommt und wie man es lagert",
+      "categories": {
+        "ALL": "Alle",
+        "VEGETABLE": "Gemüse",
+        "FRUIT": "Obst",
+        "SALAD": "Salate"
+      },
+      "search": "Lebensmittel suchen",
+      "inSeason": "Saison im {{month}}",
+      "nothing": "In diesem Monat wächst nichts im Freien.",
+      "startingSoon": "Ab nächstem Monat",
+      "available": "Außer Saison, aus Lager oder Gewächshaus",
+      "methods": {
+        "FIELD": "Freiland",
+        "PROTECTED": "Unter Vlies oder Folie",
+        "UNHEATED_GREENHOUSE": "Ungeheiztes Gewächshaus",
+        "HEATED_GREENHOUSE": "Beheiztes Gewächshaus",
+        "STORED": "Lagerware"
+      },
+      "storage": {
+        "fridge": "Hält sich am besten im Gemüsefach.",
+        "coolDark": "Hält sich am besten kühl und dunkel, außerhalb des Kühlschranks.",
+        "coldSensitive": "Kälteempfindlich.",
+        "ethyleneProducer": "Gibt Ethylen ab: getrennt von anderem Obst und Gemüse lagern.",
+        "ethyleneSensitive": "Reift und welkt neben Ethylen, etwa neben Äpfeln."
+      },
+      "region": "Deutschland, Durchschnitt mehrerer regionaler Saisonkalender.",
+      "loadFailed": "Der Saisonkalender konnte nicht geladen werden.",
+      "myRecipes": "Deine Rezepte für den {{month}}",
+      "noRecipes": "Keines deiner Rezepte nutzt, was diesen Monat Saison hat.",
+      "regionTitle": "Saison in Deutschland",
+      "previousMonth": "Vorheriger Monat",
+      "nextMonth": "Nächster Monat",
+      "lastMonth": "Saisonende",
+      "noOutdoorSeason": "Keine Freilandsaison",
+      "unavailable": "Im {{month}} keine deutsche Ernte",
+      "showUnavailable_one": "{{count}} Lebensmittel ohne Ernte im {{month}} zeigen",
+      "showUnavailable_other": "{{count}} Lebensmittel ohne Ernte im {{month}} zeigen",
+      "noMatch": "Kein Lebensmittel passt zu „{{search}}“.",
+      "inSeasonMonths": "Saison {{months}}",
+      "storageTitle": "Lagerung"
+    },
+    "coffee": {
+      "name": "Kaffee",
+      "summary": "Kaffee und Wasser für Filter, French Press, Espresso, Vollautomat, Cold Brew und mehr, mit Mahlgrad, Geschmacksprofil und Anleitung",
+      "method": "Zubereitung",
+      "methods": {
+        "pourOver": "Handfilter",
+        "filterMachine": "Filtermaschine",
+        "frenchPress": "French Press",
+        "aeroPress": "AeroPress",
+        "moka": "Espressokocher",
+        "espresso": "Espresso",
+        "coldBrewConcentrate": "Cold-Brew-Konzentrat",
+        "coldBrewReady": "Cold Brew, trinkfertig",
+        "japaneseIced": "Japanischer Eiskaffee",
+        "fullyAutomatic": "Kaffeevollautomat"
+      },
+      "strength": "Stärke",
+      "basis": "Ausgehend von",
+      "bases": {
+        "water": "Wie viel ich möchte",
+        "coffee": "Vorhandenem Kaffee"
+      },
+      "drink": "Wasser",
+      "coffeeOnHand": "Kaffee",
+      "coffee": "Kaffee",
+      "water": "Wasser",
+      "hotWater": "Heißes Wasser",
+      "ice": "Eis",
+      "ratio": "Verhältnis",
+      "ratioValue": "1 : {{water, number}}",
+      "waterTemperature": "Wasser",
+      "dilution": "Vor dem Trinken dazugeben",
+      "resultTitle": "{{method}}",
+      "toWeigh": "Abwiegen",
+      "brewing": "Zubereitung",
+      "ratioRange": "1 : {{low, number}} bis {{high, number}}",
+      "strengthInfo": "Wie viel Wasser auf ein Gramm Kaffee kommt, in der üblichen Spanne für die Zubereitung. Daneben steht, wie stark das Geschmacksprofil den Kaffee damit einschätzt.",
+      "methodDescriptions": {
+        "pourOver": "Heißes Wasser von Hand über Kaffeepulver im Papierfilter gegossen.",
+        "filterMachine": "Die Maschine tropft das heiße Wasser durch den Filter in die Kanne.",
+        "frenchPress": "Der Kaffee zieht im Wasser, dann drückt ein Metallsieb ihn nach unten.",
+        "aeroPress": "Ein Kunststoffzylinder: kurz ziehen lassen, dann durch einen kleinen Papierfilter drücken.",
+        "moka": "Eine Kanne für den Herd: Dampf drückt das Wasser durch den Kaffee nach oben.",
+        "espresso": "Eine Maschine presst heißes Wasser durch fein gemahlenen Kaffee.",
+        "coldBrewConcentrate": "Stundenlang kalt angesetzt, zum Trinken verdünnt.",
+        "coldBrewReady": "Stundenlang kalt angesetzt, trinkfertig.",
+        "japaneseIced": "Heiß direkt auf Eis gebrüht.",
+        "fullyAutomatic": "Mahlt die Bohnen und brüht auf Knopfdruck, mit Stufen für Stärke und Temperatur."
+      },
+      "beans": "Bohnen und Wasser",
+      "beansInfo": "Dunkle Röstungen geben ihr Aroma schon bei kühlerem Wasser ab, helle brauchen es heißer. Zu kühles Wasser löst zu wenig, der Kaffee schmeckt sauer; zu heißes zu viel, er wird bitter.",
+      "roasts": {
+        "light": "Hell",
+        "medium": "Mittel",
+        "dark": "Dunkel"
+      },
+      "roastWater": "Für diese Röstung: {{range}}",
+      "grind": "Mahlgrad",
+      "grinds": {
+        "extraFine": "Sehr fein",
+        "fine": "Fein",
+        "mediumFine": "Mittelfein",
+        "medium": "Mittel",
+        "mediumCoarse": "Mittelgrob",
+        "coarse": "Grob"
+      },
+      "brewTime": "Brühzeit",
+      "brewTimeValue": {
+        "clock": "{{time}} Min.",
+        "seconds": "{{value, number}} Sek.",
+        "hours": "{{value, number}} Std."
+      },
+      "taste": {
+        "title": "Geschmack",
+        "strength": "Stärke",
+        "extraction": "Extraktion",
+        "extractionValue": "etwa {{percent}} %, geschätzt",
+        "extractionInfo": "Wie viel vom Kaffeepulver sich im Wasser löst. Brühstandards streben 18 bis 22 % an: Darunter schmeckt Kaffee sauer und dünn, darüber bitter und trocken. Gemessen wird das mit einem Refraktometer; CookPal schätzt es aus Mahlgrad, Wassertemperatur, Brühzeit und Röstung, nach Messungen.",
+        "profile": "Profil",
+        "strengths": {
+          "weak": "Dünn",
+          "balanced": "Ausgewogen",
+          "strong": "Kräftig"
+        },
+        "sectors": {
+          "strong": {
+            "under": "kräftig, sauer",
+            "ideal": "kräftig, rund",
+            "over": "kräftig, bitter"
+          },
+          "balanced": {
+            "under": "sauer, grasig",
+            "ideal": "ausgewogen, süß",
+            "over": "bitter, trocken"
+          },
+          "weak": {
+            "under": "dünn, sauer",
+            "ideal": "leicht, mild",
+            "over": "dünn, bitter"
+          }
+        },
+        "axisExtraction": "Extraktion in %",
+        "legend": "Wie eine Brühkontrollkarte: Nach rechts löst sich mehr aus dem Kaffeepulver (Extraktion), nach oben wird das Getränk stärker (TDS, gelöste Stoffe im Getränk). Jede Linie steht für ein Verhältnis von Kaffee zu Wasser, mit mehr Kaffee wird sie steiler. Mahlgrad, Wassertemperatur, Brühzeit, Röstung und Zubereitung verschieben deinen Kaffee entlang seiner Linie. Das grüne Feld ist ausgewogen, wie Brühstandards es empfehlen. Alle Werte sind geschätzt, nicht gemessen.",
+        "chartTitle": "Geschmacksprofil",
+        "axisStrength": "Stärke (TDS) in %",
+        "legendBrew": "Dein Kaffee",
+        "legendRatio": "Dein Verhältnis",
+        "legendOthers": "Andere Verhältnisse",
+        "legendBalanced": "Ausgewogen",
+        "enlarge": "Vergrößern",
+        "coldBrewNote": {
+          "fridge": "Im Kühlschrank löst sich Cold Brew langsam: Nach den üblichen 12 bis 18 Stunden schmeckt er milder, fertig ausgezogen ist er erst nach gut einem Tag.",
+          "room": "Bei Raumtemperatur ist Cold Brew nach etwa 10 Stunden fertig ausgezogen, länger gezogen ändert sich die Stärke kaum noch."
+        },
+        "coldBrewSectors": {
+          "strong": {
+            "under": "kräftig, süß",
+            "ideal": "kräftig, voll",
+            "over": "kräftig, herb"
+          },
+          "balanced": {
+            "under": "mild, süß",
+            "ideal": "ausgewogen, voll",
+            "over": "herb, trocken"
+          },
+          "weak": {
+            "under": "dünn, flach",
+            "ideal": "leicht, mild",
+            "over": "dünn, herb"
+          }
+        },
+        "coldExtractionInfo": "Wie viel vom Kaffeepulver sich im Wasser löst. Kalt steigt das langsam und bleibt nach Messungen bei 18 bis 22 % stehen: bei Raumtemperatur nach etwa 10 Stunden, im Kühlschrank nach gut einem Tag. Kürzer gezogen schmeckt Cold Brew süßer und flacher, länger gezogen voller und herber. Helle Röstungen geben kalt etwas mehr ab als dunkle. CookPal schätzt das aus diesen Messungen, Zeit, Ort, Röstung und Mahlgrad.",
+        "strongByDesign": "Die empfohlenen Einstellungen fallen hier schon etwas kräftiger aus, als Brühstandards es ausgewogen nennen. Mit weniger Kaffee oder mehr Wasser landest du im grünen Feld."
+      },
+      "cup": "Tasse",
+      "automat": {
+        "title": "Dein Vollautomat",
+        "hint": "Jeder Vollautomat mahlt und brüht etwas anders. CookPal rechnet mit 6 bis 12 g Kaffee je nach Stärkestufe und 90 bis 95 °C: Nimm das Ergebnis als Richtung, nicht als Messung.",
+        "drinks": {
+          "espresso": "Espresso",
+          "coffee": "Kaffee"
+        },
+        "level": "Stufe {{level}} von {{levels}}, etwa {{dose}}",
+        "temperatures": {
+          "low": "Niedrig",
+          "normal": "Normal",
+          "high": "Hoch"
+        },
+        "drink": "Getränk",
+        "temperature": "Brühtemperatur",
+        "espressoHint": "Ein Vollautomat mahlt je Tasse meist weniger Kaffee als ein Siebträger und lässt mehr Wasser durch, sein Espresso wird deshalb oft dünner. Kräftiger wird er mit einer höheren Stufe, einer kleineren Tasse oder zwei Mahlgängen für eine Tasse (etwa Double Shot), wenn dein Gerät das kann.",
+        "cupHint": "Der Automat mahlt je Stufe gleich viel Kaffee, egal wie groß die Tasse ist: Mehr Wasser macht ihn dünner. Für große Tassen haben viele Geräte einen Doppelbezug mit zwei Mahlgängen."
+      },
+      "grindHint": "Empfohlen: {{grind}}. Feiner löst mehr aus dem Kaffee, gröber weniger.",
+      "machineWater": "Für diese Röstung: {{range}}. Stell es ein, wenn deine Maschine das erlaubt.",
+      "fixedWater": "Die Maschine brüht mit etwa {{range}}.",
+      "brewTimeHint": "Üblich: {{range}}; länger löst mehr, bis es kaum noch zunimmt.",
+      "stepsTitle": "So brühst du ihn",
+      "steps": {
+        "pourOver": [
+          "Den Papierfilter mit heißem Wasser ausspülen und das Wasser weggießen.",
+          "{{coffee}} Kaffee {{grind}} gemahlen in den Filter geben.",
+          "Mit {{bloom}} Wasser von {{temperature}} übergießen und 30 bis 45 Sekunden quellen lassen.",
+          "Den Rest in langsamen Kreisen aufgießen, bis {{water}} im Filter sind; nach etwa {{time}} ist alles durchgelaufen.",
+          "Läuft es schneller durch, mahle feiner; dauert es länger, gröber."
+        ],
+        "filterMachine": [
+          "{{water}} Wasser in den Tank füllen.",
+          "Eine Filtertüte einlegen und {{coffee}} Kaffee {{grind}} gemahlen hineingeben.",
+          "Die Maschine einschalten und durchlaufen lassen."
+        ],
+        "frenchPress": [
+          "{{coffee}} Kaffee {{grind}} gemahlen in die Kanne geben.",
+          "{{water}} Wasser von {{temperature}} aufgießen.",
+          "{{time}} ziehen lassen, dann die Kruste mit einem Löffel aufbrechen und Schaum und schwimmende Teilchen abschöpfen.",
+          "Ein paar Minuten setzen lassen, den Stempel nur bis zur Oberfläche drücken und vorsichtig ausgießen.",
+          "Gleich ausschenken: In der Kanne zieht er weiter und wird bitter."
+        ],
+        "aeroPress": [
+          "{{coffee}} Kaffee {{grind}} gemahlen hineingeben.",
+          "{{water}} Wasser von {{temperature}} aufgießen und 10 Sekunden umrühren.",
+          "Den Stempel aufsetzen und nach insgesamt etwa {{time}} sanft in 20 bis 30 Sekunden herunterdrücken."
+        ],
+        "moka": [
+          "Den Wasserkessel bis knapp unter das Ventil mit Wasser füllen.",
+          "Den Trichter mit {{coffee}} Kaffee {{grind}} gemahlen füllen, nicht andrücken.",
+          "Auf mittlerer Hitze erhitzen und vom Herd nehmen, sobald kein Kaffee mehr nachfließt."
+        ],
+        "espresso": [
+          "{{coffee}} Kaffee {{grind}} mahlen, im Siebträger gleichmäßig verteilen und gerade tampen.",
+          "Den Bezug starten und nach etwa {{time}} bei {{water}} in der Tasse stoppen.",
+          "Läuft er schneller, mahle feiner; läuft er langsamer, gröber."
+        ],
+        "fullyAutomatic": [
+          "Stärke, Tassengröße und Temperatur einstellen.",
+          "Den Mahlgrad nur verstellen, während das Mahlwerk läuft: Im Stillstand kann es Schaden nehmen.",
+          "Tropft der Kaffee nur, stell gröber; läuft er schnell und wässrig durch, feiner.",
+          "Für dunkle Röstungen die Temperatur eine Stufe senken."
+        ],
+        "coldBrewConcentrate": [
+          "{{coffee}} Kaffee {{grind}} mahlen und mit {{water}} kaltem Wasser verrühren.",
+          "Abgedeckt etwa {{time}} {{place}} ziehen lassen.",
+          "Durch ein Sieb mit Papierfilter abgießen, ohne zu drücken.",
+          "Vor dem Trinken mit {{dilution}} Wasser verdünnen. Im Kühlschrank hält sich das Konzentrat etwa zwei Wochen."
+        ],
+        "coldBrewReady": [
+          "{{coffee}} Kaffee {{grind}} mahlen und mit {{water}} kaltem Wasser verrühren.",
+          "Abgedeckt etwa {{time}} {{place}} ziehen lassen.",
+          "Durch ein Sieb mit Papierfilter abgießen, ohne zu drücken.",
+          "Im Kühlschrank hält er sich etwa eine Woche."
+        ],
+        "japaneseIced": [
+          "{{ice}} Eis in die Kanne geben.",
+          "{{coffee}} Kaffee {{grind}} gemahlen in den Filter geben, mit {{bloom}} heißem Wasser von {{temperature}} übergießen und 30 bis 45 Sekunden quellen lassen.",
+          "Das restliche heiße Wasser aufgießen, bis {{water}} im Filter sind, und durchlaufen lassen.",
+          "Die Kanne schwenken, bis das Eis geschmolzen ist."
+        ]
+      },
+      "waterTemperatureTitle": "Wassertemperatur",
+      "strengthValue": "{{ratio}}, {{name}}",
+      "steeping": "Wo zieht er?",
+      "steepings": {
+        "fridge": "Kühlschrank",
+        "room": "Raumtemperatur"
+      },
+      "steepIn": {
+        "fridge": "im Kühlschrank",
+        "room": "bei Raumtemperatur"
+      }
+    },
+    "tea": {
+      "name": "Tee",
+      "summary": "Menge, Wassertemperatur und Ziehzeit, heiß, kalt oder als Eistee, mit Aufgüssen und Timer",
+      "type": "Tee",
+      "types": {
+        "black": "Schwarztee",
+        "green": "Grüntee",
+        "white": "Weißer Tee",
+        "herbal": "Kräuter- & Früchtetee",
+        "rooibos": "Rooibos",
+        "matchaUsucha": "Matcha (Usucha)",
+        "matchaKoicha": "Matcha (Koicha)",
+        "oolong": "Oolong"
+      },
+      "water": "Wasser",
+      "tea": "Tee",
+      "waterTemperature": "Wasser",
+      "steep": "Ziehen lassen",
+      "minutes": "{{low, number}} bis {{high, number}} Min.",
+      "whisk": "Aufschlagen, nicht ziehen lassen",
+      "ice": "Eis",
+      "toWeigh": "Abwiegen",
+      "brewing": "Zubereitung",
+      "howMuch": "Wie viel",
+      "typeDescriptions": {
+        "black": "Voll oxidierte Teeblätter, kräftig und dunkel.",
+        "green": "Teeblätter, die nicht oxidiert sind.",
+        "white": "Junge Blätter und Knospen, nur gewelkt und getrocknet.",
+        "herbal": "Getrocknete Kräuter, Blüten oder Früchte, ohne Teeblätter.",
+        "rooibos": "Rotbusch aus Südafrika, ohne Koffein.",
+        "matchaUsucha": "Dünner Matcha: grünes Teepulver mit mehr Wasser aufgeschlagen.",
+        "matchaKoicha": "Dicker Matcha: mehr Pulver und wenig Wasser.",
+        "oolong": "Teilweise oxidierte Teeblätter, zwischen grün und schwarz, oft gerollt."
+      },
+      "method": "Zubereitung",
+      "methods": {
+        "hot": "Heiß",
+        "coldBrew": "Cold Brew",
+        "iced": "Eistee"
+      },
+      "methodHints": {
+        "hot": "Klassisch mit heißem Wasser aufgegossen.",
+        "coldBrew": "Mit kaltem Wasser angesetzt und für Stunden in den Kühlschrank gestellt: milder, kaum bitter.",
+        "iced": "Heiß und doppelt so stark aufgegossen, dann über die gleiche Menge Eis."
+      },
+      "strength": "Stärke",
+      "strengthHint": "Wie viel Tee auf das Wasser kommt: mehr Blätter, mehr von allem.",
+      "strengths": {
+        "light": "Mild",
+        "normal": "Normal",
+        "strong": "Kräftig"
+      },
+      "coldWater": "Kalt",
+      "inTheFridge": "Etwa {{hours, number}} Std. im Kühlschrank",
+      "infusions": "Aufgüsse",
+      "infusionsValue_one": "{{count}} Aufguss",
+      "infusionsValue_other": "{{count}} Aufgüsse",
+      "infusion": "{{n}}. Aufguss",
+      "clock": "{{minutes}}:{{seconds}} Min.",
+      "resultTitles": {
+        "hot": "{{type}}",
+        "coldBrew": "{{type}} als Cold Brew",
+        "iced": "{{type}} als Eistee"
+      },
+      "amountAndTimeInfo": "Menge und Ziehzeit wirken verschieden. Die Menge bestimmt, wie konzentriert der ganze Tee ist: Mehr Blätter geben mehr von allem, im gleichen Verhältnis. Die Ziehzeit verändert die Mischung: Koffein, Aroma und die süßlichen Aminosäuren lösen sich in den ersten ein bis drei Minuten, Gerbstoffe kommen bis etwa sechs bis acht Minuten nach. Kurz gezogen schmeckt Tee frisch und leicht, länger voller und herber, danach nur noch bitterer. Kräuter- und Früchtetee haben kaum Gerbstoffe: Länger heißt dort vor allem kräftiger.",
+      "steepTime": "Ziehzeit",
+      "steepFor": "Ziehen lassen",
+      "steepTimeHint": "Kürzer: frischer und leichter. Länger: voller und herber, über die Empfehlung hinaus nur noch bitterer.",
+      "steepTimeHintHerbs": "Kürzer: milder. Länger: kräftiger im Geschmack.",
+      "steepUsual": "Üblich sind {{low}} bis {{high}}",
+      "taste": "Geschmack",
+      "tasteValue": "{{strength}}, {{steep}}",
+      "strengthTastes": {
+        "light": "Mild",
+        "normal": "Ausgewogen",
+        "strong": "Kräftig"
+      },
+      "steepTastes": {
+        "fresh": "frisch und leicht",
+        "full": "voll und herb",
+        "bitter": "bitter, länger als empfohlen",
+        "mild": "eher mild",
+        "strong": "kräftig im Geschmack",
+        "intense": "sehr intensiv, länger als empfohlen",
+        "round": "rund"
+      },
+      "infusionsInfo": "Gute Teeblätter lassen sich mehrmals aufgießen, diese hier etwa {{count}}-mal. Weil sie jedes Mal weniger abgeben, lässt du jeden weiteren Aufguss etwa {{seconds}} Sekunden länger ziehen als den davor. Schmeckt er dünn, sind die Blätter ausgelaugt.",
+      "rawHerbsWarning": "Kräuter, Früchte und Rooibos werden nur getrocknet, nicht erhitzt, und können Keime tragen, die erst kochendes Wasser abtötet. Verbraucherschützer raten deshalb: mit sprudelnd kochendem Wasser aufgießen, mindestens 5 Minuten ziehen lassen und dann abkühlen. Kalt ansetzen nur Tees, die ausdrücklich für Cold Brew verkauft werden.",
+      "leaf": "Teemenge",
+      "strengthValue": "{{amount}}, {{name}}"
+    },
+    "ownValue": "Eigene",
+    "fewer": "Weniger",
+    "more": "Mehr",
+    "recommendedSettings": "Empfohlene Einstellungen",
+    "recommendedSettingsActive": "Empfohlene Einstellungen aktiv"
   }
 }

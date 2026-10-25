@@ -1,21 +1,21 @@
 ---
-import { getContent, type Lang } from '../content';
+import type { FaqItem } from '../content';
 import { linkTarget } from '../site';
 
 interface Props {
-  lang: Lang;
+  title: string;
+  items: FaqItem[];
 }
 
-const { lang } = Astro.props;
-const t = getContent(lang).faq;
+const { title, items } = Astro.props;
 ---
 
 <section id="faq" class="border-t border-line bg-bg-soft">
   <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6 md:py-20">
-    <h2 class="text-3xl font-bold tracking-tight">{t.title}</h2>
+    <h2 class="text-3xl font-bold tracking-tight">{title}</h2>
     <div class="mt-8 divide-y divide-line rounded-2xl border border-line bg-surface">
       {
-        t.items.map((item) => (
+        items.map((item) => (
           <details class="group p-5">
             <summary class="flex min-h-8 cursor-pointer list-none items-start justify-between gap-4 font-semibold">
               {item.question}

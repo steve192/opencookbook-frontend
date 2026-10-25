@@ -1,7 +1,7 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, View} from 'react-native';
+import {View} from 'react-native';
 import {Button, Surface, Text} from 'react-native-paper';
 import {answeredByServer} from '../../api/ApiError';
 import {useAcceptHouseholdInviteMutation, usePreviewHouseholdInviteQuery} from '../../api/endpoints/households';
@@ -13,6 +13,7 @@ import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
 import {SwitchRow} from '../../components/SwitchRow';
 import {useOwnRecipeCount} from './useOwnRecipeCount';
+import {AppScrollView} from '../../components/AppScrollView';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'HouseholdInviteScreen'>;
 
@@ -59,7 +60,7 @@ export const HouseholdInviteScreen = (props: Props) => {
 
   return (
     <Surface style={CentralStyles.screen}>
-      <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
+      <AppScrollView contentContainerStyle={CentralStyles.contentContainer}>
         <Text variant="titleLarge">{t('screens.households.joinTitle', {name: householdName})}</Text>
         <Text style={CentralStyles.elementSpacing}>{t('screens.households.joinExplanation')}</Text>
 
@@ -73,7 +74,7 @@ export const HouseholdInviteScreen = (props: Props) => {
           style={CentralStyles.elementSpacing} onPress={join}>
           {t('screens.households.join')}
         </Button>
-      </ScrollView>
+      </AppScrollView>
     </Surface>
   );
 };

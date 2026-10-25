@@ -3,18 +3,18 @@ import {useKeepAwake} from 'expo-keep-awake';
 import React, {useEffect, useLayoutEffect, useMemo, useState} from 'react';
 import {useRecipe} from '../api/endpoints/recipes';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Appbar, Button, Divider, Icon, Surface, Text} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {IngredientList} from '../components/IngredientList';
 import {PreparationStepText} from '../components/PreparationStepText';
 import {SectionTitle} from '../components/SectionTitle';
 import {StepProgressBar} from '../components/StepProgressBar';
-import {StepTimer} from '../components/StepTimer';
+import {TimerControl} from '../components/TimerControl';
 import {ViewPager} from '../components/ViewPager';
 import {QueryFallback} from '../components/QueryFallback';
 import {IngredientUse, Recipe} from '../api/types/recipes';
-import {runningTimerCount} from '../helper/cookingTimers';
+import {runningTimerCount, timerKey} from '../helper/cookingTimers';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
 import {findIngredientsWithoutStep, matchIngredientsInStep} from '../helper/ingredientMatching';
 import {useCheckedIngredients} from '../helper/useCheckedIngredients';
@@ -23,6 +23,7 @@ import {MainNavigationProps} from '../navigation/NavigationRoutes';
 import {setAppbarOptions} from '../navigation/appbarOptions';
 import {useAppSelector} from '../redux/hooks';
 import CentralStyles, {useAppTheme} from '../styles/CentralStyles';
+import {AppScrollView} from '../components/AppScrollView';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'GuidedCookingScreen'>;
 
@@ -123,7 +124,7 @@ const GuidedCooking = (props: Props & {recipe: Recipe}) => {
     const timers = findStepDurations(step);
 
     return (
-      <ScrollView key={stepIndex} contentContainerStyle={[CentralStyles.contentContainer, styles.content]}>
+      <AppScrollView key={stepIndex} contentContainerStyle={[CentralStyles.contentContainer, styles.content]}>
         <PreparationStepText
           style={{fontSize: TEXT_SIZES[textSizeIndex], lineHeight: TEXT_SIZES[textSizeIndex] * 1.4}}
           value={step}
@@ -132,12 +133,12 @@ const GuidedCooking = (props: Props & {recipe: Recipe}) => {
         {/* Timers are identified by the recipe they belong to, so an unsaved recipe -
             which cooking mode is never reached from - simply offers none */}
         {recipe.id !== undefined && timers.map((duration) => (
-          <StepTimer
+          <TimerControl
             key={`${duration.seconds}-${duration.label}`}
+            timerKey={timerKey(recipe.id as number, stepIndex, duration.seconds)}
             duration={duration}
-            recipeId={recipe.id as number}
-            recipeTitle={recipe.title}
-            stepIndex={stepIndex} />
+            title={recipe.title}
+            target={{recipeId: recipe.id as number, stepIndex}} />
         ))}
 
         <Divider />
@@ -183,7 +184,7 @@ const GuidedCooking = (props: Props & {recipe: Recipe}) => {
             {t('screens.guidedCooking.screenStaysOn')}
           </Text>
         </View>
-      </ScrollView>
+      </AppScrollView>
     );
   };
 

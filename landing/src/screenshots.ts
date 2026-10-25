@@ -1,4 +1,5 @@
 import type { ImageMetadata } from 'astro';
+import type { ToolDefinition } from './tools';
 
 export const screenshotNames = [
   'recipe-list',
@@ -15,14 +16,26 @@ export const screenshotNames = [
 
 export type ScreenshotName = (typeof screenshotNames)[number];
 
-const files = import.meta.glob<{ default: ImageMetadata }>('./assets/screenshots/*/*.webp', {
+/** Every screen is taken on a phone; the kitchen tools on a desktop too. */
+export type Device = 'phone' | 'desktop';
+
+const files = import.meta.glob<{ default: ImageMetadata }>('./assets/screenshots/*/*/*.webp', {
   eager: true,
 });
 
-export function screenshot(lang: string, name: ScreenshotName): ImageMetadata {
-  const file = files[`./assets/screenshots/${lang}/${name}.webp`];
+function load(lang: string, device: Device, name: string): ImageMetadata {
+  const path = `./assets/screenshots/${lang}/${device}/${name}.webp`;
+  const file = files[path];
   if (!file) {
-    throw new Error(`Missing screenshot src/assets/screenshots/${lang}/${name}.webp`);
+    throw new Error(`Missing screenshot src${path.slice(1)}`);
   }
   return file.default;
+}
+
+export function screenshot(lang: string, name: ScreenshotName): ImageMetadata {
+  return load(lang, 'phone', name);
+}
+
+export function toolScreenshot(lang: string, tool: ToolDefinition, device: Device): ImageMetadata {
+  return load(lang, device, `tool-${tool.slug}`);
 }

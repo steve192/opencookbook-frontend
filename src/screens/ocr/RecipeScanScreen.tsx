@@ -3,7 +3,7 @@ import {ImageManipulator} from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import React, {useEffect, useReducer, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Image, ScrollView, StyleSheet, View} from 'react-native';
+import {Image, StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Button, Card, IconButton, Surface, Text} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import AppPersistence from '../../AppPersistence';
@@ -33,6 +33,7 @@ import {rotationDegrees, Turn} from '../../helper/recipeScanRotation';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {useIsOnline} from '../../offline/useIsOnline';
 import {BlockConfirmation} from './BlockConfirmation';
+import {AppScrollView} from '../../components/AppScrollView';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeScanScreen'>;
 
@@ -321,7 +322,7 @@ export const RecipeScanScreen = (props: Props) => {
   );
 
   const renderPageStrip = () => (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.strip}>
+    <AppScrollView horizontal style={styles.strip}>
       {pages.map((entry, index) => (
         <View key={entry.uri} style={styles.thumbnailWrapper}>
           <IconButton
@@ -340,7 +341,7 @@ export const RecipeScanScreen = (props: Props) => {
           </View>
         </View>
       ))}
-    </ScrollView>
+    </AppScrollView>
   );
 
   const renderScanning = () => {

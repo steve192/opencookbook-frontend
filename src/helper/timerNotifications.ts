@@ -171,7 +171,7 @@ export const openAlarmSettings = async (): Promise<void> => {
  * @param {string} timerKey identifies the alarm, so it can be replaced or called off
  * @param {number} endsAt when it should ring, as a timestamp
  * @param {TimerNotificationTexts} texts what it says while ringing
- * @param {TimerNotificationTarget} target the step it belongs to, carried through the alarm
+ * @param {TimerNotificationTarget} target the step or tool it belongs to, carried through the alarm
  * @return {Promise<boolean>} whether the alarm was scheduled
  */
 const scheduleAlarm = async (
@@ -204,9 +204,9 @@ const scheduleAlarm = async (
         // Both button titles have to be given: the library falls back to the English
         // "Stop" and "Open" when they are not.
         secondaryButtonTitle: texts.openLabel,
-        // The step travels with the alarm, so tapping it can open the right one even if the
-        // tap is what started the app.
-        metadata: {recipeId: target.recipeId, stepIndex: target.stepIndex},
+        // The step or tool travels with the alarm, so tapping it can open the right one even if
+        // the tap is what started the app.
+        metadata: {...target},
         // A pot does not need five minutes of ringing to be noticed
         maxRingDurationSeconds: 120,
       },
@@ -242,7 +242,7 @@ const cancelAlarm = async (timerKey: string): Promise<void> => {
  *
  * @param {string} timerKey identifies the timer
  * @param {TimerNotificationTexts} texts what the reminder says
- * @param {TimerNotificationTarget} target the step to open when it is tapped
+ * @param {TimerNotificationTarget} target the step or tool to open when it is tapped
  * @return {Promise<void>} resolves once it is posted, or could not be
  */
 const postRunningReminder = async (
@@ -279,7 +279,7 @@ const postRunningReminder = async (
  * @param {string} timerKey identifies the timer
  * @param {number} endsAt when the timer is due, as a timestamp
  * @param {TimerNotificationTexts} texts what the notification says
- * @param {TimerNotificationTarget} target the step to open when it is tapped
+ * @param {TimerNotificationTarget} target the step or tool to open when it is tapped
  * @return {Promise<boolean>} whether it was booked
  */
 const scheduleAlert = async (
@@ -323,7 +323,7 @@ const scheduleAlert = async (
  * @param {string} timerKey identifies the timer, and with it both notifications
  * @param {number} endsAt when the timer is due, as a timestamp
  * @param {TimerNotificationTexts} texts what each of the two notifications says
- * @param {TimerNotificationTarget} target the step to open when one of them is tapped
+ * @param {TimerNotificationTarget} target the step or tool to open when one of them is tapped
  * @return {Promise<TimerAnnouncement>} how the timer will announce itself
  */
 export const startTimerNotifications = async (

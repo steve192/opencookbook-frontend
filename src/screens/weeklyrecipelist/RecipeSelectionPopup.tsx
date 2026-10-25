@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Appbar, Button, Icon, List, Modal, Text, TextInput, TouchableRipple} from 'react-native-paper';
 import XDate from 'xdate';
 import {iconSide} from '../../components/listSides';
@@ -11,6 +11,7 @@ import {formatWeekdayAndDate} from '../../helper/weekplan';
 import {LEFTOVER_DAYS, LeftoverSource} from '../../helper/weekplanDay';
 import {withPortal} from '../../helper/withPortal';
 import {overlayStyles, useAppTheme} from '../../styles/CentralStyles';
+import {AppScrollView} from '../../components/AppScrollView';
 
 interface Props {
   visible: boolean;
@@ -120,7 +121,7 @@ export const RecipeSelectionPopup = withPortal(function RecipeSelectionPopup(pro
 
     if (selectionType === 'leftovers') {
       return (
-        <ScrollView contentContainerStyle={styles.leftovers}>
+        <AppScrollView contentContainerStyle={styles.leftovers}>
           {props.leftoverSources.length === 0 &&
             <Text variant="bodyMedium">{t('screens.recipeselectionpopup.noLeftovers', {days: LEFTOVER_DAYS})}</Text>}
           {props.leftoverSources.map((source) => (
@@ -132,7 +133,7 @@ export const RecipeSelectionPopup = withPortal(function RecipeSelectionPopup(pro
               left={iconSide(LEFTOVERS_ICON)}
               onPress={() => props.onLeftoversSelected(source)} />
           ))}
-        </ScrollView>
+        </AppScrollView>
       );
     }
 

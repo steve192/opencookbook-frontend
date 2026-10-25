@@ -1,7 +1,7 @@
 import {AxiosError, AxiosResponse} from 'axios';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {secrets} from './__mocks__/secureStorage';
-import {baseQuery} from './baseQuery';
+import {ApiRequest, baseQuery} from './baseQuery';
 import {client} from './client';
 import {onSessionRejected} from './session';
 
@@ -15,9 +15,9 @@ const answer = (data: unknown) => ({data});
 const failure = (status?: number, data: unknown = {}) => new AxiosError('failed', undefined, undefined, undefined,
     status === undefined ? undefined : {status, data} as AxiosResponse);
 
-const run = async (state: {online?: boolean, loggedIn?: boolean} = {}, url = '/recipes', anonymous = false) => {
+const run = async (state: {online?: boolean, loggedIn?: boolean} = {}, sent: Partial<ApiRequest> = {}) => {
   const dispatch = vi.fn();
-  const result = await baseQuery({url, anonymous}, {
+  const result = await baseQuery({url: '/recipes', ...sent}, {
     getState: () => ({connectivity: {online: state.online ?? true}, auth: {loggedIn: state.loggedIn ?? true}}),
     dispatch,
   } as never, {});
@@ -51,9 +51,22 @@ describe('baseQuery', () => {
 
   it('still sends public requests while signed out', async () => {
     request.mockResolvedValue(answer({sharingEnabled: true}));
-    const {result} = await run({loggedIn: false}, '/instance', true);
+    const {result} = await run({loggedIn: false}, {url: '/instance', anonymous: true});
     expect(result.data).toEqual({sharingEnabled: true});
     expect(request.mock.calls[0][0].headers?.Authorization).toBeUndefined();
+  });
+
+  it('sends requests that also serve visitors without the token while signed out', async () => {
+    request.mockResolvedValue(answer([]));
+    const {result} = await run({loggedIn: false}, {url: '/catalogue/seasons', signInOptional: true});
+    expect(result.data).toEqual([]);
+    expect(request.mock.calls[0][0].headers?.Authorization).toBeUndefined();
+  });
+
+  it('sends requests that also serve visitors with the token while signed in', async () => {
+    request.mockResolvedValue(answer([]));
+    await run({loggedIn: true}, {url: '/catalogue/search', signInOptional: true});
+    expect(request.mock.calls[0][0].headers).toEqual({Authorization: 'Bearer old-access'});
   });
 
   it('takes a request that timed out or never arrived for being offline', async () => {

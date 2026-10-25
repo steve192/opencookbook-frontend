@@ -10,6 +10,8 @@ import {
   runningTimerCount,
   secondsRemaining,
   timerKey,
+  toolTimerKey,
+  timerDoneMessage,
   timerNotificationTexts,
 } from './cookingTimers';
 
@@ -18,8 +20,8 @@ const NOW = 1_700_000_000_000;
 const timer = (endsInSeconds: number) => ({
   label: '5 minutes',
   endsAt: NOW + endsInSeconds * 1000,
-  recipeTitle: 'Lasagne',
-  stepIndex: 2,
+  title: 'Lasagne',
+  target: {recipeId: 7, stepIndex: 2},
 });
 
 describe('timerKey', () => {
@@ -128,6 +130,10 @@ describe('timerNotificationTexts', () => {
 });
 
 describe('readTimerNotificationTarget', () => {
+  it('reads a tool\'s timer notification', () => {
+    expect(readTimerNotificationTarget({kind: 'alert', toolSlug: 'tea'})).toEqual({toolSlug: 'tea'});
+  });
+
   it('reads the recipe and step a timer belongs to', () => {
     expect(readTimerNotificationTarget({kind: 'alert', recipeId: 7, stepIndex: 2}))
         .toEqual({recipeId: 7, stepIndex: 2});
@@ -158,6 +164,10 @@ describe('readTimerNotificationTarget', () => {
 });
 
 describe('parseTimerKey', () => {
+  it('reads back a tool\'s timer', () => {
+    expect(parseTimerKey(toolTimerKey('tea', 180))).toEqual({toolSlug: 'tea'});
+  });
+
   // The key is also the id the alarm is scheduled under, so it has to survive the round trip
   it('reads back what timerKey put in', () => {
     expect(parseTimerKey(timerKey(7, 2, 300))).toEqual({recipeId: 7, stepIndex: 2});
@@ -172,5 +182,15 @@ describe('parseTimerKey', () => {
     expect(parseTimerKey('7-2')).toBeUndefined();
     expect(parseTimerKey('7-2-300-4')).toBeUndefined();
     expect(parseTimerKey('a-b-c')).toBeUndefined();
+  });
+});
+
+describe('a tool\'s timer', () => {
+  const t = ((key: string, values?: Record<string, unknown>) => `${key} ${JSON.stringify(values ?? {})}`) as never;
+  const tea = {label: '3 minutes', endsAt: NOW, title: 'Tea', target: {toolSlug: 'tea'}};
+
+  it('names the tool instead of a recipe step', () => {
+    expect(timerNotificationTexts(t, tea).alertBody).toContain('tools.timer.alertBody');
+    expect(timerDoneMessage(t, tea)).toContain('tools.timer.doneFor');
   });
 });

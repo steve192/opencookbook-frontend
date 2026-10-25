@@ -1,21 +1,31 @@
 import {TFunction} from 'i18next';
 import type {TimerNotificationTexts} from './timerNotifications';
 
-/** Where a timer notification should take you when it is tapped. */
-export interface TimerNotificationTarget {
+/** A preparation step of a recipe; the step is zero based, so it is shown as stepIndex + 1. */
+export interface RecipeStepTarget {
   recipeId: number;
   stepIndex: number;
 }
 
-/** A timer the user started on a preparation step. */
+/** A kitchen tool, by its path segment. */
+export interface ToolTarget {
+  toolSlug: string;
+}
+
+/** Where a timer belongs, and where its notification takes you when it is tapped. */
+export type TimerNotificationTarget = RecipeStepTarget | ToolTarget;
+
+export const isRecipeStep = (target: TimerNotificationTarget): target is RecipeStepTarget => 'recipeId' in target;
+
+/** A timer the user started on a preparation step or in a kitchen tool. */
 export interface CookingTimer {
-  /** What the step said, e.g. "5 minutes" */
+  /** What it counts down, e.g. "5 minutes" */
   label: string;
   /** When it goes off, as a wall clock timestamp */
   endsAt: number;
-  recipeTitle: string;
-  /** Zero based, so it is shown as stepIndex + 1 */
-  stepIndex: number;
+  /** What it belongs to as the user knows it: the recipe's title or the tool's name */
+  title: string;
+  target: TimerNotificationTarget;
 }
 
 export type CookingTimers = Record<string, CookingTimer>;
@@ -33,15 +43,28 @@ export const timerKey = (recipeId: number, stepIndex: number, seconds: number): 
   `${recipeId}-${stepIndex}-${seconds}`;
 
 /**
+ * Identifies a tool's timer the same way: one per tool and duration.
+ *
+ * @param {string} toolSlug the tool's path segment
+ * @param {number} seconds how long the duration is
+ * @return {string} the key that timer is held under
+ */
+export const toolTimerKey = (toolSlug: string, seconds: number): string => `tool:${toolSlug}:${seconds}`;
+
+/**
  * Reads back the step a timer key was built for.
  *
  * The key is also the id the alarm is scheduled under, so an alarm handed back by the system
  * says which step it belongs to without anything having to be looked up or stored.
  *
- * @param {string} key a key made by timerKey
- * @return {TimerNotificationTarget | undefined} the step, or undefined if this is not one
+ * @param {string} key a key made by timerKey or toolTimerKey
+ * @return {TimerNotificationTarget | undefined} the step or tool, or undefined if this is not one
  */
 export const parseTimerKey = (key: string): TimerNotificationTarget | undefined => {
+  const tool = /^tool:([a-z-]+):\d+$/.exec(key);
+  if (tool) {
+    return {toolSlug: tool[1]};
+  }
   const parts = key.split('-');
   if (parts.length !== 3) {
     return undefined;
@@ -121,19 +144,35 @@ export const formatEndTime = (endsAt: number, locale?: string): string =>
  * @return {TimerNotificationTexts} the texts for every way it announces itself
  */
 export const timerNotificationTexts = (t: TFunction, timer: CookingTimer): TimerNotificationTexts => {
-  const where = {recipe: timer.recipeTitle, step: timer.stepIndex + 1};
+  const time = formatEndTime(timer.endsAt);
+  const step = isRecipeStep(timer.target) ? timer.target.stepIndex + 1 : undefined;
   return {
     runningTitle: t('screens.guidedCooking.timerRunningTitle', {label: timer.label}),
-    runningBody: t('screens.guidedCooking.timerRunningBody', {time: formatEndTime(timer.endsAt), ...where}),
+    runningBody: step != null ?
+      t('screens.guidedCooking.timerRunningBody', {time, recipe: timer.title, step}) :
+      t('tools.timer.runningBody', {time, tool: timer.title}),
     alertTitle: t('screens.guidedCooking.timerNotificationTitle', {label: timer.label}),
-    alertBody: t('screens.guidedCooking.timerNotificationBody', where),
+    alertBody: step != null ?
+      t('screens.guidedCooking.timerNotificationBody', {recipe: timer.title, step}) :
+      t('tools.timer.alertBody', {tool: timer.title}),
     stopLabel: t('screens.guidedCooking.stopAlarm'),
-    openLabel: t('screens.guidedCooking.openRecipe'),
+    openLabel: step != null ? t('screens.guidedCooking.openRecipe') : t('tools.timer.openTool'),
   };
 };
 
 /**
- * Reads the step a timer notification was started from.
+ * What the app says when a timer it was watching runs out.
+ *
+ * @param {TFunction} t the translation function of the caller
+ * @param {CookingTimer} timer the timer that is up
+ * @return {string} the message
+ */
+export const timerDoneMessage = (t: TFunction, timer: CookingTimer): string => isRecipeStep(timer.target) ?
+  t('screens.guidedCooking.timerDoneFor', {label: timer.label, recipe: timer.title, step: timer.target.stepIndex + 1}) :
+  t('tools.timer.doneFor', {label: timer.label, tool: timer.title});
+
+/**
+ * Reads the step or tool a timer notification was started from.
  *
  * The data travels with the notification rather than being looked up later, because the tap
  * may arrive long after the app was last running - or be the thing that starts it.
@@ -146,7 +185,10 @@ export const readTimerNotificationTarget = (data: unknown): TimerNotificationTar
   if (typeof data !== 'object' || data === null) {
     return undefined;
   }
-  const {recipeId, stepIndex} = data as Record<string, unknown>;
+  const {recipeId, stepIndex, toolSlug} = data as Record<string, unknown>;
+  if (typeof toolSlug === 'string') {
+    return {toolSlug};
+  }
   if (typeof recipeId !== 'number' || typeof stepIndex !== 'number' || stepIndex < 0) {
     return undefined;
   }

@@ -35,7 +35,7 @@ export const OfflineDataCard = () => {
     synced ?
       t('offline.lastSynced', {time: `${formatDayAndMonth(synced, i18n.language)} ${synced.toString('HH:mm')}`}) :
       t('offline.neverSynced'),
-    ...(usage === null ? [] : [t('offline.storageUsed', {size: (usage / BYTES_PER_MEGABYTE).toFixed(1)})]),
+    ...(usage === null ? [] : [t('offline.storageUsed', {size: usage / BYTES_PER_MEGABYTE})]),
   ];
 
   return (

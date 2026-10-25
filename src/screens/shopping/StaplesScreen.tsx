@@ -1,7 +1,7 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {List, Surface, Text} from 'react-native-paper';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useForgetStapleMutation, useGetStaplesQuery} from '../../api/endpoints/shopping';
@@ -13,6 +13,7 @@ import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
+import {AppScrollView} from '../../components/AppScrollView';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'StaplesScreen'>;
 
@@ -35,7 +36,7 @@ export const StaplesScreen = (_props: Props) => {
 
   return (
     <Surface style={CentralStyles.screen}>
-      <ScrollView contentContainerStyle={{paddingBottom: insets.bottom}}>
+      <AppScrollView contentContainerStyle={{paddingBottom: insets.bottom}}>
         <Text variant="bodyMedium" style={styles.intro}>
           {staples.length === 0 ? t('screens.shopping.noStaples') : t('screens.shopping.staplesSubtitle')}
         </Text>
@@ -48,7 +49,7 @@ export const StaplesScreen = (_props: Props) => {
                 disabled: !online},
             ])} />
         ))}
-      </ScrollView>
+      </AppScrollView>
     </Surface>
   );
 };

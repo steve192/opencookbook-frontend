@@ -1,7 +1,7 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Button, Surface, Text} from 'react-native-paper';
 import XDate from 'xdate';
 import {
@@ -29,6 +29,7 @@ import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles from '../../styles/CentralStyles';
 import {PlanSlotRow} from './PlanSlotRow';
+import {AppScrollView} from '../../components/AppScrollView';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'PlanDraftScreen'>;
 
@@ -97,7 +98,7 @@ export const PlanDraftScreen = (props: Props) => {
 
   return (
     <Surface style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <AppScrollView contentContainerStyle={styles.scrollContent}>
         <View style={[CentralStyles.contentContainer, styles.content]}>
           <Text variant="bodyMedium">{draftSummary(t, draft)}</Text>
           {repeats &&
@@ -120,7 +121,7 @@ export const PlanDraftScreen = (props: Props) => {
             </View>
           ))}
         </View>
-      </ScrollView>
+      </AppScrollView>
       <ScreenFooter>
         <Button mode="outlined" disabled={controlsDisabled} onPress={() => change(() => rerollPlanDraft(ref).unwrap())}>
           {t('screens.planning.rerollAll')}

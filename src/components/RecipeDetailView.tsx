@@ -1,6 +1,6 @@
 import React, {ReactNode, useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {Linking, ScrollView, StyleSheet, View} from 'react-native';
+import {Linking, StyleSheet, View} from 'react-native';
 import {Chip, Divider, List, Text} from 'react-native-paper';
 import {Recipe} from '../api/types/recipes';
 import {dietLabel} from '../helper/recipeDiet';
@@ -13,6 +13,7 @@ import {NutritionSheetProps} from './NutritionSheet';
 import {RecipeImageViewPager} from './RecipeImageViewPager';
 import {SectionTitle} from './SectionTitle';
 import {TextBullet} from './TextBullet';
+import {AppScrollView} from './AppScrollView';
 
 const IMAGE_HEIGHT = 300;
 
@@ -164,7 +165,7 @@ export const RecipeDetailView = (props: Props) => {
   );
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent}>
+    <AppScrollView contentContainerStyle={styles.scrollContent}>
       <RecipeImageViewPager
         style={{height: IMAGE_HEIGHT}}
         images={props.recipe.images}
@@ -184,7 +185,7 @@ export const RecipeDetailView = (props: Props) => {
           canCorrect: props.nutrition.canCorrect,
         })
       }
-    </ScrollView>
+    </AppScrollView>
   );
 };
 

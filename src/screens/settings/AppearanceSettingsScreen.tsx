@@ -7,7 +7,8 @@ import {CustomCard} from '../../components/CustomCard';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {changeTheme} from '../../redux/features/settingsSlice';
 import {RootState} from '../../redux/store';
-import {SettingsHint, SettingsPage} from './SettingsPage';
+import {PageFrame} from '../../components/PageFrame';
+import {SettingsHint} from './SettingsHint';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'AppearanceSettingsScreen'>;
 
@@ -19,7 +20,7 @@ export const AppearanceSettingsScreen = (_props: Props) => {
   const selectedTheme = useSelector((state: RootState) => state.settings.theme);
 
   return (
-    <SettingsPage>
+    <PageFrame>
       <CustomCard>
         <SettingsHint>{t('screens.settings.theme')}</SettingsHint>
         <RadioButton.Group value={selectedTheme} onValueChange={(value) => dispatch(changeTheme(value as typeof THEMES[number]))}>
@@ -28,6 +29,6 @@ export const AppearanceSettingsScreen = (_props: Props) => {
           ))}
         </RadioButton.Group>
       </CustomCard>
-    </SettingsPage>
+    </PageFrame>
   );
 };

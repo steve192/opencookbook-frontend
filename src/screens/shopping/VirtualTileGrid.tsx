@@ -5,6 +5,7 @@ import {tileCells} from '../../helper/shopping/aisles';
 import {columnsFor, TILE_AREA_PADDING, TILE_GAP, tileRows, tileWidthFor} from '../../helper/shopping/tileLayout';
 import {useLayoutWidth} from '../../helper/useLayoutWidth';
 import {AisleHeading} from './AisleHeading';
+import {AppScrollView} from '../../components/AppScrollView';
 
 interface Props<T> {
   items: T[];
@@ -25,6 +26,7 @@ export const VirtualTileGrid = <T extends {aisle: Aisle}>({items, keyOf, renderT
     <FlatList
       data={rows}
       keyExtractor={(row) => row.key}
+      renderScrollComponent={(props) => <AppScrollView {...props} />}
       // What a tile shows, e.g. whether it is on the list, changes without the rows changing.
       extraData={renderTile}
       onLayout={onLayout}

@@ -1,7 +1,7 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, View} from 'react-native';
+import {View} from 'react-native';
 import {Appbar, Button, Card, IconButton, List, Surface} from 'react-native-paper';
 import {
   useCreateHouseholdInviteMutation,
@@ -27,6 +27,7 @@ import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
 import {useOwnRecipeCount} from './useOwnRecipeCount';
+import {AppScrollView} from '../../components/AppScrollView';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'HouseholdScreen'>;
 
@@ -131,7 +132,7 @@ export const HouseholdScreen = (props: Props) => {
 
   return (
     <Surface style={CentralStyles.screen}>
-      <ScrollView contentContainerStyle={CentralStyles.contentContainer}>
+      <AppScrollView contentContainerStyle={CentralStyles.contentContainer}>
         <Card style={CentralStyles.elementSpacing}>
           <Card.Title title={t('screens.households.cookbook')}
             subtitle={t('screens.households.recipeCount', {count: recipeCount})} />
@@ -195,7 +196,7 @@ export const HouseholdScreen = (props: Props) => {
             onPress={() => part(me)}>
             {t('screens.households.leave')}
           </Button>}
-      </ScrollView>
+      </AppScrollView>
     </Surface>
   );
 };

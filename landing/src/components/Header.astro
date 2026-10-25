@@ -4,6 +4,7 @@ import GithubIcon from './icons/GithubIcon.astro';
 import LanguageSwitch from './LanguageSwitch.astro';
 import { getContent, type Lang } from '../content';
 import { linkTarget, links, pagePaths, type PageKey } from '../site';
+import { getToolPages } from '../toolPages';
 
 interface Props {
   lang: Lang;
@@ -15,6 +16,7 @@ const t = getContent(lang);
 const home = pagePaths.home[lang];
 const anchors = [
   { label: t.nav.features, href: `${home}#features` },
+  { label: getToolPages(lang).title, href: `${home}#tools` },
   { label: t.nav.selfHosting, href: `${home}#self-hosting` },
   { label: t.nav.faq, href: `${home}#faq` },
 ];
@@ -27,7 +29,7 @@ const anchors = [
       CookPal
     </a>
     <div class="flex items-center gap-1 sm:gap-2">
-      {anchors.map((a) => <a href={a.href} class="hidden rounded-lg px-3 py-2 text-sm text-muted transition hover:text-text md:block">{a.label}</a>)}
+      {anchors.map((a) => <a href={a.href} class="hidden rounded-lg px-3 py-2 text-sm text-muted transition hover:text-text lg:block">{a.label}</a>)}
       <LanguageSwitch lang={lang} page={page} />
       <a
         href={links.github}
