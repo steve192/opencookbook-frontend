@@ -1,4 +1,5 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {skipToken} from '@reduxjs/toolkit/query';
 import React, {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet} from 'react-native';
@@ -9,19 +10,23 @@ import {SectionTitle} from '../../components/SectionTitle';
 import {ShoppingListMenu} from '../../components/shopping/ShoppingListMenu';
 import {LoadingScreen} from '../../components/LoadingScreen';
 import {
-  useCreateBringExportOfLinesMutation, useGetImportPreviewQuery, useImportToShoppingListMutation,
+  useCreateBringExportOfLinesMutation, useGetImportPreviewQuery, useGetShoppingRegularsQuery,
+  useImportToShoppingListMutation,
 } from '../../api/endpoints/shopping';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {openBringImport} from '../../helper/bringExport';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {bringLine, MealChoice, sheetLines} from '../../helper/shopping/importLines';
-import {importRequest, initialChoices, isShoppedFor, isTicked, Ticks} from '../../helper/shopping/importSheet';
-import {defaultListFor} from '../../helper/shopping/lists';
+import {
+  dueLines, importLineOf, importRequest, initialChoices, isShoppedFor, isTicked, Ticks,
+} from '../../helper/shopping/importSheet';
+import {preselectedList} from '../../helper/shopping/lists';
 import {activeItems, visibleItems} from '../../helper/shopping/listItems';
 import {nameKey} from '../../helper/shopping/names';
+import {useRhythmTexts} from '../../helper/shopping/rhythmTexts';
 import {loadShoppingLists, syncShoppingList} from '../../helper/shopping/shoppingSync';
 import {useListName} from '../../helper/shopping/useListName';
-import {useShoppingProvider} from '../../helper/shopping/useShoppingProvider';
+import {useShoppingSettings} from '../../helper/shopping/useShoppingSettings';
 import {useShoppingVocabulary} from '../../helper/shopping/useShoppingVocabulary';
 import {formatDayAndMonth, toDayKey} from '../../helper/weekplan';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
@@ -41,8 +46,9 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
   const target = route.params;
   const {t, i18n} = useTranslation('translation');
   const dispatch = useAppDispatch();
-  const {provider} = useShoppingProvider();
+  const {provider, suggestions} = useShoppingSettings();
   const lists = useAppSelector((state) => state.shopping.lists);
+  const lastUsedListId = useAppSelector((state) => state.shopping.activeListId);
   const sync = useAppSelector((state) => state.shopping.sync);
   const {unitWords} = useShoppingVocabulary();
   const online = useIsOnline();
@@ -54,6 +60,8 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
 
   const [choices, setChoices] = useState<MealChoice[]>();
   const [ticks, setTicks] = useState<Ticks>({});
+  // Due items are offered, not assumed: unticked until ticked.
+  const [dueTicks, setDueTicks] = useState<Ticks>({});
   const [targetListId, setTargetListId] = useState<number>();
   const [showEarlier, setShowEarlier] = useState(false);
   const [sending, setSending] = useState(false);
@@ -84,7 +92,7 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
 
   useEffect(() => {
     if (targetListId === undefined) {
-      setTargetListId(defaultListFor(lists, householdId)?.id);
+      setTargetListId(preselectedList(lists, lastUsedListId, householdId)?.id);
     }
   }, [lists]);
 
@@ -94,12 +102,19 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
   const targetList = lists.find((list) => list.id === targetListId);
   const nameOf = useListName();
 
+  const targetItems = useMemo(
+      () => visibleItems(targetListId === undefined ? undefined : sync[targetListId]), [sync, targetListId]);
   // What the target list already holds, so a line can say so.
-  const onTargetList = useMemo(() => {
-    const held = targetListId === undefined ? undefined : sync[targetListId];
-    const items = activeItems(visibleItems(held));
-    return new Map(items.map((item) => [nameKey(item.name), item.spec]));
-  }, [sync, targetListId]);
+  const onTargetList = useMemo(
+      () => new Map(activeItems(targetItems).map((item) => [nameKey(item.name), item.spec])), [targetItems]);
+
+  const weekEnd = target.kind === 'week' ? target.to : undefined;
+  const offersDue = weekEnd !== undefined && provider === 'COOKPAL' && suggestions;
+  const {data: regulars} = useGetShoppingRegularsQuery(offersDue && targetList ? targetList : skipToken);
+  const due = useMemo(() => regulars && weekEnd ?
+    dueLines(regulars, Object.values(targetItems), lines, new Date(), weekEnd) : [], [regulars, targetItems, lines, weekEnd]);
+  const tickedDue = due.filter((line) => dueTicks[line.key]);
+  const rhythmTexts = useRhythmTexts();
 
   const earlier = (choices ?? []).filter((choice) => onlyFromToday && choice.meal.date !== null && choice.meal.date < today);
   const ahead = (choices ?? []).filter((choice) => !earlier.includes(choice));
@@ -122,11 +137,12 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
         await openBringImport(await createBringExportOfLines({title: bringTitle(), servings,
           lines: tickedLines.map(bringLine), shown: request.shown}).unwrap());
       } else if (targetList) {
-        await importToShoppingList({list: targetList, lines: request.lines, shown: request.shown}).unwrap();
+        await importToShoppingList({list: targetList, lines: [...request.lines, ...tickedDue.map(importLineOf)],
+          shown: request.shown}).unwrap();
         dispatch(shoppingListChosen(targetList.id));
         void dispatch(syncShoppingList(targetList.id));
         SnackbarUtil.show({message: t('screens.shopping.import.added',
-            {count: request.lines.length, list: nameOf(targetList)})});
+            {count: request.lines.length + tickedDue.length, list: nameOf(targetList)})});
       }
       navigation.goBack();
     } catch (error) {
@@ -167,6 +183,16 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
               onToggle={() => toggle(line.key, ticked)} />
           );
         })} />
+
+        {due.length > 0 && <SectionTitle>{t('screens.shopping.import.alsoDue')}</SectionTitle>}
+        <AisleSections items={due} renderItems={(aisleLines) => aisleLines.map((line) => (
+          <SheetLineRow
+            key={line.key}
+            line={line}
+            ticked={!!dueTicks[line.key]}
+            note={rhythmTexts.every(line.everyDays)}
+            onToggle={() => setDueTicks((current) => ({...current, [line.key]: !current[line.key]}))} />
+        ))} />
       </AppScrollView>
       <ScreenFooter>
         {provider === 'COOKPAL' && lists.length > 1 &&
@@ -185,11 +211,12 @@ export const ShoppingImportScreen = ({route, navigation}: Props) => {
           mode="contained"
           icon={provider === 'BRING' ? 'send' : 'cart-plus'}
           loading={sending}
-          disabled={!online || sending || tickedLines.length === 0 || (provider === 'COOKPAL' && !targetList)}
+          disabled={!online || sending || tickedLines.length + tickedDue.length === 0 ||
+            (provider === 'COOKPAL' && !targetList)}
           onPress={send}>
           {provider === 'BRING' ?
             t('screens.shopping.import.sendToBring', {count: tickedLines.length}) :
-            t('screens.shopping.import.add', {count: tickedLines.length})}
+            t('screens.shopping.import.add', {count: tickedLines.length + tickedDue.length})}
         </Button>
       </ScreenFooter>
     </Surface>

@@ -62,6 +62,9 @@ export type ShoppingOp =
   | ShoppingOpBase & {type: 'RESTORE', spec?: string | null}
   | ShoppingOpBase & {type: 'DELETE'};
 
+/** As sent: with when it was made, by this device's clock, which dates the list's history. */
+export type DatedShoppingOp = ShoppingOp & {at: string};
+
 /** Something to tap when adding to a list; per language, the name to show comes first. */
 export interface ShoppingTile {
   key: string;
@@ -118,6 +121,62 @@ export interface ImportLine {
 export interface ShownLine {
   name: string;
   ticked: boolean;
+}
+
+/** A name a list held lately, offered again while typing. */
+export interface ShoppingEntry {
+  name: string;
+  aisle: Aisle;
+  icon: string | null;
+  lastUsedAt: string;
+}
+
+/** A name a list buys at a steady rhythm, or one somebody chose not to have suggested. */
+export interface ShoppingRegular {
+  id: number;
+  name: string;
+  aisle: Aisle;
+  icon: string | null;
+  /** Null for a muted name whose purchases no longer make a rhythm. */
+  everyDays: number | null;
+  lastBoughtAt: string | null;
+  muted: boolean;
+  /**
+   * When it is suggested, by this device's clock: while one of them is open, unless the name is on the list or was
+   * bought since lastBoughtAt. None while muted.
+   */
+  windows: {from: string, until: string}[];
+}
+
+/** What a person did to an item, as the list's history records it. */
+export type ItemChange = 'ADDED' | 'RESTORED' | 'BOUGHT' | 'REMOVED' | 'RENAMED' | 'SPEC_CHANGED' | 'AISLE_CHANGED' |
+  'PRIORITIZED' | 'UNPRIORITIZED';
+
+/** One change a person made to an item of a list. */
+export interface ShoppingListEvent {
+  id: number;
+  at: string;
+  kind: ItemChange;
+  /** As the item was named after the change. */
+  name: string;
+  aisle: Aisle;
+  icon: string | null;
+  /** What was asked for when added, or the new amount. */
+  spec: string | null;
+  /** Before a rename. */
+  previousName: string | null;
+  /** A display name; null once that account is gone. */
+  actor: string | null;
+  /** Made by whoever is looking. */
+  byViewer: boolean;
+  /** The meals an addition was imported for. */
+  sources: ShoppingItemSource[];
+}
+
+export interface ShoppingHistoryPage {
+  events: ShoppingListEvent[];
+  /** No older page follows. */
+  last: boolean;
 }
 
 export interface Staple {

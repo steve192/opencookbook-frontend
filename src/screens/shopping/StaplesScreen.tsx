@@ -1,19 +1,18 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet} from 'react-native';
-import {List, Surface, Text} from 'react-native-paper';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {List} from 'react-native-paper';
 import {useForgetStapleMutation, useGetStaplesQuery} from '../../api/endpoints/shopping';
 import {Staple} from '../../api/types/shopping';
+import {CustomCard} from '../../components/CustomCard';
 import {actionsSide} from '../../components/listSides';
+import {PageFrame} from '../../components/PageFrame';
 import {QueryFallback} from '../../components/QueryFallback';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {useIsOnline} from '../../offline/useIsOnline';
-import CentralStyles from '../../styles/CentralStyles';
-import {AppScrollView} from '../../components/AppScrollView';
+import {SettingsHint} from '../settings/SettingsHint';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'StaplesScreen'>;
 
@@ -21,7 +20,6 @@ type Props = NativeStackScreenProps<MainNavigationProps, 'StaplesScreen'>;
 export const StaplesScreen = (_props: Props) => {
   const {t} = useTranslation('translation');
   const online = useIsOnline();
-  const insets = useSafeAreaInsets();
   const {data: staples, error: loadError, refetch} = useGetStaplesQuery();
   const [forgetStaple] = useForgetStapleMutation();
 
@@ -35,25 +33,22 @@ export const StaplesScreen = (_props: Props) => {
   }
 
   return (
-    <Surface style={CentralStyles.screen}>
-      <AppScrollView contentContainerStyle={{paddingBottom: insets.bottom}}>
-        <Text variant="bodyMedium" style={styles.intro}>
-          {staples.length === 0 ? t('screens.shopping.noStaples') : t('screens.shopping.staplesSubtitle')}
-        </Text>
-        {staples.map((staple) => (
-          <List.Item
-            key={staple.id}
-            title={staple.name}
-            right={actionsSide([
-              {icon: 'close', label: t('screens.shopping.forgetStaple'), onPress: () => forget(staple),
-                disabled: !online},
-            ])} />
-        ))}
-      </AppScrollView>
-    </Surface>
+    <PageFrame>
+      <SettingsHint>
+        {staples.length === 0 ? t('screens.shopping.noStaples') : t('screens.shopping.staplesSubtitle')}
+      </SettingsHint>
+      {staples.length > 0 &&
+        <CustomCard>
+          {staples.map((staple) => (
+            <List.Item
+              key={staple.id}
+              title={staple.name}
+              right={actionsSide([
+                {icon: 'close', label: t('screens.shopping.forgetStaple'), onPress: () => forget(staple),
+                  disabled: !online},
+              ])} />
+          ))}
+        </CustomCard>}
+    </PageFrame>
   );
 };
-
-const styles = StyleSheet.create({
-  intro: {margin: 16},
-});

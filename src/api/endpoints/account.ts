@@ -3,8 +3,9 @@ import {api} from '../api';
 import {ApiError} from '../ApiError';
 import {queryString} from '../queryString';
 import {IssuedTokens, storeTokens} from '../session';
-import {ApiKey, ApiScope, InstanceInfo, IssuedApiKey, SignupRequest, SignupState, UserInfo} from '../types/account';
-import {ShoppingProvider} from '../types/shopping';
+import {
+  ApiKey, ApiScope, InstanceInfo, IssuedApiKey, ShoppingSettings, SignupRequest, SignupState, UserInfo,
+} from '../types/account';
 
 // Tokens are stored before the call resolves, so whatever the caller does next is signed in.
 const signedIn = async (result: {data?: unknown, error?: ApiError}): Promise<{data: void} | {error: ApiError}> => {
@@ -63,8 +64,9 @@ const accountApi = api.injectEndpoints({
         ({url: '/users/self/displayName', method: 'PUT', body: {displayName}})),
       completeOnboarding: accountChange((displayName: string) =>
         ({url: '/users/self/onboarding', method: 'POST', body: {displayName}})),
-      setShoppingProvider: accountChange((provider: ShoppingProvider) =>
-        ({url: '/users/self/shoppingProvider', method: 'PUT', body: {provider}})),
+      // A setting left out stays as it is.
+      setShoppingSettings: accountChange((settings: ShoppingSettings) =>
+        ({url: '/users/self/shoppingSettings', method: 'PUT', body: settings})),
       deleteAccount: builder.mutation<void, void>({
         query: () => ({url: '/users/self', method: 'DELETE'}),
       }),
@@ -99,7 +101,7 @@ export const {
   useResetPasswordMutation,
   useSetDisplayNameMutation,
   useCompleteOnboardingMutation,
-  useSetShoppingProviderMutation,
+  useSetShoppingSettingsMutation,
   useDeleteAccountMutation,
   useGetApiKeysQuery,
   useCreateApiKeyMutation,

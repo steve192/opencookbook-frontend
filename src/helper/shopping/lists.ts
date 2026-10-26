@@ -11,6 +11,18 @@ export const defaultListFor = (lists: ShoppingList[], householdId?: string | nul
   lists.find((list) => list.defaultList && list.householdId === (householdId ?? null));
 
 /**
+ * The list an import starts with: the one last used on this device, or the plan's default list.
+ *
+ * @param {ShoppingList[]} lists every list
+ * @param {number | null} lastUsedId the list last opened or imported to
+ * @param {string} householdId the plan's household, or nothing for your own
+ * @return {ShoppingList | undefined} the list to preselect
+ */
+export const preselectedList = (lists: ShoppingList[], lastUsedId: number | null,
+    householdId?: string | null): ShoppingList | undefined =>
+  lists.find((list) => list.id === lastUsedId) ?? defaultListFor(lists, householdId);
+
+/**
  * What a list is called: its own name, or for an unrenamed default list the household's or "mine".
  *
  * @param {ShoppingList} list the list

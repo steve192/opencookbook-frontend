@@ -754,7 +754,80 @@
         "failed": "Konnte nicht auf die Einkaufsliste gesetzt werden.",
         "loadFailed": "Die Mahlzeiten konnten nicht geladen werden.",
         "weekTitle": "Woche vom {{date}}",
-        "leftoversNothingToBuy": "{{leftovers}}, nichts zu kaufen"
+        "leftoversNothingToBuy": "{{leftovers}}, nichts zu kaufen",
+        "alsoDue": "Auch fällig"
+      },
+      "suggestions": {
+        "title": "Wieder fällig?",
+        "addAll": "Alle hinzufügen",
+        "add": "Auf die Liste",
+        "notNow": "Nicht jetzt",
+        "never": "Nicht mehr vorschlagen",
+        "neverDone": "{{name}} wird nicht mehr vorgeschlagen. Unter Einstellungen › Einkaufsliste › Regelmäßige Einkäufe lässt sich das ändern.",
+        "setting": "Regelmäßige Einkäufe vorschlagen",
+        "settingExplanation": "Was eine Liste in festem Rhythmus kauft, erscheint unter „Wieder fällig?“, sobald es fällig ist. Das ändert nur, was deine Geräte zeigen; eine geteilte Liste lernt für alle weiter."
+      },
+      "regulars": {
+        "title": "Regelmäßige Einkäufe",
+        "subtitle": "Was jede Liste in festem Rhythmus kauft, und ob es vorgeschlagen wird.",
+        "howItLearns": "CookPal lernt einen Artikel, sobald er dreimal in festem Rhythmus gekauft wurde.",
+        "every_one": "Wird etwa täglich gekauft.",
+        "every_other": "Wird etwa alle {{count}} Tage gekauft.",
+        "lastBoughtToday": "Zuletzt heute gekauft.",
+        "lastBoughtYesterday": "Zuletzt gestern gekauft.",
+        "lastBoughtDaysAgo_one": "Zuletzt vor {{count}} Tag gekauft.",
+        "lastBoughtDaysAgo_other": "Zuletzt vor {{count}} Tagen gekauft.",
+        "suggest": "{{name}} vorschlagen"
+      },
+      "history": {
+        "title": "Verlauf",
+        "empty": "Auf dieser Liste ist noch nichts passiert.",
+        "today": "Heute",
+        "yesterday": "Gestern",
+        "formerMember": "Ein ehemaliges Mitglied",
+        "forMeals": "für {{meals}}",
+        "kinds": {
+          "ADDED": {
+            "other": "{{who}} hat es hinzugefügt",
+            "you": "Du hast es hinzugefügt"
+          },
+          "RESTORED": {
+            "other": "{{who}} hat es wieder auf die Liste gesetzt",
+            "you": "Du hast es wieder auf die Liste gesetzt"
+          },
+          "BOUGHT": {
+            "other": "{{who}} hat es abgehakt",
+            "you": "Du hast es abgehakt"
+          },
+          "REMOVED": {
+            "other": "{{who}} hat es entfernt",
+            "you": "Du hast es entfernt"
+          },
+          "RENAMED": {
+            "other": "{{who}} hat es umbenannt (vorher {{previous}})",
+            "you": "Du hast es umbenannt (vorher {{previous}})"
+          },
+          "SPEC_CHANGED": {
+            "other": "{{who}} hat die Menge auf {{spec}} geändert",
+            "you": "Du hast die Menge auf {{spec}} geändert"
+          },
+          "SPEC_CLEARED": {
+            "other": "{{who}} hat die Menge entfernt",
+            "you": "Du hast die Menge entfernt"
+          },
+          "AISLE_CHANGED": {
+            "other": "{{who}} hat es nach {{aisle}} verschoben",
+            "you": "Du hast es nach {{aisle}} verschoben"
+          },
+          "PRIORITIZED": {
+            "other": "{{who}} hat ihm Priorität gegeben",
+            "you": "Du hast ihm Priorität gegeben"
+          },
+          "UNPRIORITIZED": {
+            "other": "{{who}} hat die Priorität entfernt",
+            "you": "Du hast die Priorität entfernt"
+          }
+        }
       }
     },
     "legal": {

@@ -119,7 +119,7 @@ export const visibleItems = (held: ListSync | undefined): ItemMap =>
   (held?.pending ?? []).reduce((items, pending) => withOp(items, pending.op, pending.at), held?.server ?? {});
 
 // Compared as times: the server writes microseconds, the device milliseconds.
-const timeOf = (instant: string | null | undefined): number => (instant ? Date.parse(instant) : 0);
+export const timeOf = (instant: string | null | undefined): number => (instant ? Date.parse(instant) : 0);
 
 // Prioritized first, then oldest first, so what was added last is at the end.
 export const activeItems = (items: ItemMap): ShoppingItem[] =>

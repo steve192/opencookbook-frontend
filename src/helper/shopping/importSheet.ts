@@ -1,5 +1,7 @@
-import {ImportLine, PreviewMeal, ShownLine} from '../../api/types/shopping';
+import {ImportLine, PreviewMeal, ShoppingItem, ShoppingRegular, ShownLine} from '../../api/types/shopping';
 import {MealChoice, SheetLine} from './importLines';
+import {nameKey} from './names';
+import {dueBy} from './suggestions';
 
 /** A tick the person set by hand, by line key; it survives the checklist being recomputed. */
 export type Ticks = Record<string, boolean>;
@@ -35,8 +37,33 @@ export const isTicked = (line: SheetLine, ticks: Ticks): boolean => ticks[line.k
  * @return {object} the lines to add and the lines shown
  */
 export const importRequest = (lines: SheetLine[], ticks: Ticks): {lines: ImportLine[], shown: ShownLine[]} => ({
-  lines: lines.filter((line) => isTicked(line, ticks)).map((line) => ({
-    name: line.name, spec: line.spec, aisle: line.aisle, icon: line.icon, sources: line.sources,
-  })),
+  lines: lines.filter((line) => isTicked(line, ticks)).map(importLineOf),
   shown: lines.map((line) => ({name: line.name, ticked: isTicked(line, ticks)})),
 });
+
+export const importLineOf = (line: SheetLine): ImportLine =>
+  ({name: line.name, spec: line.spec, aisle: line.aisle, icon: line.icon, sources: line.sources});
+
+/** A regular item of the target list offered beside the meals' ingredients. */
+export interface DueLine extends SheetLine {
+  everyDays: number;
+}
+
+/**
+ * What the target list buys regularly and is due by the end of the imported week, unless it is among the meals'
+ * ingredients.
+ *
+ * @param {ShoppingRegular[]} regulars the target list's
+ * @param {ShoppingItem[]} items the target list's, as this device holds them
+ * @param {SheetLine[]} lines the meals' ingredients
+ * @param {Date} now this device's clock
+ * @param {string} weekEnd yyyy-MM-dd, the week's last day
+ * @return {DueLine[]} one line per due name
+ */
+export const dueLines = (regulars: ShoppingRegular[], items: ShoppingItem[], lines: SheetLine[], now: Date,
+    weekEnd: string): DueLine[] => {
+  const covered = new Set(lines.map((line) => nameKey(line.name)));
+  return dueBy(regulars, items, now, weekEnd).flatMap(({name, aisle, icon, everyDays}) =>
+    everyDays === null || covered.has(nameKey(name)) ? [] :
+      [{key: `due:${nameKey(name)}`, name, spec: null, aisle, icon, staple: false, sources: [], everyDays}]);
+};

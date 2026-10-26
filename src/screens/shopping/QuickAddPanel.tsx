@@ -1,84 +1,60 @@
 import React, {useMemo} from 'react';
-import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {ShoppingItemTile} from '../../components/shopping/ShoppingItemTile';
-import {Aisle} from '../../api/aisles';
-import {ShoppingItem, ShoppingTile} from '../../api/types/shopping';
+import {ShoppingItem} from '../../api/types/shopping';
 import {nameKey} from '../../helper/shopping/names';
 import {TILE_AREA_PADDING} from '../../helper/shopping/tileLayout';
-import {TYPED_TILE_KEY} from '../../helper/shopping/tileKeys';
-import {searchTiles, tileName, typedEntry} from '../../helper/shopping/tiles';
+import {IndexedTile, KnownName, Offer, offersFor, tileOffer} from '../../helper/shopping/tiles';
 import {TileGrid} from './TileGrid';
 import {VirtualTileGrid} from './VirtualTileGrid';
 import {AppScrollView} from '../../components/AppScrollView';
 
-// A tile to add from: a known tile, or what is typed, which the server places.
-interface Offer {
-  key: string;
-  name: string;
-  aisle: Aisle;
-  icon: string | null;
-  tile?: ShoppingTile;
-}
-
-const offerOf = (tile: ShoppingTile, language: string): Offer =>
-  ({key: tile.key, name: tileName(tile, language), aisle: tile.aisle, icon: tile.icon, tile});
 const offerKey = (offer: Offer) => offer.key;
-const itemKey = (item: ShoppingItem) => item.id;
 
 interface Props {
   typed: string;
-  tiles: ShoppingTile[];
+  tiles: IndexedTile[];
   unitWords: ReadonlySet<string>;
+  /** What the list held before, most recent first. */
+  earlier: KnownName[];
   active: ShoppingItem[];
-  bought: ShoppingItem[];
-  /** @param sourceKey the tapped tile's, as registered */
-  onAdd: (name: string, spec: string | null, tile: ShoppingTile | undefined, sourceKey: string) => void;
-  onRestore: (item: ShoppingItem, sourceKey: string) => void;
+  /** @param spec the amount typed with the name */
+  onAdd: (offer: Offer, spec: string | null) => void;
   registerSource: (key: string) => (view: View | null) => void;
 }
 
-// With nothing typed, every tile by aisle; while typing, fitting recent purchases, the typed tile, fitting tiles.
-export const QuickAddPanel = (props: Props) => {
-  const {i18n} = useTranslation('translation');
-  const language = i18n.language;
-  const entry = useMemo(() => typedEntry(props.typed, props.unitWords, props.tiles, props.bought),
-      [props.typed, props.unitWords, props.tiles, props.bought]);
+// With nothing typed, every tile by aisle; while typing, the typed name first, then earlier entries, then tiles.
+// Memoised, so a keystroke renders it only once the deferred text catches up.
+export const QuickAddPanel = React.memo(function QuickAddPanel(props: Props) {
+  const offers = useMemo(() => offersFor(props.typed, props.unitWords, props.tiles, props.earlier),
+      [props.typed, props.unitWords, props.tiles, props.earlier]);
   const onList = useMemo(() => new Set(props.active.map((item) => nameKey(item.name))), [props.active]);
-  const allOffers = useMemo(() => props.tiles.map((tile) => offerOf(tile, language)), [props.tiles, language]);
+  const browsing = useMemo(() => props.tiles.map(({tile, shown}) => tileOffer(tile, shown)), [props.tiles]);
 
-  const renderOffer = (offer: Offer) => (
+  const renderOffer = (offer: Offer, muted = false) => (
     <ShoppingItemTile
       name={offer.name}
-      spec={offer.tile ? undefined : entry?.spec}
+      spec={offer === offers?.typed ? offers.spec : undefined}
       icon={offer.icon}
       aisle={offer.aisle}
+      muted={muted}
       highlighted={onList.has(nameKey(offer.name))}
       viewRef={props.registerSource(offer.key)}
-      onPress={() => props.onAdd(offer.name, entry?.spec ?? null, offer.tile, offer.key)} />
+      onPress={() => props.onAdd(offer, offers?.spec ?? null)} />
   );
 
-  if (!entry) {
-    return <VirtualTileGrid items={allOffers} keyOf={offerKey} renderTile={renderOffer} />;
+  if (!offers) {
+    return <VirtualTileGrid items={browsing} keyOf={offerKey} renderTile={(offer) => renderOffer(offer)} />;
   }
-
-  const key = nameKey(entry.name);
-  const recent = props.bought.filter((item) => nameKey(item.name).includes(key)).slice(0, 8);
-  const typedOffer: Offer[] = entry.tile || entry.recent ?
-    [] : [{key: TYPED_TILE_KEY, name: entry.name, aisle: 'OTHER', icon: null}];
-  const fitting = searchTiles(props.tiles, entry.name, language).map((tile) => offerOf(tile, language));
   return (
     <AppScrollView contentContainerStyle={styles.panel} keyboardShouldPersistTaps="always">
-      {recent.length > 0 &&
-        <TileGrid items={recent} keyOf={itemKey} renderTile={(item) => (
-          <ShoppingItemTile name={item.name} icon={item.icon} aisle={item.aisle} muted
-            viewRef={props.registerSource(item.id)}
-            onPress={() => props.onRestore(item, item.id)} />
-        )} />}
-      <TileGrid items={[...typedOffer, ...fitting]} keyOf={offerKey} renderTile={renderOffer} />
+      <TileGrid items={[offers.typed, ...offers.earlier]} keyOf={offerKey}
+        renderTile={(offer) => renderOffer(offer, offer !== offers.typed)} />
+      {offers.fitting.length > 0 &&
+        <TileGrid items={offers.fitting} keyOf={offerKey} renderTile={(offer) => renderOffer(offer)} />}
     </AppScrollView>
   );
-};
+});
 
 const styles = StyleSheet.create({
   // Stretched, since the grids fit their columns to the width they get.
