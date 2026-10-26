@@ -16,7 +16,7 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery,
   tagTypes: ['UserInfo', 'InstanceInfo', 'Recipe', 'RecipeGroup', 'Nutrition', 'Weekplan', 'Household',
-    'HouseholdInvite', 'PlanningProfile', 'ApiKey', 'Share', 'Ingredient', 'Staple'],
+    'HouseholdInvite', 'PlanningProfile', 'ApiKey', 'Share', 'Ingredient', 'Staple', 'ShoppingRegular'],
   keepUnusedDataFor: KEEP_FOR_OFFLINE_SECONDS,
   // An opened screen shows what is cached at once and refreshes it once that is a minute old.
   refetchOnMountOrArgChange: 60,

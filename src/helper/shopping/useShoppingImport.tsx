@@ -10,7 +10,7 @@ import {errorMessageKey} from '../apiErrorMessage';
 import {openBringImport} from '../bringExport';
 import {SnackbarUtil} from '../GlobalSnackbar';
 import {ShoppingImportTarget} from './importTarget';
-import {useShoppingProvider} from './useShoppingProvider';
+import {useShoppingSettings} from './useShoppingSettings';
 
 /**
  * Starts putting a week or a recipe on the shopping list. Asks where it should go the first time;
@@ -21,7 +21,7 @@ import {useShoppingProvider} from './useShoppingProvider';
 export const useShoppingImport = () => {
   const {t} = useTranslation('translation');
   const navigation = useNavigation<NativeStackNavigationProp<MainNavigationProps>>();
-  const {provider, choose} = useShoppingProvider();
+  const {provider, chooseProvider} = useShoppingSettings();
   const [createBringExport] = useCreateBringExportMutation();
   const [asking, setAsking] = useState<ShoppingImportTarget>();
   // Without feedback during the two requests a Bring export takes, the button gets tapped again,
@@ -53,7 +53,7 @@ export const useShoppingImport = () => {
 
   const chooseAndProceed = async (target: ShoppingImportTarget, chosen: ShoppingProvider) => {
     try {
-      await choose(chosen);
+      await chooseProvider(chosen);
       await proceed(target, chosen);
     } catch (error) {
       SnackbarUtil.show({message: t(errorMessageKey(error))});

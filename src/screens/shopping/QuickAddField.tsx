@@ -30,6 +30,7 @@ export const QuickAddField = (props: Props) => {
         onChangeText={props.onType}
         onFocus={props.onFocus}
         onSubmitEditing={props.onSubmit}
+        enterKeyHint="enter"
         submitBehavior="submit" />
       {props.adding && <Button onPress={props.onDone}>{t('common.done')}</Button>}
     </Surface>

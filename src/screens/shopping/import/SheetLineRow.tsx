@@ -11,11 +11,13 @@ interface Props {
   ticked: boolean;
   /** What the target list already has of it, for a CookPal list; undefined when it has none. */
   onList?: string | null;
+  /** Why it is offered, when that is not the meals. */
+  note?: string;
   onToggle: () => void;
 }
 
 // One line of the checklist, and why it might be left out: usually at home, or already on the list.
-export const SheetLineRow = ({line, ticked, onList, onToggle}: Props) => {
+export const SheetLineRow = ({line, ticked, onList, note, onToggle}: Props) => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
   const onListNote = () => {
@@ -29,6 +31,7 @@ export const SheetLineRow = ({line, ticked, onList, onToggle}: Props) => {
     line.sources.length > 1 ? t('screens.shopping.import.forMeals', {count: line.sources.length}) : null,
     line.staple ? t('screens.shopping.import.staple') : null,
     onListNote(),
+    note,
   ].filter(Boolean).join(' · ');
 
   return (

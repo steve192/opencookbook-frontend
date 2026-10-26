@@ -754,7 +754,80 @@
         "failed": "Could not add to the shopping list.",
         "loadFailed": "Could not load the meals.",
         "weekTitle": "Week of {{date}}",
-        "leftoversNothingToBuy": "{{leftovers}}, nothing to buy"
+        "leftoversNothingToBuy": "{{leftovers}}, nothing to buy",
+        "alsoDue": "Also due"
+      },
+      "suggestions": {
+        "title": "Time to buy again?",
+        "addAll": "Add all",
+        "add": "Add to list",
+        "notNow": "Not now",
+        "never": "Don't suggest this",
+        "neverDone": "{{name}} is no longer suggested. Settings › Shopping list › Regular items brings it back.",
+        "setting": "Suggest regular items",
+        "settingExplanation": "Items a list buys at a steady rhythm show up under \"Time to buy again?\" when they are due. This only changes what your devices show; a shared list keeps learning for everyone."
+      },
+      "regulars": {
+        "title": "Regular items",
+        "subtitle": "What each list buys at a steady rhythm, and whether it is suggested.",
+        "howItLearns": "CookPal learns an item once it was bought three times at a steady rhythm.",
+        "every_one": "Bought about every day.",
+        "every_other": "Bought about every {{count}} days.",
+        "lastBoughtToday": "Last bought today.",
+        "lastBoughtYesterday": "Last bought yesterday.",
+        "lastBoughtDaysAgo_one": "Last bought {{count}} day ago.",
+        "lastBoughtDaysAgo_other": "Last bought {{count}} days ago.",
+        "suggest": "Suggest {{name}}"
+      },
+      "history": {
+        "title": "History",
+        "empty": "Nothing has happened on this list yet.",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "formerMember": "A former member",
+        "forMeals": "for {{meals}}",
+        "kinds": {
+          "ADDED": {
+            "other": "{{who}} added it",
+            "you": "You added it"
+          },
+          "RESTORED": {
+            "other": "{{who}} put it back on the list",
+            "you": "You put it back on the list"
+          },
+          "BOUGHT": {
+            "other": "{{who}} ticked it off",
+            "you": "You ticked it off"
+          },
+          "REMOVED": {
+            "other": "{{who}} removed it",
+            "you": "You removed it"
+          },
+          "RENAMED": {
+            "other": "{{who}} renamed it (was {{previous}})",
+            "you": "You renamed it (was {{previous}})"
+          },
+          "SPEC_CHANGED": {
+            "other": "{{who}} changed the amount to {{spec}}",
+            "you": "You changed the amount to {{spec}}"
+          },
+          "SPEC_CLEARED": {
+            "other": "{{who}} cleared the amount",
+            "you": "You cleared the amount"
+          },
+          "AISLE_CHANGED": {
+            "other": "{{who}} moved it to {{aisle}}",
+            "you": "You moved it to {{aisle}}"
+          },
+          "PRIORITIZED": {
+            "other": "{{who}} gave it priority",
+            "you": "You gave it priority"
+          },
+          "UNPRIORITIZED": {
+            "other": "{{who}} took its priority away",
+            "you": "You took its priority away"
+          }
+        }
       }
     },
     "legal": {

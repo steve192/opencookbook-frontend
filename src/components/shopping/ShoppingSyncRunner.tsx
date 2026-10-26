@@ -10,7 +10,7 @@ import {
   syncShoppingList,
   syncShoppingListBehind,
 } from '../../helper/shopping/shoppingSync';
-import {useShoppingProvider} from '../../helper/shopping/useShoppingProvider';
+import {useShoppingSettings} from '../../helper/shopping/useShoppingSettings';
 import {useIsOnline} from '../../offline/useIsOnline';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 
@@ -28,7 +28,7 @@ const ignore = () => undefined;
  */
 export const ShoppingSyncRunner = () => {
   const dispatch = useAppDispatch();
-  const {provider} = useShoppingProvider();
+  const {provider} = useShoppingSettings();
   const isOnline = useIsOnline();
   const lists = useAppSelector((state) => state.shopping.lists);
   const activeListId = useAppSelector((state) => state.shopping.activeListId);

@@ -55,7 +55,9 @@ export type MainNavigationProps = {
     HouseholdInviteScreen: { token: string }
     ShoppingImportScreen: ShoppingImportTarget
     ShoppingListsScreen: undefined
+    ShoppingHistoryScreen: { listId: number }
     StaplesScreen: undefined
+    RegularsScreen: undefined
     OpenSourceLicensesScreen: undefined
     AccountSettingsScreen: undefined
     ShoppingSettingsScreen: undefined

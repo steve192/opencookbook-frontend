@@ -31,11 +31,25 @@ const listOf = (state: RootState, listId: number): ShoppingList | undefined =>
 const isRefused = (error: unknown) => toApiError(error).status === 400;
 const isGone = (error: unknown) => toApiError(error).status === 404;
 
-// Lists and items are kept in the shopping slice, not in the request cache.
-const FRESH = {subscribe: false, forceRefetch: true};
+const FRESH = {forceRefetch: true};
+
+/**
+ * Lists and items are kept in the shopping slice, not in the request cache, so a request is subscribed to only
+ * until it is answered. Unsubscribed from the start, the cache could drop the answer before it is read.
+ *
+ * @param {object} request what initiate returned
+ * @return {Promise} the answer
+ */
+const answerOf = async <T, >(request: {unwrap: () => Promise<T>, unsubscribe: () => void}): Promise<T> => {
+  try {
+    return await request.unwrap();
+  } finally {
+    request.unsubscribe();
+  }
+};
 
 const changesOf = (dispatch: AppDispatch, list: ShoppingList, since: number) =>
-  dispatch(shoppingEndpoints.getShoppingChanges.initiate({list, since}, FRESH)).unwrap();
+  answerOf(dispatch(shoppingEndpoints.getShoppingChanges.initiate({list, since}, FRESH)));
 
 /**
  * Sends what this device changed on a list and takes in what others changed. Safe to call at any
@@ -59,7 +73,7 @@ export const syncShoppingList = (listId: number): Thunk => async (dispatch, getS
   inFlight.add(listId);
   try {
     const known = getState().shopping.sync[listId];
-    const batch = (known?.pending ?? []).slice(0, MAX_OPS_PER_BATCH).map((pending) => pending.op);
+    const batch = (known?.pending ?? []).slice(0, MAX_OPS_PER_BATCH).map(({op, at}) => ({...op, at}));
     const since = known?.version ?? 0;
     try {
       const changes = batch.length > 0 ?
@@ -151,7 +165,7 @@ export const syncAllShoppingLists = (): Thunk => async (dispatch, getState) => {
  * @return {Thunk} the request
  */
 export const loadShoppingLists = (): Thunk => async (dispatch) => {
-  dispatch(shoppingListsLoaded(await dispatch(shoppingEndpoints.getShoppingLists.initiate(undefined, FRESH)).unwrap()));
+  dispatch(shoppingListsLoaded(await answerOf(dispatch(shoppingEndpoints.getShoppingLists.initiate(undefined, FRESH)))));
 };
 
 /**
@@ -161,5 +175,5 @@ export const loadShoppingLists = (): Thunk => async (dispatch) => {
  */
 export const loadShoppingVocabulary = (): Thunk => async (dispatch) => {
   dispatch(shoppingVocabularyLoaded(
-      await dispatch(shoppingEndpoints.getShoppingVocabulary.initiate(undefined, FRESH)).unwrap()));
+      await answerOf(dispatch(shoppingEndpoints.getShoppingVocabulary.initiate(undefined, FRESH)))));
 };

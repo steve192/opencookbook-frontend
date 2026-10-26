@@ -53,9 +53,11 @@ import {ShoppingSettingsScreen} from '../screens/settings/ShoppingSettingsScreen
 import {ShoppingImportScreen} from '../screens/shopping/ShoppingImportScreen';
 import {ShoppingListScreen} from '../screens/shopping/ShoppingListScreen';
 import {ShoppingListsScreen} from '../screens/shopping/ShoppingListsScreen';
+import {ShoppingHistoryScreen} from '../screens/shopping/ShoppingHistoryScreen';
 import {StaplesScreen} from '../screens/shopping/StaplesScreen';
+import {RegularsScreen} from '../screens/shopping/RegularsScreen';
 import {ShoppingSyncRunner} from '../components/shopping/ShoppingSyncRunner';
-import {useShoppingProvider} from '../helper/shopping/useShoppingProvider';
+import {useShoppingSettings} from '../helper/shopping/useShoppingSettings';
 import {useOpenWaitingShare} from '../helper/useOpenWaitingShare';
 import {LegalDocumentScreen} from '../screens/legal/LegalDocumentScreen';
 import {WeeklyRecipeListScreen} from '../screens/weeklyrecipelist/WeeklyRecipeListScreen';
@@ -136,7 +138,7 @@ const BottomTabNavigation = () => {
   const {t} = useTranslation('translation');
   const theme = useAppTheme();
   // Somebody who shops with Bring has no use for the built-in list.
-  const {provider} = useShoppingProvider();
+  const {provider} = useShoppingSettings();
   useOpenWaitingShare();
   return (
     <BottomTab.Navigator
@@ -295,9 +297,19 @@ const MainStackNavigation = () => {
           options={{title: t('screens.shopping.listsTitle')}}
         />
         <MainStack.Screen
+          name="ShoppingHistoryScreen"
+          component={ShoppingHistoryScreen}
+          options={{title: t('screens.shopping.history.title')}}
+        />
+        <MainStack.Screen
           name="StaplesScreen"
           component={StaplesScreen}
           options={{title: t('screens.shopping.staplesTitle')}}
+        />
+        <MainStack.Screen
+          name="RegularsScreen"
+          component={RegularsScreen}
+          options={{title: t('screens.shopping.regulars.title')}}
         />
         <MainStack.Screen
           name="OpenSourceLicensesScreen"

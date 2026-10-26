@@ -14,6 +14,8 @@ interface Props {
   muted?: boolean;
   /** Already on the list, while adding. */
   highlighted?: boolean;
+  /** Not on the list yet but due again: outlined instead of filled. */
+  suggested?: boolean;
   /** Picked, as for moving. */
   selected?: boolean;
   prioritized?: boolean;
@@ -33,11 +35,14 @@ export const ShoppingItemTile = (props: Props) => {
     background = theme.colors.primaryContainer;
   } else if (props.muted) {
     background = theme.colors.surfaceVariant;
+  } else if (props.suggested) {
+    background = 'transparent';
   }
   return (
     <View ref={props.viewRef} collapsable={false} style={props.hidden ? styles.hidden : undefined}>
       <TouchableRipple
-        style={[styles.tile, {backgroundColor: background, opacity: props.muted ? 0.7 : 1}]}
+        style={[styles.tile, {backgroundColor: background, opacity: props.muted ? 0.7 : 1},
+          props.suggested && [styles.suggested, {borderColor: theme.colors.outline}]]}
         borderless
         accessibilityRole="button"
         accessibilityLabel={props.spec ? `${props.name}, ${props.spec}` : props.name}
@@ -70,6 +75,7 @@ const BADGE_SIZE = 18;
 
 const styles = StyleSheet.create({
   tile: {minHeight: 96, borderRadius: 12},
+  suggested: {borderWidth: 1.5, borderStyle: 'dashed'},
   content: {flex: 1, alignItems: 'center', justifyContent: 'center', padding: 6, gap: 2},
   name: {textAlign: 'center'},
   hidden: {opacity: 0},

@@ -7,6 +7,13 @@ export interface UserInfo {
   onboarded?: boolean;
   /** Null until the first shopping import asked where the list should go. */
   shoppingProvider?: ShoppingProvider | null;
+  /** Whether the app shows suggestions of regularly bought items. */
+  shoppingSuggestions?: boolean;
+}
+
+export interface ShoppingSettings {
+  provider?: ShoppingProvider;
+  suggestions?: boolean;
 }
 
 export interface InstanceInfo {

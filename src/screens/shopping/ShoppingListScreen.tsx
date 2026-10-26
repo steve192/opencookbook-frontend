@@ -9,7 +9,7 @@ import {Appbar, Surface, Text} from 'react-native-paper';
 import {TileLook} from '../../components/shopping/FlyingTile';
 import {ShoppingListMenu} from '../../components/shopping/ShoppingListMenu';
 import {useTileFlights} from '../../components/shopping/useTileFlights';
-import {ShoppingItem, ShoppingList, ShoppingTile} from '../../api/types/shopping';
+import {ShoppingItem, ShoppingList, ShoppingRegular} from '../../api/types/shopping';
 import {newClientId} from '../../helper/clientId';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {activeItems, recentlyBought, visibleItems} from '../../helper/shopping/listItems';
@@ -20,9 +20,10 @@ import {
   ShoppingChange,
   syncShoppingList,
 } from '../../helper/shopping/shoppingSync';
-import {boughtKey, listKey, sheetKey, sourceKeyOf} from '../../helper/shopping/tileKeys';
+import {boughtKey, listKey, sheetKey, suggestedKey} from '../../helper/shopping/tileKeys';
 import {TILE_AREA_PADDING} from '../../helper/shopping/tileLayout';
-import {typedEntry} from '../../helper/shopping/tiles';
+import {indexTiles, Offer} from '../../helper/shopping/tiles';
+import {useEarlierEntries} from '../../helper/shopping/useEarlierEntries';
 import {useListName} from '../../helper/shopping/useListName';
 import {useShoppingVocabulary} from '../../helper/shopping/useShoppingVocabulary';
 import {useStableCallback} from '../../helper/useStableCallback';
@@ -33,13 +34,15 @@ import {useIsOnline} from '../../offline/useIsOnline';
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
 import {ItemTile} from './ItemTile';
-import {QuickAddField} from './QuickAddField';
-import {QuickAddSheet} from './QuickAddSheet';
+import {QuickAdd} from './QuickAdd';
 import {ItemEdit, ShoppingItemDialog} from './ShoppingItemDialog';
+import {SuggestionDialog} from './SuggestionDialog';
+import {SuggestionSection} from './SuggestionSection';
 import {TILE_LAYOUT, TileGrid} from './TileGrid';
 import {useFollowNewest} from './useFollowNewest';
 import {useItemSelection} from './useItemSelection';
 import {useQuickAdd} from './useQuickAdd';
+import {useSuggestions} from './useSuggestions';
 import {AppScrollView} from '../../components/AppScrollView';
 
 type Props =
@@ -50,7 +53,7 @@ type Props =
 
 // The list to shop with: tap a tile when it is in the basket, type or browse to add.
 export const ShoppingListScreen = (props: Props) => {
-  const {t} = useTranslation('translation');
+  const {t, i18n} = useTranslation('translation');
   const theme = useAppTheme();
   const dispatch = useAppDispatch();
   const isOnline = useIsOnline();
@@ -60,6 +63,7 @@ export const ShoppingListScreen = (props: Props) => {
   const {tiles, unitWords} = useShoppingVocabulary();
 
   const [openItem, setOpenItem] = useState<ShoppingItem>();
+  const [openSuggestion, setOpenSuggestion] = useState<ShoppingRegular>();
   const [refreshing, setRefreshing] = useState(false);
   const quickAdd = useQuickAdd(props.navigation);
   const selection = useItemSelection(props.navigation);
@@ -73,6 +77,9 @@ export const ShoppingListScreen = (props: Props) => {
       () => visibleItems(held), [held]);
   const active = useMemo(() => activeItems(items), [items]);
   const bought = useMemo(() => recentlyBought(items), [items]);
+  const earlier = useEarlierEntries(activeList, bought);
+  const suggestions = useSuggestions(activeList, items, bought);
+  const tileIndex = useMemo(() => indexTiles(tiles, i18n.language), [tiles, i18n.language]);
 
   const refresh = useCallback(async () => {
     if (!isOnline) {
@@ -80,9 +87,10 @@ export const ShoppingListScreen = (props: Props) => {
     }
     await dispatch(loadShoppingLists()).catch(() => undefined);
     if (activeListId !== null) {
+      suggestions.reload();
       await dispatch(syncShoppingList(activeListId));
     }
-  }, [isOnline, activeListId]);
+  }, [isOnline, activeListId, suggestions.reload]);
 
   const chooseList = (list: ShoppingList) => {
     dispatch(shoppingListChosen(list.id));
@@ -90,6 +98,7 @@ export const ShoppingListScreen = (props: Props) => {
   };
 
   const manageLists = () => props.navigation.navigate('ShoppingListsScreen');
+  const showHistory = () => activeList && props.navigation.navigate('ShoppingHistoryScreen', {listId: activeList.id});
 
   const startMoving = () => {
     quickAdd.stop();
@@ -109,17 +118,21 @@ export const ShoppingListScreen = (props: Props) => {
     title: activeList ? nameOf(activeList) : t('screens.shopping.screenTitle'),
     leading: undefined,
     actions: (
-      <ShoppingListMenu
-        lists={lists}
-        selectedId={activeListId}
-        renderAnchor={(open) => <Appbar.Action icon="format-list-bulleted" color={theme.colors.onPrimary}
-          accessibilityLabel={t('screens.shopping.switchList')} onPress={open} />}
-        onChoose={chooseList}
-        extraItems={[
-          ...(otherLists.length > 0 && active.length > 0 ?
-            [{title: t('screens.shopping.moveItems'), icon: MOVE_ICON, onPress: startMoving}] : []),
-          {title: t('screens.shopping.manageLists'), icon: 'cog-outline', onPress: manageLists},
-        ]} />
+      <>
+        <Appbar.Action icon="history" color={theme.colors.onPrimary}
+          accessibilityLabel={t('screens.shopping.history.title')} disabled={!activeList} onPress={showHistory} />
+        <ShoppingListMenu
+          lists={lists}
+          selectedId={activeListId}
+          renderAnchor={(open) => <Appbar.Action icon="format-list-bulleted" color={theme.colors.onPrimary}
+            accessibilityLabel={t('screens.shopping.switchList')} onPress={open} />}
+          onChoose={chooseList}
+          extraItems={[
+            ...(otherLists.length > 0 && active.length > 0 ?
+              [{title: t('screens.shopping.moveItems'), icon: MOVE_ICON, onPress: startMoving}] : []),
+            {title: t('screens.shopping.manageLists'), icon: 'cog-outline', onPress: manageLists},
+          ]} />
+      </>
     ),
   });
 
@@ -162,19 +175,20 @@ export const ShoppingListScreen = (props: Props) => {
       quickAdd.next();
     }, follow.reveal);
 
-  const add = (name: string, spec: string | null, tile: ShoppingTile | undefined, sourceKey: string) =>
-    addFrom(sourceKey, {name, spec, icon: tile?.icon ?? null, aisle: tile?.aisle ?? 'OTHER'},
-        {type: 'ADD', itemId: newClientId(), name, spec, aisle: tile?.aisle ?? null, icon: tile?.icon ?? null});
+  const add = (offer: Offer, spec: string | null) =>
+    addFrom(offer.key, {name: offer.name, spec, icon: offer.icon, aisle: offer.aisle}, {
+      type: 'ADD', itemId: newClientId(), name: offer.name, spec,
+      aisle: offer.placed ? offer.aisle : null, icon: offer.placed ? offer.icon : null,
+    });
 
-  const restoreFrom = (item: ShoppingItem, sourceKey: string) =>
-    addFrom(sourceKey, lookOf(item), {type: 'RESTORE', itemId: item.id});
+  const additionOf = (regular: ShoppingRegular): ShoppingChange =>
+    ({type: 'ADD', itemId: newClientId(), name: regular.name, aisle: regular.aisle, icon: regular.icon});
 
-  const addTyped = () => {
-    const entry = typedEntry(quickAdd.typed, unitWords, tiles, bought);
-    if (entry) {
-      void add(entry.name, entry.spec, entry.tile, sourceKeyOf(entry));
-    }
-  };
+  const addSuggestion = (regular: ShoppingRegular) =>
+    flights.launch(suggestedKey(regular.name), listKey(regular.name),
+        {name: regular.name, spec: null, icon: regular.icon, aisle: regular.aisle}, () => change(additionOf(regular)));
+
+  const addAllSuggestions = () => suggestions.suggested.forEach((regular) => change(additionOf(regular)));
 
   const tick = (item: ShoppingItem) => {
     void flights.launch(listKey(item.name), boughtKey(item.name), lookOf(item),
@@ -195,6 +209,7 @@ export const ShoppingListScreen = (props: Props) => {
   const onLongPress = useStableCallback((item: ShoppingItem) =>
     selection.selecting ? selection.toggle(item.id) : setOpenItem(item));
   const onRestore = useStableCallback((item: ShoppingItem) => restore(item));
+  const onAddSuggestion = useStableCallback((regular: ShoppingRegular) => void addSuggestion(regular));
 
   const save = (item: ShoppingItem, changes: ItemEdit) => {
     if (Object.values(changes).some((value) => value !== undefined)) {
@@ -228,10 +243,14 @@ export const ShoppingListScreen = (props: Props) => {
             )} />
           {!quickAdd.adding && !selection.selecting &&
             <Animated.View layout={TILE_LAYOUT} entering={FadeIn} exiting={FadeOut}>
-              {bought.length > 0 &&
+              <SuggestionSection suggested={suggestions.suggested}
+                isMoving={(regular) => flights.isMoving(suggestedKey(regular.name))}
+                register={(regular) => flights.register(suggestedKey(regular.name))} onAdd={onAddSuggestion}
+                onAddAll={addAllSuggestions} onLongPress={setOpenSuggestion} />
+              {suggestions.recentlyBought.length > 0 &&
                 <Text variant="titleSmall" style={styles.recent}>{t('screens.shopping.recentlyBought')}</Text>}
               {/* Mounted while empty too, so the first tile ticked off already animates into it. */}
-              <TileGrid animated items={bought} keyOf={(item) => item.id}
+              <TileGrid animated items={suggestions.recentlyBought} keyOf={(item) => item.id}
                 still={(item) => flights.isMoving(boughtKey(item.name))}
                 renderTile={(item) => (
                   <ItemTile item={item} muted hidden={flights.isMoving(boughtKey(item.name))}
@@ -243,12 +262,10 @@ export const ShoppingListScreen = (props: Props) => {
           <Pressable style={StyleSheet.absoluteFill} accessibilityRole="button" accessibilityLabel={t('common.done')}
             onPress={quickAdd.stop} />}
       </View>
-      {quickAdd.adding &&
-        <QuickAddSheet typed={quickAdd.typed} tiles={tiles} unitWords={unitWords} active={active} bought={bought}
-          onAdd={add} onRestore={restoreFrom} registerSource={(key) => flights.register(sheetKey(key))} />}
-      {!selection.selecting &&
-        <QuickAddField inputRef={quickAdd.fieldRef} typed={quickAdd.typed} onType={quickAdd.setTyped}
-          onFocus={quickAdd.start} onSubmit={addTyped} adding={quickAdd.adding} onDone={quickAdd.stop} />}
+      <QuickAdd adding={quickAdd.adding} showField={!selection.selecting} inputRef={quickAdd.fieldRef}
+        typedRef={quickAdd.typedRef} onStart={quickAdd.start} onDone={quickAdd.stop} tiles={tileIndex}
+        unitWords={unitWords} earlier={earlier} active={active} onAdd={add}
+        registerSource={(key) => flights.register(sheetKey(key))} />
       {flights.copies}
       {openItem &&
         <ShoppingItemDialog
@@ -256,6 +273,13 @@ export const ShoppingListScreen = (props: Props) => {
           onDismiss={() => setOpenItem(undefined)}
           onSave={(changes) => save(openItem, changes)}
           onRemove={() => remove(openItem)} />}
+      {openSuggestion &&
+        <SuggestionDialog
+          regular={openSuggestion}
+          onDismiss={() => setOpenSuggestion(undefined)}
+          onAdd={() => void addSuggestion(openSuggestion)}
+          onNotNow={() => void suggestions.putOff(openSuggestion)}
+          onNever={() => void suggestions.neverSuggest(openSuggestion)} />}
     </Surface>
   );
 };
