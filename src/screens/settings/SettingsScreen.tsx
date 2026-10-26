@@ -1,29 +1,23 @@
-import {BottomTabScreenProps} from '@react-navigation/bottom-tabs';
-import {CompositeScreenProps} from '@react-navigation/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import Constants from 'expo-constants';
-import React, {useEffect} from 'react';
+import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Avatar, Text} from 'react-native-paper';
 import {useGetUserInfoQuery} from '../../api/endpoints/account';
 import {LegalLinks} from '../../components/LegalLinks';
 import {useInstanceFeatures} from '../../helper/useInstanceFeatures';
-import {setAppbarOptions} from '../../navigation/appbarOptions';
-import {MainNavigationProps, OverviewNavigationProps} from '../../navigation/NavigationRoutes';
+import {MainNavigationProps} from '../../navigation/NavigationRoutes';
 import {OfflineDataCard} from '../../offline/OfflineDataCard';
 import {PwaIosInstructionsDialog} from '../../pwa/PwaIosInstructionsDialog';
 import {useInstallApp} from '../../pwa/useInstallApp';
 import {useAppSelector} from '../../redux/hooks';
 import {useAppTheme} from '../../styles/CentralStyles';
 import {SettingsEntry} from './SettingsEntry';
-import {SettingsHint, SettingsPage} from './SettingsPage';
+import {PageFrame} from '../../components/PageFrame';
+import {SettingsHint} from './SettingsHint';
 
-type Props =
-    CompositeScreenProps<
-        BottomTabScreenProps<OverviewNavigationProps, 'SettingsScreen'>,
-        NativeStackScreenProps<MainNavigationProps, 'OverviewScreen'>
-    >;
+type Props = NativeStackScreenProps<MainNavigationProps, 'SettingsScreen'>;
 
 type SettingsRoute =
   'AccountSettingsScreen' | 'HouseholdListScreen' | 'ShoppingSettingsScreen' | 'PlanningSettingsScreen' |
@@ -37,25 +31,10 @@ export const SettingsScreen = (props: Props) => {
   const {data: userInfo} = useGetUserInfoQuery();
   const installApp = useInstallApp();
 
-  useEffect(() => {
-    const applyHeaderOptions = () => setAppbarOptions(props.navigation.getParent(), {
-      title: t('screens.settings.screenTitle'),
-      // Clearing both sides: the recipe list leaves a back action in the
-      // shared header when it is showing a group, and it belongs to that tab.
-      leading: undefined,
-      actions: undefined,
-    });
-    // Also on mount: choosing Bring removes the shopping tab, which mounts this screen anew while focused.
-    if (props.navigation.isFocused()) {
-      applyHeaderOptions();
-    }
-    return props.navigation.addListener('focus', applyHeaderOptions);
-  }, [props.navigation]);
-
   const open = (route: SettingsRoute) => () => props.navigation.navigate(route);
 
   return (
-    <SettingsPage>
+    <PageFrame>
       <View style={styles.header}>
         <Avatar.Icon style={styles.serverIcon} size={100} color={theme.colors.onSurface} icon="server" />
         <Text style={styles.bold}>{backendUrl}</Text>
@@ -116,7 +95,7 @@ export const SettingsScreen = (props: Props) => {
         <SettingsHint>{t('screens.settings.appVersion', {version: Constants.expoConfig?.version})}</SettingsHint>
       </View>
       <PwaIosInstructionsDialog visible={installApp.iosStepsShown} onDismiss={installApp.hideIosSteps} />
-    </SettingsPage>
+    </PageFrame>
   );
 };
 

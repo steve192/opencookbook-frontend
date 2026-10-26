@@ -1,0 +1,18 @@
+---
+import ToolCards from './ToolCards.astro';
+import { getContent, type Lang } from '../content';
+import { getToolPages } from '../toolPages';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = getContent(lang);
+---
+
+<section id="tools" class="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20">
+  <h2 class="text-3xl font-bold tracking-tight">{getToolPages(lang).title}</h2>
+  <p class="mt-4 max-w-3xl text-lg leading-8 text-muted">{t.tools.lead}</p>
+  <div class="mt-10"><ToolCards lang={lang} /></div>
+</section>

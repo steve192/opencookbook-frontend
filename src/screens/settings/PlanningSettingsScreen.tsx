@@ -6,7 +6,7 @@ import {CustomCard} from '../../components/CustomCard';
 import {SwitchRow} from '../../components/SwitchRow';
 import {usePersistedFlag} from '../../helper/usePersistedFlag';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
-import {SettingsPage} from './SettingsPage';
+import {PageFrame} from '../../components/PageFrame';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'PlanningSettingsScreen'>;
 
@@ -17,13 +17,13 @@ export const PlanningSettingsScreen = (_props: Props) => {
       AppPersistence.getAskForPlanningDetails, AppPersistence.setAskForPlanningDetails, true);
 
   return (
-    <SettingsPage>
+    <PageFrame>
       <CustomCard>
         <SwitchRow
           label={t('screens.settings.askPlanningDetails')}
           value={askPlanningDetails}
           onChange={setAskPlanningDetails} />
       </CustomCard>
-    </SettingsPage>
+    </PageFrame>
   );
 };

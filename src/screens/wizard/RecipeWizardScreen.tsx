@@ -1,7 +1,7 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {Appbar, Button, Divider, Menu, Surface, Text, TextInput} from 'react-native-paper';
 import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
 import {SectionTitle} from '../../components/SectionTitle';
@@ -49,6 +49,7 @@ import {RecipeFormField} from './PreparationStepFormField';
 import {ImportCompletionNotice} from './ImportCompletionNotice';
 import {PlanningDetailsSection} from './PlanningDetailsSection';
 import {RecipeGroupFormField} from './RecipeGroupFormField';
+import {AppScrollView} from '../../components/AppScrollView';
 
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'RecipeWizardScreen'>;
@@ -348,7 +349,7 @@ const RecipeWizardScreen = (props: Props) => {
 
   return (
     <Surface style={styles.screen}>
-      <ScrollView keyboardShouldPersistTaps='handled' contentContainerStyle={styles.scrollContent}>
+      <AppScrollView keyboardShouldPersistTaps='handled' contentContainerStyle={styles.scrollContent}>
         <RecipeImageViewPager
           style={{height: 260}}
           onImageAdded={(uuid) => edit((recipe) => withImageAdded(recipe, uuid))}
@@ -394,7 +395,7 @@ const RecipeWizardScreen = (props: Props) => {
             {props.route.params?.editing ? t('common.save') : t('common.create')}
           </Button>
         </View>
-      </ScrollView>
+      </AppScrollView>
     </Surface>
   );
 };

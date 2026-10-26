@@ -36,6 +36,9 @@ import {PlanDraftScreen} from '../screens/weekplanning/PlanDraftScreen';
 import {WeekplanWizardScreen} from '../screens/weekplanning/WeekplanWizardScreen';
 import {InvitationScreen} from '../screens/InvitationScreen';
 import {SharedRecipeScreen} from '../screens/SharedRecipeScreen';
+import {MoreScreen} from '../screens/MoreScreen';
+import {ToolScreen, toolTitle} from '../screens/tools/ToolScreen';
+import {ToolsOverviewScreen} from '../screens/tools/ToolsOverviewScreen';
 import {HouseholdInviteScreen} from '../screens/households/HouseholdInviteScreen';
 import {HouseholdListScreen} from '../screens/households/HouseholdListScreen';
 import {HouseholdScreen} from '../screens/households/HouseholdScreen';
@@ -62,7 +65,7 @@ import {LINKING_SCREENS} from './linking';
 import {RETIRED_HOSTED_INSTANCE_URL} from '../hostedInstance';
 import {addBasePath, restoreBasePathInState, stripBasePath} from './basePath';
 import {navigationRef} from './navigationRef';
-import {PaperStackHeader} from './PaperStackHeader';
+import {renderPaperStackHeader} from './PaperStackHeader';
 import {
   BaseNavigatorProps,
   LoginNavigationProps,
@@ -172,11 +175,11 @@ const BottomTabNavigation = () => {
             tabBarIcon: tabBarIcon('cart-outline'),
           }} />}
       <BottomTab.Screen
-        name="SettingsScreen"
-        component={SettingsScreen}
+        name="MoreScreen"
+        component={MoreScreen}
         options={{
-          title: t('screens.settings.screenTitle'),
-          tabBarIcon: tabBarIcon('cog-outline'),
+          title: t('screens.more.screenTitle'),
+          tabBarIcon: tabBarIcon('dots-horizontal'),
         }} />
     </BottomTab.Navigator>
   );
@@ -205,7 +208,7 @@ const MainStackNavigation = () => {
       <ShoppingSyncRunner />
       <MainStack.Navigator
         screenOptions={{
-          header: (nav) => <PaperStackHeader {...nav} />,
+          header: renderPaperStackHeader,
         }}>
         <MainStack.Screen
           name="OverviewScreen"
@@ -300,6 +303,11 @@ const MainStackNavigation = () => {
           name="OpenSourceLicensesScreen"
           component={OpenSourceLicensesScreen}
           options={{title: t('screens.licenses.title')}}
+        />
+        <MainStack.Screen
+          name="SettingsScreen"
+          component={SettingsScreen}
+          options={{title: t('screens.settings.screenTitle')}}
         />
         <MainStack.Screen
           name="AccountSettingsScreen"
@@ -423,7 +431,7 @@ const MainNavigation = () => {
         component={SharedRecipeScreen}
         options={{
           headerShown: true,
-          header: (nav) => <PaperStackHeader {...nav} />,
+          header: renderPaperStackHeader,
           title: t('navigation.screenTitleSharedRecipe'),
         }}
       />
@@ -431,6 +439,20 @@ const MainNavigation = () => {
         name='InvitationScreen'
         component={InvitationScreen}
         options={{title: t('navigation.screenTitleInvitation')}}
+      />
+      <BaseStack.Screen
+        name='ToolsOverviewScreen'
+        component={ToolsOverviewScreen}
+        options={{headerShown: true, header: renderPaperStackHeader, title: t('tools.title')}}
+      />
+      <BaseStack.Screen
+        name='ToolScreen'
+        component={ToolScreen}
+        options={({route}) => ({
+          headerShown: true,
+          header: renderPaperStackHeader,
+          title: toolTitle(t, route.params.slug),
+        })}
       />
     </BaseStack.Navigator>
   );

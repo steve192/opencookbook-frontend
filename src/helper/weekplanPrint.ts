@@ -1,3 +1,5 @@
+import {escapeHtml, toPrintDocument} from './htmlDocument';
+
 /** One day as it appears on the printed sheet. */
 export interface PrintableWeekplanDay {
   weekday: string;
@@ -12,20 +14,6 @@ export interface PrintableWeekplan {
   /** Shown in place of the meals of a day that has none */
   emptyLabel: string;
 }
-
-/**
- * Recipe titles are user content and end up inside markup here.
- *
- * @param {string} value text to put into the document
- * @return {string} the text with the markup characters escaped
- */
-const escapeHtml = (value: string): string =>
-  value
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll('\'', '&#39;');
 
 /**
  * Renders the meals of one day, or the empty notice.
@@ -43,6 +31,21 @@ const renderMeals = (day: PrintableWeekplanDay, emptyLabel: string): string => {
 };
 
 /**
+ * Renders one day with its meals.
+ *
+ * @param {PrintableWeekplanDay} day the day to render
+ * @param {string} emptyLabel notice for a day without meals
+ * @return {string} the markup of that day
+ */
+const renderDay = (day: PrintableWeekplanDay, emptyLabel: string): string => `<section class="day">
+  <div class="day-header">
+    <span class="weekday">${escapeHtml(day.weekday)}</span>
+    <span class="date">${escapeHtml(day.date)}</span>
+  </div>
+  <div class="meals">${renderMeals(day, emptyLabel)}</div>
+</section>`;
+
+/**
  * Builds a self contained A4 sheet for one week.
  *
  * Kept free of any print API so the document can be asserted on directly, and
@@ -53,28 +56,7 @@ const renderMeals = (day: PrintableWeekplanDay, emptyLabel: string): string => {
  * @param {PrintableWeekplan} weekplan what to put on the sheet
  * @return {string} a complete html document
  */
-export const buildWeekplanPrintHtml = (weekplan: PrintableWeekplan): string => `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>${escapeHtml(weekplan.title)}</title>
-<style>
-  @page { size: A4 portrait; margin: 14mm; }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    font-family: Helvetica, Arial, sans-serif;
-    color: #111;
-    /* Android takes the page size from its own print dialog rather than from @page,
-       so the sheet fills whatever page it is given and only caps at the printable
-       width of an A4 page, which is what the web build lays out in. */
-    width: 100%;
-    max-width: 182mm;
-    margin: 0 auto;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
+export const buildWeekplanPrintHtml = (weekplan: PrintableWeekplan): string => toPrintDocument(weekplan.title, `
   header { border-bottom: 1.5pt solid #111; padding-bottom: 3mm; margin-bottom: 6mm; }
   h1 { font-size: 20pt; line-height: 1.1; margin: 0; }
   .subtitle { font-size: 10.5pt; color: #555; margin: 1.5mm 0 0 0; }
@@ -100,20 +82,8 @@ export const buildWeekplanPrintHtml = (weekplan: PrintableWeekplan): string => `
   .meals { padding: 2.5mm 3mm; min-height: 22mm; }
   ul { margin: 0; padding-left: 5mm; }
   li { font-size: 11pt; line-height: 1.55; }
-  .empty { margin: 0; font-size: 10pt; color: #999; font-style: italic; }
-</style>
-</head>
-<body>
-<header>
+  .empty { margin: 0; font-size: 10pt; color: #999; font-style: italic; }`, `<header>
   <h1>${escapeHtml(weekplan.title)}</h1>
   <p class="subtitle">${escapeHtml(weekplan.subtitle)}</p>
 </header>
-${weekplan.days.map((day) => `<section class="day">
-  <div class="day-header">
-    <span class="weekday">${escapeHtml(day.weekday)}</span>
-    <span class="date">${escapeHtml(day.date)}</span>
-  </div>
-  <div class="meals">${renderMeals(day, weekplan.emptyLabel)}</div>
-</section>`).join('\n')}
-</body>
-</html>`;
+${weekplan.days.map((day) => renderDay(day, weekplan.emptyLabel)).join('\n')}`);

@@ -117,6 +117,10 @@ const de: SelfHostingContent = {
               'Zeigt diese Projektseite unter `/`. Standardmäßig aus, dann öffnet `/` die App.',
             ],
             [
+              'TOOLS_PUBLIC',
+              'Macht die Küchenhelfer auch ohne Konto nutzbar (Standard `false`).',
+            ],
+            [
               'LEGAL_DIR',
               'Ordner mit den rechtlichen Texten, die in der App angezeigt werden (Standard `./legal`).',
             ],
@@ -265,6 +269,10 @@ const en: SelfHostingContent = {
             [
               'LANDING_ENABLED',
               'Shows this project page at `/`. Off by default, then `/` opens the app.',
+            ],
+            [
+              'TOOLS_PUBLIC',
+              'Lets people use the kitchen tools without an account (default `false`).',
             ],
             [
               'LEGAL_DIR',

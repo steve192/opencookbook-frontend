@@ -17,7 +17,8 @@ import {signOut} from '../../redux/sessionThunks';
 import {logout} from '../../redux/features/authSlice';
 import {useAppDispatch} from '../../redux/hooks';
 import {useAppTheme} from '../../styles/CentralStyles';
-import {SettingsHint, SettingsPage} from './SettingsPage';
+import {PageFrame} from '../../components/PageFrame';
+import {SettingsHint} from './SettingsHint';
 
 type Props = NativeStackScreenProps<MainNavigationProps, 'AccountSettingsScreen'>;
 
@@ -94,7 +95,7 @@ export const AccountSettingsScreen = (_props: Props) => {
   };
 
   return (
-    <SettingsPage>
+    <PageFrame>
       <CustomCard style={styles.card}>
         <TextInput
           mode="outlined"
@@ -128,7 +129,7 @@ export const AccountSettingsScreen = (_props: Props) => {
           {t('screens.settings.deleteAccount')}
         </Button>
       </View>
-    </SettingsPage>
+    </PageFrame>
   );
 };
 

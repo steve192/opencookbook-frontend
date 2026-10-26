@@ -2,7 +2,7 @@ import {InstanceInfo} from '../api/types/account';
 
 export type InstanceFeatures = Pick<InstanceInfo, 'sharingEnabled' | 'householdsEnabled' | 'ocrImportEnabled' |
   'apiKeysEnabled' |
-  'setupRequired' | 'signupMode' | 'mailEnabled' | 'googleSignIn'>;
+  'setupRequired' | 'signupMode' | 'mailEnabled' | 'googleSignIn' | 'toolsPublic'>;
 
 /**
  * What an instance offers, with what to assume until it has said.
@@ -22,4 +22,6 @@ export const instanceFeatures = (info?: InstanceInfo): InstanceFeatures => ({
   signupMode: info?.signupMode ?? 'OPEN',
   mailEnabled: info?.mailEnabled ?? true,
   googleSignIn: info?.googleSignIn ?? null,
+  // Assumed private: showing a tool that then refuses to load is worse than asking to sign in.
+  toolsPublic: info?.toolsPublic ?? false,
 });

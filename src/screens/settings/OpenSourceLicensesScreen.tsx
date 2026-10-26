@@ -10,6 +10,7 @@ import {
   OpenSourceSection,
 } from '../../legal/openSourceComponents';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
+import {AppScrollView} from '../../components/AppScrollView';
 
 // Generated when Metro starts (see metro.config.js); required here so it is only read once this screen opens.
 const appSection = (): OpenSourceSection =>
@@ -54,6 +55,7 @@ export const OpenSourceLicensesScreen = () => {
       <SectionList
         sections={sections}
         keyExtractor={(component, index) => `${component.name}-${index}`}
+        renderScrollComponent={(props) => <AppScrollView {...props} />}
         stickySectionHeadersEnabled={false}
         ListHeaderComponent={
           <View style={styles.header}>

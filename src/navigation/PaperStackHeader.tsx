@@ -35,3 +35,6 @@ export const PaperStackHeader = (nav: NativeStackHeaderProps) => {
     </>
   );
 };
+
+// The `header` option takes a render function; the header itself stays a component with its own hooks.
+export const renderPaperStackHeader = (nav: NativeStackHeaderProps) => <PaperStackHeader {...nav} />;

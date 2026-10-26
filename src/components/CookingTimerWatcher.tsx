@@ -2,7 +2,7 @@ import {useEffect} from 'react';
 import {useTranslation} from 'react-i18next';
 import {AppState} from 'react-native';
 import {SnackbarUtil} from '../helper/GlobalSnackbar';
-import {elapsedTimerKeys, timerNotificationTexts} from '../helper/cookingTimers';
+import {elapsedTimerKeys, timerDoneMessage, timerNotificationTexts} from '../helper/cookingTimers';
 import {
   clearOrphanedRunningNotifications,
   clearRunningTimerNotification,
@@ -49,13 +49,7 @@ export const CookingTimerWatcher = () => {
         // A notification Android is holding back rings now, rather than minutes late
         void ringPendingAlertNow(key);
         VibrationUtils.longPressFeedbackVibration();
-        SnackbarUtil.show({
-          message: t('screens.guidedCooking.timerDoneFor', {
-            label: timer.label,
-            recipe: timer.recipeTitle,
-            step: timer.stepIndex + 1,
-          }),
-        });
+        SnackbarUtil.show({message: timerDoneMessage(t, timer)});
         dispatch(timerStopped(key));
       });
     }, TICK_MS);

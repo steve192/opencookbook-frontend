@@ -1,7 +1,7 @@
 import {describe, expect, it} from 'vitest';
 import reducer, {allTimersStopped, timerStarted, timerStopped} from './timersSlice';
 
-const timer = (endsAt: number) => ({label: '5 minutes', endsAt, recipeTitle: 'Lasagne', stepIndex: 1});
+const timer = (endsAt: number) => ({label: '5 minutes', endsAt, title: 'Lasagne', target: {recipeId: 7, stepIndex: 1}});
 
 describe('timersSlice', () => {
   it('starts with nothing running', () => {

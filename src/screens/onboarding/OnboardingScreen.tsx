@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {Avatar, Button, Surface, Text, TextInput} from 'react-native-paper';
 import {useCompleteOnboardingMutation} from '../../api/endpoints/account';
 import {errorMessageKey} from '../../helper/apiErrorMessage';
 import {SnackbarUtil} from '../../helper/GlobalSnackbar';
 import {DISPLAY_NAME_MAX_LENGTH} from '../../helper/nameLimits';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
+import {AppScrollView} from '../../components/AppScrollView';
 
 /**
  * Asks once, at first sign in, for a display name. Answered, the account says so and the app carries on.
@@ -28,7 +29,7 @@ export const OnboardingScreen = () => {
 
   return (
     <Surface style={CentralStyles.screen}>
-      <ScrollView
+      <AppScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[CentralStyles.contentContainer, styles.centered]}>
         <Avatar.Icon
@@ -59,7 +60,7 @@ export const OnboardingScreen = () => {
           onPress={save}>
           {t('screens.onboarding.save')}
         </Button>
-      </ScrollView>
+      </AppScrollView>
     </Surface>
   );
 };

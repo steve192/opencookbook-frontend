@@ -1,0 +1,78 @@
+---
+import Button from './Button.astro';
+import ClosingCta from './ClosingCta.astro';
+import Faq from './Faq.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import ToolCards from './ToolCards.astro';
+import ToolScreenshot from './ToolScreenshot.astro';
+import Layout from '../layouts/Layout.astro';
+import type { Lang } from '../content';
+import { appToolLink } from '../site';
+import { getToolPages } from '../toolPages';
+import type { ToolDefinition } from '../tools';
+
+interface Props {
+  lang: Lang;
+  tool: ToolDefinition;
+}
+
+const { lang, tool } = Astro.props;
+const { categories, ui, pages } = getToolPages(lang);
+const page = pages[tool.id];
+const appLink = appToolLink(tool.slug);
+---
+
+<Layout lang={lang} title={page.title} description={page.description} page={tool.id}>
+  <Header lang={lang} page={tool.id} />
+  <main id="main">
+    <div class="mx-auto max-w-3xl px-4 pt-12 sm:px-6 md:pt-16">
+      <p class="text-sm font-semibold uppercase tracking-wider text-brand">{categories[tool.category]}</p>
+      <h1 class="mt-2 text-4xl font-extrabold tracking-tight sm:text-5xl">{page.heading}</h1>
+      <div class="mt-6 space-y-4 text-lg leading-8 text-muted">
+        {page.intro.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+      <div class="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-5">
+        <Button href={appLink}>{ui.open}</Button>
+        <p class="text-sm text-muted">{ui.openNote}</p>
+      </div>
+    </div>
+    <div class="mx-auto mt-10 max-w-5xl px-4 sm:px-6 md:mt-12">
+      <ToolScreenshot lang={lang} tool={tool} href={appLink} alt={`${page.name}: ${ui.open}`} />
+    </div>
+    <article class="mx-auto mt-14 max-w-3xl space-y-12 px-4 pb-12 sm:px-6 md:pb-16">
+      {
+        page.sections.map((section) => (
+          <section>
+            <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">{section.heading}</h2>
+            <div class="mt-4 space-y-4 text-lg leading-8 text-muted">
+              {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+            </div>
+            {section.items && (
+              <ul class="mt-4 list-disc space-y-1 pl-6 text-lg leading-8 text-muted marker:text-brand">
+                {section.items.map((item) => <li>{item}</li>)}
+              </ul>
+            )}
+            {section.after && (
+              <div class="mt-4 space-y-4 text-lg leading-8 text-muted">
+                {section.after.map((paragraph) => <p>{paragraph}</p>)}
+              </div>
+            )}
+          </section>
+        ))
+      }
+      <div class="flex flex-col items-start gap-4 rounded-2xl border border-line bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-lg font-semibold">{page.cta}</p>
+        <Button href={appLink}>{ui.open}</Button>
+      </div>
+      <p class="mt-6 text-sm text-muted">{ui.disclaimer}</p>
+    </article>
+    <Faq title={ui.faq} items={page.faq} />
+    <section id="more-tools" class="mx-auto max-w-6xl px-4 py-16 sm:px-6 md:py-20">
+      <h2 class="text-3xl font-bold tracking-tight">{ui.moreTools}</h2>
+      <div class="mt-10"><ToolCards lang={lang} exclude={tool.id} /></div>
+    </section>
+    <ClosingCta lang={lang} />
+  </main>
+  <Footer lang={lang} page={tool.id} />
+</Layout>

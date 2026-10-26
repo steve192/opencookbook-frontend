@@ -1,12 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {ScrollView, StyleSheet} from 'react-native';
+import {StyleSheet} from 'react-native';
 import {ActivityIndicator, Button, Dialog, List, Searchbar, Text} from 'react-native-paper';
-import {useLinkIngredientMutation, useSearchCatalogueQuery} from '../api/endpoints/nutrition';
+import {useSearchCatalogueQuery} from '../api/endpoints/catalogue';
+import {useLinkIngredientMutation} from '../api/endpoints/nutrition';
 import {errorMessageKey} from '../helper/apiErrorMessage';
 import {formatNutrient} from '../helper/nutrition';
 import {withPortal} from '../helper/withPortal';
 import {overlayStyles, useAppTheme} from '../styles/CentralStyles';
+import {AppScrollView} from './AppScrollView';
 
 const SEARCH_DELAY_MS = 300;
 
@@ -24,7 +26,7 @@ export const IngredientLinkDialog = withPortal(function IngredientLinkDialog(pro
 
   const [query, setQuery] = useState(props.ingredientName);
   const [searched, setSearched] = useState(props.ingredientName.trim());
-  const search = useSearchCatalogueQuery(searched, {skip: searched === ''});
+  const search = useSearchCatalogueQuery({q: searched}, {skip: searched === ''});
   const foods = searched === '' ? [] : search.data ?? [];
   const searching = search.isFetching;
   const [linkIngredient, {isLoading: saving}] = useLinkIngredientMutation();
@@ -64,7 +66,7 @@ export const IngredientLinkDialog = withPortal(function IngredientLinkDialog(pro
         {failure && <Text style={{color: theme.colors.error}}>{failure}</Text>}
       </Dialog.Content>
       <Dialog.ScrollArea style={styles.results}>
-        <ScrollView keyboardShouldPersistTaps="handled">
+        <AppScrollView keyboardShouldPersistTaps="handled">
           {foods.length === 0 && !searching && query.trim() !== '' &&
             <Text style={[styles.noResults, {color: theme.colors.onSurfaceVariant}]}>{t('nutrition.link.noResults')}</Text>
           }
@@ -83,7 +85,7 @@ export const IngredientLinkDialog = withPortal(function IngredientLinkDialog(pro
               descriptionNumberOfLines={2}
               onPress={() => link(food.id)} />
           ))}
-        </ScrollView>
+        </AppScrollView>
       </Dialog.ScrollArea>
       <Dialog.Actions style={overlayStyles.dialogActions}>
         {saving && <ActivityIndicator animating={true} />}

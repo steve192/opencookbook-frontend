@@ -1,0 +1,40 @@
+---
+import { getImage } from 'astro:assets';
+import type { Lang } from '../content';
+import { toolScreenshot } from '../screenshots';
+import type { ToolDefinition } from '../tools';
+
+interface Props {
+  lang: Lang;
+  tool: ToolDefinition;
+  href: string;
+  alt: string;
+}
+
+const { lang, tool, href, alt } = Astro.props;
+// Art direction: the phone screen on small screens, from md up the desktop one with the result beside the questions.
+const phone = await getImage({
+  src: toolScreenshot(lang, tool, 'phone'),
+  widths: [360, 720],
+  sizes: '(min-width: 412px) 288px, 70vw',
+  loading: 'eager',
+});
+const desktop = await getImage({
+  src: toolScreenshot(lang, tool, 'desktop'),
+  widths: [800, 1200, 1680],
+  sizes: '(min-width: 1024px) 976px, 100vw',
+});
+---
+
+<a href={href} class="group mx-auto block w-[70%] max-w-[18rem] md:w-full md:max-w-none">
+  <picture class="block rounded-[2rem] border border-line bg-surface p-1.5 shadow-xl shadow-black/15 transition group-hover:border-brand md:rounded-2xl md:p-1">
+    <source
+      media="(min-width: 768px)"
+      srcset={desktop.srcSet.attribute}
+      sizes={desktop.attributes.sizes}
+      width={desktop.attributes.width}
+      height={desktop.attributes.height}
+    />
+    <img src={phone.src} srcset={phone.srcSet.attribute} {...phone.attributes} alt={alt} class="h-auto w-full rounded-[1.6rem] md:rounded-xl" />
+  </picture>
+</a>
