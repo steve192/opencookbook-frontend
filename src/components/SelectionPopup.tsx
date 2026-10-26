@@ -1,5 +1,5 @@
-import React, {useRef, useState} from 'react';
-import {Pressable, StyleProp, TextInput as RNTextInput, View, ViewStyle} from 'react-native';
+import React, {useState} from 'react';
+import {Keyboard, Pressable, StyleProp, View, ViewStyle} from 'react-native';
 import {TextInput} from 'react-native-paper';
 import {Option, SelectionPopupModal} from './SelectionPopupModal';
 
@@ -19,19 +19,22 @@ interface Props {
 export const SelectionPopup = (props: Props) => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  // Paper TextInput's ref typing intersects RNTextInput & TextInputHandles, which is
-  // not satisfiable on its own - use the wider RNTextInput type Paper actually forwards to.
-  const textbox = useRef<RNTextInput>(null);
-
 
   const openModal = () => {
     setModalVisible(true);
   };
 
+  // Android hands the focus of a removed field to the field at the top of the screen, so the
+  // search field gives it up before the modal unmounts.
+  const closeModal = () => {
+    Keyboard.dismiss();
+    setModalVisible(false);
+  };
+
 
   const applySelection = (selectedValue: Option) => {
     props.onValueChanged?.(selectedValue);
-    setModalVisible(false);
+    closeModal();
   };
 
 
@@ -41,15 +44,12 @@ export const SelectionPopup = (props: Props) => {
         style={props.style}
         onPress={() => openModal()}>
         <View pointerEvents="none">
+          {/* Display only: a field that can take focus gets it from Android without a tap */}
           <TextInput
-            ref={textbox}
             label={props.label}
             dense={props.dense}
             mode="outlined"
-            onFocus={() => {
-              textbox.current?.blur();
-              openModal();
-            }}
+            editable={false}
             placeholder={props.placeholder}
             value={props.value}/>
         </View>
@@ -58,7 +58,7 @@ export const SelectionPopup = (props: Props) => {
       {modalVisible && <SelectionPopupModal
         modalVisible={modalVisible}
         options={props.options}
-        onClose={() => setModalVisible(false) }
+        onClose={closeModal}
         onSelection={applySelection}
         placeholder={props.placeholder}
         allowCreate={props.allowCreate}
