@@ -65,7 +65,7 @@ import {LINKING_SCREENS} from './linking';
 import {RETIRED_HOSTED_INSTANCE_URL} from '../hostedInstance';
 import {addBasePath, restoreBasePathInState, stripBasePath} from './basePath';
 import {navigationRef} from './navigationRef';
-import {PaperStackHeader} from './PaperStackHeader';
+import {renderPaperStackHeader} from './PaperStackHeader';
 import {
   BaseNavigatorProps,
   LoginNavigationProps,
@@ -208,7 +208,7 @@ const MainStackNavigation = () => {
       <ShoppingSyncRunner />
       <MainStack.Navigator
         screenOptions={{
-          header: (nav) => <PaperStackHeader {...nav} />,
+          header: renderPaperStackHeader,
         }}>
         <MainStack.Screen
           name="OverviewScreen"
@@ -431,7 +431,7 @@ const MainNavigation = () => {
         component={SharedRecipeScreen}
         options={{
           headerShown: true,
-          header: (nav) => <PaperStackHeader {...nav} />,
+          header: renderPaperStackHeader,
           title: t('navigation.screenTitleSharedRecipe'),
         }}
       />
@@ -443,14 +443,14 @@ const MainNavigation = () => {
       <BaseStack.Screen
         name='ToolsOverviewScreen'
         component={ToolsOverviewScreen}
-        options={{headerShown: true, header: (nav) => <PaperStackHeader {...nav} />, title: t('tools.title')}}
+        options={{headerShown: true, header: renderPaperStackHeader, title: t('tools.title')}}
       />
       <BaseStack.Screen
         name='ToolScreen'
         component={ToolScreen}
         options={({route}) => ({
           headerShown: true,
-          header: (nav) => <PaperStackHeader {...nav} />,
+          header: renderPaperStackHeader,
           title: toolTitle(t, route.params.slug),
         })}
       />

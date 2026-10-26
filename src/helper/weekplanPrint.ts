@@ -31,6 +31,21 @@ const renderMeals = (day: PrintableWeekplanDay, emptyLabel: string): string => {
 };
 
 /**
+ * Renders one day with its meals.
+ *
+ * @param {PrintableWeekplanDay} day the day to render
+ * @param {string} emptyLabel notice for a day without meals
+ * @return {string} the markup of that day
+ */
+const renderDay = (day: PrintableWeekplanDay, emptyLabel: string): string => `<section class="day">
+  <div class="day-header">
+    <span class="weekday">${escapeHtml(day.weekday)}</span>
+    <span class="date">${escapeHtml(day.date)}</span>
+  </div>
+  <div class="meals">${renderMeals(day, emptyLabel)}</div>
+</section>`;
+
+/**
  * Builds a self contained A4 sheet for one week.
  *
  * Kept free of any print API so the document can be asserted on directly, and
@@ -71,10 +86,4 @@ export const buildWeekplanPrintHtml = (weekplan: PrintableWeekplan): string => t
   <h1>${escapeHtml(weekplan.title)}</h1>
   <p class="subtitle">${escapeHtml(weekplan.subtitle)}</p>
 </header>
-${weekplan.days.map((day) => `<section class="day">
-  <div class="day-header">
-    <span class="weekday">${escapeHtml(day.weekday)}</span>
-    <span class="date">${escapeHtml(day.date)}</span>
-  </div>
-  <div class="meals">${renderMeals(day, weekplan.emptyLabel)}</div>
-</section>`).join('\n')}`);
+${weekplan.days.map((day) => renderDay(day, weekplan.emptyLabel)).join('\n')}`);

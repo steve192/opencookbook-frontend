@@ -172,7 +172,7 @@ export const STYLES: Record<PizzaStyle, StyleData> = {
     salt: [1.5, 2.75, 2],
     oil: [3, 1.5],
     sugar: [0],
-    panDensity: [900 / 900, (1000 + 750 + 20 + 7.5) / (3 * 30 * 40), (350 + 290 + 7 + 7 + 2) / (30 * 40), 0.5],
+    panDensity: [1, (1000 + 750 + 20 + 7.5) / (3 * 30 * 40), (350 + 290 + 7 + 7 + 2) / (30 * 40), 0.5],
     bake: {oven: 'homeOven', settings: [
       {temperatureC: 240, minutes: {low: 10, high: 12}},
       {temperatureC: 180, minutes: {low: 10, high: 12}},
@@ -251,7 +251,7 @@ export const STYLES: Record<PizzaStyle, StyleData> = {
     salt: [2, 2, 2.5],
     oil: [6, 6, 7],
     sugar: [0],
-    panDensity: [900 / 900, 1655 / (3 * 30 * 40), 871 / (30 * 40), 840 / (40 * 35), 819 / (24 * 32)],
+    panDensity: [1, 1655 / (3 * 30 * 40), 871 / (30 * 40), 840 / (40 * 35), 819 / (24 * 32)],
     bake: {oven: 'homeOven', settings: [
       {temperatureC: 250, minutes: {low: 22, high: 22}},
       {temperatureC: 240, minutes: {low: 14, high: 15}},

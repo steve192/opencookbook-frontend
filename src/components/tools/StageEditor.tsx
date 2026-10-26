@@ -38,7 +38,7 @@ export const StageEditor = (props: Props) => {
       ))}
       {props.stages.length < MAX_STAGES &&
         <Button icon="plus" mode="text" style={styles.add}
-          onPress={() => props.onChange([...props.stages, props.stages[props.stages.length - 1]])}>
+          onPress={() => props.onChange([...props.stages, props.stages.at(-1)!])}>
           {t('tools.dough.addStage')}
         </Button>}
     </View>

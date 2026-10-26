@@ -194,7 +194,10 @@ const steepTaste = (type: TeaType, steep: number, usual: Range): SteepTaste => {
   if (steep < usual.low + third) {
     return herbs ? 'mild' : 'fresh';
   }
-  return steep > usual.high - third ? (herbs ? 'strong' : 'full') : 'round';
+  if (steep > usual.high - third) {
+    return herbs ? 'strong' : 'full';
+  }
+  return 'round';
 };
 
 /**

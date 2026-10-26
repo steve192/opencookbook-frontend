@@ -36,8 +36,22 @@ export const resultText = (title: string, sections: ResultSection[], footer: str
     ...(section.steps ?? []).map((step, index) => `${index + 1}. ${step}`),
   ].join('\n')), footer].join('\n\n');
 
-const row = (line: ResultLine, className?: string) => `<tr${className ? ` class="${className}"` : ''}><td>${
-  escapeHtml(line.label)}</td><td>${escapeHtml(line.value)}</td></tr>`;
+const row = (line: ResultLine, className?: string) => {
+  const classAttribute = className ? ` class="${className}"` : '';
+  return `<tr${classAttribute}><td>${escapeHtml(line.label)}</td><td>${escapeHtml(line.value)}</td></tr>`;
+};
+
+const lineHtml = (line: ResultLine) => {
+  const details = (line.details ?? []).map((detail) => row(detail, 'detail')).join('');
+  return `<tbody>${row(line)}${details}</tbody>`;
+};
+
+const sectionHtml = (section: ResultSection) => {
+  const heading = section.title ? `<h2>${escapeHtml(section.title)}</h2>` : '';
+  const items = section.steps?.map((step) => `<li>${escapeHtml(step)}</li>`).join('');
+  const steps = items == null ? '' : `<ol>${items}</ol>`;
+  return `${heading}<table>${section.lines.map(lineHtml).join('')}</table>${steps}`;
+};
 
 /**
  * A result as a printable document: black on white, for the kitchen wall.
@@ -59,8 +73,5 @@ export const resultHtml = (title: string, sections: ResultSection[], footer: str
   ol { margin: 4pt 0 0; padding-left: 6mm; font-size: 12pt; }
   li { margin: 0 0 4pt; }
   .footer { margin-top: 14pt; font-size: 9pt; color: #555; }`, `<h1>${escapeHtml(title)}</h1>
-${sections.map((section) => `${section.title ? `<h2>${escapeHtml(section.title)}</h2>` : ''}<table>${
-    section.lines.map((line) => `<tbody>${row(line)}${(line.details ?? []).map((detail) => row(detail, 'detail'))
-        .join('')}</tbody>`).join('')}</table>${section.steps ?
-    `<ol>${section.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol>` : ''}`).join('\n')}
+${sections.map(sectionHtml).join('\n')}
 <p class="footer">${escapeHtml(footer)}</p>`);

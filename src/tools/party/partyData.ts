@@ -176,7 +176,7 @@ export const FILLERS: Partial<Record<PartyItem, Filler>> = {
  */
 export const WITHOUT_EXTRA_COURSE: Record<Filler, number[]> = {
   starch: [200 / 150, 150 / 120, 50 / 40],
-  vegetables: [200 / 150, 100 / 100, 50 / 30],
+  vegetables: [200 / 150, 1, 50 / 30],
 };
 
 /** Jars of gherkins and of silver onions per guest at a raclette: a jar of each for four. */

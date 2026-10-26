@@ -295,6 +295,16 @@ const CALIBRATIONS = Object.fromEntries(PIZZA_STYLES.map((style) =>
   [style, pizzaCalibration(STYLES[style].yeastSchedules ?? PIZZA_YEAST_SCHEDULES)])) as Record<PizzaStyle, Calibration>;
 
 /**
+ * Balls of a round style's usual weight from the dough the flour at hand makes; a pan style counts none.
+ *
+ * @param {PizzaStyle} style the style
+ * @param {number} doughG the dough, in g
+ * @return {number} the pieces
+ */
+const piecesFromFlour = (style: PizzaStyle, doughG: number): number =>
+  STYLES[style].shape === 'round' ? Math.max(1, Math.floor(doughG / defaultBallWeight(style))) : 0;
+
+/**
  * Everything to weigh for a pizza order, with the water temperature and what to watch out for.
  *
  * @param {PizzaInputs} inputs the order
@@ -330,8 +340,7 @@ export const calculatePizza = (inputs: PizzaInputs): PizzaResult => {
   const waterTemperatureC = waterTemperature({targetC, roomC: inputs.roomC, flourC: inputs.roomC,
     starterC: inputs.leavener === 'sourdough' ? inputs.roomC : undefined}, inputs.kneading);
   warnings.push(...doughWarnings(freshYeast, waterTemperatureC));
-  const flourPieces = inputs.amountMode !== 'flour' ? pieces :
-    data.shape === 'round' ? Math.max(1, Math.floor(amounts.total / defaultBallWeight(inputs.style))) : 0;
+  const flourPieces = inputs.amountMode === 'flour' ? piecesFromFlour(inputs.style, amounts.total) : pieces;
   const blend = data.blend && {rice: (median(data.blend.rice) ?? 0) / 100 * amounts.flour,
     soy: (median(data.blend.soy) ?? 0) / 100 * amounts.flour};
   return {

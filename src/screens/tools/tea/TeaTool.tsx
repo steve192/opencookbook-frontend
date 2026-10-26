@@ -97,7 +97,7 @@ export const TeaTool = () => {
         onChoose={(type) => change({type, method: methodsOf(type).includes(inputs.method) ? inputs.method : 'hot',
           steepMinutes: undefined})}
         options={TEA_TYPES.map((type) => ({value: type, title: t(`tools.tea.types.${type}`),
-          description: `${t(`tools.tea.typeDescriptions.${type}`)} ${facts(type)}`, image: TEA_TYPE_PHOTOS[type]}))} />
+          description: [t(`tools.tea.typeDescriptions.${type}`), facts(type)].join(' '), image: TEA_TYPE_PHOTOS[type]}))} />
       {hasStrength(inputs.type) && <RecommendedButton result={result} recommendedResult={calculateTea(recommended)}
         onPress={() => change(recommended)} />}
       {methods.length > 1 &&

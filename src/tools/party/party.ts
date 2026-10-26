@@ -188,7 +188,15 @@ const servedAs = (item: ChosenCourse, inputs: PartyInputs): {food: Starch | Vege
 };
 
 /** Courses a host plans as servings of a recipe. */
-const IN_SERVINGS: readonly Course[] = ['starter', 'dessert'];
+const IN_SERVINGS: ReadonlySet<Course> = new Set(['starter', 'dessert']);
+
+// The vegetarian main is eaten by the guests who eat no meat, the meat by the others, the rest by everyone.
+const eatersOf = (data: ItemData, meatFreeShare: number): number => {
+  if (data.item === 'vegetarianMain') {
+    return meatFreeShare;
+  }
+  return data.meat ? 1 - meatFreeShare : 1;
+};
 
 const served = (data: ItemData, inputs: PartyInputs) => data.accompaniment ?
   inputs.accompaniments.includes(data.accompaniment) : inputs.courses.includes(data.course);
@@ -269,7 +277,7 @@ export const planParty = (inputs: PartyInputs): PartyResult => {
 
   const food = perAdult(inputs)
       .flatMap(({data, grams}): PartyLine[] => {
-        const eaters = data.item === 'vegetarianMain' ? meatFreeShare : data.meat ? 1 - meatFreeShare : 1;
+        const eaters = eatersOf(data, meatFreeShare);
         const total = adultEquivalents * eaters * grams * reserve;
         // The host's starches and vegetables are the course's dishes.
         if (data.item === 'warmSides' || data.item === 'salad') {
@@ -278,7 +286,7 @@ export const planParty = (inputs: PartyInputs): PartyResult => {
         }
         return [{item: data.item, course: data.course, grams: total,
           gramsPerDish: inputs.dishes > 1 ? Math.min(total, total / inputs.dishes * SHARE_PER_DISH) : undefined,
-          ...(IN_SERVINGS.includes(data.course) ? {servings: {count: Math.ceil(total / grams), grams}} : {})}];
+          ...(IN_SERVINGS.has(data.course) ? {servings: {count: Math.ceil(total / grams), grams}} : {})}];
       })
       .filter((line) => line.grams > 0);
 

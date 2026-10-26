@@ -82,11 +82,17 @@ export const convertOven = (inputs: OvenInputs): OvenResult => {
   const minutes = inputs.minutes > 0 ? Math.round(inputs.minutes * timeFactor(inputs, frozenInAirFryer)) : undefined;
   return {
     temperatureC,
-    warnings: airFryer && temperatureC > AIR_FRYER_MAX_C ? ['airFryerTooHot'] :
-      !airFryer && temperatureC > OVEN_MAX_C ? ['ovenTooHot'] : [],
+    warnings: tooHot(airFryer, temperatureC),
     minutes,
     checkEarlyMinutes: minutes != null && minutes <= 2 * CHECK_EARLY_MINUTES ? undefined : CHECK_EARLY_MINUTES,
   };
+};
+
+const tooHot = (airFryer: boolean, temperatureC: number): OvenResult['warnings'] => {
+  if (airFryer) {
+    return temperatureC > AIR_FRYER_MAX_C ? ['airFryerTooHot'] : [];
+  }
+  return temperatureC > OVEN_MAX_C ? ['ovenTooHot'] : [];
 };
 
 const timeFactor = (inputs: OvenInputs, frozenInAirFryer: boolean): number => {

@@ -53,6 +53,12 @@ export const DoughSchedule = (props: Props) => {
     date.setDate(date.getDate() + offset);
     return date;
   };
+  const describeChoice = (choice: ScheduleChoice) => {
+    if (choice !== 'custom') {
+      return describe(presetStages(choice, props.roomC));
+    }
+    return props.preset === 'custom' ? describe(props.stages) : t('tools.dough.customSchedule');
+  };
   return (
     <>
       {props.showStages !== false &&
@@ -60,8 +66,7 @@ export const DoughSchedule = (props: Props) => {
           chosen={props.preset}
           onChoose={(preset) => props.onChange(preset === 'custom' ? {preset, stages: props.stages} : {preset})}
           options={SCHEDULE_CHOICES.map((choice) => ({value: choice, title: t(`tools.dough.presets.${choice}`),
-            icon: ICONS[choice], description: choice !== 'custom' ? describe(presetStages(choice, props.roomC)) :
-              props.preset === 'custom' ? describe(props.stages) : t('tools.dough.customSchedule'),
+            icon: ICONS[choice], description: describeChoice(choice),
             badge: choice !== 'custom' && props.recommended?.presets.includes(choice) ? props.recommended.label :
               undefined}))}>
           {props.preset === 'custom' && <StageEditor stages={props.stages} onChange={(stages) => props.onChange({stages})} />}

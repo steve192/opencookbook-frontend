@@ -39,7 +39,7 @@ const TINTS = {
 };
 
 // The same colour see-through, so a gradient fades without passing through grey.
-const clear = (rgba: string) => rgba.replace(/[\d.]+\)$/, '0)');
+const clear = (rgba: string) => `${rgba.slice(0, rgba.lastIndexOf(','))}, 0)`;
 
 /**
  * The name of a sector of the plane: cold brew tastes flat rather than sour when steeped short, and harsh when long.

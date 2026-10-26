@@ -12,8 +12,8 @@ import {ToolFrame} from '../../../components/tools/ToolFrame';
 import {ToolResult} from '../../../components/tools/ToolResult';
 import {UnitSwitch} from '../../../components/tools/UnitSwitch';
 import {useUnitSystem} from '../../../helper/useUnitSystem';
-import {Appetite, APPETITES, BEER_BOTTLE_L, choosableSides, coursesOf, mainStandsAlone, parsePartyInputs, planParty,
-  portion, WINE_BOTTLE_L} from '../../../tools/party/party';
+import {Appetite, APPETITES, BEER_BOTTLE_L, choosableSides, coursesOf, mainStandsAlone, parsePartyInputs, PartyLine,
+  planParty, portion, WINE_BOTTLE_L} from '../../../tools/party/party';
 import {ACCOMPANIMENTS, Drinking, DRINKINGS, GUEST_GROUPS, PARTY_EVENTS, STARCHES, VEGETABLES}
   from '../../../tools/party/partyData';
 import {ResultLine} from '../../../tools/result';
@@ -24,8 +24,12 @@ import {useToolInputs} from '../useToolInputs';
 const MAX_GUESTS = 1000;
 const percent = (value: number) => `${Math.round(value)} %`;
 // The last one stays: a course is always served as something.
-const toggled = <T, >(chosen: T[], value: T): T[] => chosen.includes(value) ?
-  (chosen.length > 1 ? chosen.filter((other) => other !== value) : chosen) : [...chosen, value];
+const toggled = <T, >(chosen: T[], value: T): T[] => {
+  if (!chosen.includes(value)) {
+    return [...chosen, value];
+  }
+  return chosen.length > 1 ? chosen.filter((other) => other !== value) : chosen;
+};
 
 export const PartyTool = () => {
   const {t, i18n} = useTranslation('translation');
@@ -45,15 +49,15 @@ export const PartyTool = () => {
       onDecrease={() => onChange(value - 1)} onIncrease={() => onChange(value + 1)} entry={{min: 0, max, onChange}} />
   );
 
+  const amountText = (line: PartyLine) => {
+    if (line.servings) {
+      return t('tools.partyPlanner.servings', {count: line.servings.count, size: weight(line.servings.grams)});
+    }
+    return line.gramsPerDish != null ?
+      t('tools.partyPlanner.perDish', {total: weight(line.grams), dish: weight(line.gramsPerDish)}) : weight(line.grams);
+  };
   const food: ResultLine[] = [
-    ...result.food.map((line) => ({
-      label: t(`tools.partyPlanner.items.${line.item}`),
-      value: line.servings ?
-        t('tools.partyPlanner.servings', {count: line.servings.count, size: weight(line.servings.grams)}) :
-        line.gramsPerDish != null ?
-          t('tools.partyPlanner.perDish', {total: weight(line.grams), dish: weight(line.gramsPerDish)}) :
-          weight(line.grams),
-    })),
+    ...result.food.map((line) => ({label: t(`tools.partyPlanner.items.${line.item}`), value: amountText(line)})),
     ...(result.pickleJars > 0 ? [{label: t('tools.partyPlanner.pickles'),
       value: t('tools.partyPlanner.jarsEach', {count: Math.ceil(result.pickleJars)})}] : []),
   ];

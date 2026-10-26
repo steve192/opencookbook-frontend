@@ -445,78 +445,183 @@ const hotExtraction = (roast: Roast, temperatureC?: number, brewed?: number, usu
 };
 
 /**
- * Coffee and water for a method, ratio and roast, and where the brew lands in taste. Extraction is estimated, hot or
- * cold, and more with finer grinding.
+ * Coffee and water for what is given: a fully automatic machine's dose and cup, the coffee at hand or the drink.
+ *
+ * @param {CoffeeInputs} inputs the method and what is given
+ * @return {object} grams of coffee and millilitres of water
+ */
+const amountsOf = (inputs: CoffeeInputs): {coffeeG: number, waterMl: number} => {
+  if (inputs.method === 'fullyAutomatic') {
+    return {coffeeG: automatDose(inputs.automatLevel), waterMl: Math.max(AUTOMAT.smallestCupMl, inputs.waterMl)};
+  }
+  const ratio = chosenRatio(inputs.method, inputs.ratio);
+  const coffeeG = inputs.basis === 'coffee' ? inputs.coffeeG : inputs.waterMl / ratio;
+  return {coffeeG, waterMl: coffeeG * ratio};
+};
+
+/**
+ * Water the spent coffee keeps: a fully automatic machine's puck, none of an espresso weighed as the drink, else
+ * the grounds'.
+ *
+ * @param {CoffeeMethod} method the method
+ * @return {number} g per g of coffee
+ */
+const retainedOf = (method: CoffeeMethod): number => {
+  if (method === 'fullyAutomatic') {
+    return requiredMedian(PUCK_RETAINED, 'the water a puck keeps');
+  }
+  return METHODS[method].taste === 'espresso' ? 0 : requiredMedian(RETAINED, 'the water grounds keep');
+};
+
+/**
+ * The water as brewed and what suits it: as chosen or the middle of what suits the roast where one sets it, a fully
+ * automatic machine's level, a filter machine's own, or none.
+ *
+ * @param {CoffeeInputs} inputs the method, roast and settings
+ * @return {object} the water, °C, and the recommended range
+ */
+const waterOf = (inputs: CoffeeInputs): {temperatureC?: number, recommendedC?: Range} => {
+  const data = METHODS[inputs.method];
+  const suits = roastC(inputs.roast);
+  switch (data.heat) {
+    case 'kettle':
+    case 'machine':
+      return {temperatureC: inputs.temperatureC ?? midpoint(suits), recommendedC: suits};
+    case 'levels':
+      return {temperatureC: automatC(inputs.automatTemperature), recommendedC: suits};
+    case 'fixed': {
+      const own = medianRange(data.waterC!);
+      return {temperatureC: midpoint(own), recommendedC: own};
+    }
+    case 'none':
+      return {};
+  }
+};
+
+/**
+ * A brew's time: the usual one, to the step; where the time is a dial, the one chosen within its limits; and the
+ * one brewed.
+ *
+ * @param {CoffeeInputs} inputs the method, where cold brew steeps and the time chosen
+ * @return {object} the time as shown, and the usual one, or nothing for a method without a time
+ */
+const brewTimeOf = (inputs: CoffeeInputs): {shown: NonNullable<CoffeeResult['brewTime']>, usual: number} |
+    undefined => {
+  const data = METHODS[inputs.method];
+  const recommended = data.cold ? medianRange(COLD_BREW[inputs.steeping].steep) :
+    data.brewTime?.ranges && medianRange(data.brewTime.ranges);
+  if (!recommended || !data.brewTime) {
+    return undefined;
+  }
+  const unit = data.brewTime.unit;
+  const limits = data.brewTime.limits;
+  const usual = Math.round(midpoint(recommended) / TIME_STEPS[unit]) * TIME_STEPS[unit];
+  const chosen = limits && Math.min(limits.high, Math.max(limits.low, inputs.brewTime ?? usual));
+  return {shown: {chosen, brewed: chosen ?? usual, recommended, unit}, usual};
+};
+
+/**
+ * What a brew's strength is judged by: a fully automatic machine's by the drink it pours.
+ *
+ * @param {CoffeeInputs} inputs the method and a machine's drink
+ * @return {TasteBand | undefined} the band, or none for a brew without one
+ */
+const tasteBandOf = (inputs: CoffeeInputs): TasteBand | undefined => {
+  if (inputs.method !== 'fullyAutomatic') {
+    return METHODS[inputs.method].taste;
+  }
+  return inputs.automatDrink === 'espresso' ? 'espresso' : 'filter';
+};
+
+/**
+ * Where a value lies against a band.
+ *
+ * @param {number} value the value
+ * @param {Range} band the band
+ * @param {Array} names below, within and above it
+ * @return {string} the name for where it lies
+ */
+const inBand = <T>(value: number, band: Range, names: readonly [T, T, T]): T => {
+  if (value < band.low) {
+    return names[0];
+  }
+  return value > band.high ? names[2] : names[1];
+};
+
+/** What a brew's taste depends on, as brewed. */
+interface Brew {
+  coffeeG: number;
+  waterMl: number;
+  temperatureC?: number;
+  brewed?: number;
+  usual?: number;
+  grind: Grind;
+  retained: number;
+  dilution?: number;
+}
+
+/**
+ * Where a brew lands in taste: its extraction, hot or cold and more with a finer grind, and the strength that gives
+ * in the cup, with the lines of the method's mild, medium and strong or a machine's levels.
+ *
+ * @param {CoffeeInputs} inputs the method and settings
+ * @param {TasteBand} band what its strength is judged by
+ * @param {Brew} brew how it is brewed
+ * @return {Taste} where it lands
+ */
+const tasteOf = (inputs: CoffeeInputs, band: TasteBand, brew: Brew): Taste => {
+  const data = METHODS[inputs.method];
+  const ideal = medianRange(EXTRACTION_BAND);
+  const finer = GRINDS.indexOf(grindOf(data.grinds)) - GRINDS.indexOf(brew.grind);
+  const extracted = data.cold ? coldExtraction(inputs.steeping, inputs.roast, brew.brewed!) :
+    hotExtraction(inputs.roast, brew.temperatureC, brew.brewed, brew.usual);
+  const extraction = Math.min(30, Math.max(10, extracted - GRIND_SLOPE * finer));
+  // An espresso is weighed as the drink. Dripped, the drink is the water less what the grounds keep; steeped, the
+  // grounds hold liquid as strong as the drink, so the strength spreads over all the water. Dilution adds to either.
+  const slope = (ratio: number) => 1 / ((data.immersion ? ratio : ratio - brew.retained) * (1 + (brew.dilution ?? 0)));
+  const ratios = inputs.method === 'fullyAutomatic' ?
+    [1, Math.ceil(automatLevels() / 2), automatLevels()].map((level) => brew.waterMl / automatDose(level)) :
+    STRENGTHS.map((strength) => chosenRatio(inputs.method, namedRatio(inputs.method, strength)));
+  const tds = extraction * slope(brew.waterMl / brew.coffeeG);
+  const strengthBand = medianRange(BANDS[band]);
+  return {kind: band, tds, band: strengthBand, extraction, extractionBand: ideal,
+    strength: inBand<Taste['strength']>(tds, strengthBand, ['weak', 'balanced', 'strong']),
+    extracted: inBand<Taste['extracted']>(extraction, ideal, ['under', 'ideal', 'over']),
+    lines: ratios.map((ratio) => ({ratio, slope: slope(ratio)}))};
+};
+
+/**
+ * Coffee and water for a method, ratio and roast, and where the brew lands in taste.
  *
  * @param {CoffeeInputs} inputs the method, settings and what is given
  * @return {CoffeeResult} what to weigh and how to brew
  */
 export const calculateCoffee = (inputs: CoffeeInputs): CoffeeResult => {
   const data = METHODS[inputs.method];
-  const automat = inputs.method === 'fullyAutomatic';
-  const ratio = automat ? 0 : chosenRatio(inputs.method, inputs.ratio);
-  const coffeeG = automat ? automatDose(inputs.automatLevel) :
-    inputs.basis === 'coffee' ? inputs.coffeeG : inputs.waterMl / ratio;
-  const waterMl = automat ? Math.max(AUTOMAT.smallestCupMl, inputs.waterMl) : coffeeG * ratio;
+  const amounts = amountsOf(inputs);
   const ice = data.iceShare && midpoint(medianRange(data.iceShare));
   const dilution = data.dilution && median(data.dilution);
-  const retained = automat ? requiredMedian(PUCK_RETAINED, 'the water a puck keeps') :
-    data.taste === 'espresso' ? 0 : requiredMedian(RETAINED, 'the water grounds keep');
-  // One part water to one of concentrate, which is the water less what the grounds keep.
-  const dilutionMl = dilution ? (waterMl - retained * coffeeG) * dilution : undefined;
-
-  const suits = roastC(inputs.roast);
-  const temperatureC = {kettle: inputs.temperatureC ?? midpoint(suits), machine: inputs.temperatureC ?? midpoint(suits),
-    levels: automatC(inputs.automatTemperature), fixed: data.waterC && midpoint(medianRange(data.waterC)),
-    none: undefined}[data.heat];
-  const recommendedC = data.heat === 'fixed' ? medianRange(data.waterC!) : data.heat === 'none' ? undefined : suits;
-
-  const recommendedTime = data.cold ? medianRange(COLD_BREW[inputs.steeping].steep) :
-    data.brewTime?.ranges && medianRange(data.brewTime.ranges);
-  const limits = data.brewTime?.limits;
-  const step = TIME_STEPS[data.brewTime?.unit ?? 'minutes'];
-  const usualTime = recommendedTime && Math.round(midpoint(recommendedTime) / step) * step;
-  const chosenTime = usualTime != null && limits ?
-    Math.min(limits.high, Math.max(limits.low, inputs.brewTime ?? usualTime)) : undefined;
-  const brewedTime = chosenTime ?? usualTime;
+  const retained = retainedOf(inputs.method);
+  const water = waterOf(inputs);
+  const time = brewTimeOf(inputs);
   const recommendedGrind = grindOf(data.grinds);
   const grind = inputs.grind ?? recommendedGrind;
-
-  const band = automat ? (inputs.automatDrink === 'espresso' ? 'espresso' : 'filter') : data.taste;
-  const taste = band && (() => {
-    const ideal = medianRange(EXTRACTION_BAND);
-    const finer = GRINDS.indexOf(recommendedGrind) - GRINDS.indexOf(grind);
-    const extracted = data.cold ? coldExtraction(inputs.steeping, inputs.roast, brewedTime!) :
-      hotExtraction(inputs.roast, temperatureC, brewedTime, usualTime);
-    const extraction = Math.min(30, Math.max(10, extracted - GRIND_SLOPE * finer));
-    // An espresso is weighed as the drink. Dripped, the drink is the water less what the grounds keep; steeped, the
-    // grounds hold liquid as strong as the drink, so the strength spreads over all the water. Dilution adds to either.
-    const slope = (ratio: number) => 1 / ((data.immersion ? ratio : ratio - retained) * (1 + (dilution ?? 0)));
-    const ratios = automat ? [1, Math.ceil(automatLevels() / 2), automatLevels()]
-        .map((level) => waterMl / automatDose(level)) :
-      STRENGTHS.map((strength) => chosenRatio(inputs.method, namedRatio(inputs.method, strength)));
-    const tds = extraction * slope(waterMl / coffeeG);
-    const strengthBand = medianRange(BANDS[band]);
-    return {kind: band, tds, band: strengthBand, extraction, extractionBand: ideal,
-      strength: tds < strengthBand.low ? 'weak' : tds > strengthBand.high ? 'strong' : 'balanced',
-      extracted: extraction < ideal.low ? 'under' : extraction > ideal.high ? 'over' : 'ideal',
-      lines: ratios.map((ratio) => ({ratio, slope: slope(ratio)}))} satisfies Taste;
-  })();
-
+  const band = tasteBandOf(inputs);
   return {
-    ratio: waterMl / coffeeG,
-    coffeeG,
-    waterMl,
-    iceG: ice != null ? waterMl * ice : undefined,
-    dilutionMl,
+    ratio: amounts.waterMl / amounts.coffeeG,
+    coffeeG: amounts.coffeeG,
+    waterMl: amounts.waterMl,
+    iceG: ice != null ? amounts.waterMl * ice : undefined,
+    // One part water to one of concentrate, which is the water less what the grounds keep.
+    dilutionMl: dilution ? (amounts.waterMl - retained * amounts.coffeeG) * dilution : undefined,
     heat: data.heat,
-    temperatureC,
-    recommendedC,
-    brewTime: recommendedTime && {chosen: chosenTime, brewed: brewedTime!, recommended: recommendedTime,
-      unit: data.brewTime!.unit},
+    temperatureC: water.temperatureC,
+    recommendedC: water.recommendedC,
+    brewTime: time?.shown,
     grind,
     recommendedGrind,
-    taste,
+    taste: band && tasteOf(inputs, band, {...amounts, temperatureC: water.temperatureC, brewed: time?.shown.brewed,
+      usual: time?.usual, grind, retained, dilution}),
   };
 };
 

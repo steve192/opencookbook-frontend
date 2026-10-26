@@ -17,43 +17,67 @@ import {useUnitSystem} from '../../../helper/useUnitSystem';
 import {BREAD_METHODS, calculateBread, FLOUR_SHARE_STEP, FlourShare, flourWater, maxFlourShare, methodFor,
   parseBreadInputs, recommendedHydration, SOUR_HOURS, sourRiseHours, withFlourShare, withoutFlour}
   from '../../../tools/bread/bread';
-import {BREAD_FLOURS, BreadFlour, RYE_FLOURS} from '../../../tools/bread/breadData';
-import {KNEAD_MINUTES} from '../../../tools/dough/dough';
-import {ResultSection} from '../../../tools/result';
-import {formatTemperature, formatWeight} from '../../../tools/units';
+import {BREAD_FLOURS, BreadFlour} from '../../../tools/bread/breadData';
+import {formatTemperature} from '../../../tools/units';
 import {YEAST_TYPES} from '../../../tools/yeast/yeast';
 import {DoughSchedule} from '../dough/DoughSchedule';
 import {DoughTemperatures} from '../dough/DoughTemperatures';
-import {ingredientLines, timelineSection} from '../dough/doughResult';
 import {LeavenerChoice} from '../dough/LeavenerChoice';
 import {BREAD_METHOD_PHOTOS} from '../toolPhotos';
 import {useToolInputs} from '../useToolInputs';
 import {AdditionsEditor} from './AdditionsEditor';
+import {breadSections} from './breadResult';
 
 const MAX_FLOURS = 4;
 // A flour added to the mix starts small, as a second flour usually is.
 const NEW_FLOUR_SHARE = 20;
 const percent = (value: number) => `${Math.round(value)} %`;
-const toFive = (minutes: number) => Math.round(minutes / 5) * 5;
 
-export const BreadTool = () => {
-  const {t, i18n} = useTranslation('translation');
-  const [system] = useUnitSystem();
-  const [inputs, change] = useToolInputs('bread', parseBreadInputs);
-  const result = calculateBread(inputs);
-  const format = {t, system, locale: i18n.language};
-  const weight = (grams: number) => formatWeight(grams, system, i18n.language);
-  const temperature = (celsius: number) => formatTemperature(celsius, system, i18n.language);
+interface FlourMixProps {
+  flours: FlourShare[];
+  onChange: (flours: FlourShare[]) => void;
+}
+
+// The flours of the mix, each with its share once there are several, and one more to add.
+const FlourMix = ({flours, onChange}: FlourMixProps) => {
+  const {t} = useTranslation('translation');
   const flourName = (flour: BreadFlour) => t(`tools.dough.flours.${flour}`);
   const flourDescription = (flour: BreadFlour) => {
     const maxShare = maxFlourShare(flour);
     return [t(`tools.dough.flourDescriptions.${flour}`), t('tools.bread.flourTakes', {water: Math.round(flourWater(flour))}),
       ...(maxShare != null ? [t('tools.bread.flourMaxShare', {share: Math.round(maxShare)})] : [])].join(' ');
   };
-  // A mix without rye cannot make a sour.
-  const changeFlours = (flours: FlourShare[]) => change({flours, method: methodFor(inputs.method, flours)});
-  const replaceFlour = (index: number, flour: BreadFlour) =>
-    changeFlours(inputs.flours.map((part, at) => at === index ? {...part, flour} : part));
+  const mixed = flours.length > 1;
+  return <>
+    {flours.map((part, index) => (
+      <OptionList key={index} chosen={part.flour}
+        onChoose={(flour) => onChange(flours.map((other, at) => at === index ? {...other, flour} : other))}
+        title={mixed ? t('tools.bread.flourN', {n: index + 1}) : t('tools.dough.flourType')}
+        hint={mixed && index === 0 ? t('tools.bread.flourMixHint') : undefined}
+        options={BREAD_FLOURS.map((flour) => ({value: flour, title: flourName(flour),
+          description: flourDescription(flour)}))}>
+        {mixed && <>
+          <SliderField label={t('tools.bread.share')} value={part.share} min={FLOUR_SHARE_STEP}
+            max={100 - FLOUR_SHARE_STEP * (flours.length - 1)} step={FLOUR_SHARE_STEP}
+            format={percent} onChange={(share) => onChange(withFlourShare(flours, index, share))} />
+          <Button icon="delete-outline" style={styles.remove} onPress={() => onChange(withoutFlour(flours, index))}>
+            {t('tools.bread.removeFlour')}
+          </Button>
+        </>}
+      </OptionList>
+    ))}
+    {flours.length < MAX_FLOURS &&
+      <Button icon="plus" style={styles.add} onPress={() => onChange(withFlourShare([...flours,
+        {flour: 'type1050', share: 0}], flours.length, NEW_FLOUR_SHARE))}>{t('tools.bread.addFlour')}</Button>}
+  </>;
+};
+
+export const BreadTool = () => {
+  const {t, i18n} = useTranslation('translation');
+  const [system] = useUnitSystem();
+  const [inputs, change] = useToolInputs('bread', parseBreadInputs);
+  const result = calculateBread(inputs);
+  const temperature = (celsius: number) => formatTemperature(celsius, system, i18n.language);
   const methods = BREAD_METHODS.filter((method) => methodFor(method, inputs.flours) === method);
   const usesYeast = inputs.method === 'yeast' || inputs.withYeast;
   const sourSetsSchedule = inputs.method === 'sour' && !inputs.withYeast;
@@ -61,60 +85,7 @@ export const BreadTool = () => {
   const riseHours = sourSetsSchedule ? sourRiseHours(inputs) : undefined;
   const sourRises = riseHours != null && Number.isFinite(riseHours.high);
   const recommendedWater = recommendedHydration(inputs.flours);
-  const doughHydration = result.doughWater / result.amounts.totalFlour * 100;
-  const sourFlour = inputs.flours.filter((part) => RYE_FLOURS.includes(part.flour))
-      .sort((a, b) => b.share - a.share)[0]?.flour;
-  const {guide} = result;
   const breadName = t(`tools.bread.resultTitles.${inputs.method}`);
-
-  const sections: ResultSection[] = [
-    {title: t('tools.result.ingredients'), icon: 'basket-outline', lines: ingredientLines(format, result.amounts,
-      inputs.method === 'yeast' ? t(`tools.dough.leaveners.${inputs.yeast}`) : t(`tools.bread.inDough.${inputs.method}`),
-      result.flourSplit.filter((part) => part.grams > 0).map((part) =>
-        ({label: flourName(part.flour), value: weight(part.grams)})), [
-        ...(result.yeastGrams ?
-          [{label: t(`tools.dough.leaveners.${inputs.yeast}`), value: weight(result.yeastGrams)}] : []),
-        ...inputs.additions.filter((addition) => addition.soakAbsorption == null)
-            .map((addition) => ({label: addition.name, value: weight(addition.grams)})),
-      ])},
-    {title: t('tools.result.preparation'), icon: 'chef-hat', lines: [
-      // All the dough's water, the starter's and the additions' included, so it matches the percentage.
-      {label: t('tools.bread.doughWater'), value: t('tools.bread.doughWaterValue', {
-        grams: weight(result.doughWater), percent: Math.round(doughHydration), yield: Math.round(100 + doughHydration)})},
-      ...(result.amounts.additionWater > 0 ?
-        [{label: t('tools.bread.fromAdditions'), value: weight(result.amounts.additionWater)}] : []),
-      {label: t('tools.bread.loaves', {count: result.pieces}), value: weight(result.pieceWeight)},
-      {label: t('tools.dough.waterTemperature'), value: temperature(result.waterTemperatureC)},
-    ]},
-    ...(result.sour ? [{title: t('tools.bread.sourTitle'), icon: 'flask-outline', lines: [
-      {label: t('tools.bread.sourStarter'), value: weight(result.sour.starter)},
-      {label: t('tools.dough.water'), value: weight(result.sour.water)},
-      {label: sourFlour ? flourName(sourFlour) : t('tools.bread.sourFlour'), value: weight(result.sour.flour)},
-      {label: t('tools.bread.sourTime'), value: t('tools.bread.sourTimeValue', {hours: result.sour.hours,
-        temperature: temperature(result.sour.temperatureC)})},
-    ]}] : []),
-    ...(result.soaker ? [{title: t('tools.bread.soakerTitle'), icon: 'water-outline', lines: [
-      ...inputs.additions.filter((addition) => addition.soakAbsorption != null)
-          .map((addition) => ({label: addition.name, value: weight(addition.grams)})),
-      {label: t('tools.dough.water'), value: weight(result.soaker.water)},
-      {label: t('tools.bread.soakerTime'), value: t('tools.bread.soakerTimeValue', {hours: result.soaker.hours})},
-    ]}] : []),
-    timelineSection(format, result.stages, inputs, new Date(), inputs.kneading, [
-      ...(result.sour ? [{label: t('tools.bread.startSour'), hoursBeforeMix: result.sour.hours}] : []),
-      ...(result.soaker ? [{label: t('tools.bread.startSoaker'), hoursBeforeMix: result.soaker.hours}] : []),
-    ], guide.ryeDough ? t('tools.bread.mixOnly') : undefined),
-    {title: t('tools.bread.stepsTitle'), icon: 'format-list-numbered', lines: [], steps: [
-      ...(result.sour ? [t('tools.bread.steps.sour')] : []),
-      ...(result.soaker ? [t('tools.bread.steps.soaker')] : []),
-      guide.ryeDough ? t('tools.bread.steps.mixRye') :
-        t('tools.bread.steps.knead', {minutes: KNEAD_MINUTES[inputs.kneading]}),
-      guide.foldSets > 0 ? t('tools.bread.steps.fold', {count: guide.foldSets}) : t('tools.bread.steps.rise'),
-      t('tools.bread.steps.shape', {hours: Math.round(guide.shapeHoursBefore * 4) / 4, count: result.pieces}),
-      t('tools.bread.steps.bake', {start: temperature(guide.startC), after: toFive(guide.lowerAfterMinutes),
-        lower: temperature(guide.lowerC), minutes: toFive(guide.minutes)}),
-      t(guide.ryeDough ? 'tools.bread.steps.doneRye' : 'tools.bread.steps.done', {core: temperature(guide.coreC)}),
-    ]},
-  ];
 
   return (
     <ToolFrame result={<>
@@ -122,29 +93,12 @@ export const BreadTool = () => {
         <Notice key={warning} icon="alert-outline" tone="warning">{t(`tools.dough.warnings.${warning}`)}</Notice>
       ))}
       <ToolResult title={inputs.method !== 'yeast' && inputs.withYeast ?
-        t('tools.bread.resultWithYeast', {bread: breadName}) : breadName} sections={sections} />
+        t('tools.bread.resultWithYeast', {bread: breadName}) : breadName} sections={breadSections({t, system, locale: i18n.language}, inputs, result)} />
     </>}>
       <UnitSwitch />
-      {inputs.flours.map((part, index) => (
-        <OptionList key={index} chosen={part.flour} onChoose={(flour) => replaceFlour(index, flour)}
-          title={inputs.flours.length > 1 ? t('tools.bread.flourN', {n: index + 1}) : t('tools.dough.flourType')}
-          hint={inputs.flours.length > 1 && index === 0 ? t('tools.bread.flourMixHint') : undefined}
-          options={BREAD_FLOURS.map((flour) => ({value: flour, title: flourName(flour),
-            description: flourDescription(flour)}))}>
-          {inputs.flours.length > 1 && <>
-            <SliderField label={t('tools.bread.share')} value={part.share} min={FLOUR_SHARE_STEP}
-              max={100 - FLOUR_SHARE_STEP * (inputs.flours.length - 1)} step={FLOUR_SHARE_STEP}
-              format={percent} onChange={(share) => change({flours: withFlourShare(inputs.flours, index, share)})} />
-            <Button icon="delete-outline" style={styles.remove}
-              onPress={() => changeFlours(withoutFlour(inputs.flours, index))}>
-              {t('tools.bread.removeFlour')}
-            </Button>
-          </>}
-        </OptionList>
-      ))}
-      {inputs.flours.length < MAX_FLOURS &&
-        <Button icon="plus" style={styles.add} onPress={() => change({flours: withFlourShare([...inputs.flours,
-          {flour: 'type1050', share: 0}], inputs.flours.length, NEW_FLOUR_SHARE)})}>{t('tools.bread.addFlour')}</Button>}
+      {/* A mix without rye cannot make a sour. */}
+      <FlourMix flours={inputs.flours}
+        onChange={(flours) => change({flours, method: methodFor(inputs.method, flours)})} />
 
       <OptionList title={t('tools.bread.method')} chosen={inputs.method} onChoose={(method) => change({method})}
         hint={methods.includes('sour') ? undefined : t('tools.bread.sourNeedsRye')}

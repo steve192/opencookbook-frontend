@@ -55,7 +55,8 @@ const spread = (shares: number[], total: number): number[] => {
 export const withFlourShare = (flours: FlourShare[], index: number, share: number): FlourShare[] => {
   const own = Math.min(Math.max(share, FLOUR_SHARE_STEP), 100 - FLOUR_SHARE_STEP * (flours.length - 1));
   const rest = spread(flours.filter((_, at) => at !== index).map((part) => part.share), 100 - own);
-  return flours.map((part, at) => ({...part, share: at === index ? own : rest[at < index ? at : at - 1]}));
+  const shares = [...rest.slice(0, index), own, ...rest.slice(index)];
+  return flours.map((part, at) => ({...part, share: shares[at]}));
 };
 
 /**
@@ -449,6 +450,68 @@ const breadGuide = (method: BreadMethod, ryePercent: number, loafGrams: number):
 });
 
 /**
+ * Each flour's grams in the dough: its share of all the flour, less what the starter or sour holds of it.
+ *
+ * @param {BreadInputs} inputs the bread
+ * @param {DoughAmounts} amounts what the dough weighs
+ * @param {DoughLeavener} leavener what leavens it
+ * @return {Array} each flour with its grams
+ */
+const flourSplitOf = (inputs: BreadInputs, amounts: DoughAmounts, leavener: DoughLeavener): BreadResult['flourSplit'] => {
+  const total = inputs.flours.reduce((sum, part) => sum + part.share, 0) || 1;
+  const starterFlour = leavener === 'sourdough' ? amounts.leavener / 2 : 0;
+  // A sour is made of the rye; a starter takes from every flour.
+  const carriers = inputs.flours.filter((part) => inputs.method !== 'sour' || RYE_FLOURS.includes(part.flour));
+  const carrierTotal = carriers.reduce((sum, part) => sum + part.share, 0) || 1;
+  return inputs.flours.map((part) => ({flour: part.flour, grams: part.share / total * amounts.totalFlour -
+    (carriers.includes(part) ? starterFlour * part.share / carrierTotal : 0)}));
+};
+
+/**
+ * The sour to make ahead: its flour and water, and the starter that ripens it in its hours.
+ *
+ * @param {BreadInputs} inputs the bread
+ * @param {DoughAmounts} amounts what the dough weighs, the sour as its leavener
+ * @return {object | undefined} the sour, or nothing for a bread without one
+ */
+const sourToMake = (inputs: BreadInputs, amounts: DoughAmounts): BreadResult['sour'] => {
+  if (inputs.method !== 'sour') {
+    return undefined;
+  }
+  const sourFlour = amounts.leavener / 2;
+  // The starter, half flour and half water, is part of the sour.
+  // It ripens where the dough goes, its starter as for a dough of its hours.
+  const ripening = [{hours: inputs.sourHours, temperatureC: inputs.roomC}];
+  const starter = leavenerNeeded(BREAD_CALIBRATION, 'sourdough', ripening, inputs.roomC) / 100 * sourFlour;
+  return {flour: sourFlour - starter / 2, water: sourFlour - starter / 2, starter, hours: inputs.sourHours,
+    temperatureC: inputs.roomC};
+};
+
+/**
+ * What makes a bread's mix unlikely to work: a soaker or fruit and vegetables beyond what the dough carries, rye
+ * without a sour, or too much of a flour with little gluten.
+ *
+ * @param {BreadInputs} inputs the bread
+ * @param {number} totalFlour all the flour, in g
+ * @param {number} soakerSeeds the seeds soaked, in g
+ * @param {Addition[]} doughAdditions what goes into the dough itself
+ * @return {Array} the warnings
+ */
+const mixWarnings = (inputs: BreadInputs, totalFlour: number, soakerSeeds: number,
+    doughAdditions: Addition[]): BreadResult['warnings'] => {
+  const fruitVeg = doughAdditions.filter((addition) => addition.preparation != null)
+      .reduce((sum, addition) => sum + addition.grams, 0);
+  return [
+    ...(soakerSeeds > requiredMedian(SOAKER.maxShareOfFlour, 'the largest soaker') / 100 * totalFlour ?
+      ['soakerTooLarge' as const] : []),
+    ...(fruitVeg > MAX_FRUIT_VEG_SHARE / 100 * totalFlour ? ['tooManyAdditions' as const] : []),
+    ...(inputs.method !== 'sour' && ryeShare(inputs.flours) * 100 > RYE_BREAD_SHARE ? ['ryeWithoutSour' as const] : []),
+    ...(inputs.flours.some((part) => part.share > (maxFlourShare(part.flour) ?? Infinity)) ?
+      ['flourShareTooHigh' as const] : []),
+  ];
+};
+
+/**
  * Everything to weigh for a bread, with the sour or soaker to prepare and the water temperature.
  *
  * @param {BreadInputs} inputs the bread
@@ -487,44 +550,12 @@ export const calculateBread = (inputs: BreadInputs): BreadResult => {
     warnings.push('tooLittleToWeigh');
   }
 
-  const total = inputs.flours.reduce((sum, part) => sum + part.share, 0) || 1;
-  const starterFlour = leavener === 'sourdough' ? amounts.leavener / 2 : 0;
-  // A sour is made of the rye; a starter takes from every flour.
-  const carriers = inputs.flours.filter((part) => inputs.method !== 'sour' || RYE_FLOURS.includes(part.flour));
-  const carrierTotal = carriers.reduce((sum, part) => sum + part.share, 0) || 1;
-  const flourSplit = inputs.flours.map((part) => ({flour: part.flour, grams: part.share / total * amounts.totalFlour -
-    (carriers.includes(part) ? starterFlour * part.share / carrierTotal : 0)}));
-
-  if (soakerSeeds > requiredMedian(SOAKER.maxShareOfFlour, 'the largest soaker') / 100 * amounts.totalFlour) {
-    warnings.push('soakerTooLarge');
-  }
-  const fruitVeg = doughAdditions.filter((addition) => addition.preparation != null)
-      .reduce((sum, addition) => sum + addition.grams, 0);
-  if (fruitVeg > MAX_FRUIT_VEG_SHARE / 100 * amounts.totalFlour) {
-    warnings.push('tooManyAdditions');
-  }
-  const rye = ryeShare(inputs.flours) * 100;
-  if (inputs.method !== 'sour' && rye > RYE_BREAD_SHARE) {
-    warnings.push('ryeWithoutSour');
-  }
-  if (inputs.flours.some((part) => part.share > (maxFlourShare(part.flour) ?? Infinity))) {
-    warnings.push('flourShareTooHigh');
-  }
+  warnings.push(...mixWarnings(inputs, amounts.totalFlour, soakerSeeds, doughAdditions));
   const waterTemperatureC = waterTemperature({targetC: recommendedDoughC('bread', stages), roomC: inputs.roomC,
     flourC: inputs.roomC, starterC: leavener === 'sourdough' ? inputs.roomC : undefined}, inputs.kneading);
   const freshYeast = leavener !== 'sourdough' ? convertYeast(leavenerPct, leavener, 'fresh') :
     convertYeast(yeastPercent ?? 0, inputs.yeast, 'fresh');
   warnings.push(...doughWarnings(freshYeast, waterTemperatureC));
-
-  const sour = inputs.method === 'sour' ? (() => {
-    const sourFlour = amounts.leavener / 2;
-    // The starter, half flour and half water, is part of the sour.
-    // It ripens where the dough goes, its starter as for a dough of its hours.
-    const ripening = [{hours: inputs.sourHours, temperatureC: inputs.roomC}];
-    const starter = leavenerNeeded(BREAD_CALIBRATION, 'sourdough', ripening, inputs.roomC) / 100 * sourFlour;
-    return {flour: sourFlour - starter / 2, water: sourFlour - starter / 2, starter, hours: inputs.sourHours,
-      temperatureC: inputs.roomC};
-  })() : undefined;
 
   const doughTotal = amounts.total + soakerSeeds + soakerWater;
   // Flour at hand makes loaves of the usual size, so a big batch is not baked as one giant loaf.
@@ -534,11 +565,11 @@ export const calculateBread = (inputs: BreadInputs): BreadResult => {
   return {
     hydration,
     amounts,
-    flourSplit,
+    flourSplit: flourSplitOf(inputs, amounts, leavener),
     yeastGrams,
-    sour,
+    sour: sourToMake(inputs, amounts),
     stages,
-    guide: breadGuide(inputs.method, rye, pieceWeight),
+    guide: breadGuide(inputs.method, ryeShare(inputs.flours) * 100, pieceWeight),
     doughWater: hydration / 100 * amounts.totalFlour + amounts.excessWater,
     soaker: soakerSeeds > 0 ?
       {seeds: soakerSeeds, water: soakerWater, hours: requiredMedian(SOAKER.hours, 'the hours of a soaker')} : undefined,

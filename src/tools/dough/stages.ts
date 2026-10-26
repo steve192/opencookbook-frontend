@@ -1,5 +1,5 @@
 import {Stage} from '../fermentation/fermentation';
-import {asRawInputs, RawInputs, readList, readNumber} from '../inputs';
+import {RawInputs, readList, readNumber} from '../inputs';
 
 /** A ready-made schedule; its stages follow the room temperature. */
 export type SchedulePreset = 'quick' | 'sameDay' | 'daylong' | 'overnight' | 'fridge24' | 'fridge48' | 'fridge72';
@@ -72,8 +72,6 @@ export const readStages = (raw: RawInputs, fallback: Stage[]): Stage[] =>
   }), 6, fallback);
 
 export const totalHours = (stages: Stage[]): number => stages.reduce((sum, stage) => sum + stage.hours, 0);
-
-export {asRawInputs};
 
 /** When the dough goes into the oven: a day counted from today and a clock time. */
 export interface BakeTime {
