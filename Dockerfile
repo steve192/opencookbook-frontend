@@ -1,4 +1,4 @@
-FROM node:24.21.0-bookworm-slim AS node
+FROM node:24.22.0-bookworm-slim AS node
 
 # The Expo web export, served under /app.
 FROM node AS app
@@ -25,7 +25,7 @@ COPY assets/icon.png /app/assets/icon.png
 COPY landing ./
 RUN npm run check && npm run build && npm test
 
-FROM nginx:1.31.6
+FROM nginx:1.31.7
 
 RUN chown nginx:nginx /etc/nginx -R && \
     chown nginx:nginx /var/cache/nginx -R && \
