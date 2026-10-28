@@ -1,4 +1,4 @@
-FROM node:24.22.0-bookworm-slim AS node
+FROM node:26.12.0-bookworm-slim AS node
 
 # The Expo web export, served under /app.
 FROM node AS app
