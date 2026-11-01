@@ -5,8 +5,8 @@ import {bringLine, MealChoice, sheetLines} from './importLines';
 const UNITS = new Set(['g', 'kg', 'ml', 'l']);
 
 const line = (name: string, amount: number | null, unit: string, mergeUnit: string, mergeFactor = 1,
-    staple = false): PreviewLine => ({
-  name, nameKey: name.toLowerCase(), amount, unit, mergeUnit, mergeFactor, aisle: 'BAKING', icon: null, staple,
+    staple = false, note = ''): PreviewLine => ({
+  name, nameKey: name.toLowerCase(), amount, unit, mergeUnit, mergeFactor, aisle: 'BAKING', icon: null, staple, note,
 });
 
 const meal = (title: string, recipeServings: number, lines: PreviewLine[], date = '2026-10-05'): PreviewMeal => ({
@@ -69,6 +69,19 @@ describe('sheetLines', () => {
     ], 'en', UNITS);
     expect(flour.sources).toEqual([
       {title: 'Pancakes', planDate: '2026-10-05'}, {title: 'Bread', planDate: '2026-10-06'}]);
+  });
+
+  // The note is for the person shopping; nothing of it goes onto the list or to Bring
+  it('keeps what the recipes of the meals say beside the food, once each', () => {
+    const [potatoes] = sheetLines([
+      choose(meal('Ofenkartoffeln', 2, [line('Potatoes', 1, 'kg', 'g', 1000, false, 'festkochend')])),
+      choose(meal('Salad', 2, [line('Potatoes', 500, 'g', 'g'), line('Potatoes', 200, 'g', 'g', 1, false, 'festkochend')])),
+      choose(meal('Gratin', 2, [line('Potatoes', 1, 'kg', 'g', 1000, false, 'festkochend')])),
+    ], 'en', UNITS);
+    expect(potatoes.recipeNotes).toEqual([
+      {title: 'Ofenkartoffeln', note: 'festkochend'}, {title: 'Salad', note: 'festkochend'},
+      {title: 'Gratin', note: 'festkochend'}]);
+    expect(bringLine(potatoes)).toBe('2.7 kg Potatoes');
   });
 
   it('marks a line as a staple when any recipe line was one', () => {

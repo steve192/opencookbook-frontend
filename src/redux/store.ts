@@ -33,7 +33,7 @@ const ofThisVersion = {version: CACHE_VERSION, migrate: keepOnlyVersion(CACHE_VE
 
 const rootReducer = combineReducers({
   auth: authSlice,
-  settings: settingsSlice,
+  settings: persisted('settings', settingsSlice, {whitelist: ['ingredientEntry']}),
   timers: timersSlice,
   // Unsent shopping changes survive app updates; only the cache is tied to a version.
   shopping: persisted('shopping', shoppingSlice),

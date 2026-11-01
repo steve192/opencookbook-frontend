@@ -7,7 +7,7 @@ import {
   splitStepForHighlighting,
 } from './ingredientMatching';
 
-const use = (name: string): IngredientUse => ({ingredient: {name}, amount: null, unit: ''});
+const use = (name: string): IngredientUse => ({ingredient: {name}, amount: null, unit: '', note: ''});
 
 const usedNames = (step: string, names: string[]) => {
   const ingredients = names.map(use);

@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {formatAmount, servingFactor} from './servings';
+import {amountLabel, formatAmount, servingFactor} from './servings';
 
 describe('servings', () => {
   it('scales by the ratio of servings', () => {
@@ -19,5 +19,11 @@ describe('servings', () => {
 
   it('writes the decimal the way the language does', () => {
     expect(formatAmount(1.5, 'de')).toBe('1,5');
+  });
+
+  it('labels an ingredient by its scaled amount and unit', () => {
+    expect(amountLabel({ingredient: {name: 'Mehl'}, amount: 1.5, unit: 'EL', note: ''}, 'de', 2)).toBe('3 EL');
+    expect(amountLabel({ingredient: {name: 'Salz'}, amount: 0, unit: 'Prise', note: ''}, 'de')).toBe('Prise');
+    expect(amountLabel({ingredient: {name: 'Salz'}, amount: null, unit: '', note: ''}, 'de')).toBe('');
   });
 });

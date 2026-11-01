@@ -11,6 +11,8 @@ interface Props {
   onMoveUp: () => void;
   onMoveDown: () => void;
   onRemove: () => void;
+  /** Side by side, for a row only one field high. */
+  horizontal?: boolean;
 }
 
 // Reorder and remove for one row of the editor, stacked into a narrow trailing column so
@@ -32,7 +34,7 @@ export const RowActions = (props: Props) => {
   );
 
   return (
-    <View style={styles.column}>
+    <View style={[styles.column, props.horizontal && styles.horizontal]}>
       {renderAction('chevron-up', t('screens.editRecipe.moveUp'), props.onMoveUp, props.canMoveUp)}
       {renderAction('chevron-down', t('screens.editRecipe.moveDown'), props.onMoveDown, props.canMoveDown)}
       {renderAction('close', props.removeLabel, props.onRemove, true, theme.colors.error)}
@@ -43,6 +45,9 @@ export const RowActions = (props: Props) => {
 const styles = StyleSheet.create({
   column: {
     justifyContent: 'center',
+  },
+  horizontal: {
+    flexDirection: 'row',
   },
   // 44 square: the Android guideline for a touch target is 48dp and Apple's is 44pt, and
   // three stacked 34x28 targets were small enough to mis-hit.

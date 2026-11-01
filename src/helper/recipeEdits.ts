@@ -12,6 +12,19 @@ import {RecipeSuit} from './recipeSuits';
  * split the weekplan uses for its days.
  */
 
+/** What was typed into an ingredient row in text mode. Once read, the row's parts are what the server read from it. */
+export interface WrittenIngredient {
+  text: string;
+  read: boolean;
+}
+
+export type EditedIngredient = IngredientUse & {written?: WrittenIngredient};
+
+/** The recipe as the editor holds it, with what was typed into its ingredient rows. */
+export type EditedRecipe = Omit<Recipe, 'neededIngredients'> & {neededIngredients: EditedIngredient[]};
+
+const blankIngredient = (): IngredientUse => ({ingredient: {name: ''}, amount: null, unit: '', note: ''});
+
 /**
  * A recipe that has not been filled in yet, with one blank ingredient and step to start on.
  *
@@ -19,7 +32,7 @@ import {RecipeSuit} from './recipeSuits';
  */
 export const emptyRecipe = (): Recipe => ({
   title: '',
-  neededIngredients: [{ingredient: {name: ''}, amount: null, unit: ''}],
+  neededIngredients: [blankIngredient()],
   preparationSteps: [''],
   images: [],
   servings: 1,
@@ -82,11 +95,13 @@ export const withNumberField = (
 
 /**
  * @param {Recipe} recipe the recipe being edited
- * @return {Recipe} a new recipe with a blank ingredient at the end
+ * @param {number} [index] where the blank ingredient goes; at the end without one
+ * @return {Recipe} a new recipe with a blank ingredient there
  */
-export const withIngredientAdded = (recipe: Recipe): Recipe => ({
+export const withIngredientAdded = (recipe: Recipe, index = recipe.neededIngredients.length): Recipe => ({
   ...recipe,
-  neededIngredients: [...recipe.neededIngredients, {ingredient: {id: undefined, name: ''}, unit: '', amount: null}],
+  neededIngredients: [
+    ...recipe.neededIngredients.slice(0, index), blankIngredient(), ...recipe.neededIngredients.slice(index)],
 });
 
 /**
@@ -99,6 +114,78 @@ export const withIngredientChanged = (recipe: Recipe, index: number, ingredient:
   ...recipe,
   neededIngredients: recipe.neededIngredients.map((existing, at) => at === index ? ingredient : existing),
 });
+
+/**
+ * In text mode the row shows what was typed, and keeps its last read parts until the server has read the text.
+ *
+ * @param {EditedRecipe} recipe the recipe being edited
+ * @param {number} index which ingredient
+ * @param {string} text what was typed
+ * @return {EditedRecipe} a new recipe with that row waiting to be read, or blank where nothing was typed
+ */
+export const withIngredientWritten = (recipe: EditedRecipe, index: number, text: string): EditedRecipe => ({
+  ...recipe,
+  neededIngredients: recipe.neededIngredients.map((row, at) => {
+    if (at !== index) {
+      return row;
+    }
+    return text.trim() === '' ? blankIngredient() : {...row, written: {text, read: false}};
+  }),
+});
+
+/**
+ * Only rows still waiting for exactly that text are read: a row typed on since waits for its new text.
+ *
+ * @param {EditedRecipe} recipe the recipe being edited
+ * @param {Map} read per text, the ingredient read from it, or null where it names none
+ * @return {EditedRecipe} a new recipe with those rows read
+ */
+export const withIngredientsRead = (
+    recipe: EditedRecipe,
+    read: ReadonlyMap<string, IngredientUse | null>,
+): EditedRecipe => ({
+  ...recipe,
+  neededIngredients: recipe.neededIngredients.map((row) => {
+    const written = row.written;
+    if (!written || written.read || !read.has(written.text)) {
+      return row;
+    }
+    return {...(read.get(written.text) ?? blankIngredient()), written: {text: written.text, read: true}};
+  }),
+});
+
+/**
+ * @param {EditedRecipe} recipe the recipe being edited
+ * @return {string[]} the texts of rows the server has not read yet, each once
+ */
+export const unreadIngredientTexts = (recipe: EditedRecipe): string[] => [...new Set(
+    recipe.neededIngredients.flatMap((row) => row.written && !row.written.read ? [row.written.text] : []))];
+
+/**
+ * @param {EditedRecipe} recipe the recipe being edited
+ * @return {string[]} the texts of rows in which the server found no ingredient ("200 g")
+ */
+export const unnamedIngredientTexts = (recipe: EditedRecipe): string[] =>
+  recipe.neededIngredients.flatMap((row) => row.written?.read && row.ingredient.name === '' ? [row.written.text] : []);
+
+/**
+ * An amount for typing it anew; 0 shows as none, as in the recipe.
+ *
+ * @param {number | null} amount the amount
+ * @param {string} [locale] how the decimal is written; the amount field takes a point
+ * @return {string} "1.5", "0.333", or nothing
+ */
+export const amountText = (amount: number | null, locale = 'en'): string =>
+  amount ? amount.toLocaleString(locale, {maximumFractionDigits: 3, useGrouping: false}) : '';
+
+/**
+ * @param {EditedIngredient} row an ingredient row
+ * @param {string} locale how the decimal is written
+ * @return {string} what text mode shows in it: what was typed, else its parts as in "200 g Butter, weich"
+ */
+export const ingredientText = (row: EditedIngredient, locale: string): string => row.written?.text ??
+  [amountText(row.amount, locale), row.unit.trim(), row.ingredient.name].filter((part) => part !== '').join(' ') +
+    (row.note ? `, ${row.note}` : '');
 
 /**
  * @param {Recipe} recipe the recipe being edited
@@ -185,19 +272,22 @@ export const withImageRemoved = (recipe: Recipe, uuid: string): Recipe =>
 export const withImages = (recipe: Recipe, images: RecipeImage[]): Recipe => ({...recipe, images});
 
 const isUntouchedIngredientLine = (line: IngredientUse): boolean =>
-  line.ingredient.name.trim() === '' && line.amount === null && line.unit.trim() === '';
+  line.ingredient.name.trim() === '' && line.amount === null && line.unit.trim() === '' && line.note.trim() === '';
 
 /**
  * What is sent when the recipe is saved.
  *
  * A group the user never picked is left behind as a blank entry, which the server would
- * store as a group with no name. The editor's blank ingredient line is left out too.
+ * store as a group with no name. The editor's blank ingredient line is left out too, and so is
+ * what was typed into a row.
  *
- * @param {Recipe} recipe the recipe being edited
+ * @param {EditedRecipe} recipe the recipe being edited
  * @return {Recipe} the recipe as it should be stored
  */
-export const forSaving = (recipe: Recipe): Recipe => ({
+export const forSaving = (recipe: EditedRecipe): Recipe => ({
   ...recipe,
   recipeGroups: recipe.recipeGroups.filter((group) => group.title !== ''),
-  neededIngredients: recipe.neededIngredients.filter((line) => !isUntouchedIngredientLine(line)),
+  neededIngredients: recipe.neededIngredients
+      .filter((line) => !isUntouchedIngredientLine(line))
+      .map(({ingredient, amount, unit, note}) => ({ingredient, amount, unit, note})),
 });

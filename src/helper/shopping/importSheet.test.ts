@@ -10,7 +10,7 @@ const meal = (date: string | null, defaultServings = 2): PreviewMeal => ({
 });
 
 const line = (key: string, staple = false): SheetLine =>
-  ({key, name: key, spec: '1', aisle: 'OTHER', icon: null, staple, sources: []});
+  ({key, name: key, spec: '1', aisle: 'OTHER', icon: null, staple, sources: [], recipeNotes: []});
 
 describe('importSheet', () => {
   it('leaves out what was eaten earlier this week', () => {

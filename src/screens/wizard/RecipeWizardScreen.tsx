@@ -1,8 +1,8 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {StyleSheet, View} from 'react-native';
-import {Appbar, Button, Divider, Menu, Surface, Text, TextInput} from 'react-native-paper';
+import {Keyboard, StyleSheet, View} from 'react-native';
+import {Appbar, Button, Divider, Menu, SegmentedButtons, Surface, Text, TextInput} from 'react-native-paper';
 import {RecipeImageViewPager} from '../../components/RecipeImageViewPager';
 import {SectionTitle} from '../../components/SectionTitle';
 import {Option} from '../../components/SelectionPopupModal';
@@ -17,8 +17,10 @@ import {missesPlanningDetails, missingDetails} from '../../helper/recipeComplete
 import {takeDraft} from '../../helper/recipeDraftHandover';
 import {useDerivedDiet} from '../../helper/useDerivedDiet';
 import {
+  EditedRecipe,
   emptyRecipe,
   forSaving,
+  unnamedIngredientTexts,
   withDiet,
   withGroup,
   withImageAdded,
@@ -28,6 +30,7 @@ import {
   withIngredientChanged,
   withIngredientMoved,
   withIngredientRemoved,
+  withIngredientWritten,
   withNumberField,
   withStepAdded,
   withStepChanged,
@@ -36,15 +39,19 @@ import {
   withSuitToggled,
   withTitle,
 } from '../../helper/recipeEdits';
+import {useIngredientReading} from '../../helper/useIngredientReading';
 import {useProgressiveRender} from '../../helper/useProgressiveRender';
 import {PromptUtil} from '../../helper/Prompt';
 import {setAppbarOptions} from '../../navigation/appbarOptions';
 import {MainNavigationProps} from '../../navigation/NavigationRoutes';
+import {IngredientEntry, ingredientEntryChosen} from '../../redux/features/settingsSlice';
+import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {UNITS} from '../../helper/units';
 import {OfflineSaveHint} from '../../offline/OfflineSaveHint';
 import {useIsOnline} from '../../offline/useIsOnline';
 import CentralStyles, {useAppTheme} from '../../styles/CentralStyles';
 import {IngredientFormField} from './IngredientFromField';
+import {IngredientInput, IngredientTextField} from './IngredientTextField';
 import {RecipeFormField} from './PreparationStepFormField';
 import {ImportCompletionNotice} from './ImportCompletionNotice';
 import {PlanningDetailsSection} from './PlanningDetailsSection';
@@ -62,17 +69,20 @@ const RecipeWizardScreen = (props: Props) => {
   const {t} = useTranslation('translation');
   const online = useIsOnline();
   const existingRecipe: Recipe | undefined = useOwnRecipes().data?.find((recipe) => recipe.id === props.route.params?.recipeId);
-  const [createRecipe, creating] = useCreateRecipeMutation();
-  const [updateRecipe, updating] = useUpdateRecipeMutation();
+  const [createRecipe] = useCreateRecipeMutation();
+  const [updateRecipe] = useUpdateRecipeMutation();
   const [deleteRecipe] = useDeleteRecipeMutation();
   const [getRecipeDeletionImpact] = useLazyGetRecipeDeletionImpactQuery();
-  const savePending = creating.isLoading || updating.isLoading;
+  // From the tap on save on: the typed ingredients are read first, then the recipe is sent
+  const [saving, setSaving] = useState(false);
+  const ingredientEntry = useAppSelector((state) => state.settings.ingredientEntry);
+  const dispatch = useAppDispatch();
 
   // A draft wins over anything in the store: it is why the wizard was opened, and it has no id.
-  const [recipeData, setRecipeData] = useState<Recipe>(
+  const [recipeData, setRecipeData] = useState<EditedRecipe>(
       () => (props.route.params?.hasDraft ? takeDraft() : undefined) ??
         existingRecipe ?? emptyRecipe());
-  const canSave = online && !savePending && recipeData.title.trim().length > 0;
+  const canSave = online && !saving && recipeData.title.trim().length > 0;
 
   // A scan opens with a draft: what its source did not say is asked for here
   const opensDraft = props.route.params?.hasDraft === true;
@@ -106,8 +116,8 @@ const RecipeWizardScreen = (props: Props) => {
       [],
   );
   const resolveIngredient = useCallback(
-      (name: string) => availableIngredients.find(
-          (ingredient) => ingredient.name.toLowerCase() === name.toLowerCase()),
+      (name: string): Ingredient => availableIngredients.find(
+          (ingredient) => ingredient.name.toLowerCase() === name.toLowerCase()) ?? {name},
       [availableIngredients],
   );
 
@@ -125,21 +135,84 @@ const RecipeWizardScreen = (props: Props) => {
   const isDirty = () => JSON.stringify(recipeData) !== pristineRecipe.current;
 
   // Each change is a pure function on the recipe; the screen only says when to apply one
-  const edit = useCallback((change: (recipe: Recipe) => Recipe) => setRecipeData(change), []);
+  const edit = useCallback((change: (recipe: EditedRecipe) => EditedRecipe) => setRecipeData(change), []);
+
+  const ingredientReading = useIngredientReading(recipeData, resolveIngredient, edit);
 
   const changeIngredient = useCallback(
       (ingredient: IngredientUse, index: number) =>
         edit((recipe) => withIngredientChanged(recipe, index, ingredient)),
       [edit],
   );
+  // The keyboard closes before a row or mode goes: Android hands a removed field's focus to the top one
   const removeIngredient = useCallback(
-      (index: number) => edit((recipe) => withIngredientRemoved(recipe, index)),
+      (index: number) => {
+        Keyboard.dismiss();
+        edit((recipe) => withIngredientRemoved(recipe, index));
+      },
       [edit],
   );
+  const writeIngredient = useCallback(
+      (index: number, text: string) => edit((recipe) => withIngredientWritten(recipe, index, text)),
+      [edit],
+  );
+
+  // Text rows by index, to put the cursor into a row just added or moved
+  const ingredientInputs = useRef<(IngredientInput | null)[]>([]);
+  const registerIngredientInput = useCallback(
+      (index: number, input: IngredientInput | null) => {
+        ingredientInputs.current[index] = input;
+      },
+      [],
+  );
+  const [ingredientToFocus, setIngredientToFocus] = useState<number>();
+  useEffect(() => {
+    if (ingredientToFocus !== undefined) {
+      ingredientInputs.current[ingredientToFocus]?.focus();
+      setIngredientToFocus(undefined);
+    }
+  }, [ingredientToFocus]);
+  const addIngredient = useCallback(
+      (index: number) => {
+        edit((recipe) => withIngredientAdded(recipe, index));
+        setIngredientToFocus(index);
+      },
+      [edit],
+  );
+  // Rows are keyed by index, so the cursor would stay behind and type into the row that took the place
   const moveIngredient = useCallback(
-      (fromIndex: number, toIndex: number) => edit((recipe) => withIngredientMoved(recipe, fromIndex, toIndex)),
+      (fromIndex: number, toIndex: number) => {
+        edit((recipe) => withIngredientMoved(recipe, fromIndex, toIndex));
+        if (ingredientInputs.current[fromIndex]?.isFocused()) {
+          setIngredientToFocus(toIndex);
+        }
+      },
       [edit],
   );
+
+  // Every typed row read, or nothing where a row names no ingredient: that row is named rather than dropped, as
+  // field mode refuses an amount without a name
+  const readIngredients = async (): Promise<EditedRecipe | undefined> => {
+    const read = await ingredientReading.readAll();
+    const [unnamed] = unnamedIngredientTexts(read);
+    if (unnamed === undefined) {
+      return read;
+    }
+    SnackbarUtil.show({message: t('screens.editRecipe.noIngredientFoundIn', {text: unnamed})});
+    return undefined;
+  };
+
+  // Field rows show what was read, so whatever was typed is read first
+  const chooseIngredientEntry = async (entry: IngredientEntry) => {
+    Keyboard.dismiss();
+    try {
+      if (entry === 'text' || await readIngredients()) {
+        dispatch(ingredientEntryChosen(entry));
+      }
+    } catch (error) {
+      SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.editRecipe.readIngredientsFailed'))});
+    }
+  };
 
   const changeStep = useCallback(
       (index: number, text: string) => edit((recipe) => withStepChanged(recipe, index, text)),
@@ -156,16 +229,23 @@ const RecipeWizardScreen = (props: Props) => {
 
   // Unwrapped so that a rejected request is a rejected promise: a plain dispatch resolves
   // either way, which used to close the screen on a recipe the server never accepted.
-  const saveRecipe = () => {
+  const saveRecipe = async () => {
     if (!canSave) return;
-    const toSave = forSaving(recipeData);
-    const saving = props.route.params.editing ? updateRecipe(toSave) : createRecipe(toSave);
-    saving.unwrap().then(() => {
+    setSaving(true);
+    try {
+      const read = await readIngredients();
+      if (!read) {
+        setSaving(false);
+        return;
+      }
+      const toSave = forSaving(read);
+      await (props.route.params.editing ? updateRecipe(toSave) : createRecipe(toSave)).unwrap();
       savedOrDiscarded.current = true;
       props.navigation.goBack();
-    }).catch((error) => {
+    } catch (error) {
+      setSaving(false);
       SnackbarUtil.show({message: t(errorMessageKey(error, 'screens.editRecipe.saveFailed'))});
-    });
+    }
   };
 
   const performDelete = () => {
@@ -267,25 +347,54 @@ const RecipeWizardScreen = (props: Props) => {
 
   const renderIngredientsSection = () => (
     <View style={styles.section}>
-      <SectionTitle testID='ingredient-list-title'>{t('screens.editRecipe.ingredients')}</SectionTitle>
+      <View style={styles.sectionHeader}>
+        <SectionTitle testID='ingredient-list-title'>{t('screens.editRecipe.ingredients')}</SectionTitle>
+        <SegmentedButtons
+          density="small"
+          style={styles.entrySwitch}
+          value={ingredientEntry}
+          onValueChange={chooseIngredientEntry}
+          buttons={[
+            {value: 'text', label: t('screens.editRecipe.entryText')},
+            {value: 'fields', label: t('screens.editRecipe.entryFields'), disabled: !online && ingredientReading.unread},
+          ]} />
+      </View>
       {recipeData.neededIngredients.length === 0 &&
         <Text style={{color: theme.colors.onSurfaceVariant}}>{t('screens.editRecipe.noIngredientsYet')}</Text>
       }
-      {recipeData.neededIngredients.slice(0, renderedIngredients).map((neededIngredient, ingredientIndex) => (
-        <IngredientFormField
-          key={ingredientIndex}
-          ingredient={neededIngredient}
-          ingredientIndex={ingredientIndex}
-          ingredientOptions={ingredientOptions}
-          unitOptions={unitOptions}
-          resolveIngredient={resolveIngredient}
-          canMoveUp={ingredientIndex > 0}
-          canMoveDown={ingredientIndex < recipeData.neededIngredients.length - 1}
-          onIngredientChange={changeIngredient}
-          onMove={moveIngredient}
-          onRemovePress={removeIngredient} />
-      ))}
-      <Button icon="plus" onPress={() => edit(withIngredientAdded)}>{t('screens.editRecipe.addIngredient')}</Button>
+      {recipeData.neededIngredients.slice(0, renderedIngredients).map((neededIngredient, ingredientIndex) =>
+        ingredientEntry === 'text' ?
+          <IngredientTextField
+            key={ingredientIndex}
+            ingredient={neededIngredient}
+            ingredientIndex={ingredientIndex}
+            online={online}
+            canMoveUp={ingredientIndex > 0}
+            canMoveDown={ingredientIndex < recipeData.neededIngredients.length - 1}
+            registerInput={registerIngredientInput}
+            onWrite={writeIngredient}
+            onAddIngredient={addIngredient}
+            onMove={moveIngredient}
+            onRemovePress={removeIngredient} /> :
+          // A field row is three lines high; without a line between rows, "+ Note" could belong to either
+          <React.Fragment key={ingredientIndex}>
+            {ingredientIndex > 0 && <Divider />}
+            <IngredientFormField
+              ingredient={neededIngredient}
+              ingredientIndex={ingredientIndex}
+              ingredientOptions={ingredientOptions}
+              unitOptions={unitOptions}
+              resolveIngredient={resolveIngredient}
+              canMoveUp={ingredientIndex > 0}
+              canMoveDown={ingredientIndex < recipeData.neededIngredients.length - 1}
+              onIngredientChange={changeIngredient}
+              onMove={moveIngredient}
+              onRemovePress={removeIngredient} />
+          </React.Fragment>,
+      )}
+      <Button icon="plus" onPress={() => addIngredient(recipeData.neededIngredients.length)}>
+        {t('screens.editRecipe.addIngredient')}
+      </Button>
     </View>
   );
 
@@ -389,7 +498,7 @@ const RecipeWizardScreen = (props: Props) => {
           <OfflineSaveHint />
           <Button
             mode="contained"
-            loading={savePending}
+            loading={saving}
             disabled={!canSave}
             onPress={saveRecipe}>
             {props.route.params?.editing ? t('common.save') : t('common.create')}
@@ -412,6 +521,16 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: 8,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  entrySwitch: {
+    flexShrink: 1,
+    maxWidth: 200,
   },
   factsRow: {
     flexDirection: 'row',
