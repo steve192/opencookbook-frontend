@@ -31,7 +31,7 @@ Debug::Acquire::https "true";\
     apt-get install -y openjdk-17-jdk curl git unzip && \
     # Must track .nvmrc's major: the lockfile is written by the npm that
     # ships with that Node, and an older npm's `npm ci` rejects it.
-    curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
+    curl -fsSL https://deb.nodesource.com/setup_26.x | bash - && \
     apt-get install -y nodejs && \
     apt-get clean
 

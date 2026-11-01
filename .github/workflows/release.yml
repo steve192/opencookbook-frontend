@@ -60,11 +60,11 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v7.1.0
         with:
-          python-version: "3.15.1"
+          python-version: "3.15.2"
 
       - name: Run semantic-release dry run
         id: semantic
-        uses: cycjimmy/semantic-release-action@v6.0.0
+        uses: cycjimmy/semantic-release-action@v8.1.4
         with:
           dry_run: true
           semantic_version: 25.0.9
@@ -233,10 +233,10 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v7.1.0
         with:
-          python-version: "3.15.1"
+          python-version: "3.15.2"
 
       - name: Run semantic-release
-        uses: cycjimmy/semantic-release-action@v6.0.0
+        uses: cycjimmy/semantic-release-action@v8.1.4
         with:
           semantic_version: 25.0.9
           branches: main
