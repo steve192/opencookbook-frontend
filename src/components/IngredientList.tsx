@@ -3,7 +3,8 @@ import {useTranslation} from 'react-i18next';
 import {StyleSheet, View} from 'react-native';
 import {Divider, Icon, IconButton, Text, TouchableRipple} from 'react-native-paper';
 import {IngredientUse} from '../api/types/recipes';
-import {formatAmount, servingFactor} from '../helper/servings';
+import {amountLabel, servingFactor} from '../helper/servings';
+import {IngredientNote} from './IngredientNote';
 import {useAppTheme} from '../styles/CentralStyles';
 
 
@@ -30,8 +31,7 @@ export const IngredientList = (props: Props) => {
   const theme = useAppTheme();
   const {t, i18n} = useTranslation('translation');
 
-  const scaleIngredient = (originalAmount: number) =>
-    formatAmount(originalAmount * servingFactor(props.servings, props.scaledServings), i18n.language);
+  const factor = servingFactor(props.servings, props.scaledServings);
 
   const updateServings = (newServings:number) => {
     props.onServingScaleChange?.(newServings);
@@ -39,7 +39,6 @@ export const IngredientList = (props: Props) => {
   const renderRow = (ingredient: IngredientUse, position: number) => {
     const index = props.ingredientIndexes?.[position] ?? position;
     const checked = props.checkedIngredients?.has(index) ?? false;
-    const amountLabel = `${ingredient.amount && ingredient.amount > 0 ? scaleIngredient(ingredient.amount) : ''} ${ingredient.unit}`.trim();
     const dimmed = props.greyedOutStyle || checked;
 
     const row = (
@@ -56,7 +55,7 @@ export const IngredientList = (props: Props) => {
             {color: dimmed ? theme.colors.onSurfaceDisabled : theme.colors.primaryText},
             checked && styles.checkedOff,
           ]}>
-          {amountLabel}
+          {amountLabel(ingredient, i18n.language, factor)}
         </Text>
         <Text
           style={[
@@ -65,6 +64,7 @@ export const IngredientList = (props: Props) => {
             checked && styles.checkedOff,
           ]}>
           {ingredient.ingredient.name}
+          <IngredientNote note={ingredient.note} color={dimmed ? theme.colors.onSurfaceDisabled : undefined} />
         </Text>
       </View>
     );

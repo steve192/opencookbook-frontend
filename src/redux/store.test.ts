@@ -33,13 +33,14 @@ const start = async () => {
   const {recipeEndpoints} = await import('../api/endpoints/recipes');
   const {login, logout} = await import('./features/authSlice');
   const {shoppingListsLoaded} = await import('./features/shoppingSlice');
+  const {ingredientEntryChosen} = await import('./features/settingsSlice');
   await new Promise<void>((resolve) => {
     const check = () => persistor.getState().bootstrapped && resolve();
     persistor.subscribe(check);
     check();
   });
   const cachedRecipes = () => recipeEndpoints.getRecipes.select()(store.getState()).data;
-  return {store, persistor, recipeEndpoints, login, logout, shoppingListsLoaded, cachedRecipes};
+  return {store, persistor, recipeEndpoints, login, logout, shoppingListsLoaded, ingredientEntryChosen, cachedRecipes};
 };
 
 const list = {id: 7, name: null, defaultList: true, householdId: null, householdName: null, version: 0};
@@ -73,6 +74,16 @@ describe('store persistence', () => {
 
     expect(second.cachedRecipes()).toBeUndefined();
     expect(second.store.getState().shopping.lists).toEqual([list]);
+  });
+
+  it('remembers how ingredients are entered', async () => {
+    const first = await start();
+    first.store.dispatch(first.ingredientEntryChosen('fields'));
+    await first.persistor.flush();
+
+    const second = await start();
+
+    expect(second.store.getState().settings.ingredientEntry).toBe('fields');
   });
 
   it('keeps nothing of an account that signed out', async () => {

@@ -32,6 +32,7 @@ export const SheetLineRow = ({line, ticked, onList, note, onToggle}: Props) => {
     line.staple ? t('screens.shopping.import.staple') : null,
     onListNote(),
     note,
+    ...line.recipeNotes.map((recipeNote) => `${recipeNote.title}: ${recipeNote.note}`),
   ].filter(Boolean).join(' · ');
 
   return (

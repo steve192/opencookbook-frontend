@@ -9,6 +9,8 @@ export interface IngredientUse {
     ingredient: Ingredient
     amount: number | null
     unit: string
+    /** What the line says beside its food ("weich"), shown after the name; empty where it says nothing. */
+    note: string
 }
 
 export interface RecipeImage {

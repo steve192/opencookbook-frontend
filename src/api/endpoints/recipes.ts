@@ -4,7 +4,9 @@ import {UPLOAD_TIMEOUT_MILLIS} from '../client';
 import {ownRecipesOf, recipeInListing, recipesShownIn} from '../recipeSelection';
 import {imageForm, uploadRequest} from '../upload';
 import {RecipeSuggestionRequest, RecipeSuggestions} from '../types/planning';
-import {Ingredient, Recipe, RecipeDeletionImpact, RecipeDiet, RecipeGroup, RecipeImport} from '../types/recipes';
+import {
+  Ingredient, IngredientUse, Recipe, RecipeDeletionImpact, RecipeDiet, RecipeGroup, RecipeImport,
+} from '../types/recipes';
 
 export const asRecipe = (recipe: Recipe): Recipe => ({...recipe, type: 'Recipe'});
 const asRecipeGroup = (group: RecipeGroup): RecipeGroup => ({...group, type: 'RecipeGroup'});
@@ -58,6 +60,11 @@ const recipesApi = api.injectEndpoints({
       query: (ingredientNames) => ({url: '/recipes/diet-preview', method: 'POST', body: {ingredientNames}}),
       transformResponse: (response: {diet?: RecipeDiet | null}) => response.diet ?? null,
     }),
+    // Reads each line as an import does; null where a line names no ingredient. Nothing is stored.
+    readIngredientLines: builder.mutation<(IngredientUse | null)[], string[]>({
+      query: (lines) => ({url: '/recipes/ingredient-lines', method: 'POST', body: {lines}}),
+      transformResponse: (response: {ingredients: (IngredientUse | null)[]}) => response.ingredients,
+    }),
     suggestRecipes: builder.mutation<RecipeSuggestions, RecipeSuggestionRequest>({
       query: (request) => ({url: '/recipes/suggestions', method: 'POST', body: request}),
     }),
@@ -104,6 +111,7 @@ export const {
   useLazyGetRecipeDeletionImpactQuery,
   useGetAvailableImportHostsQuery,
   usePreviewDietMutation,
+  useReadIngredientLinesMutation,
   useSuggestRecipesMutation,
   useGetIngredientsQuery,
   useGetRecipeGroupsQuery,

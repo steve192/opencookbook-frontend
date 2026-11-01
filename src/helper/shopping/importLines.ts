@@ -25,6 +25,14 @@ export interface SheetLine {
   icon: string | null;
   staple: boolean;
   sources: ShoppingItemSource[];
+  /** What the meals' recipes say beside the food, for the sheet only. */
+  recipeNotes: RecipeNote[];
+}
+
+/** "Ofenkartoffeln: festkochend" */
+export interface RecipeNote {
+  title: string;
+  note: string;
 }
 
 interface Need {
@@ -97,6 +105,9 @@ const lineOf = (key: string, needs: Need[], locale: string): SheetLine => {
     icon: placed?.icon ?? null,
     staple: needs.some((need) => need.line?.staple),
     sources: uniqueSources(needs),
+    recipeNotes: uniqueBy(
+        needs.flatMap((need) => need.line?.note ? [{title: need.source.title, note: need.line.note}] : []),
+        (recipeNote) => `${recipeNote.title}:${recipeNote.note}`),
   };
 };
 

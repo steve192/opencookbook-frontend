@@ -1,11 +1,15 @@
 import {describe, expect, it} from 'vitest';
-import reducer, {changeBackendUrl, changeTheme} from './settingsSlice';
+import reducer, {changeBackendUrl, changeTheme, ingredientEntryChosen} from './settingsSlice';
 
 const initialState = () => reducer(undefined, {type: '@@INIT'});
 
 describe('settingsSlice', () => {
-  it('starts on the system theme with no backend url', () => {
-    expect(initialState()).toEqual({theme: 'system', backendUrl: ''});
+  it('starts on the system theme with no backend url, taking ingredients as text', () => {
+    expect(initialState()).toEqual({theme: 'system', backendUrl: '', ingredientEntry: 'text'});
+  });
+
+  it('remembers how ingredients are entered', () => {
+    expect(reducer(initialState(), ingredientEntryChosen('fields')).ingredientEntry).toBe('fields');
   });
 
   it.each(['light', 'dark', 'system'] as const)('stores the %s theme', (theme) => {
@@ -15,6 +19,6 @@ describe('settingsSlice', () => {
   it('leaves the theme untouched when the backend url changes', () => {
     const withTheme = reducer(initialState(), changeTheme('dark'));
     expect(reducer(withTheme, changeBackendUrl('https://example.test'))).toEqual(
-        {theme: 'dark', backendUrl: 'https://example.test'});
+        {theme: 'dark', backendUrl: 'https://example.test', ingredientEntry: 'text'});
   });
 });

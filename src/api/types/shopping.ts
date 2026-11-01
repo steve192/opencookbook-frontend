@@ -93,6 +93,8 @@ export interface PreviewLine {
   aisle: Aisle;
   icon: string | null;
   staple: boolean;
+  /** What the recipe says beside the food ("festkochend"), empty where nothing; shown on the sheet, never put on the list. */
+  note: string;
 }
 
 export interface PreviewMeal {

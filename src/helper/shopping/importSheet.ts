@@ -65,5 +65,5 @@ export const dueLines = (regulars: ShoppingRegular[], items: ShoppingItem[], lin
   const covered = new Set(lines.map((line) => nameKey(line.name)));
   return dueBy(regulars, items, now, weekEnd).flatMap(({name, aisle, icon, everyDays}) =>
     everyDays === null || covered.has(nameKey(name)) ? [] :
-      [{key: `due:${nameKey(name)}`, name, spec: null, aisle, icon, staple: false, sources: [], everyDays}]);
+      [{key: `due:${nameKey(name)}`, name, spec: null, aisle, icon, staple: false, sources: [], recipeNotes: [], everyDays}]);
 };
