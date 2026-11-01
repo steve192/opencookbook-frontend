@@ -52,6 +52,7 @@
         "react-native-worklets",
         "@react-native-async-storage/async-storage",
         "@react-native-community/netinfo",
+        "@react-native-community/slider",
         "@babel/core",
         "babel-preset-expo",
         "typescript",
