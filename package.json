@@ -69,7 +69,7 @@
     "react-i18next": "17.1.9",
     "react-icons": "5.7.0",
     "react-native": "0.86.3",
-    "react-native-alarm-scheduler": "1.0.1",
+    "react-native-alarm-scheduler": "1.1.0",
     "react-native-gesture-handler": "~2.32.0",
     "react-native-keyboard-controller": "1.21.9",
     "react-native-pager-view": "8.0.2",
