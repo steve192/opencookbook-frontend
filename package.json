@@ -35,7 +35,7 @@
     "@react-navigation/native-stack": "7.21.0",
     "@reduxjs/toolkit": "2.13.0",
     "@types/xdate": "0.8.35",
-    "axios": "1.20.0",
+    "axios": "1.21.0",
     "buffer": "6.0.3",
     "expo": "57.0.31",
     "expo-application": "57.0.3",
