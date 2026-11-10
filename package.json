@@ -96,14 +96,14 @@
     "@types/react-dom": "~19.2.0",
     "@typescript-eslint/eslint-plugin": "8.72.1",
     "@typescript-eslint/parser": "8.72.1",
-    "@vitest/coverage-v8": "5.0.5",
+    "@vitest/coverage-v8": "5.1.0",
     "babel-preset-expo": "~57.0.0",
     "eslint": "8.57.1",
     "eslint-config-google": "0.14.0",
     "eslint-plugin-react": "7.37.5",
     "sharp": "0.35.5",
     "typescript": "~6.0.3",
-    "vitest": "5.0.5",
+    "vitest": "5.1.0",
     "workbox-cli": "7.4.1"
   },
   "expo": {
