@@ -25,7 +25,7 @@ COPY assets/icon.png /app/assets/icon.png
 COPY landing ./
 RUN npm run check && npm run build && npm test
 
-FROM nginx:1.31.7
+FROM nginx:1.31.8
 
 RUN chown nginx:nginx /etc/nginx -R && \
     chown nginx:nginx /var/cache/nginx -R && \
