@@ -1,6 +1,6 @@
 {
   "main": "node_modules/expo/AppEntry.js",
-  "version": "1.27.38",
+  "version": "1.27.39",
   "scripts": {
     "start": "expo start --tunnel",
     "android": "expo start --tunnel --android",
