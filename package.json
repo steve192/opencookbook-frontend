@@ -37,7 +37,7 @@
     "@types/xdate": "0.8.35",
     "axios": "1.21.1",
     "buffer": "6.0.3",
-    "expo": "57.0.33",
+    "expo": "57.0.34",
     "expo-application": "57.0.3",
     "expo-auth-session": "57.0.17",
     "expo-build-properties": "57.0.24",
